@@ -1,0 +1,67 @@
+{
+  "pages": [
+    {
+      "path": "pages/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/video/add-webdav",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/video-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/video-player",
+      "style": {
+        "navigationBarTitleText": "视频播放"
+      }
+    }
+  ],
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "nut-(.*)?-(.*)": "@/uni_modules/nutui-uni/components/nutui-uni/components/$1$2/$1$2.vue",
+      "nut-(.*)": "@/uni_modules/nutui-uni/components/nutui-uni/components/$1/$1.vue"
+    }
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#ffffff"
+  },
+  "uniIdRouter": {},
+  "tabBar": {
+    "color": "#86909C",
+    "selectedColor": "#18CAB8",
+    "backgroundColor": "#F2F2F2",
+    "list": [
+      {
+        "pagePath": "pages/video/index",
+        "text": "媒体库",
+        "iconPath": "static/video.png",
+        "selectedIconPath": "static/video-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/mine.png",
+        "selectedIconPath": "static/mine-active.png"
+      }
+    ]
+  }
+}

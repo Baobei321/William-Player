@@ -1,0 +1,150 @@
+<template>
+  <div class="hxList" ref="hx_list">
+    <div class="hxList-title">
+      <div class="hxList-title-left">{{ props.title }}</div>
+      <div class="hxList-title-right" @click="toVideoAll">
+        <span>全部</span>
+        <span>{{ props.listData.length }}</span>
+        <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
+      </div>
+    </div>
+    <div class="hxList-list">
+      <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
+        <div class="hxList-list-movie">
+          <div class="hxList-list-movie__item" v-for="item in props.listData" :key="item.name" @click="toVideoDetail(item)">
+            <img :src="item.poster" mode="aspectFill">
+            <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
+          </div>
+        </div>
+      </scroll-view>
+    </div>
+  </div>
+</template>
+<script setup>
+import { onMounted, ref, nextTick } from 'vue';
+
+const props = defineProps({
+  title: { type: String, default: '电影' },
+  number: { type: String, default: '0' },
+  listData: { type: Array, default: [] },
+})
+
+const removeExtension = (filename) => {
+  const lastDotIndex = filename.lastIndexOf('.');
+  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  if (name.length > 7) {
+    name = name.slice(0, 6) + '...'
+  }
+  return name
+};
+
+const typeMapping = {
+  '电影': 'movie',
+  '电视剧': 'tv'
+}
+
+const toVideoDetail = (item) => {
+  uni.navigateTo({
+    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`
+  })
+}
+
+const toVideoAll = () => {
+  uni.navigateTo({
+    url: `/pages/video/video-all?title=${props.title}`
+  })
+}
+
+</script>
+<style lang="scss" scoped>
+@keyframes opacityIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.hxList {
+  width: 100%;
+  margin-bottom: 50rpx;
+  overflow-x: hidden;
+  .hxList-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .hxList-title-left {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .hxList-title-right {
+      display: flex;
+      align-items: center;
+
+      span {
+        font-size: 30rpx;
+        color: gray;
+      }
+
+      span:nth-child(2) {
+        padding-left: 6rpx;
+      }
+    }
+  }
+
+  .hxList-list {
+    margin-top: 24rpx;
+
+    .hxList-list-scroll {
+      width: 100%;
+
+      .hxList-list-movie {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+
+        .hxList-list-movie__item {
+          margin-left: 24rpx;
+          flex: 0 0 214rpx;
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 320rpx;
+            border-radius: 20rpx;
+          }
+          &-name {
+            font-size: 28rpx;
+            font-weight: bold;
+            color: #000;
+            display: block;
+          }
+          &-time {
+            font-size: 24rpx;
+            color: gray;
+            padding-top: 6rpx;
+            display: block;
+          }
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+
+        .is-move {
+          transition: transform 0.3s ease;
+        }
+
+        .is-new {
+          animation: opacityIn 0.3s ease;
+        }
+      }
+    }
+  }
+}
+</style>
