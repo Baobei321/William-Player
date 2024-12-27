@@ -89,6 +89,7 @@ const toVideoAll = () => {
 
       span {
         font-size: 30rpx;
+        line-height: 30rpx;
         color: gray;
       }
 

@@ -49,7 +49,8 @@ import { onMounted, ref, watch, watchEffect } from 'vue';
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  tmdbKey1: { type: String, default: '' }
 })
 
 const navBarHeight = ref('')
@@ -75,8 +76,8 @@ const emits = defineEmits(['refresh'])
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = (statusBarHeight + 44) / 16 + 'rem' //计算nav导航栏的高度
-  contentHeight.value = '2.75rem'
+  navBarHeight.value = (statusBarHeight + 54) / 16 + 'rem' //计算nav导航栏的高度
+  contentHeight.value = '3.375rem'
 }
 
 //计算h5的navBar高度
@@ -97,7 +98,7 @@ getH5NavbarHeight()
 
 const toVideoSearch = () => {
   uni.navigateTo({
-    url: '/media/video-search'
+    url: '/pages/video/search'
   })
 }
 
@@ -115,8 +116,6 @@ const toAddWebdav = () => {
 }
 
 const showProgress = () => {
-  console.log("点击");
-
   if (!uni.getStorageSync('tmdbKey')) {
     popoverData.value.title = 'api_key'
     showPopover.value = true
@@ -170,6 +169,14 @@ watch(
   }, { deep: true }
 )
 
+watch(
+  () =>props.tmdbKey1,
+  (val)=>{
+    initTmdbKey.value = val
+    tmdbKey.value = val
+  },{immediate:true}
+)
+
 defineExpose({
   showProgress
 })
@@ -214,6 +221,8 @@ onMounted(() => {
     z-index: 99;
     margin-bottom: 0;
     .nut-navbar__left {
+      position: absolute;
+      left: 0;
       .video-navbar-logo {
         width: 70rpx;
         height: 70rpx;

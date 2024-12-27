@@ -28,7 +28,7 @@
       <div class="video-detail-container__content">
         <nut-button custom-color="#090909" @click="clickPlayButton">
           <template #icon>
-            <img :src="Play">
+            <image src="/static/play.png" />
           </template>
           <span>{{ buttonText }}</span>
         </nut-button>
@@ -53,7 +53,7 @@
             <div class="tv-version-list">
               <div class="tv-version-list__item" v-for="(item,index) in tvList" :key="item.name" @click="toPlayVideo(item,index)">
                 <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
-                  <img :src="playVideoButton">
+                  <image src="/static/playVideo-button.png" />
                   <span class="item-img-runtime">{{ item.runtime }}</span>
                 </div>
                 <div class="item-title">{{ index+1+'.'+item.title }}</div>
@@ -102,11 +102,10 @@
 <script setup>
 import { onBeforeMount, ref } from 'vue'
 import wilNavbar from '@/components/wil-navbar/index.vue'
-import Play from '../../static/play.png'
 import { useDict } from '../../utils/useDict';
 import { getFolder, handleSecond } from './components/common'
-import playVideoButton from '../../static/playVideo-button.png'
 import { onShow, onLoad } from '@dcloudio/uni-app';
+
 
 const { getUntokenDict } = useDict()
 
@@ -399,8 +398,6 @@ const setButtonText = () => {
 onBeforeMount(() => {
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
   getUntokenDict('online_storage_source').then((res) => {
-    console.log(res, 'res');
-
     sourceList.value = JSON.parse(routerParams.value.source).map(i => {
       i.sourceName = res.online_storage_source.find(v => v.value == i.provider).label
       return i
@@ -438,7 +435,7 @@ page {
     height: 100%;
     .video-detail-container__img {
       width: 100%;
-      height: 420px;
+      height: 840rpx;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -463,12 +460,12 @@ page {
           rgba(0, 0, 0, 0) 0%,
           rgba(0, 0, 0, 0.4) 100%
         );
-        padding: 0 12px 15px 12px;
+        padding: 0 24rpx 30rpx 24rpx;
         .img-title {
           position: relative;
           z-index: 2;
           color: #fff;
-          font-size: 21px;
+          font-size: 42rpx;
           font-weight: bold;
         }
         .img-mid {
@@ -476,58 +473,58 @@ page {
           z-index: 2;
           display: flex;
           align-items: center;
-          padding: 15px 0 10px 0;
+          padding: 30rpx 0 10px 0;
           .img-mid-score {
             display: flex;
             align-items: center;
-            padding: 0 7px;
+            padding: 0 14rpx;
             padding-left: 0;
             position: relative;
             &::after {
               position: absolute;
               content: "";
-              width: 1px;
-              height: 12px;
+              width: 2rpx;
+              height: 24rpx;
               background-color: #c2c5c6;
               right: 0;
               top: 50%;
               transform: translateY(-50%);
             }
             span {
-              font-size: 14px;
+              font-size: 28rpx;
               color: #c2c5c6;
-              padding-left: 5px;
+              padding-left: 10rpx;
             }
           }
           .img-mid-date {
             display: flex;
             align-items: center;
-            padding: 0 7px;
+            padding: 0 14rpx;
             position: relative;
             &::after {
               position: absolute;
               content: "";
-              width: 1px;
-              height: 12px;
+              width: 2rpx;
+              height: 24rpx;
               background-color: #c2c5c6;
               right: 0;
               top: 50%;
               transform: translateY(-50%);
             }
             span {
-              font-size: 14px;
+              font-size: 28rpx;
               color: #c2c5c6;
-              padding-left: 5px;
+              padding-left: 10rpx;
             }
           }
           .img-mid-runtime {
             display: flex;
             align-items: center;
-            padding: 0 7px;
+            padding: 0 14rpx;
             span {
-              font-size: 14px;
+              font-size: 28rpx;
               color: #c2c5c6;
-              padding-left: 5px;
+              padding-left: 10rpx;
             }
           }
         }
@@ -538,8 +535,8 @@ page {
         display: flex;
         align-items: center;
         span {
-          padding: 0 7px;
-          font-size: 14px;
+          padding: 0 14rpx;
+          font-size: 28rpx;
           color: #c2c5c6;
           &:first-child {
             padding-left: 0;
@@ -549,8 +546,8 @@ page {
             &::before {
               position: absolute;
               content: "";
-              width: 1px;
-              height: 12px;
+              width: 2rpx;
+              height: 24rpx;
               background-color: #c2c5c6;
               left: 0;
               top: 50%;
@@ -561,29 +558,29 @@ page {
       }
     }
     .video-detail-container__content {
-      padding: 12px 12px 0 12px;
-      padding-bottom: 50px;
+      padding: 24rpx 24rpx 0 24rpx;
+      padding-bottom: 100rpx;
       ::v-deep .nut-button {
         width: 100%;
-        border-radius: 8px;
-        height: 50px;
+        border-radius: 16rpx;
+        height: 100rpx;
         .nut-button__wrap {
-          img {
-            width: 15px;
-            height: 15px;
+          image {
+            width: 30rpx;
+            height: 30rpx;
           }
           .nut-button__text {
-            margin-left: 8px;
+            margin-left: 16rpx;
           }
         }
       }
       .movie-version {
-        margin-top: 25px;
+        margin-top: 50rpx;
         .movie-version-title {
-          font-size: 16px;
+          font-size: 32rpx;
           font-weight: bold;
           color: #000;
-          padding-bottom: 10px;
+          padding-bottom: 20rpx;
         }
         .movie-version-scroll {
           .movie-version-list {
@@ -591,13 +588,13 @@ page {
             align-items: center;
             flex-wrap: nowrap;
             .movie-version-list__item {
-              font-size: 14px;
+              font-size: 28rpx;
               color: #000;
               font-weight: bold;
-              padding: 6px 12px;
-              border-radius: 4px 4px 4px 4px;
-              border: 1px solid #c2c5c6;
-              margin-left: 6px;
+              padding: 12rpx 24rpx;
+              border-radius: 8rpx;
+              border: 2rpx solid #c2c5c6;
+              margin-left: 12rpx;
               white-space: nowrap;
               &:first-child {
                 margin-left: 0;
@@ -605,13 +602,13 @@ page {
             }
             .movie-version-list__active {
               color: #315ffd;
-              border: 1px solid #315ffd;
+              border: 2rpx solid #315ffd;
             }
           }
         }
       }
       .tv-version {
-        margin-top: 10px;
+        margin-top: 20rpx;
         ::v-deep .nut-tabs {
           &__titles {
             .nut-tabs__list {
@@ -621,7 +618,7 @@ page {
                 flex: 0 0 auto;
                 min-width: auto;
                 width: auto;
-                margin-left: 15px;
+                margin-left: 30rpx;
                 &:first-child {
                   margin-left: 0;
                 }
@@ -630,7 +627,7 @@ page {
                 color: #090909;
                 .nut-tabs__titles-item__line {
                   width: 100%;
-                  border-radius: 4px;
+                  border-radius: 8rpx;
                   bottom: 12%;
                 }
               }
@@ -646,23 +643,23 @@ page {
             align-items: center;
             flex-wrap: nowrap;
             .tv-version-list__item {
-              margin-left: 12px;
-              flex: 0 0 calc((100% - 12px) / 2);
+              margin-left: 24rpx;
+              flex: 0 0 calc((100% - 24rpx) / 2);
               &:first-child {
                 margin-left: 0;
               }
               .item-img {
                 width: 100%;
-                height: 85px;
+                height: 170rpx;
                 background: rgb(212, 212, 212);
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
-                border-radius: 8px;
+                border-radius: 16rpx;
                 position: relative;
-                img {
-                  width: 30px;
-                  height: 30px;
+                image {
+                  width: 60rpx;
+                  height: 60rpx;
                   position: absolute;
                   left: 50%;
                   top: 50%;
@@ -670,20 +667,20 @@ page {
                 }
                 .item-img-runtime {
                   position: absolute;
-                  right: 5px;
-                  bottom: 5px;
+                  right: 10rpx;
+                  bottom: 10rpx;
                   background: rgba(0, 0, 0, 0.5);
                   color: #fff;
-                  font-size: 12px;
-                  border-radius: 4px;
-                  padding: 2px 4px;
+                  font-size: 24rpx;
+                  border-radius: 8rpx;
+                  padding: 4rpx 8rpx;
                 }
               }
               .item-title {
-                font-size: 14px;
+                font-size: 28rpx;
                 color: #000;
                 font-weight: bold;
-                padding-top: 6px;
+                padding-top: 12rpx;
                 width: 100%;
                 white-space: nowrap;
                 overflow: hidden;
@@ -694,12 +691,12 @@ page {
         }
       }
       .story-introduction {
-        margin-top: 25px;
+        margin-top: 50rpx;
         .story-introduction-title {
-          font-size: 16px;
+          font-size: 32rpx;
           font-weight: bold;
           color: #000;
-          padding-bottom: 10px;
+          padding-bottom: 20rpx;
         }
         .story-introduction-text {
           display: -webkit-box;
@@ -707,17 +704,17 @@ page {
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
-          font-size: 14px;
+          font-size: 28rpx;
           color: #000;
         }
       }
       .related-actors {
-        margin-top: 25px;
+        margin-top: 50rpx;
         .related-actors-title {
-          font-size: 16px;
+          font-size: 32rpx;
           font-weight: bold;
           color: #000;
-          padding-bottom: 10px;
+          padding-bottom: 20rpx;
         }
         .related-actors-scroll {
           .related-actors-list {
@@ -725,22 +722,22 @@ page {
             align-items: center;
             flex-wrap: nowrap;
             .related-actors-list__item {
-              margin-left: 6px;
+              margin-left: 12rpx;
               display: flex;
               flex-direction: column;
               align-items: center;
-              flex: 0 0 70px;
+              flex: 0 0 140rpx;
               overflow: hidden;
               &:first-child {
                 margin-left: 0;
               }
               .item-avatar {
-                width: 60px;
-                height: 60px;
+                width: 120rpx;
+                height: 120rpx;
                 border-radius: 50%;
               }
               .item-name {
-                font-size: 14px;
+                font-size: 28rpx;
                 color: #000;
                 white-space: nowrap;
                 overflow: hidden;
@@ -749,14 +746,14 @@ page {
                 width: 100%;
               }
               .item-job {
-                padding: 2px 3px;
-                border: 1px solid #c2c5c6;
-                font-size: 12px;
+                padding: 4rpx 6rpx;
+                border: 2rpx solid #c2c5c6;
+                font-size: 24rpx;
                 color: #c2c5c6;
-                border-radius: 3px;
+                border-radius: 6rpx;
               }
               .item-role {
-                font-size: 12px;
+                font-size: 24rpx;
                 color: #c2c5c6;
                 width: 100%;
                 white-space: nowrap;
@@ -769,30 +766,30 @@ page {
         }
       }
       .tip-footer {
-        margin-top: 25px;
-        padding-top: 10px;
-        border-top: 1px solid #c2c5c6;
+        margin-top: 50rpx;
+        padding-top: 20rpx;
+        border-top: 2rpx solid #c2c5c6;
         .tip-footer-name {
-          font-size: 12px;
+          font-size: 24rpx;
           color: #c2c5c6;
         }
         .tip-footer-webdav {
-          font-size: 12px;
+          font-size: 24rpx;
           color: #c2c5c6;
-          padding-top: 10px;
+          padding-top: 20rpx;
         }
         .tip-footer-timesize {
-          font-size: 12px;
+          font-size: 24rpx;
           color: #acacac;
           font-weight: bold;
           display: flex;
           align-items: center;
-          padding-top: 10px;
+          padding-top: 20rpx;
           span:nth-child(2) {
-            padding-left: 5px;
+            padding-left: 10rpx;
           }
           span:last-child {
-            padding-left: 5px;
+            padding-left: 10rpx;
           }
         }
       }

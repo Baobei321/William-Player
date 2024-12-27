@@ -5,7 +5,7 @@
       <div class="recent-played-title-right" @click="toVideoAll">
         <span>全部</span>
         <span>{{ listData.length }}</span>
-        <IconFont name="rect-right" size="10" color="gray"></IconFont>
+        <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
       </div>
     </div>
     <div class="recent-played-list">
@@ -13,7 +13,7 @@
         <div class="recent-played-list-movie">
           <div class="recent-played-list-movie__item" v-for="item in listData" :key="item.name" @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img" :style="{backgroundImage:`url(${item.poster})`}">
-              <img :src="playVideoButton">
+              <image :src="playVideoButton" />
               <span class="img-runtime">{{ item.initialTime=='-1'?'跳转浏览器播放':handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
             </div>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ removeExtension(item.name) }}</span>
@@ -29,6 +29,7 @@
 import { ref } from "vue";
 import playVideoButton from '../../../static/playVideo-button.png'
 import { handleSecond } from './common'
+import { onShow } from '@dcloudio/uni-app';
 
 const listData = ref(uni.getStorageSync('historyPlay') || [])
 
@@ -68,18 +69,9 @@ const setItemFirst = (item) => {
 }
 
 const toVideoPlayer = (item) => {
-  if (item.initialTime == '-1') {
-    wx.miniapp.openUrl({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/' + item.path,
-      success: () => {
-        setItemFirst(item)
-      }
-    })
-    return
-  }
   if (item.type == 'movie') {
     uni.navigateTo({
-      url: `/media/video-player?path=${item.path}&type=movie`,
+      url: `/pages/video/video-player?path=${item.path}&type=movie`,
       success: () => {
         setItemFirst(item)
       }
@@ -87,7 +79,7 @@ const toVideoPlayer = (item) => {
 
   } else if (item.type == 'tv') {
     uni.navigateTo({
-      url: `/media/video-player?path=${item.path}&type=tv`,
+      url: `/pages/video/video-player?path=${item.path}&type=tv`,
       success: () => {
         setItemFirst(item)
       }
@@ -101,7 +93,8 @@ const toVideoAll = () => {
   })
 }
 
-uni.useDidShow(() => {
+
+onShow(()=>{
   listData.value = uni.getStorageSync('historyPlay') || []
 })
 
@@ -129,6 +122,7 @@ uni.useDidShow(() => {
       span {
         font-size: 30rpx;
         color: gray;
+        line-height: 30rpx;
       }
 
       span:nth-child(2) {
@@ -158,7 +152,7 @@ uni.useDidShow(() => {
             width: 100%;
             border-radius: 20rpx;
             position: relative;
-            img {
+            image {
               width: 80rpx;
               height: 80rpx;
               position: absolute;

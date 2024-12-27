@@ -1,7 +1,31 @@
 {
   "pages": [
     {
+      "path": "pages/mine/entry",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/list",
+      "style": {
+        "navigationBarTitleText": "媒体库"
+      }
+    },
+    {
+      "path": "pages/video/catelog-list",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/video/search",
       "style": {
         "navigationStyle": "custom"
       }
@@ -9,7 +33,7 @@
     {
       "path": "pages/mine/index",
       "style": {
-        "navigationBarTitleText": "我的"
+        "navigationStyle": "custom"
       }
     },
     {
@@ -28,6 +52,18 @@
       "path": "pages/video/video-player",
       "style": {
         "navigationBarTitleText": "视频播放"
+      }
+    },
+    {
+      "path": "pages/mine/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/backend/index",
+      "style": {
+        "navigationStyle": "custom"
       }
     }
   ],
@@ -48,7 +84,7 @@
   "tabBar": {
     "color": "#86909C",
     "selectedColor": "#18CAB8",
-    "backgroundColor": "#F2F2F2",
+    "backgroundColor": "#fff",
     "list": [
       {
         "pagePath": "pages/video/index",

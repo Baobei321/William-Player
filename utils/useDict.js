@@ -1,4 +1,4 @@
-import { getDicts, getUntokenDicts } from '../network/api';
+import { getDicts, getUntokenDicts } from '../network/apis';
 
 let res1 = {}
 export const useDict = () => {

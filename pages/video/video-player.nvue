@@ -1,6 +1,6 @@
 <template>
   <view class="video-player">
-    <video :src="config.url" :autoplay="config.autoplay" :poster="config.poster" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted"
+    <video :src="config.url" :autoplay="config.autoplay" :poster="config.poster" :loop="config.loop" :initial-time="historyObj.initialTime" :is-live="config.isLive" :muted="config.muted"
       :codec="config.codec" style="height: 313px;width: 100%;" @timeupdate="setHistory">
     </video>
   </view>
@@ -97,18 +97,9 @@ export default {
         this.config.poster = this.historyObj.poster
       }
     },
-    navToNvue () {
-      uni.navigateTo({
-        url: 'new-nvue-page-2'
-      })
-    },
-    navToVue () {
-      uni.navigateTo({
-        url: 'new-vue-page-2'
-      })
-    }
   },
   async onLoad (options) {
+    this.historyPlay=uni.getStorageSync('historyPlay') ||[]
     this.routerParams = options
     this.setInitialTime()
     let res = await this.getVideoUrl()

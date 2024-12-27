@@ -10,8 +10,8 @@
     <div class="base-form-content" :style="{paddingTop:props.title?'':'0'}">
       <nut-form :model-value="formData" :labelPosition="labelPosition" ref="formRef" :rules="rules">
         <nut-form-item :label="item.label" v-for="item in props.options" :key="item.prop" :prop="item.prop">
-          <nut-input v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='input'" @blur="customBlurValidate(item.prop)" @update:modelValue="change"
-            @click="clickInput(item)" :border="false"/>
+          <input :value="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='input'" @blur="customBlurValidate(item.prop)" @input="(val)=>changeInput(val,item.prop)"
+            @click="clickInput(item)" :border="false" />
           <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='textarea'" :disableDefaultPadding="true" @blur="customBlurValidate(item.prop)"
             @change="change" />
           <slot :name="item.prop" v-if="$slots[item.prop]&&!item.type" v-bind="{...item.formItemProps,customBlurValidate}" @blur="customBlurValidate(item.prop)"></slot>
@@ -48,6 +48,11 @@ const emits = defineEmits(['submit', 'update:modelValue', 'changePicker', 'click
 
 const change = (val) => {
   emits('update:modelValue', JSON.parse(JSON.stringify(formData.value)))
+}
+
+const changeInput = (val, prop) => {
+  formData.value[prop] = val.detail.value
+  change(val.detail.value)
 }
 
 //失去焦点校验
@@ -109,37 +114,37 @@ watch(
 .base-form {
   width: 100%;
   background-color: #fff;
-  border-radius: 8px;
-  padding: 11px 13px;
+  border-radius: 16rpx;
+  padding: 22rpx 26rpx;
   box-sizing: border-box;
   &-title {
     background-color: #fff;
-    border-radius: 8px 8px 0 0;
-    padding-bottom: 11px;
-    border-bottom: 1px solid #d8d8d8;
+    border-radius: 16rpx 16rpx 0 0;
+    padding-bottom: 22rpx;
+    border-bottom: 2rpx solid #d8d8d8;
     display: flex;
     justify-content: space-between;
     align-items: center;
     &__left {
       font-weight: bold;
-      font-size: 15px;
+      font-size: 30rpx;
       color: #343434;
     }
     &__right {
       &-status {
-        padding: 4px 13px;
+        padding: 8rpx 26rpx;
         // box-sizing: border-box;
         display: inline-block;
-        border-radius: 4px;
+        border-radius: 8rpx;
         background: rgba(24, 202, 184, 0.1);
         color: #18cab8;
-        font-size: 13px;
+        font-size: 26rpx;
       }
     }
   }
   &-content {
     box-sizing: border-box;
-    padding-top: 11px;
+    padding-top: 22rpx;
     ::v-deep .nut-form {
       .nut-cell-group {
         &__wrap {
@@ -152,13 +157,14 @@ watch(
             padding-right: 0;
             box-shadow: none;
             margin: 0;
+            align-items: baseline;
             &:first-child {
               padding-top: 0;
             }
             &__label {
-              min-width: 70px;
+              min-width: 140rpx;
               width: auto;
-              font-size: 14px;
+              font-size: 28rpx;
               color: #353a45;
               margin-right: 0;
               // display: inline-flex !important;
@@ -175,11 +181,11 @@ watch(
                   // box-sizing: border-box;
                   &__textarea {
                     color: #353a45;
-                    font-size: 14px;
-                    height: 128px;
+                    font-size: 28rpx;
+                    height: 256rpx;
                   }
                   .textarea-placeholder {
-                    font-size: 14px;
+                    font-size: 28rpx;
                     color: #86909c;
                   }
                 }
@@ -190,7 +196,7 @@ watch(
                 }
                 .nut-rate {
                   &-item {
-                    margin-right: 4px;
+                    margin-right: 8rpx;
                     .nut-icon::before {
                       position: relative;
                       top: auto;
@@ -204,7 +210,7 @@ watch(
               input {
                 display: inline;
                 height: auto;
-                font-size: 14px;
+                font-size: 28rpx;
                 text-align: left;
                 color: #353a45;
                 width: 100%;
@@ -227,7 +233,7 @@ watch(
           .nut-form-item.nut-cell::after {
             left: 0;
             right: 0;
-            border-bottom: 1px solid #f5f6f7;
+            border-bottom: 2rpx solid #f5f6f7;
             z-index: 1;
           }
         }
@@ -238,7 +244,7 @@ watch(
         .nut-picker__bar {
           .nut-picker__title {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 28rpx;
             color: #353a45;
           }
           .nut-picker__right {
@@ -250,12 +256,12 @@ watch(
   }
   &-bottom {
     width: 100%;
-    margin-top: 106px;
-    padding-bottom: 30px;
+    margin-top: 212rpx;
+    padding-bottom: 60rpx;
     .nut-button {
       width: 100%;
-      height: 40px;
-      border-radius: 20px;
+      height: 80rpx;
+      border-radius: 40rpx;
     }
   }
 }
