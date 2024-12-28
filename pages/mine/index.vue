@@ -63,6 +63,7 @@ const cellOptions = ref([
     // { title: '快递查询', leftIcon: cellClock, path: '/account-information/express-search' },
     { title: '媒体库列表', leftIcon: cellStudent1, path: '/pages/video/list', },
     { title: '后台管理', leftIcon: cellCompany3, path: '/pages/backend/index', },
+    { title: 'tmdbKey', leftIcon: cellCompany3, path: '/pages/mine/tmdb-key', },
   ],
 ])
 

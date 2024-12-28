@@ -61,9 +61,17 @@
       }
     },
     {
+      "path": "pages/mine/tmdb-key",
+      "style": {
+        "navigationBarTitleText": "设置tmdbKey",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
       "path": "pages/backend/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "后台管理系统",
+        "navigationBarBackgroundColor": "#fff"
       }
     }
   ],

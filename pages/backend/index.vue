@@ -5,12 +5,12 @@
 </template>
 
 <script>
-e xport default {
+export default {
   data () {
     return {
-      url:'http://111.173.105.111:8080/manage'
+      url: 'http://111.173.105.111:8080/manage'
     }
-     },
+  },
 }
 </script>
 
@@ -18,8 +18,5 @@ e xport default {
 .backend {
   width: 100%;
   height: 100%;
-  background: #fff;
-  padding: 24rpx;
-  overflow-y: auto;
 }
 </style>
