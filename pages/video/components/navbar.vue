@@ -46,6 +46,7 @@
 
 <script setup>
 import { onMounted, ref, watch, watchEffect } from 'vue';
+import { setTmdbKey } from '../../../network/apis'
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
@@ -143,10 +144,11 @@ const getRefreshPosition = () => {
   }).exec()
 }
 
-const confirmApiKey = () => {
+const confirmApiKey = async () => {
   initTmdbKey.value = tmdbKey.value
   uni.setStorageSync('tmdbKey', tmdbKey.value)
   showPopover.value = false
+  await setTmdbKey({ tmdbKey: tmdbKey.value })
 }
 
 watch(
@@ -170,11 +172,11 @@ watch(
 )
 
 watch(
-  () =>props.tmdbKey1,
-  (val)=>{
+  () => props.tmdbKey1,
+  (val) => {
     initTmdbKey.value = val
     tmdbKey.value = val
-  },{immediate:true}
+  }, { immediate: true }
 )
 
 defineExpose({

@@ -5,7 +5,7 @@
       <template #bottom>
         <nut-button custom-color="#18CAB8" @click="confirmCommit" v-if="userAgree">登录</nut-button>
         <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree">登录</nut-button>
-        <div class="register-button" @click="toWechatApp">立即注册</div>
+        <!-- <div class="register-button" @click="toWechatApp">立即注册</div> -->
       </template>
     </base-form>
     <div class="user-agreement" @click="checkAgree">
@@ -26,7 +26,7 @@ import { ref } from 'vue'
 import baseForm from '../../components/wil-form/index.vue'
 import checkIcon from '../../static/check.png'
 import checkActiveIcon from '../../static/check-active.png'
-import { loginByPhone,getWeUserByopenId } from '../../network/apis';
+import { loginByPhone, getWeUserByopenId } from '../../network/apis';
 // import { getUserByopenId } from '../../utils/user'
 import { encrypt } from '../../utils/jsencrypt.js'
 import * as CONFIG from '../../utils/config';
@@ -62,6 +62,7 @@ const getUserByopenId = async () => {
   uni.setStorageSync(CONFIG.USER_ID, res.data.userId)
   uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, ...res.data.wuser })
   uni.setStorageSync('Authorization', res.data.token)
+  uni.setStorageSync('tmdbKey', res.data.wuser.tmdbKey)
 }
 
 const confirmCommit = async () => {

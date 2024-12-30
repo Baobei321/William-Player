@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, } from "vue";
+import { ref, onBeforeMount } from "vue";
 import Folder from '../../static/folder.png'
 import videoNavbar from './components/navbar.vue'
 import Skeleton from './components/skeleton.vue'
@@ -46,6 +46,8 @@ import { onShow } from '@dcloudio/uni-app';
 import hxList from './components/hx-list.vue'
 import recentPlayed from "./components/recent-played.vue";
 import Classify from './components/classify.vue'
+import { setTmdbKey } from '../../network/apis'
+
 const video_navbar = ref(null)
 
 const listData = ref([])
@@ -280,10 +282,21 @@ const toAddWebdav = () => {
 }
 
 //处理添加或者修改完webdav之后自动刮削
-const handleGx = () => {
+const handleGx = async () => {
   let isreload = uni.getStorageSync('isreload')
   if (isreload) {
     uni.removeStorageSync('isreload')
+    webdavInfo.value = uni.getStorageSync('webdavInfo')
+    if (webdavInfo.value.name) {
+      await loginUser()
+      let res = await getFolder()
+      listData.value = res.data.content.map(item => {
+        if (item.type == '1') {
+          item.leftIcon = Folder
+        }
+        return item
+      })
+    }
     if (!uni.getStorageSync('tmdbKey')) {
       showDialog.value = true
       return
@@ -298,18 +311,23 @@ const onCancel = () => {
   tmdbKey.value = ''
 }
 
-const onOk = () => {
+const onOk = async () => {
   showDialog.value = false
   uni.setStorageSync('tmdbKey', tmdbKey.value)
-  // tmdbKey.value = ''
+  await setTmdbKey({ tmdbKey: tmdbKey.value })
   video_navbar.value.showProgress()
 }
 
-onShow(async () => {
+onShow(() => {
   tmdbKey.value = uni.getStorageSync('tmdbKey') || ''
   historyPlay.value = uni.getStorageSync('historyPlay') || []
   webdavInfo.value = uni.getStorageSync('webdavInfo')
   localMovieTvData.value = uni.getStorageSync('localMovieTvData') || {}
+  handleGx()
+})
+
+onBeforeMount(async () => {
+  webdavInfo.value = uni.getStorageSync('webdavInfo')
   if (webdavInfo.value.name) {
     await loginUser()
     let res = await getFolder()
@@ -320,9 +338,7 @@ onShow(async () => {
       return item
     })
   }
-  handleGx()
 })
-
 
 </script>
 
@@ -413,7 +429,7 @@ page {
 
         .nut-dialog__content {
           .nut-input {
-            .h5-input {
+            input {
               color: #000;
             }
           }

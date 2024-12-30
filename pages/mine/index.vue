@@ -7,7 +7,7 @@
           <img :src="userImg">
           <span>未登录</span>
         </div>
-        <nut-button color="#18CAB8" class="mine-notLog__right">去登录</nut-button>
+        <nut-button color="#18CAB8" class="mine-notLog__right" @click="toLogin">去登录</nut-button>
       </div>
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
@@ -102,6 +102,16 @@ const clickCell = (item) => {
   }
 }
 
+const toLogin = () => {
+  uni.removeStorageSync(CONFIG.USER_ID)
+  uni.removeStorageSync(CONFIG.OPEN_ID)
+  uni.removeStorageSync(CONFIG.USER_KEY)
+  uni.removeStorageSync('Authorization')
+  uni.reLaunch({
+    url: '/pages/mine/login'
+  })
+}
+
 const openLoginPopup = (item) => {
   const whiteList = ['后台管理', '壁纸']
   if (whiteList.indexOf(item.title) > -1) {
@@ -113,9 +123,6 @@ const openLoginPopup = (item) => {
   showLoginPopup.value = true
 }
 
-const loginSuccess = () => {
-  judgeLogin()
-}
 
 onShow(() => {
   judgeLogin()

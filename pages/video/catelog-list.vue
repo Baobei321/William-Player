@@ -1,6 +1,6 @@
 <template>
   <div class="video-list">
-    <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData">
+    <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData" :refresher-enabled="false">
       <template #default="item">
         <nut-cell is-link :class="[item.$index==data.total-1?'last-cell':'']" @click="clickCell(item)">
           <template #title>
@@ -51,6 +51,7 @@ const getFileList = (data) => {
   webdavInfo.value = uni.getStorageSync('webdavInfo')
   let path = ''
   path = routerParams.value.path
+  console.log(routerParams.value, 'asdasdasdasd')
   return new Promise(resolve => {
     uni.request({
       url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/fs/list',
@@ -85,8 +86,14 @@ const clickCell = (item) => {
       url: '/pages/video/catelog-list?path=' + path + '/' + item.name
     })
   } else {
+    let type = ''
+    if (path.indexOf('电视剧') > -1) {
+      type = 'tv'
+    } else if (path.indexOf('电影') > -1) {
+      type = 'movie'
+    }
     uni.navigateTo({
-      url: '/pages/video/video-player?path=' + path + '/' + item.name
+      url: '/pages/video/video-player?path=' + path + '/' + item.name + '&type=' + type
     })
   }
 }
@@ -147,8 +154,8 @@ page {
         }
         .nut-cell__icon {
           margin-right: 16rpx;
-          uni-image{
-            div{
+          uni-image {
+            div {
               background-size: cover !important;
             }
           }

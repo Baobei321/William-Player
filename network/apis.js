@@ -63,4 +63,11 @@ export const getAccountDetail = data => {
     data: data
   })
 }
-
+//设置tmdbkey
+export const setTmdbKey = data => {
+  return request({
+    url: `/wechat/setTmdbkey`,
+    method: 'post',
+    data: data
+  })
+}
