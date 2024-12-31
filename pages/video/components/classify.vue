@@ -58,13 +58,13 @@ getGenre()
 //跳转到videoAll
 const toVideoAll = (item) => {
   uni.navigateTo({
-    url: `/media/video-all?title=${item.label}&genreId=${item.id}`
+    url: `/pages/video/video-all?title=${item.label}&genreId=${item.id}`
   })
 }
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .video-classify {
   width: 100%;
   overflow-x: hidden;

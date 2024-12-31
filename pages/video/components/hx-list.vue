@@ -46,7 +46,7 @@ const typeMapping = {
 
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`
+    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   })
 }
 

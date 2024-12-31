@@ -89,7 +89,7 @@ const toVideoPlayer = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/media/video-all?title=最近观看`
+    url: `/pages/video/video-all?title=最近观看`
   })
 }
 

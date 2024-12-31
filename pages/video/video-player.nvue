@@ -1,10 +1,13 @@
 <template>
-	<view class="video-player" style="width:100%;height:313px;background:#000">
+	<view class="video-player" style="width:750rpx;height:313px;background:#000">
 		<video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
 			:initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
-			style="width:100%;height:313px" @timeupdate="setHistory" v-if="config.url" @error="error"
+			style="width:750rpx;height:313px" @timeupdate="setHistory" v-if="config.url&&!showReload" @error="error"
 			@waiting="waiting">
 		</video>
+		<button class="video-button" v-if="showReload" @click="reloadVideo">
+			<text style="color:#fff">重新加载</text>
+		</button>
 	</view>
 </template>
 
@@ -21,6 +24,8 @@
 				routerParams: {},
 				rawUrl: '',
 				timeout: null,
+				reloadTimeout: null,
+				showReload: false,
 				emptyUrl: 'https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400',
 				config: {
 					url: "",
@@ -67,6 +72,7 @@
 			},
 			//裁剪格式获取电影名
 			getMovieName(val) {
+				console.log(val, 'name')
 				const lastDotIndex = val.lastIndexOf('.');
 				let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
 				return name
@@ -75,14 +81,16 @@
 				this.sum += 1
 				if (this.sum == 5) {
 					this.sum = 0
+					console.log(String(Math.round(event.detail.currentTime)), '只')
 					this.historyObj.initialTime = String(Math.round(event.detail.currentTime))
 					let index = null
 					if (this.routerParams.type == 'tv') {
 						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && i.titlePlay == this
 							.historyObj.titlePlay)
 					} else if (this.routerParams.type == 'movie') {
-						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && getMovieName(i.name) ==
-							getMovieName(this.historyObj.name))
+						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && this.getMovieName(i
+								.name) ==
+							this.getMovieName(this.historyObj.name))
 					}
 					if (index > -1) {
 						this.historyPlay.splice(index, 1)
@@ -92,9 +100,9 @@
 					}
 					uni.setStorageSync('historyPlay', this.historyPlay)
 				}
-				// if (this.timeout) {
-				// 	clearTimeout(this.timeout)
-				// 	this.timeout = null
+				// if (this.reloadTimeout) {
+				// 	clearTimeout(this.reloadTimeout)
+				// 	this.reloadTimeout = null
 				// }
 			},
 			//初始化进入的时候，设置从哪儿开始播放
@@ -122,13 +130,19 @@
 					.title
 			},
 			error(e) {
-        this.rawUrl = this.config.url
-				this.config.url = ''
-				setTimeout(() => {
-					this.$nextTick(() => {
-						this.config.url = this.rawUrl
-					})
-				}, 2000)
+				// this.rawUrl = this.config.url
+				// this.config.url = ''
+				// setTimeout(() => {
+				// 	this.$nextTick(() => {
+				// 		this.config.url = this.rawUrl
+				// 	})
+				// }, 10000)
+				// if (!this.reloadTimeout) {
+				// 	this.reloadTimeout = setTimeout(() => {
+				// 		this.showReload = true
+				// 	}, 10000)
+				// }
+				this.showReload = true
 			},
 			waiting(e) {
 				// this.timeout = setTimeout(() => {
@@ -139,6 +153,9 @@
 				// 		this.config.url = url
 				// 	})
 				// }, 10000)
+			},
+			reloadVideo() {
+				this.showReload = false
 			},
 		},
 		async onLoad(options) {
@@ -153,4 +170,23 @@
 </script>
 
 <style lang="scss">
+	.video-player {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		.video-button {
+			width: 200rpx;
+			borderColor: #00B2A0;
+			height: 80rpx;
+			background: #00B2A0;
+			color: #ffffff;
+			justify-content: center;
+			align-items: center;
+			display: flex;
+			border-radius: 30rpx;
+			line-height: 80rpx
+		}
+	}
 </style>

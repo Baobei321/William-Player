@@ -49,6 +49,13 @@
       }
     },
     {
+      "path": "pages/video/video-all",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
       "path": "pages/video/video-player",
       "style": {
         "navigationBarTitleText": "视频播放"

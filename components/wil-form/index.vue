@@ -157,7 +157,7 @@ watch(
             padding-right: 0;
             box-shadow: none;
             margin: 0;
-            align-items: baseline;
+            // align-items: center;
             &:first-child {
               padding-top: 0;
             }
@@ -167,6 +167,8 @@ watch(
               font-size: 28rpx;
               color: #353a45;
               margin-right: 0;
+              height: 46rpx;
+              line-height: 46rpx;
               // display: inline-flex !important;
               // justify-content: center;
               // display: flex !important;
@@ -207,7 +209,14 @@ watch(
                   }
                 }
               }
-              input {
+              uni-input{
+                height: 46rpx;
+                line-height: 46rpx;
+              }
+              .uni-input-placeholder{
+                font-size: 28rpx;
+              }
+              .uni-input-input {
                 display: inline;
                 height: auto;
                 font-size: 28rpx;

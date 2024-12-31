@@ -14,10 +14,10 @@
         <div class="video-navbar-popover">
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
-          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{right:popoverPosition.right-6+'px',top:popoverPosition.top+'px',
+          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{right:(popoverPosition.right-6)/16+'rem',top:popoverPosition.top/16+'rem',
             borderLeft:'0.375rem solid transparent',borderRight:'0.375rem solid transparent',borderBottom:'0.5rem solid #315ffd'}" v-show="showPopover">
           </div>
-          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{right:popoverPosition.right-18+'px',top:popoverPosition.top+8+'px'}"
+          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{right:(popoverPosition.right-18)/16+'rem',top:(popoverPosition.top+8)/16+'rem'}"
             v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">{{ popoverData.title }}</div>
