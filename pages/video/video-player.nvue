@@ -159,7 +159,8 @@
 		},
 		async onLoad(options) {
       uni.showToast({
-        title:'目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕'
+        title:'目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
+        duration:3000,
       })
 			this.historyPlay = uni.getStorageSync('historyPlay') || []
 			this.routerParams = options
