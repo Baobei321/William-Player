@@ -51,7 +51,6 @@ const getFileList = (data) => {
   webdavInfo.value = uni.getStorageSync('webdavInfo')
   let path = ''
   path = routerParams.value.path
-  console.log(routerParams.value, 'asdasdasdasd')
   return new Promise(resolve => {
     uni.request({
       url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/fs/list',

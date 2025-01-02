@@ -78,6 +78,7 @@
 				return name
 			},
 			setHistory(event) {
+				if (!this.routerParams.type) return
 				this.sum += 1
 				if (this.sum == 5) {
 					this.sum = 0
@@ -95,7 +96,9 @@
 						this.historyPlay.splice(index, 1)
 						this.historyPlay.unshift(this.historyObj)
 					} else {
-						this.historyPlay.unshift(this.historyObj)
+						if (this.historyObj.type) {
+							this.historyPlay.unshift(this.historyObj)
+						}
 					}
 					uni.setStorageSync('historyPlay', this.historyPlay)
 				}
@@ -121,8 +124,15 @@
 					this.historyObj = JSON.parse(this.routerParams.item)
 					this.config.poster = this.historyObj.poster
 				} else {
-					this.historyObj = obj
-					this.config.poster = this.historyObj.poster
+					if (this.routerParams.type) {
+						this.historyObj = obj
+						this.config.poster = this.historyObj.poster
+					} else {
+						this.config.initialTime = 0
+						this.config.title = this.routerParams.path.substring(lastIndex + 1)
+						this.historyObj = {}
+						return
+					}
 				}
 				this.config.initialTime = Number(this.historyObj.initialTime)
 				this.config.title = this.historyObj.titlePlay + ' ' + '第' + this.historyObj.ji + '集 ' + this.historyObj
@@ -158,10 +168,11 @@
 			},
 		},
 		async onLoad(options) {
-      uni.showToast({
-        title:'目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
-        duration:3000,
-      })
+			uni.showToast({
+				title: '目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
+				duration: 3000,
+				icon: 'none',
+			})
 			this.historyPlay = uni.getStorageSync('historyPlay') || []
 			this.routerParams = options
 			this.setInitialTime()
