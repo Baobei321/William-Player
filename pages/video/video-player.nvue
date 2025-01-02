@@ -2,8 +2,8 @@
 	<view class="video-player" style="width:750rpx;height:313px;background:#000">
 		<video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
 			:initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
-			style="width:750rpx;height:313px" @timeupdate="setHistory" v-if="config.url&&!showReload" @error="error"
-			@waiting="waiting">
+			:play-strategy="config.playStrategy" style="width:750rpx;height:313px" @timeupdate="setHistory"
+			v-if="config.url&&!showReload" @error="error" @waiting="waiting">
 		</video>
 		<button class="video-button" v-if="showReload" @click="reloadVideo">
 			<text style="color:#fff">重新加载</text>
@@ -43,6 +43,7 @@
 					muted: false,
 					codec: "hardware",
 					title: "",
+					playStrategy: 0,
 				},
 			}
 		},
@@ -72,7 +73,6 @@
 			},
 			//裁剪格式获取电影名
 			getMovieName(val) {
-				console.log(val, 'name')
 				const lastDotIndex = val.lastIndexOf('.');
 				let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
 				return name
@@ -81,7 +81,6 @@
 				this.sum += 1
 				if (this.sum == 5) {
 					this.sum = 0
-					console.log(String(Math.round(event.detail.currentTime)), '只')
 					this.historyObj.initialTime = String(Math.round(event.detail.currentTime))
 					let index = null
 					if (this.routerParams.type == 'tv') {
