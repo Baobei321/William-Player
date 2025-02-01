@@ -228,7 +228,6 @@ onMounted(() => {
       .video-navbar-logo {
         width: 70rpx;
         height: 70rpx;
-        border-radius: 20rpx;
         border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;

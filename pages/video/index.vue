@@ -34,6 +34,7 @@
         </nut-dialog>
       </div>
     </template>
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName></wil-upgrade>
   </div>
 </template>
 
@@ -46,7 +47,8 @@ import { onShow } from '@dcloudio/uni-app';
 import hxList from './components/hx-list.vue'
 import recentPlayed from "./components/recent-played.vue";
 import Classify from './components/classify.vue'
-import { setTmdbKey } from '../../network/apis'
+import { setTmdbKey,getUntokenDicts } from '../../network/apis'
+import wilUpgrade from '../../components/wil-upgrade/index.vue'
 
 const video_navbar = ref(null)
 
@@ -55,6 +57,11 @@ const webdavInfo = ref({})
 const refreshData = ref({ found: 0, toupdate: 0, updated: 0 })
 const refreshLoading = ref(false)
 const showDialog = ref(false)
+
+const upgradeInfo = ref({
+  logo:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5d/e6/c4/5de6c4a3-0387-fd0e-2bad-9547264f3aa8/AppIconLight-0-0-1x_U007emarketing-0-8-0-0-0-0-85-220.png/350x350.png",
+  appName:"William Player"
+})
 
 const movieTvData = ref({ //存储电影电视剧数据
   movie: [],
@@ -316,6 +323,12 @@ const onOk = async () => {
   uni.setStorageSync('tmdbKey', tmdbKey.value)
   await setTmdbKey({ tmdbKey: tmdbKey.value })
   video_navbar.value.showProgress()
+}
+
+//获取应用更新信息
+const getAppUpdateInfo =async()=>{
+  let res =await getUntokenDicts("app_version")
+  return res
 }
 
 onShow(() => {
