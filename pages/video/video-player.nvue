@@ -1,11 +1,12 @@
 <template>
-	<view class="video-player" style="width:750rpx;height:313px;background:#000">
+	<view class="video-player" style="width:750rpx;height:650rpx;background:#000">
 		<video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
 			:initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
-			:play-strategy="config.playStrategy" style="width:750rpx;height:313px" @timeupdate="setHistory"
-			v-if="config.url&&!showReload" @error="error" @waiting="waiting">
+			:play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
+			v-if="config.url&&!showReload&&plateForm=='ios'" @error="error" @waiting="waiting">
 		</video>
-		<button class="video-button" v-if="showReload" @click="reloadVideo">
+		<my-video v-if="plateForm=='android'" src="config.url"></my-video>
+		<button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
 			<text style="color:#fff">重新加载</text>
 		</button>
 	</view>
@@ -26,6 +27,7 @@
 				timeout: null,
 				reloadTimeout: null,
 				showReload: false,
+				plateForm:'',
 				emptyUrl: 'https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400',
 				config: {
 					url: "",
@@ -168,11 +170,15 @@
 			},
 		},
 		async onLoad(options) {
-			uni.showToast({
-				title: '目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
-				duration: 3000,
-				icon: 'none',
-			})
+			let systemInfo  = uni.getSystemInfoSync();
+			this.plateForm = systemInfo.platform;
+			if(this.plateForm=='ios'){
+				uni.showToast({
+					title: '目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
+					duration: 3000,
+					icon: 'none',
+				})
+			}
 			this.historyPlay = uni.getStorageSync('historyPlay') || []
 			this.routerParams = options
 			this.setInitialTime()
