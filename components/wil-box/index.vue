@@ -107,7 +107,7 @@ const getData = (data) => {
       }
 
       &.green {
-        background: #18cab8;
+        background: #ff6701;
       }
       &.red {
         background: rgba(245, 63, 63, 1);

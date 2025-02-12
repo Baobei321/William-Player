@@ -262,8 +262,8 @@ page {
     display: inline-flex;
     align-items: center;
     font-size: 28rpx;
-    background: rgba(0, 178, 160, 0.1);
-    color: #00b2a0;
+    background: rgba(255, 103, 1, 0.1);
+    color: #ff6701;
     border-radius: 16rpx;
     padding: 16rpx;
     margin-top: 24rpx;
@@ -353,7 +353,7 @@ page {
     position: fixed;
     width: 136rpx;
     height: 136rpx;
-    background: #18cab8;
+    background: #ff6701;
     right: 24rpx;
     bottom: 148rpx;
     border-radius: 50%;

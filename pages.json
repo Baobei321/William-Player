@@ -77,7 +77,7 @@
     {
       "path": "pages/backend/index",
       "style": {
-        "navigationBarTitleText": "后台管理系统",
+        // "navigationBarTitleText": "后台管理系统",
         "navigationBarBackgroundColor": "#fff"
       }
     }
@@ -98,7 +98,7 @@
   "uniIdRouter": {},
   "tabBar": {
     "color": "#86909C",
-    "selectedColor": "#18CAB8",
+    "selectedColor": "#ff6701",
     "backgroundColor": "#fff",
     "list": [
       {

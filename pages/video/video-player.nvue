@@ -1,11 +1,12 @@
 <template>
-	<view class="video-player" style="width:750rpx;height:650rpx;background:#000">
+	<view class="video-player" style="width:750rpx;height:650rpx">
 		<video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
 			:initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
 			:play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
 			v-if="config.url&&!showReload&&plateForm=='ios'" @error="error" @waiting="waiting">
 		</video>
-		<my-video v-if="plateForm=='android'" src="config.url"></my-video>
+		<video-view v-if="plateForm=='android'" :initialTime="config.initialTime" :title="config.title"
+			:src="config.url" @timeupdate="setHistory" style="width:750rpx;height:650rpx"></video-view>
 		<button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
 			<text style="color:#fff">重新加载</text>
 		</button>
@@ -27,7 +28,7 @@
 				timeout: null,
 				reloadTimeout: null,
 				showReload: false,
-				plateForm:'',
+				plateForm: '',
 				emptyUrl: 'https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400',
 				config: {
 					url: "",
@@ -81,10 +82,33 @@
 			},
 			setHistory(event) {
 				if (!this.routerParams.type) return
-				this.sum += 1
-				if (this.sum == 5) {
-					this.sum = 0
-					this.historyObj.initialTime = String(Math.round(event.detail.currentTime))
+
+				if (this.plateForm == 'ios') {
+					this.sum += 1
+					if (this.sum == 5) {
+						this.sum = 0
+						this.historyObj.initialTime = Math.round(event.detail.currentTime)
+						let index = null
+						if (this.routerParams.type == 'tv') {
+							index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && i.titlePlay == this
+								.historyObj.titlePlay)
+						} else if (this.routerParams.type == 'movie') {
+							index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && this.getMovieName(i
+									.name) ==
+								this.getMovieName(this.historyObj.name))
+						}
+						if (index > -1) {
+							this.historyPlay.splice(index, 1)
+							this.historyPlay.unshift(this.historyObj)
+						} else {
+							if (this.historyObj.type) {
+								this.historyPlay.unshift(this.historyObj)
+							}
+						}
+						uni.setStorageSync('historyPlay', this.historyPlay)
+					}
+				} else if (this.plateForm == 'android') {
+					this.historyObj.initialTime = Math.round(event.detail.currentTime)
 					let index = null
 					if (this.routerParams.type == 'tv') {
 						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && i.titlePlay == this
@@ -104,10 +128,6 @@
 					}
 					uni.setStorageSync('historyPlay', this.historyPlay)
 				}
-				// if (this.reloadTimeout) {
-				// 	clearTimeout(this.reloadTimeout)
-				// 	this.reloadTimeout = null
-				// }
 			},
 			//初始化进入的时候，设置从哪儿开始播放
 			setInitialTime() {
@@ -170,9 +190,9 @@
 			},
 		},
 		async onLoad(options) {
-			let systemInfo  = uni.getSystemInfoSync();
+			let systemInfo = uni.getSystemInfoSync();
 			this.plateForm = systemInfo.platform;
-			if(this.plateForm=='ios'){
+			if (this.plateForm == 'ios') {
 				uni.showToast({
 					title: '目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
 					duration: 3000,
@@ -184,6 +204,7 @@
 			this.setInitialTime()
 			let res = await this.getVideoUrl()
 			this.config.url = res.data.raw_url
+			// this.config.url = ''
 			this.config.showVideo = true
 		}
 	}

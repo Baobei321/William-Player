@@ -6,7 +6,7 @@
         </div>
       </template>
       <template #left>
-        <span>William</span>
+        <span>William Player</span>
       </template>
       <template #right>
         <nut-icon name="search" custom-color="#000" @click="toVideoSearch"></nut-icon>
@@ -228,10 +228,10 @@ onMounted(() => {
       .video-navbar-logo {
         width: 70rpx;
         height: 70rpx;
-        border: 2rpx solid gray;
+        // border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;
-        background: url("https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5d/e6/c4/5de6c4a3-0387-fd0e-2bad-9547264f3aa8/AppIconLight-0-0-1x_U007emarketing-0-8-0-0-0-0-85-220.png/350x350.png")
+        background: url("../../../static/app-logo1.png")
           center no-repeat;
         background-size: 100% 100%;
       }

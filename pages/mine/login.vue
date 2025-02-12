@@ -3,14 +3,14 @@
     <div class="login-title">用户登录</div>
     <base-form :options="settings" :show-button="true" ref="base_form" v-model="formData">
       <template #bottom>
-        <nut-button custom-color="#18CAB8" @click="confirmCommit" v-if="userAgree">登录</nut-button>
+        <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
         <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree">登录</nut-button>
         <!-- <div class="register-button" @click="toWechatApp">立即注册</div> -->
       </template>
     </base-form>
     <div class="user-agreement" @click="checkAgree">
-      <image :src="checkIcon" v-show="!userAgree" />
-      <image :src="checkActiveIcon" v-show="userAgree" />
+      <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon"/>
+      <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon"/>
       <div class="user-agreement-word">
         <span>我已阅读并同意</span>
         <span>《用户协议》</span>
@@ -108,8 +108,9 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4E2B141_427A_background_20241125161030786newMediaImage.png")
-    center no-repeat;
+  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
+  //   center no-repeat;
+  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
   background-size: 100% 100%;
   padding: 200rpx 48rpx 68rpx 48rpx;
   position: relative;
@@ -196,7 +197,7 @@ page {
     box-sizing: border-box;
 
     // padding-bottom: 68rpx;
-    image {
+    .user-agreement-icon {
       width: 28rpx;
       height: 28rpx;
       display: block;

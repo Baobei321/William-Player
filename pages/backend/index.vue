@@ -4,14 +4,15 @@
   </view>
 </template>
 
-<script>
-export default {
-  data () {
-    return {
-      url: 'http://111.173.105.111:8080/manage'
-    }
-  },
-}
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app';
+
+const url = ref('')
+
+onLoad((options) => {
+  url.value = decodeURIComponent(options.url)
+})
 </script>
 
 <style lang="scss">

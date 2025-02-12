@@ -1,6 +1,7 @@
 <template>
   <div class="video">
-    <video-navbar @refresh="refreshVideo" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar" :tmdbKey1="tmdbKey"></video-navbar>
+    <video-navbar @refresh="refreshVideo" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"
+      :tmdbKey1="tmdbKey"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
     <template v-else>
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
@@ -15,9 +16,8 @@
       </div>
       <div class="video-empty" v-if="!localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length">
         <div class="video-empty-logo">
-          <img
-            src="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5d/e6/c4/5de6c4a3-0387-fd0e-2bad-9547264f3aa8/AppIconLight-0-0-1x_U007emarketing-0-8-0-0-0-0-85-220.png/350x350.png">
-          <span>William</span>
+          <image :src="appLogo" />
+          <span>William Player</span>
         </div>
         <div class="video-empty-tip">
           <div>从网盘添加资源到媒体库中</div>
@@ -34,7 +34,8 @@
         </nut-dialog>
       </div>
     </template>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName></wil-upgrade>
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo"
+      :app-name=upgradeInfo.appName></wil-upgrade>
   </div>
 </template>
 
@@ -47,8 +48,9 @@ import { onShow } from '@dcloudio/uni-app';
 import hxList from './components/hx-list.vue'
 import recentPlayed from "./components/recent-played.vue";
 import Classify from './components/classify.vue'
-import { setTmdbKey,getUntokenDicts } from '../../network/apis'
+import { setTmdbKey, getUntokenDicts } from '../../network/apis'
 import wilUpgrade from '../../components/wil-upgrade/index.vue'
+import appLogo from '../../static/app-logo1.png'
 
 const video_navbar = ref(null)
 
@@ -59,8 +61,8 @@ const refreshLoading = ref(false)
 const showDialog = ref(false)
 
 const upgradeInfo = ref({
-  logo:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5d/e6/c4/5de6c4a3-0387-fd0e-2bad-9547264f3aa8/AppIconLight-0-0-1x_U007emarketing-0-8-0-0-0-0-85-220.png/350x350.png",
-  appName:"William Player"
+  logo: appLogo,
+  appName: "William Player"
 })
 
 const movieTvData = ref({ //存储电影电视剧数据
@@ -326,8 +328,8 @@ const onOk = async () => {
 }
 
 //获取应用更新信息
-const getAppUpdateInfo =async()=>{
-  let res =await getUntokenDicts("app_version")
+const getAppUpdateInfo = async () => {
+  let res = await getUntokenDicts("app_version")
   return res
 }
 
@@ -360,6 +362,7 @@ page {
   width: 100%;
   height: 100%;
 }
+
 .video {
   width: 100%;
   height: 100%;
@@ -377,12 +380,15 @@ page {
     box-sizing: border-box;
     position: relative;
     z-index: 1;
+
     .video-container-scroll {
       width: 100%;
       height: 100%;
+
       .scroll-list {
         padding: 40rpx 24rpx;
         box-sizing: border-box;
+
         .hxList:last-child {
           margin-bottom: 0;
         }
@@ -406,7 +412,7 @@ page {
       flex-direction: column;
       align-items: center;
 
-      img {
+      image {
         width: 140rpx;
         height: 140rpx;
       }

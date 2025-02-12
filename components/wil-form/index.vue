@@ -20,7 +20,7 @@
       </nut-form>
     </div>
     <div class="base-form-bottom" v-if="showButton">
-      <nut-button custom-color="#18CAB8" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText }}</nut-button>
+      <nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText }}</nut-button>
       <slot name="bottom" v-if="$slots.bottom"></slot>
     </div>
   </div>
@@ -137,7 +137,7 @@ watch(
         display: inline-block;
         border-radius: 8rpx;
         background: rgba(24, 202, 184, 0.1);
-        color: #18cab8;
+        color: #ff6701;
         font-size: 26rpx;
       }
     }
@@ -257,7 +257,7 @@ watch(
             color: #353a45;
           }
           .nut-picker__right {
-            color: #18cab8;
+            color: #ff6701;
           }
         }
       }

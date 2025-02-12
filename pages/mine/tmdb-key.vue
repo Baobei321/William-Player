@@ -2,7 +2,7 @@
   <div class="tmdb-key">
     <div class="tmdb-key-title">请输入要修改的tmdbKey</div>
     <nut-input v-model="tmdbKey" placeholder="请输入tmdbKey"></nut-input>
-    <nut-button custom-color="#18cab8" @click="confirmSet">确认设置</nut-button>
+    <nut-button custom-color="#ff6701" @click="confirmSet">确认设置</nut-button>
   </div>
 </template>
 

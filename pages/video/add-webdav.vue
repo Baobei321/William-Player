@@ -3,7 +3,7 @@
     <wil-navbar :title="routerParams.title"></wil-navbar>
     <div class="add-webdav-form__container">
       <base-form v-model="state.formData" :options="options" ref="base_form"></base-form>
-      <nut-button custom-color="#18CAB8" @click="confirmSubmit">确认{{ routerParams.title=='添加WebDAV'?'添加':'修改' }}</nut-button>
+      <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ routerParams.title=='添加WebDAV'?'添加':'修改' }}</nut-button>
       <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
     </div>
   </div>
@@ -71,8 +71,9 @@ page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4E2B141_427A_background_20241125161030786newMediaImage.png")
-    center no-repeat;
+  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
+  //   center no-repeat;
+  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
   background-size: 100% 100%;
   box-sizing: border-box;
   &__container {

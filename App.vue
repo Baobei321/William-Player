@@ -15,4 +15,7 @@
 <style lang="scss">
 	/*每个页面公共css */
 	@import '@/uni_modules/nutui-uni/components/nutui-uni/styles/index.scss';
+	.nut-button{
+		border:none !important;
+	}
 </style>

@@ -3,7 +3,8 @@
     &--default {
       color: $dark-color3;
       background: $dark-background2;
-      border: $button-border-width solid $dark-background2;
+      // border: $button-border-width solid $dark-background2;
+	  border:none;
     }
 
     &--plain {
@@ -93,7 +94,8 @@
     color: $button-default-color;
     background: $button-default-bg-color;
     background-origin: border-box;
-    border: $button-border-width solid $button-default-border-color;
+    // border: $button-border-width solid $button-default-border-color;
+	border: none;
   }
 
   &--primary {
@@ -198,6 +200,7 @@
   &--normal {
     padding: $button-default-padding;
     font-size: $button-default-font-size;
+	border: none !important;
   }
 
   &--small {

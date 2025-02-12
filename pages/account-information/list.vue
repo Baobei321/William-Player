@@ -43,7 +43,7 @@
               </template>
             </wil-box>
             <template #right>
-              <nut-button shape="square" style="height: 100%" @click="changeItem(item)" v-if="item.status=='0'" color="#18cab8">已报账</nut-button>
+              <nut-button shape="square" style="height: 100%" @click="changeItem(item)" v-if="item.status=='0'" color="#ff6701">已报账</nut-button>
               <nut-button shape="square" style="height: 100%" @click="changeItem(item)" v-if="item.status=='1'" color="#f56c6c">未报账</nut-button>
               <nut-button shape="square" style="height: 100%" @click="editItem(item)" color="#498ff2">修改</nut-button>
             </template>
@@ -130,7 +130,7 @@ const tagObj = ref({
     },
     '1': {
       label: '已报账',
-      color: '#18cab8'
+      color: '#ff6701'
     },
   }
 })
@@ -258,8 +258,9 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4E2B141_427A_background_20241125161030786newMediaImage.png")
-    center no-repeat;
+  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
+  //   center no-repeat;
+  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
   background-size: 100% 100%;
   box-sizing: border-box;
   ::v-deep .nut-searchbar {
@@ -413,7 +414,7 @@ page {
             color: #353a45;
           }
           .nut-picker__right {
-            color: #18cab8;
+            color: #ff6701;
           }
         }
       }
@@ -423,7 +424,7 @@ page {
     position: fixed;
     width: 68px;
     height: 68px;
-    background: #18cab8;
+    background: #ff6701;
     right: 12px;
     bottom: 74px;
     border-radius: 50%;
