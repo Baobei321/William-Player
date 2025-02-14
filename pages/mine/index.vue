@@ -79,7 +79,7 @@ const cellOptions = ref([
 		{
 			title: '数据同步',
 			leftIcon: iconTb,
-			path: '/pages/backend/index',
+			path: '/pages/backend/data-sync',
 		},
 		{
 			title: '下载管理',
@@ -104,7 +104,7 @@ const cellOptions = ref([
 		{
 			title: '关于',
 			leftIcon: iconAbout,
-			path: '/pages/mine/tmdb-key',
+			path: '/pages/backend/about-version',
 		},
 	]
 ])

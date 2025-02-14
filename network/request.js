@@ -29,22 +29,52 @@ export default (params) => {
       header: header,
       data: data,
       timeout,
-      success (response) {
+      success(response) {
         const res = response
         // 根据返回的状态码做出对应的操作
         //获取成功
         // console.log(res.statusCode);
         if (res.statusCode == 200) {
-          resolve(res.data);
+          if (res.data?.code == 0 || res.data?.code == 200) {
+            resolve(res.data);
+          } else {
+            let code = res.data?.code
+            // uni.clearStorageSync()
+            if (code == 401) {
+              uni.showModal({
+                title: "提示",
+                content: "请登录",
+                showCancel: false,
+                success() {
+                  setTimeout(() => {
+                    uni.navigateTo({
+                      url: "/pages/login/index",
+                    })
+                  }, 1000);
+                },
+              });
+            } else if (code == 404) {
+              uni.showToast({
+                title: '请求地址不存在...',
+                duration: 2000,
+              })
+            } else {
+              uni.showToast({
+                title: res.data.msg,
+                icon:'none',
+                duration: 2000,
+              })
+            }
+          }
         } else {
-          uni.clearStorageSync()
+          // uni.clearStorageSync()
           switch (res.statusCode) {
             case 401:
               uni.showModal({
                 title: "提示",
                 content: "请登录",
                 showCancel: false,
-                success () {
+                success() {
                   setTimeout(() => {
                     uni.navigateTo({
                       url: "/pages/login/index",
@@ -68,7 +98,7 @@ export default (params) => {
           }
         }
       },
-      fail (err) {
+      fail(err) {
         console.log(err)
         if (err.errMsg.indexOf('request:fail') !== -1) {
           uni.showToast({
@@ -85,10 +115,10 @@ export default (params) => {
         reject(err);
 
       },
-      complete () {
+      complete() {
         // 不管成功还是失败都会执行
-        uni.hideLoading();
-        uni.hideToast();
+        // uni.hideLoading();
+        // uni.hideToast();
       }
     });
   }).catch(() => { });

@@ -1,7 +1,7 @@
 <template>
     <div class="wil-upgrade">
         <nut-popup v-model:visible="showBottom" round position="bottom" :custom-style="{ height: '45%' }"
-            @closed="closedPopup">
+            @closed="closedPopup" @open="open" @close="close">
             <div class="wil-upgrade-container">
                 <div class="wil-upgrade-title">
                     <div class="wil-upgrade-title__logo">
@@ -43,13 +43,15 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+import { ref, onBeforeMount, watch } from 'vue'
 import { onHide } from '@dcloudio/uni-app';
 
 const props = defineProps({
     logo: { type: String, default: '' },
     appName: { type: String, default: '' },
     updateFunction: { type: Function },
+    visible: { type: Boolean, default: false },
+    enableControl: { type: Boolean, default: false },
     defaultProps: {
         type: Object, default: {
             updateTime: 'cssClass',
@@ -59,7 +61,7 @@ const props = defineProps({
         }
     },
 })
-const showBottom = ref(true)
+const showBottom = ref(false)
 const newVersion = ref({})
 const tipText = ref('等待下载')
 const percent = ref(0) //下载进度
@@ -70,6 +72,8 @@ const systemUrl = ref('')
 const dFileName = ref('')
 const dTask = ref(null)
 const downloadedSize = ref(0)
+
+const emits = defineEmits(['closed', 'update:visible'])
 
 
 const compareVersions = (newBb, oldBb) => {
@@ -90,19 +94,53 @@ const compareVersions = (newBb, oldBb) => {
     return 0; // 如果两个版本号完全相同，返回 0
 }
 
+const judegeShow = () => {
+    let remindTime = uni.getStorageSync('remindTime')
+    let mapping = {
+        '每天': 86400000,
+        '每周': 604800000
+    }
+    if (remindTime.lastTime) {
+        if (Date.now() - remindTime.lastTime > mapping[remindTime.type]) {
+            showBottom.value = true
+            uni.setStorageSync("remindTime", { type: remindTime.type, lastTime: Date.now() })
+        }
+    } else {
+        showBottom.value = true
+        uni.setStorageSync("remindTime", { type: remindTime.type, lastTime: Date.now() })
+    }
+}
+
 
 const getUpdateInfo = async () => {
     let systemInfo = uni.getSystemInfoSync()
+    console.log(systemInfo, 'systemInfo');
     // if (systemInfo.osName != 'android') return
     let res = await props.updateFunction()
     newVersion.value = res.data[res.data.length - 1]
     let version = ''
     version = systemInfo.appVersion
     if (compareVersions(newVersion.value.dictLabel, version) == 1) { //此时后台设置已有新版本
-        showBottom.value = true
+        if (props.enableControl) {
+            console.log("打开1");
+            let remindTime = uni.getStorageSync('remindTime')
+            if (remindTime.type == '总是') {
+                showBottom.value = true
+            } else if (remindTime.type == '每天') {
+                judegeShow()
+            } else if (remindTime.type == '每周') {
+                judegeShow()
+            } else if (remindTime.type == '从不') {
+
+            } else {
+                showBottom.value = true
+            }
+        } else {
+            console.log("打开2");
+            showBottom.value = true
+        }
     }
 }
-getUpdateInfo()
 
 const installNow = () => {
     plus.runtime.install(systemUrl.value, {}, {}, function (error) {
@@ -202,7 +240,17 @@ const closedPopup = () => {
         });
     }
     plus.downloader.clear();
+    emits("closed")
 }
+
+const open = () => {
+    emits('update:visible', true)
+}
+
+const close = () => {
+    emits('update:visible', false)
+}
+
 closedPopup()
 
 onBeforeMount(() => {
@@ -211,6 +259,16 @@ onBeforeMount(() => {
         downStatus.value = 2
     }
 })
+
+watch(
+    () => props.visible,
+    (val) => {
+        if (val) {
+            getUpdateInfo()
+        }
+        showBottom.value = val
+    }, { immediate: true }
+)
 
 onHide(() => {
     console.log("隐藏");

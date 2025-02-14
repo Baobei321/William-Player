@@ -71,3 +71,29 @@ export const setTmdbKey = data => {
     data: data
   })
 }
+
+//设置shareData
+export const setShareData = data => {
+  return request({
+    url: `/wechat/setShareData`,
+    method: 'post',
+    data: data
+  })
+}
+
+//删除shareData
+export const deleteShareData = data => {
+  return request({
+    url: `/wechat/deleteShareData`,
+    method: 'post',
+  })
+}
+
+//查询shareData
+export const getShareData = data => {
+  return request({
+    url: `/wechat/getShareData`,
+    method: 'get',
+    data: data
+  })
+}

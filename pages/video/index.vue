@@ -34,8 +34,9 @@
         </nut-dialog>
       </div>
     </template>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo"
-      :app-name=upgradeInfo.appName></wil-upgrade>
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
+      :enableControl="true">
+    </wil-upgrade>
   </div>
 </template>
 

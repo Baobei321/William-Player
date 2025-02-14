@@ -2,7 +2,8 @@
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
     <div class="video-classify-list">
-      <div class="list-item" v-for="item in listData" :key="item.id" :style="{background:item.background}" @click="toVideoAll(item)">
+      <div class="list-item" v-for="item in listData" :key="item.id" :style="{ background: item.background }"
+        @click="toVideoAll(item)">
         <div class="list-item-title">{{ item.label }}</div>
         <div class="list-item-img">
           <div class="img-one"></div>
@@ -18,6 +19,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { onShow } from '@dcloudio/uni-app';
 
 const listData = ref([])
 
@@ -38,14 +40,23 @@ const classifyList = ref([
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
   let idArr = []
+  listData.value = []
   let movieTvData = uni.getStorageSync('localMovieTvData')
+  console.log("moveiData", movieTvData);
+
   movieTvData.movie.forEach(item => {
-    idArr.push(...item.genre_ids)
+    if (item.genre_ids) {
+      idArr.push(...item.genre_ids)
+    }
   })
   movieTvData.tv.forEach(item => {
-    idArr.push(...item.genre_ids)
+    if (item.genre_ids) {
+      idArr.push(...item.genre_ids)
+    }
   })
+
   idArr = [...new Set(idArr)]
+
   idArr.forEach(item => {
     let obj = classifyList.value.find(i => i.id == item)
     if (obj) {
@@ -53,7 +64,6 @@ const getGenre = () => {
     }
   })
 }
-getGenre()
 
 //跳转到videoAll
 const toVideoAll = (item) => {
@@ -61,18 +71,22 @@ const toVideoAll = (item) => {
     url: `/pages/video/video-all?title=${item.label}&genreId=${item.id}`
   })
 }
-
+onShow(() => {
+  getGenre()
+})
 </script>
 
 <style lang="scss" scoped>
 .video-classify {
   width: 100%;
   overflow-x: hidden;
+
   .video-classify-title {
     font-size: 36rpx;
     font-weight: bold;
     color: #000;
   }
+
   .video-classify-list {
     display: flex;
     flex-wrap: wrap;
@@ -80,6 +94,7 @@ const toVideoAll = (item) => {
     justify-content: space-between;
     box-sizing: border-box;
     width: 100%;
+
     .list-item {
       flex: 0 0 calc(50% - 10rpx);
       height: 170rpx;
@@ -88,11 +103,13 @@ const toVideoAll = (item) => {
       position: relative;
       padding: 30rpx;
       box-sizing: border-box;
+
       .list-item-title {
         font-size: 36rpx;
         font-weight: bold;
         color: #fff;
       }
+
       .list-item-img {
         position: absolute;
         overflow: hidden;
@@ -100,6 +117,7 @@ const toVideoAll = (item) => {
         height: 100%;
         right: 0;
         top: 0;
+
         .img-one {
           background: rgba(255, 255, 255, 0.4);
           border-radius: 16rpx;
@@ -110,6 +128,7 @@ const toVideoAll = (item) => {
           top: 40rpx;
           transform: rotate(-7deg);
         }
+
         .img-two {
           background: rgba(255, 255, 255, 0.4);
           border-radius: 16rpx;
@@ -120,6 +139,7 @@ const toVideoAll = (item) => {
           top: 30rpx;
           transform: rotate(7deg);
         }
+
         .img-three {
           background: rgba(255, 255, 255, 0.4);
           border-radius: 16rpx;
@@ -129,6 +149,7 @@ const toVideoAll = (item) => {
           right: 16rpx;
           top: 20rpx;
           transform: rotate(15deg);
+
           img {
             width: 100%;
             height: 100%;
