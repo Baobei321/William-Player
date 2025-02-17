@@ -1,6 +1,6 @@
 <template>
   <view class="backend">
-    <web-view :src="url" />
+    <wil-webview :src="url" />
   </view>
 </template>
 

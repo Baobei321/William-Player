@@ -11,7 +11,7 @@
         "nvueStyleCompiler" : "uni-app",
         "compilerVersion" : 3,
         "splashscreen" : {
-            "alwaysShowBeforeRender" : false,
+            "alwaysShowBeforeRender" : true,
             "waiting" : false,
             "autoclose" : true,
             "delay" : 0
@@ -72,7 +72,10 @@
                 "ad" : {}
             },
             "splashscreen" : {
-                "androidStyle" : "default"
+                "androidStyle" : "default",
+                "android" : {
+                    "xxhdpi" : "D:/下单平台移动端/UniPlugin-Hello-AS/app/src/main/res/drawable-xxhdpi/splash.9.png"
+                }
             },
             "icons" : {
                 "android" : {
