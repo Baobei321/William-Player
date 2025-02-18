@@ -77,7 +77,6 @@
     {
       "path": "pages/backend/index",
       "style": {
-        // "navigationBarTitleText": "后台管理系统",
         "navigationBarBackgroundColor": "#fff"
       }
     },
@@ -92,6 +91,12 @@
       "path": "pages/backend/about-version",
       "style": {
         "navigationBarTitleText": "关于",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/backend/cloud-drive",
+      "style": {
         "navigationBarBackgroundColor": "#fff"
       }
     }

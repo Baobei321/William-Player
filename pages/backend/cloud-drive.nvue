@@ -1,0 +1,79 @@
+<template>
+    <view class="cloud-drive">
+        <wil-webview type="h5" :src="url" style="width: 750rpx;flex: 1;" @getlocalstorage="getLocalStorage1" />
+        <wil-webview type="web" :src="url" style="width: 750rpx;flex: 1;position: absolute;z-index: 0;"
+            @getcookies="getCookies2" v-if="showWeb" />
+    </view>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            url: '',
+            showWeb: false
+        }
+    },
+    methods: {
+        getCookies2(event) {
+            let cookies = event.detail.cookies;
+            const cookieArray = cookies.split(';');
+            let cookieObj = {};
+            cookieArray.forEach(item => {
+                let arr = item.split('=');
+                cookieObj[arr[0]] = arr[1];
+            });
+            uni.setStorageSync("tianyiCookie", { COOKIE_LOGIN_USER: cookieObj.COOKIE_LOGIN_USER, JSESSIONID: cookieObj.JSESSIONID })
+        },
+        getLocalStorage1(event) {
+            let localStorage = JSON.parse(JSON.parse(event.detail.localStorage));
+            let obj = this.deepParseJson(localStorage)
+            if (obj.accessToken) {
+                this.showWeb = true
+            }
+        },
+        //深度解析json字符串
+        deepParseJson(obj) {
+            // 如果传入的是对象或数组，遍历处理
+            if (obj && typeof obj === 'object') {
+                // 如果是数组，处理数组中的每个元素
+                // 如果是对象，处理对象中的每个属性
+                for (let key in obj) {
+                    // 确保对象本身没有原型链上的属性
+                    if (obj.hasOwnProperty(key)) {
+                        // 如果属性是字符串，尝试解析为 JSON
+                        if (typeof obj[key] === 'string') {
+                            try {
+                                // 尝试将字符串解析为 JSON
+                                obj[key] = JSON.parse(obj[key]);
+                            } catch (e) {
+                                // 如果解析失败，保留原字符串
+                            }
+                        } else {
+                            // 如果不是字符串，则递归处理该属性
+                            obj[key] = deepParseJson(obj[key]);
+                        }
+                    }
+                }
+            }
+            return obj;
+        },
+    },
+    onLoad(options) {
+        uni.setNavigationBarTitle({
+            title: decodeURIComponent(options.title)
+        })
+        this.url = decodeURIComponent(options.url)
+    }
+}
+</script>
+
+<style lang="scss">
+.cloud-drive {
+    width: 750rpx;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+</style>

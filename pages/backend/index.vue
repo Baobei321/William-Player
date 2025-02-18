@@ -1,18 +1,26 @@
 <template>
   <view class="backend">
-    <wil-webview :src="url" />
+    <web-view :src="url" style="width: 750rpx;flex: 1;"/>
   </view>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app';
+<script>
+export default {
+  data() {
+    return {
+      url: '',
 
-const url = ref('')
-
-onLoad((options) => {
-  url.value = decodeURIComponent(options.url)
-})
+    }
+  },
+  methods: {
+	  getCookies(event){
+		  uni.setStorageSync('webviewCookie',event.detail.cookies);
+	  }
+  },
+  onLoad(options) {
+    this.url = options.url
+  }
+}
 </script>
 
 <style lang="scss">

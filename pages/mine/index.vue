@@ -30,7 +30,7 @@
 					v-if="Authorization"></base-cell>
 			</div>
 		</div>
-		{{ dada1 }}
+		{{ dada1|| '没有' }}
 		<wil-modal ref="wil_modal"></wil-modal>
 	</div>
 </template>
@@ -90,9 +90,10 @@ const cellOptions = ref([
 		{
 			title: '深度求索',
 			leftIcon: iconDeepseek,
-			path: '/pages/backend/index',
+			path: '/pages/backend/cloud-drive',
 			query: {
-				url: 'https://h5.cloud.189.cn/main.html'
+				url: 'https://cloud.189.cn/web/login.html',
+				title:'天翼云盘',
 			}
 		},
 	],
