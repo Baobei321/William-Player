@@ -128,7 +128,9 @@ const buttonText = ref('播放')
 const webdavInfo = ref(uni.getStorageSync('webdavInfo'))
 
 const routerParams = ref({})
-
+const selectMedia = ref({});
+const selectType = ref({});
+const nowSourceList = ref([])
 
 //通过tmdb接口获取更详细的信息
 const getMovieTvById = (data, type) => {
@@ -216,7 +218,7 @@ const calTime = (val, type = 'cn') => {
 
 //处理电视的详情和剧集等
 const handleTv = async () => {
-  let result = await getFolder({ path: selectSource.value.path + '/' + selectSource.value.name })
+  let result = await getFolder({ path: selectSource.value.path + '/' + selectSource.value.name },selectMedia.value)
   const numberMapping = { '一': '1', '二': '2', '三': '3', '四': '4', '五': '5', '六': '6', '七': '7' }
   const match = selectSource.value.name.match(/第(.*?)季/)
   let season = ''
@@ -307,20 +309,6 @@ const clickPlayButton = () => {
     } else if (routerParams.value.type == 'tv') {
       history = historyPlay.value?.find(i => i.titlePlay == selectSource.value.name)
     }
-    wx.miniapp.openUrl({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/' + history.path,
-      success: () => {
-        history.initialTime = '-1'
-        let index = historyPlay.value.findIndex(i => i.type == routerParams.value.type && getMovieName(i.name) == getMovieName(history.name))
-        if (index > -1) {
-          historyPlay.value.splice(index, 1)
-          historyPlay.value.unshift(history)
-        } else {
-          historyPlay.value.unshift(history)
-        }
-        uni.setStorageSync('historyPlay', historyPlay.value)
-      }
-    })
     return
   }
   if (routerParams.value.type == 'movie') {
@@ -395,7 +383,22 @@ const setButtonText = () => {
   }
 }
 
+//判断选择的是webdav还是天翼云盘还是夸克
+const judgeSelect = () => {
+  nowSourceList.value = uni.getStorageSync("sourceList");
+  selectType.value = nowSourceList.value.find((item) => {
+    let select = item.list.find((i) => i.active);
+    if (select) {
+      selectMedia.value = select;
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
+
 onBeforeMount(() => {
+  judgeSelect()
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
   getUntokenDict('online_storage_source').then((res) => {
     sourceList.value = JSON.parse(routerParams.value.source).map(i => {

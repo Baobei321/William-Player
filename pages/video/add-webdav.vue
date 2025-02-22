@@ -10,56 +10,71 @@
 </template>
   
   <script setup>
-import { onBeforeMount, reactive, ref } from 'vue'
-import baseForm from '../../components/wil-form/index.vue'
-import wilNavbar from '../../components/wil-navbar/index.vue'
-import { onLoad } from '@dcloudio/uni-app';
-
+import { onBeforeMount, reactive, ref } from "vue";
+import baseForm from "../../components/wil-form/index.vue";
+import wilNavbar from "../../components/wil-navbar/index.vue";
+import { onLoad } from "@dcloudio/uni-app";
+import { loginUser } from "./components/common";
 
 const state = reactive({
-  formData: {}
-})
+  formData: {},
+});
 
-const base_form = ref(null)
+const base_form = ref(null);
 // const showLoginPopup = ref(false)
 
-const routerParams = ref({})
+const routerParams = ref({});
 
 const options = ref([
-  { label: '名称', prop: 'name', type: 'input', formItemProps: { placeholder: '请输入', type: 'text' }, rule: [{ required: true, message: '请输入名称' }] },
-  { label: '地址', prop: 'address', type: 'input', formItemProps: { placeholder: '例如:127.0.0.1', type: 'text' }, rule: [{ required: true, message: '请输入地址' }] },
-  { label: '端口', prop: 'port', type: 'input', formItemProps: { placeholder: '选填,例如:5244', type: 'number' }, rule: [{ required: true, message: '请输入端口' }] },
-  { label: '用户名', prop: 'username', type: 'input', formItemProps: { placeholder: 'alist用户名,例如:admin', type: 'text' }, rule: [{ required: true, message: '请输入用户名' }] },
-  { label: '密码', prop: 'password', type: 'input', formItemProps: { placeholder: 'alist密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
-  { label: '路径', prop: 'path', type: 'input', formItemProps: { placeholder: '选填,例如:/dav', type: 'text' }, rule: [{ required: true, message: '请输入路径' }] },
-])
-
-
+  { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
+  { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
+  { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "选填,例如:5244", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
+  {
+    label: "用户名",
+    prop: "username",
+    type: "input",
+    formItemProps: { placeholder: "alist用户名,例如:admin", type: "text" },
+    rule: [{ required: true, message: "请输入用户名" }],
+  },
+  { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "alist密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
+  { label: "路径", prop: "path", type: "input", formItemProps: { placeholder: "选填,例如:/dav", type: "text" }, rule: [{ required: true, message: "请输入路径" }] },
+]);
 
 const confirmSubmit = () => {
-  base_form.value.confirmCommit().then(async valid => {
+  base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
-      uni.setStorageSync('webdavInfo', state.formData)
-      let pages = getCurrentPages()
-      let prevPage = pages[pages.length - 2]
-      if (prevPage.route == 'pages/video/index') {
-        uni.setStorageSync('isreload', true)
+      let sourceList = uni.getStorageSync("sourceList");
+      if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address)) {
+        uni.showToast({
+          title: "存在重复的WebDAV地址，请修改",
+          icon: "none",
+        });
+      } else {
+        let res = await loginUser(state.formData);
+        sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+        uni.setStorageSync("sourceList", sourceList);
+        uni.navigateBack({
+          delta: 2,
+        });
       }
-      uni.navigateBack()
+      // let pages = getCurrentPages();
+      // let prevPage = pages[pages.length - 2];
+      // if (prevPage.route == "pages/video/index") {
+      //   uni.setStorageSync("isreload", true);
+      // }
     }
-  })
-}
+  });
+};
 
 onLoad((options) => {
-  routerParams.value.title = options.title
-  let title = ''
-  title = routerParams.value.title
-  if (title == '修改WebDAV') {
-    state.formData = uni.getStorageSync('webdavInfo')
+  routerParams.value.title = options.title;
+  let title = "";
+  title = routerParams.value.title;
+  if (title == "修改WebDAV") {
+    state.formData = uni.getStorageSync("webdavInfo");
   }
-})
-
-  </script>
+});
+</script>
   
   <style lang="scss" scoped>
 page {

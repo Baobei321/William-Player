@@ -164,7 +164,8 @@ const downloadInstallApp = (apkUrl) => {
             plus.runtime.install(plus.io.convertLocalFileSystemURL(d.filename), {}, {}, function (error) {
                 uni.showToast({
                     title: '安装失败',
-                    icon: 'none'
+                    icon: 'none',
+                    duration: 7000,
                 });
             });
         } else {

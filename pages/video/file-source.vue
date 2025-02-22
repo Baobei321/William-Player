@@ -1,0 +1,152 @@
+<template>
+  <div class="fileSource">
+    <div class="fileSource-item" v-for="item in sourceList" :key="item.type">
+      <div class="fileSource-item__title">{{ item.type }}</div>
+      <div class="fileSource-item__list">
+        <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list" :key="vitem.name" @click="toPath(vitem)" a="1" b="1" c="1" d="1"
+          e="1" f="1" g="1" h="1" i="1" j="1">
+          <div class="list-item-img">
+            <image :src="vitem.img"></image>
+          </div>
+          <div class="list-item-name">{{ vitem.name }}</div>
+          <image class="list-item-button" src="../../static/ic-into.png"></image>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import webdavFileIcon from "../../static/webdav-fileIcon.png";
+import { toParse, toStringfy } from "../mine/common";
+
+const sourceList = ref([
+  {
+    type: "网络存储",
+    list: [
+      {
+        name: "WebDAV",
+        img: webdavFileIcon,
+        path: "/pages/video/add-webdav",
+        query: { title: "添加WebDAV" },
+      },
+    ],
+  },
+  {
+    type: "云盘存储",
+    list: [
+      {
+        name: "天翼云盘",
+        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
+        path: "/pages/backend/cloud-drive",
+        query: {
+          url: "https://cloud.189.cn",
+          title: "天翼云盘",
+        },
+      },
+      {
+        name: "夸克网盘",
+        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
+        path: null,
+      },
+    ],
+  },
+]);
+
+const toPath = (vitem) => {
+  if (vitem.path) {
+    uni.navigateTo({
+      url: vitem.path + "?" + toStringfy(vitem.query),
+    });
+  } else {
+    uni.showToast({
+      title: "敬请期待",
+      icon: "none",
+    });
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+page {
+  width: 100%;
+  height: 100%;
+}
+
+.fileSource {
+  background: #f6f7f8;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 0 24rpx;
+
+  .fileSource-item {
+    padding-bottom: 16rpx;
+
+    .fileSource-item__title {
+      font-size: 28rpx;
+      color: #6d6d6d;
+      padding: 16rpx 0;
+    }
+
+    .fileSource-item__list {
+      background: #fff;
+      border-radius: 14rpx;
+
+      .list-item {
+        background: #fff;
+        padding: 10rpx 24rpx;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        &:active {
+          background: rgb(241, 241, 241);
+        }
+
+        &:first-child {
+          border-radius: 14rpx 14rpx 0 0;
+        }
+
+        &:last-child {
+          border-top: 2rpx solid rgb(241, 241, 241);
+          border-radius: 0 0 14rpx 14rpx;
+        }
+
+        .list-item-img {
+          width: 90rpx;
+          height: 90rpx;
+          position: relative;
+
+          image {
+            width: 90rpx;
+            height: 90rpx;
+            border-radius: 50%;
+          }
+        }
+
+        .list-item-name {
+          padding-left: 20rpx;
+          font-size: 32rpx;
+        }
+
+        .list-item-button {
+          position: absolute;
+          right: 24rpx;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 30rpx;
+          height: 30rpx;
+        }
+      }
+
+      .list-one {
+        border-radius: 14rpx !important;
+        border: none !important;
+      }
+    }
+  }
+}
+</style>

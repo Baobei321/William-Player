@@ -1,0 +1,208 @@
+<template>
+  <div class="source-list">
+    <wil-navbar title="资源库" :leftShow="true">
+      <template #right>
+        <nut-icon name="uploader" custom-color="#000" @click="toAddFile"></nut-icon>
+      </template>
+    </wil-navbar>
+    <div class="source-list-container" v-if="show">
+      <div class="source-list-item" v-for="item in sourceList" :key="item.type">
+        <template v-if="item.list.length">
+          <div class="source-list-item__title">{{ item.type }}</div>
+          <div class="source-list-item__list">
+            <div :class="['list-item', item.list.length == 1 ? 'list-one' : '',vitem.active?'list-active':'']" v-for="vitem in item.list" :key="vitem.name"
+              @click="handleSelect(vitem)">
+              <div class="list-item-img">
+                <image :src="item.img"></image>
+              </div>
+              <div class="list-item-name" :style="{color:vitem.active?'#ff6701':'#000'}">{{ vitem.name }}</div>
+              <image class="list-item-button" src="../../static/more-button.png"></image>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="source-list-empty" v-else>
+      <nut-button custom-color="#090909" @click="toAddFile">
+        <template #icon>
+          <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
+        </template>
+        <span>添加新资源</span>
+      </nut-button>
+    </div>
+    <wil-modal ref="wil_modal"></wil-modal>
+  </div>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import webdavFileIcon from "../../static/webdav-fileIcon.png";
+import wilNavbar from "@/components/wil-navbar/index.vue";
+import { onShow } from "@dcloudio/uni-app";
+import wilModal from "@/components/wil-modal/index.vue";
+import { loginUser } from "./components/common";
+
+const sourceList = ref([]);
+
+const show = ref(true);
+const wil_modal = ref(null);
+
+const toAddFile = () => {
+  uni.navigateTo({
+    url: "/pages/video/file-source",
+  });
+};
+
+const handleSelect = (vitem) => {
+  wil_modal.value.showModal({
+    title: "温馨提示",
+    content: "是否确认选择此资源",
+    confirmColor: "#ff6701",
+    confirm: async () => {
+      vitem.active = true;
+      uni.setStorageSync("isreload", true);
+      uni.setStorageSync("sourceList", sourceList.value);
+      uni.navigateBack();
+    },
+  });
+};
+
+const judegeShow = () => {
+  sourceList.value = uni.getStorageSync("sourceList");
+  
+  show.value = !sourceList.value.every((item) => {
+    return !item.list.length;
+  });
+  console.log("展示onshow",sourceList.value);
+};
+
+onShow(() => {
+  sourceList.value = uni.getStorageSync("sourceList");
+  judegeShow();
+});
+</script>
+
+<style lang="scss" scoped>
+page {
+  width: 100%;
+  height: 100%;
+}
+
+.source-list {
+  background: #f6f7f8;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  ::v-deep .wil-navbar {
+    background-color: #fff;
+
+    .nut-navbar {
+      .nut-navbar__right {
+        display: block;
+        position: absolute;
+        right: 0;
+      }
+    }
+  }
+
+  .source-list-container {
+    flex: 1;
+    overflow: auto;
+    padding: 0 24rpx;
+
+    .source-list-item {
+      padding-bottom: 16rpx;
+
+      .source-list-item__title {
+        font-size: 28rpx;
+        color: #6d6d6d;
+        padding: 16rpx 0;
+      }
+
+      .source-list-item__list {
+        background: #fff;
+        border-radius: 14rpx;
+
+        .list-item {
+          background: #fff;
+          padding: 6rpx 24rpx;
+          display: flex;
+          align-items: center;
+          position: relative;
+          border: 2prx solid transparent;
+
+          &:active {
+            background: rgb(241, 241, 241);
+          }
+
+          &:first-child {
+            border-radius: 14rpx 14rpx 0 0;
+          }
+
+          &:last-child {
+            border-top: 2rpx solid rgb(241, 241, 241);
+            border-radius: 0 0 14rpx 14rpx;
+          }
+
+          .list-item-img {
+            width: 100rpx;
+            height: 100rpx;
+            background: url("../../static/source-file.png") center no-repeat;
+            background-size: 100% 100%;
+            // display: flex;
+            // align-items: center;
+            // justify-content: center;
+            position: relative;
+
+            image {
+              width: 40rpx;
+              height: 40rpx;
+              border-radius: 50%;
+              position: absolute;
+              left: 50%;
+              top: 40%;
+              transform: translate(-50%, 0);
+            }
+          }
+
+          .list-item-name {
+            padding-left: 10rpx;
+            font-size: 32rpx;
+          }
+
+          .list-item-button {
+            position: absolute;
+            right: 24rpx;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42rpx;
+            height: 42rpx;
+          }
+        }
+
+        .list-one {
+          border-radius: 14rpx !important;
+          border: 2rpx solid transparent !important;
+        }
+        .list-active {
+          border: 2rpx solid #ff6701 !important;
+        }
+      }
+    }
+  }
+  .source-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    ::v-deep .nut-button {
+      border-radius: 12rpx;
+    }
+  }
+}
+</style>

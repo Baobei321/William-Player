@@ -1,7 +1,6 @@
 <template>
   <div class="video">
-    <video-navbar @refresh="refreshVideo" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"
-      :tmdbKey1="tmdbKey"></video-navbar>
+    <video-navbar @refresh="refreshVideo" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar" :tmdbKey1="tmdbKey"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
     <template v-else>
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
@@ -34,328 +33,365 @@
         </nut-dialog>
       </div>
     </template>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
-      :enableControl="true">
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :enableControl="true">
     </wil-upgrade>
   </div>
 </template>
 
 <script setup>
 import { ref, onBeforeMount } from "vue";
-import Folder from '../../static/folder.png'
-import videoNavbar from './components/navbar.vue'
-import Skeleton from './components/skeleton.vue'
-import { onShow } from '@dcloudio/uni-app';
-import hxList from './components/hx-list.vue'
+import Folder from "../../static/folder.png";
+import videoNavbar from "./components/navbar.vue";
+import Skeleton from "./components/skeleton.vue";
+import { onShow } from "@dcloudio/uni-app";
+import hxList from "./components/hx-list.vue";
 import recentPlayed from "./components/recent-played.vue";
-import Classify from './components/classify.vue'
-import { setTmdbKey, getUntokenDicts } from '../../network/apis'
-import wilUpgrade from '../../components/wil-upgrade/index.vue'
-import appLogo from '../../static/app-logo1.png'
+import Classify from "./components/classify.vue";
+import { setTmdbKey, getUntokenDicts } from "../../network/apis";
+import wilUpgrade from "../../components/wil-upgrade/index.vue";
+import appLogo from "../../static/app-logo1.png";
+import webdavFileIcon from "../../static/webdav-fileIcon.png";
+import { loginUser, getFolder, get189Folder } from "./components/common";
 
-const video_navbar = ref(null)
+const video_navbar = ref(null);
 
-const listData = ref([])
-const webdavInfo = ref({})
-const refreshData = ref({ found: 0, toupdate: 0, updated: 0 })
-const refreshLoading = ref(false)
-const showDialog = ref(false)
+const listData = ref([]);
+const webdavInfo = ref({});
+const sourceList = ref([]);
+const refreshData = ref({ found: 0, toupdate: 0, updated: 0 });
+const refreshLoading = ref(false);
+const showDialog = ref(false);
 
 const upgradeInfo = ref({
   logo: appLogo,
-  appName: "William Player"
-})
+  appName: "William Player",
+});
 
-const movieTvData = ref({ //存储电影电视剧数据
+const movieTvData = ref({
+  //存储电影电视剧数据
   movie: [],
-  tv: []
-})
+  tv: [],
+});
 
-const localMovieTvData = ref({})
-const tmdbKey = ref('')
+const localMovieTvData = ref({});
+const tmdbKey = ref("");
 
-const historyPlay = ref(uni.getStorageSync('historyPlay') || [])
+const historyPlay = ref(uni.getStorageSync("historyPlay") || []);
 
-
-
-const loginUser = () => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  return new Promise((resolve, reject) => {
-    uni.request({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/auth/login',
-      data: JSON.stringify({ username: webdavInfo.value.username, password: webdavInfo.value.password }),
-      timeout: 1500,
-      method: 'POST',
-      header: { 'Content-Type': 'application/json' },
-      success: (res) => {
-        uni.setStorageSync('webdavInfo', { ...webdavInfo.value, token: res.data.data.token })
-        resolve(res.data)
-      },
-      fail: () => {
-        reject('')
-      }
-    })
-  });
-}
-
-const getFolder = (data) => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  return new Promise(resolve => {
-    uni.request({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/fs/list',
-      data: JSON.stringify({ ...data, page: 1, per_page: 100, refresh: false }),
-      timeout: 3000,
-      method: 'POST',
-      header: { Authorization: webdavInfo.value.token, 'Content-Type': 'application/json' },
-      success: (res) => {
-        resolve(res.data)
-      }
-    })
-  })
-}
+const selectMedia = ref({});
+const selectType = ref({});
 
 //通过tmdb接口获取更详细的信息
 const searchMovieTv = (data, type) => {
-  let url = ''
-  if (type == 'movie') {
-    url = 'https://api.tmdb.org/3/search/movie'
-  } else if (type == 'tv') {
-    url = 'https://api.tmdb.org/3/search/tv'
+  let url = "";
+  if (type == "movie") {
+    url = "https://api.tmdb.org/3/search/movie";
+  } else if (type == "tv") {
+    url = "https://api.tmdb.org/3/search/tv";
   }
   return new Promise((resolve, rej) => {
     uni.request({
       url: url,
-      data: { ...data, language: 'zh-CN', page: 1, api_key: uni.getStorageSync('tmdbKey'), },
-      method: 'GET',
-      header: { 'Content-Type': 'application/json' },
-      success: (res) => {
-        resolve(res.data)
+      data: {
+        ...data,
+        language: "zh-CN",
+        page: 1,
+        api_key: uni.getStorageSync("tmdbKey"),
       },
-    })
+      method: "GET",
+      header: { "Content-Type": "application/json" },
+      success: res => {
+        resolve(res.data);
+      },
+    });
   });
-}
+};
 
 //处理内存大小
-const handleSize = (size) => {
-  if (size == 0) return '0';
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+const handleSize = size => {
+  if (size == 0) return "0";
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(size) / Math.log(1024));
   const formatted = parseFloat((size / Math.pow(1024, i)).toFixed(2));
-  return formatted + ' ' + sizes[i];
-}
+  return formatted + " " + sizes[i];
+};
 
 //groupBy视频来源，将多个网盘来的视频合成一个
-const groupBySource = (arr) => {
+const groupBySource = arr => {
   const map = new Map();
   arr.forEach(item => {
     if (!map.has(removeExtension(item.name))) {
-      map.set(removeExtension(item.name), { ...item, provider: null, source: [] });
+      map.set(removeExtension(item.name), {
+        ...item,
+        provider: null,
+        source: [],
+      });
     }
-    map.get(removeExtension(item.name)).source.push({ provider: item.provider, size: handleSize(item.size), path: item.path, name: item.name });
+    map.get(removeExtension(item.name)).source.push({
+      provider: item.provider,
+      size: handleSize(item.size),
+      path: item.path,
+      name: item.name,
+    });
   });
   const result = Array.from(map.values());
-  return result
-}
-
-const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf('.');
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  return name
+  return result;
 };
 
-const handleSeasonName = (filename) => {
-  const lastDotIndex = filename.lastIndexOf('.');
+const removeExtension = filename => {
+  const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  const lastKgIndex = name.lastIndexOf(' ')
+  return name;
+};
+
+const handleSeasonName = filename => {
+  const lastDotIndex = filename.lastIndexOf(".");
+  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  const lastKgIndex = name.lastIndexOf(" ");
   name = lastKgIndex === -1 ? name : name.substring(0, lastKgIndex);
-  return name
-}
+  return name;
+};
 
 const refreshVideo = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0 }
-  movieTvData.value = { movie: [], tv: [] }
-  await getMovieTv(listData.value, '/')
+  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  movieTvData.value = { movie: [], tv: [] };
+  await getMovieTv(listData.value, "/");
   if (!movieTvData.value.movie.length || !movieTvData.value.tv.length) {
-    refreshLoading.value = false
-    return
+    refreshLoading.value = false;
+    return;
   }
-  let movie = groupBySource(movieTvData.value.movie)
-  let tv = groupBySource(movieTvData.value.tv)
-  compareMovieTv(movie, 'movie')
-  compareMovieTv(tv, 'tv')
-  await setMovieTvImg(movie, 'movie').then((res) => {
-    localMovieTvData.value.movie = res
-  }).catch(() => {
-    refreshLoading.value = false
-    showDialog.value = true
-    uni.showToast({
-      title: '请填写正确的api_key',
-      icon: 'none'
+  let movie = groupBySource(movieTvData.value.movie);
+  let tv = groupBySource(movieTvData.value.tv);
+  compareMovieTv(movie, "movie");
+  compareMovieTv(tv, "tv");
+  await setMovieTvImg(movie, "movie")
+    .then(res => {
+      localMovieTvData.value.movie = res;
     })
-  })
-  localMovieTvData.value.tv = await setMovieTvImg(tv, 'tv')
-  refreshData.value.updated = refreshData.value.toupdate
-  refreshData.value.toupdate = 0
-  uni.setStorageSync('localMovieTvData', localMovieTvData.value)
-  refreshLoading.value = false
-}
+    .catch(() => {
+      refreshLoading.value = false;
+      showDialog.value = true;
+      uni.showToast({
+        title: "请填写正确的api_key",
+        icon: "none",
+      });
+    });
+  localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
+  refreshData.value.updated = refreshData.value.toupdate;
+  refreshData.value.toupdate = 0;
+  uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+  refreshLoading.value = false;
+};
 
 //比较新刮削出来的影片是否已经存在或者删除，不存在就是待更新
 const compareMovieTv = (arr, type) => {
-  if (type == 'movie') {
+  if (type == "movie") {
     const deleteNumber = localMovieTvData.value.movie?.filter(item => arr?.every(i => i.name != item.name))?.length || 0;
     const addNumber = arr?.filter(item => localMovieTvData.value.movie?.every(i => i.name != item.name))?.length || 0;
-    refreshData.value.toupdate += deleteNumber + addNumber
-  } else if (type == 'tv') {
+    refreshData.value.toupdate += deleteNumber + addNumber;
+  } else if (type == "tv") {
     const deleteNumber = localMovieTvData.value.tv?.filter(item => arr?.every(i => i.name != item.name))?.length || 0;
     const addNumber = arr?.filter(item => localMovieTvData.value.tv?.every(i => i.name != item.name))?.length || 0;
-    refreshData.value.toupdate += deleteNumber + addNumber
+    refreshData.value.toupdate += deleteNumber + addNumber;
   }
-}
+};
 
 //查找网盘中的名叫电影,电视剧的文件夹
-const getMovieTv = async (arr1, path1 = '/') => {
+const getMovieTv = async (arr1, path1 = "/") => {
   const handleMovieTv = async (arr, path) => {
-    if (!arr?.length) return
-    refreshLoading.value = true
+    if (!arr?.length) return;
+    refreshLoading.value = true;
     for (let item of arr) {
-      if (item.type != '1') continue
-      if (item.name == '电影') {
-        uni.hideLoading()
-        let movieResult = await getFolder({ path: path + '电影' })
+      if (item.type != "1") continue;
+      if (item.name == "电影") {
+        uni.hideLoading();
+        let movieResult = await getFolder({ path: path + "电影" }, selectMedia.value);
         movieResult.data.content.forEach(v => {
-          v.path = path + '电影'
-          v.provider = movieResult.data.provider
-        })
-        movieTvData.value.movie.push(...movieResult.data.content)
-        refreshData.value.found += movieResult.data.content.length
+          v.path = path + "电影";
+          v.provider = movieResult.data.provider;
+        });
+        movieTvData.value.movie.push(...movieResult.data.content);
+        refreshData.value.found += movieResult.data.content.length;
       }
-      if (item.name == '电视剧') {
-        uni.hideLoading()
-        let tvResult = await getFolder({ path: path + '电视剧' })
+      if (item.name == "电视剧") {
+        uni.hideLoading();
+        let tvResult = await getFolder({ path: path + "电视剧" }, selectMedia.value);
         tvResult.data.content.forEach(v => {
-          v.path = path + '电视剧'
-          v.provider = tvResult.data.provider
-        })
-        movieTvData.value.tv.push(...tvResult.data.content)
-        refreshData.value.found += tvResult.data.content.length
+          v.path = path + "电视剧";
+          v.provider = tvResult.data.provider;
+        });
+        movieTvData.value.tv.push(...tvResult.data.content);
+        refreshData.value.found += tvResult.data.content.length;
       }
-      if (item.name != '电影' && item.name != '电视剧') {
-        uni.hideLoading()
-        let otherResult = await getFolder({ path: path + item.name })
-        await handleMovieTv(otherResult.data?.content, path + item.name + '/')
+      if (item.name != "电影" && item.name != "电视剧") {
+        uni.hideLoading();
+        let otherResult = await getFolder({ path: path + item.name }, selectMedia.value);
+        await handleMovieTv(otherResult.data?.content, path + item.name + "/");
       }
     }
-  }
-  await handleMovieTv(arr1, path1)
-}
+  };
+  await handleMovieTv(arr1, path1);
+};
 
 //将网盘中的电影等都设置详细信息
 const setMovieTvImg = async (arr, type) => {
   for (let item of arr) {
-    if (showDialog.value) return
+    if (showDialog.value) return;
     try {
-      let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type)
-      let data = res.results[0]
+      let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
+      let data = res.results[0];
       if (data) {
-        item.poster = 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' + data.poster_path
-        if (type == 'movie') {
-          item.releaseTime = data.release_date
-        } else if (type == 'tv') {
-          item.releaseTime = data.first_air_date
+        item.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
+        if (type == "movie") {
+          item.releaseTime = data.release_date;
+        } else if (type == "tv") {
+          item.releaseTime = data.first_air_date;
         }
-        item.movieTvId = data.id
-        item.genre_ids = data.genre_ids
+        item.movieTvId = data.id;
+        item.genre_ids = data.genre_ids;
       } else {
-        item.poster = 'https://img0.baidu.com/it/u=3410216376,4211467608&fm=253&fmt=auto&app=138&f=JPEG?w=750&h=465'
-        item.releaseTime = '暂无时间'
+        item.poster = "https://img0.baidu.com/it/u=3410216376,4211467608&fm=253&fmt=auto&app=138&f=JPEG?w=750&h=465";
+        item.releaseTime = "暂无时间";
       }
     } catch (error) {
       return Promise.reject();
     }
-
   }
-  return arr
-}
+  return arr;
+};
 
 const toAddWebdav = () => {
-  let webdavInfo = uni.getStorageSync('webdavInfo')
+  let webdavInfo = uni.getStorageSync("webdavInfo");
   if (!webdavInfo) {
     uni.navigateTo({
-      url: '/pages/video/add-webdav?title=添加WebDAV'
-    })
+      url: "/pages/video/add-webdav?title=添加WebDAV",
+    });
   } else {
     uni.navigateTo({
-      url: '/pages/video/add-webdav?title=修改WebDAV'
-    })
+      url: "/pages/video/add-webdav?title=修改WebDAV",
+    });
   }
-}
+};
 
 //处理添加或者修改完webdav之后自动刮削
 const handleGx = async () => {
-  let isreload = uni.getStorageSync('isreload')
+  let isreload = uni.getStorageSync("isreload");
   if (isreload) {
-    uni.removeStorageSync('isreload')
-    webdavInfo.value = uni.getStorageSync('webdavInfo')
-    if (webdavInfo.value.name) {
-      await loginUser()
-      let res = await getFolder()
+    uni.removeStorageSync("isreload");
+    // webdavInfo.value = uni.getStorageSync("webdavInfo");
+    sourceList.value = uni.getStorageSync("sourceList");
+
+    if (selectMedia.value.name) {
+      let res1 = await loginUser(selectMedia.value);
+      selectMedia.value = { ...selectMedia.value, token: res1.data.token };
+      let res = await getFolder({}, selectMedia.value);
+      console.log(res, "res111");
+
       listData.value = res.data.content.map(item => {
-        if (item.type == '1') {
-          item.leftIcon = Folder
+        if (item.type == "1") {
+          item.leftIcon = Folder;
         }
-        return item
-      })
+        return item;
+      });
     }
-    if (!uni.getStorageSync('tmdbKey')) {
-      showDialog.value = true
-      return
+    if (!uni.getStorageSync("tmdbKey")) {
+      showDialog.value = true;
+      return;
     } else {
-      video_navbar.value.showProgress()
+      video_navbar.value.showProgress();
     }
   }
-}
+};
 
 const onCancel = () => {
-  showDialog.value = false
-  tmdbKey.value = ''
-}
+  showDialog.value = false;
+  tmdbKey.value = "";
+};
 
 const onOk = async () => {
-  showDialog.value = false
-  uni.setStorageSync('tmdbKey', tmdbKey.value)
-  await setTmdbKey({ tmdbKey: tmdbKey.value })
-  video_navbar.value.showProgress()
-}
+  showDialog.value = false;
+  uni.setStorageSync("tmdbKey", tmdbKey.value);
+  await setTmdbKey({ tmdbKey: tmdbKey.value });
+  video_navbar.value.showProgress();
+};
 
 //获取应用更新信息
 const getAppUpdateInfo = async () => {
-  let res = await getUntokenDicts("app_version")
-  return res
-}
+  let res = await getUntokenDicts("app_version");
+  return res;
+};
+
+//判断选择的是webdav还是天翼云盘还是夸克
+const judgeSelect = () => {
+  sourceList.value = uni.getStorageSync("sourceList");
+  selectType.value =
+    sourceList.value.find(item => {
+      let select = item.list.find(i => i.active);
+      if (select) {
+        selectMedia.value = select;
+        return true;
+      } else {
+        return false;
+      }
+    }) || {};
+};
 
 onShow(() => {
-  tmdbKey.value = uni.getStorageSync('tmdbKey') || ''
-  historyPlay.value = uni.getStorageSync('historyPlay') || []
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  localMovieTvData.value = uni.getStorageSync('localMovieTvData') || {}
-  handleGx()
-})
+  sourceList.value = uni.getStorageSync("sourceList");
+  if (!sourceList.value) {
+    sourceList.value = [
+      { type: "WebDAV", list: [], img: webdavFileIcon },
+      {
+        type: "天翼云盘",
+        list: [{ name: "19994643173", JSESSIONID: "4E99BA8CFFC320EF374143C1D08DC97F", COOKIE_LOGIN_USER: "C5FE88B243BC774F7985E2CAF38A04A4621CA7B7D218BE749991D64F85C531287E4921BEDFA9E3E67AEBB0D992047DD0CEEE30A4EEA3BF4726441412" }],
+        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
+      },
+    ];
+    uni.setStorageSync("sourceList", sourceList.value);
+  }
+  tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
+  historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  webdavInfo.value = uni.getStorageSync("webdavInfo");
+  localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
+  judgeSelect();
+  if (selectType.value.type == "WebDAV") {
+    handleGx();
+  }
+  //初始化资源库列表
+});
 
 onBeforeMount(async () => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  if (webdavInfo.value.name) {
-    await loginUser()
-    let res = await getFolder()
-    listData.value = res.data.content.map(item => {
-      if (item.type == '1') {
-        item.leftIcon = Folder
-      }
-      return item
-    })
-  }
-})
+  judgeSelect();
+  if (selectType.value.type == "WebDAV") {
+    if (selectMedia.value.name) {
+      await loginUser(selectMedia.value);
+      let res = await getFolder({}, selectMedia.value);
+      listData.value = res.data.content.map(item => {
+        if (item.type == "1") {
+          item.leftIcon = Folder;
+        }
+        return item;
+      });
+    }
+  } else if (selectType.value.type == "天翼云盘") {
+    if (selectMedia.value.name) {
+      let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
+      console.log(res, "res天翼");
+      uni.showToast({
+        title:res,
+        icon:'none',
+        duration:7000
+      })
 
+      // listData.value = res.data.content.map(item => {
+      //   if (item.type == "1") {
+      //     item.leftIcon = Folder;
+      //   }
+      //   return item;
+      // });
+    }
+  }
+});
 </script>
 
 <style lang="scss" scoped>

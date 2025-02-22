@@ -42,8 +42,6 @@ const getGenre = () => {
   let idArr = []
   listData.value = []
   let movieTvData = uni.getStorageSync('localMovieTvData')
-  console.log("moveiData", movieTvData);
-
   movieTvData.movie.forEach(item => {
     if (item.genre_ids) {
       idArr.push(...item.genre_ids)

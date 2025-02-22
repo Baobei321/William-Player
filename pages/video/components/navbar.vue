@@ -10,7 +10,7 @@
       </template>
       <template #right>
         <nut-icon name="search" custom-color="#000" @click="toVideoSearch"></nut-icon>
-        <nut-icon name="uploader" custom-color="#000" @click="toAddWebdav"></nut-icon>
+        <nut-icon name="uploader" custom-color="#000" @click="toAddMedia"></nut-icon>
         <div class="video-navbar-popover">
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
@@ -103,17 +103,20 @@ const toVideoSearch = () => {
   })
 }
 
-const toAddWebdav = () => {
-  let webdavInfo = uni.getStorageSync('webdavInfo')
-  if (!webdavInfo) {
-    uni.navigateTo({
-      url: '/pages/video/add-webdav?title=添加WebDAV'
-    })
-  } else {
-    uni.navigateTo({
-      url: '/pages/video/add-webdav?title=修改WebDAV'
-    })
-  }
+const toAddMedia = () => {
+  uni.navigateTo({
+    url:'/pages/video/source-list'
+  })
+  // let webdavInfo = uni.getStorageSync('webdavInfo')
+  // if (!webdavInfo) {
+  //   uni.navigateTo({
+  //     url: '/pages/video/add-webdav?title=添加WebDAV'
+  //   })
+  // } else {
+  //   uni.navigateTo({
+  //     url: '/pages/video/add-webdav?title=修改WebDAV'
+  //   })
+  // }
 }
 
 const showProgress = () => {

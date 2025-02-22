@@ -19,6 +19,19 @@
       }
     },
     {
+      "path": "pages/video/source-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/file-source",
+      "style": {
+        "navigationBarTitleText": "添加新文件源",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
       "path": "pages/video/catelog-list",
       "style": {
         "navigationBarTitleText": ""

@@ -30,7 +30,7 @@
 					v-if="Authorization"></base-cell>
 			</div>
 		</div>
-		{{ dada1|| '没有' }}
+		{{ dada1 || '没有' }}
 		<wil-modal ref="wil_modal"></wil-modal>
 	</div>
 </template>
@@ -48,13 +48,8 @@ import iconDownload from '../../static/icon-download.png'
 import iconDeepseek from '../../static/icon-deepseek.png'
 import iconSetting from '../../static/icon-setting.png'
 import iconAbout from '../../static/icon-about.png'
-import {
-	onShow
-} from '@dcloudio/uni-app';
-import {
-	toParse,
-	toStringfy
-} from './common'
+import { onShow } from '@dcloudio/uni-app';
+import { toParse, toStringfy } from './common'
 import wilModal from '../../components/wil-modal/index.vue'
 
 
@@ -90,10 +85,10 @@ const cellOptions = ref([
 		{
 			title: '深度求索',
 			leftIcon: iconDeepseek,
-			path: '/pages/backend/cloud-drive',
+			path: '/pages/backend/index',
 			query: {
-				url: 'https://cloud.189.cn/web/login.html',
-				title:'天翼云盘',
+				url: 'https://yuanbao.tencent.com',
+				title: '腾讯元宝',
 			}
 		},
 	],
@@ -174,35 +169,35 @@ const dada1 = ref('')
 
 onShow(() => {
 	judgeLogin()
-	uni.request({
-      url: 'https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action', // 服务端接口
-      method: 'GET',
-      header: {
-        Accept: 'application/json;charset=UTF-8',
-        // 'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-        'Browser-Id': 'a3df95921d55a8221d86cfa1e1eb2e37',
-        Connection: 'keep-alive',
-        Cookie: 'JSESSIONID=6F27FF8D385A58D1C441C8D414EE23DB; COOKIE_LOGIN_USER=B86073A85A73A567CC197498ACDDF69D36F23030086E485E0291AAAA87BC3C4449DA3776056A696A4BCF05F67F58EC3B',
-        Host: 'cloud.189.cn',
-        Priority: 'u=0',
-        Referer: 'https://cloud.189.cn/web/main/file/folder/123853172100720910',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-origin',
-        'Sign-Type': '1',
-        'TE': 'trailers'
-      },
-      data: {
-        noCache: '0.12649431360434937',
-        fileId: '423943172849903554',
-        type: '2'
-      },
-      success: (res) => {
-		dada1.value = res.data.normal
-        console.log("res",res); // 获取到的 cookie
-      }
-    });
+	// uni.request({
+	//   url: 'https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action', // 服务端接口
+	//   method: 'GET',
+	//   header: {
+	//     Accept: 'application/json;charset=UTF-8',
+	//     // 'Accept-Encoding': 'gzip, deflate, br, zstd',
+	//     'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+	//     'Browser-Id': 'a3df95921d55a8221d86cfa1e1eb2e37',
+	//     Connection: 'keep-alive',
+	//     Cookie: 'JSESSIONID=CE20E66B2F408507B6CB752A31EE9E2E; COOKIE_LOGIN_USER=CEC77EB04A42793610E350DBE3E8B9978CC87432850DECA7655424E260261A1DD7F3B1E26EF863FA4AA2E958D89AF95F',
+	//     Host: 'cloud.189.cn',
+	//     Priority: 'u=0',
+	//     Referer: 'https://cloud.189.cn/web/main/file/folder/123853172100720910',
+	//     'Sec-Fetch-Dest': 'empty',
+	//     'Sec-Fetch-Mode': 'cors',
+	//     'Sec-Fetch-Site': 'same-origin',
+	//     'Sign-Type': '1',
+	//     'TE': 'trailers'
+	//   },
+	//   data: {
+	//     noCache: '0.12649431360434937',
+	//     fileId: '423943172849903554',
+	//     type: '2'
+	//   },
+	//   success: (res) => {
+	// 	dada1.value = res.data.normal
+	//     console.log("res",res); // 获取到的 cookie
+	//   }
+	// });
 })
 </script>
 
