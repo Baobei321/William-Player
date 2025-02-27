@@ -39,7 +39,7 @@ const cancel = () => {
   data.value.cancel()
   setTimeout(() => {
     show.value = false
-  }, 200);
+  }, 180);
 }
 
 const confirm = () => {
@@ -47,7 +47,7 @@ const confirm = () => {
   data.value.confirm()
   setTimeout(() => {
     show.value = false
-  }, 200);
+  }, 180);
 }
 
 defineExpose({

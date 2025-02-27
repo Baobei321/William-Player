@@ -39,7 +39,7 @@ const sourceList = ref([
       {
         name: "天翼云盘",
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
-        path: "/pages/backend/cloud-drive",
+        path: "/pages/backend/cloud189-webview",
         query: {
           url: "https://cloud.189.cn",
           title: "天翼云盘",
@@ -48,7 +48,11 @@ const sourceList = ref([
       {
         name: "夸克网盘",
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
-        path: null,
+        path: "/pages/backend/quark-webview",
+        query:{
+          url:"https://pan.quark.cn",
+          title:'夸克网盘'
+        }
       },
     ],
   },
@@ -61,7 +65,7 @@ const toPath = (vitem) => {
     });
   } else {
     uni.showToast({
-      title: "敬请期待",
+      title: "正在开发中...",
       icon: "none",
     });
   }

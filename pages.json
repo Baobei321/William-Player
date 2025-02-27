@@ -108,9 +108,15 @@
       }
     },
     {
-      "path": "pages/backend/cloud-drive",
+      "path": "pages/backend/cloud189-webview",
       "style": {
-        "navigationBarBackgroundColor": "#fff"
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/backend/quark-webview",
+      "style": {
+        "navigationStyle": "custom"
       }
     }
   ],

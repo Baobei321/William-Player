@@ -67,7 +67,7 @@ const confirmSubmit = () => {
 };
 
 onLoad((options) => {
-  routerParams.value.title = options.title;
+  routerParams.value.title = decodeURIComponent(options.title);
   let title = "";
   title = routerParams.value.title;
   if (title == "修改WebDAV") {

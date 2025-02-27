@@ -67,6 +67,10 @@ export default (params) => {
             }
           }
         } else {
+          uni.showToast({
+            title: res.statusCode,
+            duration: 2000,
+          })
           // uni.clearStorageSync()
           switch (res.statusCode) {
             case 401:

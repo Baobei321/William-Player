@@ -1,233 +1,314 @@
 <template>
-	<view class="video-player" style="width:750rpx;height:650rpx">
-		<video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
-			:initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
-			:play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
-			v-if="config.url&&!showReload&&plateForm=='ios'" @error="error" @waiting="waiting">
-		</video>
-		<video-view v-if="plateForm=='android'" :initialTime="config.initialTime" :title="config.title"
-			:src="config.url" @timeupdate="setHistory" style="width:750rpx;height:650rpx"></video-view>
-		<button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
-			<text style="color:#fff">重新加载</text>
-		</button>
-	</view>
+  <view class="video-player" style="width:750rpx;height:650rpx">
+    <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
+      :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
+      v-if="config.url&&!showReload&&plateForm=='ios'" @error="error" @waiting="waiting">
+    </video>
+    <button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
+      <text style="color:#fff">重新加载</text>
+    </button>
+    <video-view v-if="plateForm=='android'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
+      style="width:750rpx;height:650rpx"></video-view>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				webdavInfo: {},
-				historyPlay: [],
-				historyObj: {
-					initialTime: '0'
-				},
-				sum: 0,
-				routerParams: {},
-				rawUrl: '',
-				timeout: null,
-				reloadTimeout: null,
-				showReload: false,
-				plateForm: '',
-				emptyUrl: 'https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400',
-				config: {
-					url: "",
-					// 是否自动播放
-					autoplay: true,
-					//播放器预览背景图片，支持网络地址
-					poster: "",
-					//是否循环播放
-					loop: false,
-					//开始播放位置，单位：秒
-					initialTime: 0,
-					//是否是直播
-					isLive: false,
-					//是否静音播放
-					muted: false,
-					codec: "hardware",
-					title: "",
-					playStrategy: 0,
-				},
-			}
-		},
+export default {
+  data() {
+    return {
+      webdavInfo: {},
+      historyPlay: [],
+      historyObj: {
+        initialTime: "0",
+      },
+      sum: 0,
+      routerParams: {},
+      rawUrl: "",
+      timeout: null,
+      reloadTimeout: null,
+      showReload: false,
+      plateForm: "",
+      emptyUrl:
+        "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
+      config: {
+        url: "",
+        // 是否自动播放
+        autoplay: true,
+        //播放器预览背景图片，支持网络地址
+        poster: "",
+        //是否循环播放
+        loop: false,
+        //开始播放位置，单位：秒
+        initialTime: 0,
+        //是否是直播
+        isLive: false,
+        //是否静音播放
+        muted: false,
+        codec: "hardware",
+        title: "",
+        playStrategy: 0,
+        sourceList: [],
+        selectMedia: {},
+        selectType: {},
+        cookieStr: "",
+      },
+    };
+  },
 
-		methods: {
-			getVideoUrl() {
-				this.webdavInfo = uni.getStorageSync('webdavInfo')
-				return new Promise(resolve => {
-					uni.request({
-						url: 'http://' + this.webdavInfo.address + ':' + this.webdavInfo.port +
-							'/api/fs/get',
-						data: JSON.stringify({
-							path: '/' + this.routerParams.path,
-							password: ''
-						}),
-						timeout: 5000,
-						method: 'POST',
-						header: {
-							Authorization: this.webdavInfo.token,
-							'Content-Type': 'application/json'
-						},
-						success: (res) => {
-							resolve(res.data)
-						}
-					})
-				});
-			},
-			//裁剪格式获取电影名
-			getMovieName(val) {
-				const lastDotIndex = val.lastIndexOf('.');
-				let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
-				return name
-			},
-			setHistory(event) {
-				if (!this.routerParams.type) return
+  methods: {
+    //判断选择的是webdav还是天翼云盘还是夸克
+    judgeSelect() {
+      this.sourceList = uni.getStorageSync("sourceList");
+      this.selectType =
+        this.sourceList.find((item) => {
+          let select = item.list.find((i) => i.active);
+          if (select) {
+            this.selectMedia = select;
+            return true;
+          } else {
+            return false;
+          }
+        }) || {};
+    },
+    getVideoUrl() {
+      this.judgeSelect();
+      let requestUrl = "";
+      if (this.selectType.type == "WebDAV") {
+        if (this.selectMedia.name) {
+          requestUrl = "http://" + this.selectMedia.address + ":" + this.selectMedia.port + "/api/fs/get";
+          return new Promise((resolve) => {
+            uni.request({
+              url: requestUrl,
+              data: JSON.stringify({
+                path: "/" + this.routerParams.path,
+                password: "",
+              }),
+              timeout: 5000,
+              method: "POST",
+              header: {
+                Authorization: this.selectMedia.token,
+                "Content-Type": "application/json",
+              },
+              success: (res) => {
+                resolve(res.data);
+              },
+            });
+          });
+        }
+      } else if (this.selectType.type == "天翼云盘") {
+        if (this.selectMedia.name) {
+          let randomDigits = "";
+          for (let i = 0; i < 16; i++) {
+            randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
+          }
+          let cookie = { JSESSIONID: this.selectMedia.JSESSIONID, COOKIE_LOGIN_USER: this.selectMedia.COOKIE_LOGIN_USER };
+          let arr = Object.keys(cookie);
+          arr.forEach((item, index) => {
+            let str = "";
+            if (index == arr.length - 1) {
+              str = `${item}=${cookie[item]}`;
+              this.cookieStr = this.cookieStr + str;
+            } else {
+              str = `${item}=${cookie[item]};`;
+              this.cookieStr = this.cookieStr + str;
+            }
+          });
+          requestUrl = `https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action?noCache=0.${randomDigits}&fileId=${this.routerParams.folderFileId}&type=2`;
+          return new Promise((resolve) => {
+            uni.request({
+              url: requestUrl,
+              timeout: 5000,
+              method: "GET",
+              header: {
+                Accept: "application/json;charset=UTF-8",
+                "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+                Connection: "keep-alive",
+                Cookie: this.cookieStr,
+                Host: "cloud.189.cn",
+                Priority: "u=0",
+                // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                "Sign-Type": "1",
+                TE: "trailers",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+              },
+              success: (res) => {
+                resolve(res.data);
+              },
+            });
+          });
+        }
+      } else if (this.selectType.type == "夸克网盘") {
+        if (this.selectMedia.name) {
+          requestUrl = `https://drive-pc.quark.cn/1/clouddrive/file/download?pr=ucpro&uc_param_str=&fr=pc&sys=win32&ve=3.2.8`;
+          return new Promise((resolve) => {
+            uni.request({
+              url: requestUrl,
+              timeout: 5000,
+              data: JSON.stringify({ fids: [this.routerParams.folderFileId], speedup_session: "" }),
+              method: "POST",
+              header: {
+                "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+                Connection: "keep-alive",
+                "Content-Type":"application/json;charset=utf-8",
+                Cookie: this.selectMedia.Cookie,
+                Host: "drive-pc.quark.cn",
+                Referer: "https://pan.quark.cn/",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
+              },
+              success: (res) => {
+                resolve(res.data);
+              },
+            });
+          });
+        }
+      }
+    },
+    //裁剪格式获取电影名
+    getMovieName(val) {
+      const lastDotIndex = val.lastIndexOf(".");
+      let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
+      return name;
+    },
+    setHistory(event) {
+      if (!this.routerParams.type) return;
 
-				if (this.plateForm == 'ios') {
-					this.sum += 1
-					if (this.sum == 5) {
-						this.sum = 0
-						this.historyObj.initialTime = Math.round(event.detail.currentTime)
-						let index = null
-						if (this.routerParams.type == 'tv') {
-							index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && i.titlePlay == this
-								.historyObj.titlePlay)
-						} else if (this.routerParams.type == 'movie') {
-							index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && this.getMovieName(i
-									.name) ==
-								this.getMovieName(this.historyObj.name))
-						}
-						if (index > -1) {
-							this.historyPlay.splice(index, 1)
-							this.historyPlay.unshift(this.historyObj)
-						} else {
-							if (this.historyObj.type) {
-								this.historyPlay.unshift(this.historyObj)
-							}
-						}
-						uni.setStorageSync('historyPlay', this.historyPlay)
-					}
-				} else if (this.plateForm == 'android') {
-					this.historyObj.initialTime = Math.round(event.detail.currentTime)
-					let index = null
-					if (this.routerParams.type == 'tv') {
-						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && i.titlePlay == this
-							.historyObj.titlePlay)
-					} else if (this.routerParams.type == 'movie') {
-						index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && this.getMovieName(i
-								.name) ==
-							this.getMovieName(this.historyObj.name))
-					}
-					if (index > -1) {
-						this.historyPlay.splice(index, 1)
-						this.historyPlay.unshift(this.historyObj)
-					} else {
-						if (this.historyObj.type) {
-							this.historyPlay.unshift(this.historyObj)
-						}
-					}
-					uni.setStorageSync('historyPlay', this.historyPlay)
-				}
-			},
-			//初始化进入的时候，设置从哪儿开始播放
-			setInitialTime() {
-				const lastIndex = this.routerParams.path.lastIndexOf('/')
-				let obj = {}
-				if (this.routerParams.type == 'movie') {
-					let name = this.routerParams.path.substring(lastIndex + 1)
-					obj = this.historyPlay?.find(i => i.name == name)
-				} else if (this.routerParams.type == 'tv') {
-					let name = this.routerParams.path.substring(lastIndex + 1)
-					const secondLastSlashIndex = this.routerParams.path.lastIndexOf('/', lastIndex - 1);
-					let titlePlay = this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex)
-					obj = this.historyPlay?.find(i => i.name == name && i.titlePlay == titlePlay)
-				}
-				if (this.routerParams.item) {
-					this.historyObj = JSON.parse(this.routerParams.item)
-					this.config.poster = this.historyObj.poster
-				} else {
-					if (this.routerParams.type) {
-						this.historyObj = obj
-						this.config.poster = this.historyObj.poster
-					} else {
-						this.config.initialTime = 0
-						this.config.title = this.routerParams.path.substring(lastIndex + 1)
-						this.historyObj = {}
-						return
-					}
-				}
-				this.config.initialTime = Number(this.historyObj.initialTime)
-				this.config.title = this.historyObj.titlePlay + ' ' + '第' + this.historyObj.ji + '集 ' + this.historyObj
-					.title
-			},
-			error(e) {
-				// this.rawUrl = this.config.url
-				// this.config.url = ''
-				// setTimeout(() => {
-				// 	this.$nextTick(() => {
-				// 		this.config.url = this.rawUrl
-				// 	})
-				// }, 10000)
-				// if (!this.reloadTimeout) {
-				// 	this.reloadTimeout = setTimeout(() => {
-				// 		this.showReload = true
-				// 	}, 10000)
-				// }
-				this.showReload = true
-			},
-			waiting(e) {
-				// this.timeout = setTimeout(() => {
-				// 	this.config.initialTime = 0
-				// 	let url = this.config.url
-				// 	this.config.url = ''
-				// 	this.$nextTick(() => {
-				// 		this.config.url = url
-				// 	})
-				// }, 10000)
-			},
-			reloadVideo() {
-				this.showReload = false
-			},
-		},
-		async onLoad(options) {
-			let systemInfo = uni.getSystemInfoSync();
-			this.plateForm = systemInfo.platform;
-			if (this.plateForm == 'ios') {
-				uni.showToast({
-					title: '目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕',
-					duration: 3000,
-					icon: 'none',
-				})
-			}
-			this.historyPlay = uni.getStorageSync('historyPlay') || []
-			this.routerParams = options
-			this.setInitialTime()
-			let res = await this.getVideoUrl()
-			this.config.url = res.data.raw_url
-			// this.config.url = ''
-			this.config.showVideo = true
-		}
-	}
+      if (this.plateForm == "ios") {
+        this.sum += 1;
+        if (this.sum == 5) {
+          this.sum = 0;
+          this.historyObj.initialTime = Math.round(event.detail.currentTime);
+          let index = null;
+          if (this.routerParams.type == "tv") {
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
+          } else if (this.routerParams.type == "movie") {
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && this.getMovieName(i.name) == this.getMovieName(this.historyObj.name));
+          }
+          if (index > -1) {
+            this.historyPlay.splice(index, 1);
+            this.historyPlay.unshift(this.historyObj);
+          } else {
+            if (this.historyObj.type) {
+              this.historyPlay.unshift(this.historyObj);
+            }
+          }
+          uni.setStorageSync("historyPlay", this.historyPlay);
+        }
+      } else if (this.plateForm == "android") {
+        this.historyObj.initialTime = Math.round(event.detail.currentTime);
+        let index = null;
+        if (this.routerParams.type == "tv") {
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
+        } else if (this.routerParams.type == "movie") {
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && this.getMovieName(i.name) == this.getMovieName(this.historyObj.name));
+        }
+        if (index > -1) {
+          this.historyPlay.splice(index, 1);
+          this.historyPlay.unshift(this.historyObj);
+        } else {
+          if (this.historyObj.type) {
+            this.historyPlay.unshift(this.historyObj);
+          }
+        }
+        uni.setStorageSync("historyPlay", this.historyPlay);
+      }
+    },
+    //初始化进入的时候，设置从哪儿开始播放
+    setInitialTime() {
+      const lastIndex = this.routerParams.path.lastIndexOf("/");
+      let obj = {};
+      if (this.routerParams.type == "movie") {
+        let name = this.routerParams.path.substring(lastIndex + 1);
+        obj = this.historyPlay?.find((i) => i.name == name)||{};
+      } else if (this.routerParams.type == "tv") {
+        let name = this.routerParams.path.substring(lastIndex + 1);
+        const secondLastSlashIndex = this.routerParams.path.lastIndexOf("/", lastIndex - 1);
+        let titlePlay = this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex);
+        obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay)||{};
+      }
+
+      if (this.routerParams.item) {
+        this.historyObj = JSON.parse(this.routerParams.item);
+        this.config.poster = this.historyObj.poster;
+      } else {
+        if (this.routerParams.type) {
+          this.historyObj = obj;
+          this.config.poster = this.historyObj.poster;
+        } else {
+          this.config.initialTime = 0;
+          this.config.title = this.routerParams.path.substring(lastIndex + 1);
+          this.historyObj = {};
+          return;
+        }
+      }
+      this.config.initialTime = Number(this.historyObj.initialTime);
+      this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+    },
+    reloadVideo() {
+      this.showReload = false;
+    },
+  },
+  async onLoad(options) {
+    let systemInfo = uni.getSystemInfoSync();
+    this.plateForm = systemInfo.platform;
+    if (this.plateForm == "ios") {
+      uni.showToast({
+        title: "目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕",
+        duration: 3000,
+        icon: "none",
+      });
+    }
+    this.historyPlay = uni.getStorageSync("historyPlay") || [];
+    this.routerParams = options;
+    this.setInitialTime();
+    let res = await this.getVideoUrl();
+    if (this.selectType.type == "WebDAV") {
+      this.config.url = res.data.raw_url;
+    } else if (this.selectType.type == "天翼云盘") {
+      const NetworkModule = uni.requireNativePlugin("NetworkModule");
+      NetworkModule.request(
+        {
+          url: res.normal.url,
+          timeout: 5000,
+          method: "GET",
+        },
+        (res1) => {
+          uni.showToast({
+            title: res1.location,
+            icon: "none",
+            duration: 7000,
+          });
+          this.config.url = res1.location;
+        },
+        (error) => {}
+      );
+    }else if(this.selectType.type=='夸克网盘'){
+      this.config.url = res.data[0].download_url;
+    }
+  },
+};
 </script>
 
 <style lang="scss">
-	.video-player {
-		position: relative;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+.video-player {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-		.video-button {
-			width: 200rpx;
-			borderColor: #00B2A0;
-			height: 80rpx;
-			background: #00B2A0;
-			color: #ffffff;
-			justify-content: center;
-			align-items: center;
-			display: flex;
-			border-radius: 30rpx;
-			line-height: 80rpx
-		}
-	}
+  .video-button {
+    width: 200rpx;
+    bordercolor: #00b2a0;
+    height: 80rpx;
+    background: #00b2a0;
+    color: #ffffff;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border-radius: 30rpx;
+    line-height: 80rpx;
+  }
+}
 </style>

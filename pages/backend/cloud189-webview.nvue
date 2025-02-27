@@ -1,0 +1,116 @@
+<template>
+  <view class="cloud-drive">
+    <wil-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm"></wil-navbar>
+    <wil-webview type="web" :src="url" style="width: 750rpx;flex: 1;" @getcookies="getCookies" class="wil-webview" />
+  </view>
+</template>
+
+<script>
+import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import { get189Folder, get189User } from "../video/components/common";
+export default {
+  components: {
+    wilNavbar,
+  },
+  data() {
+    return {
+      url: "",
+      sum: 0,
+      debounceCookie: null,
+      timeout: null,
+      sourceList: [],
+      cookieObj: {},
+    };
+  },
+  methods: {
+    debounce(func, wait) {
+      return function () {
+        let context = this; // 保存this指向
+        let args = arguments; // 拿到event对象
+        if (this.timeout) {
+          clearTimeout(this.timeout);
+        }
+        this.timeout = setTimeout(function () {
+          func.apply(context, args);
+        }, wait);
+      };
+    },
+    getCookieData(event) {
+      let cookies = event.detail.cookies;
+      const cookieArray = cookies.split(";");
+      cookieArray.forEach((item) => {
+        let arr = item.split("=");
+        this.cookieObj[arr[0]] = arr[1];
+      });
+      this.sourceList = uni.getStorageSync("sourceList");
+    },
+    getCookies(event) {
+      this.debounceCookie(event);
+    },
+    async handleConfirm() {
+      let cloud189 = this.sourceList.find((item) => {
+        return item.type == "天翼云盘";
+      });
+      if (!this.cookieObj.JSESSIONID || !this.cookieObj.COOKIE_LOGIN_USER) {
+        uni.showToast({
+          title: "权限校验失败，请稍后再试",
+          icon: "none",
+        });
+        return;
+      }
+      let res = await get189Folder({ folderId: "-11" }, { JSESSIONID: this.cookieObj.JSESSIONID, COOKIE_LOGIN_USER: this.cookieObj.COOKIE_LOGIN_USER });
+      if (res.res_code == 0) {
+        let res1 = await get189User(this.cookieObj);
+        if (cloud189.list.length) {
+          cloud189.list[0].name = res1.loginName;
+          Object.keys(this.cookieObj).forEach((item) => {
+            cloud189.list[0][item] = this.cookieObj[item];
+          });
+          uni.showToast({
+            title: "修改成功",
+            icon: "none",
+          });
+        } else {
+          let obj = { name: res1.loginName };
+          Object.keys(this.cookieObj).forEach((item) => {
+            obj[item] = this.cookieObj[item];
+          });
+          cloud189.list.push(obj);
+          uni.showToast({
+            title: "添加成功",
+            icon: "none",
+          });
+        }
+        uni.setStorageSync("sourceList", this.sourceList);
+        uni.navigateBack({
+          delta: 2,
+        });
+      } else {
+        uni.showToast({
+          title: "权限校验失败，请稍后再试",
+          icon: "none",
+        });
+      }
+    },
+  },
+  onLoad(options) {
+    uni.setNavigationBarTitle({
+      title: decodeURIComponent(options.title),
+    });
+    this.url = decodeURIComponent(options.url);
+    this.debounceCookie = this.debounce(this.getCookieData, 8000);
+  },
+};
+</script>
+
+<style lang="scss">
+.cloud-drive {
+  width: 750rpx;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  .wil-webview {
+    flex: 1;
+  }
+}
+</style>

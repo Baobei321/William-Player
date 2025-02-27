@@ -67,13 +67,12 @@ const get189Folder = (data, cookieInfo) => {
       method: "GET",
       header: {
         "Accept": "application/json;charset=UTF-8",
-        "Accept-Encoding": 'gzip, deflate, br, zstd',
         "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
         'Connection': 'keep-alive',
         'Cookie': cookieStr,
         "Host": 'cloud.189.cn',
         'Priority': 'u=0',
-        'Referer': 'https://cloud.189.cn/web/main/file/folder/-11',
+        // 'Referer': 'https://cloud.189.cn/web/main/file/folder/-11',
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-origin',
@@ -86,6 +85,86 @@ const get189Folder = (data, cookieInfo) => {
       },
     });
   });
+}
+//天翼云盘获取用户信息
+const get189User = (obj) => {
+  let randomDigits = "";
+  for (let i = 0; i < 16; i++) {
+    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
+  }
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://cloud.189.cn/api/open/user/getUserInfoForPortal.action?noCache=0.${randomDigits}`,
+      header: {
+        Accept: "application/json;charset=UTF-8",
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "keep-alive",
+        Cookie: `JSESSIONID=${obj.JSESSIONID};COOKIE_LOGIN_USER=${obj.COOKIE_LOGIN_USER}`,
+        Host: "cloud.189.cn",
+        Priority: "u=0",
+        Referer: "https://cloud.189.cn/web/main/file/folder/-11",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        TE: "trailers",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+      },
+      success: (res) => {
+        resolve(res.data)
+      },
+    });
+  })
+
+}
+
+//天翼云盘处理网络ip变化刷新cookie
+const setCloud189Cookie = () => {
+
+}
+
+//夸克网盘
+const getQuarkFolder = (data, cookieInfo) => {
+  let cookieStr = cookieInfo.Cookie;
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=${data.fid}&_page=1&_size=100&_fetch_total=1`,
+      timeout: 3000,
+      method: "GET",
+      header: {
+        "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Connection': 'Keep-Alive',
+        'Cookie': cookieStr,
+        "Host": 'drive-pc.quark.cn',
+        'Referer': 'https://pan.quark.cn/',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
+//夸克网盘获取用户信息
+const getQuarkUser = (obj) => {
+  let cookieStr = obj.Cookie;
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://pan.quark.cn/account/info?fr=pc&platform=pc`,
+      header: {
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "Keep-Alive",
+        'Cookie': cookieStr,
+        "Host": 'pan.quark.cn',
+        Referer: "https://pan.quark.cn/list",
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
+      },
+      success: (res) => {
+        resolve(res.data)
+      },
+    });
+  })
+
 }
 
 //处理秒
@@ -111,4 +190,4 @@ const handleSecond = (val) => {
   return time
 }
 
-export { getFolder, loginUser, get189Folder, handleSecond };
+export { getFolder, loginUser, get189Folder, get189User, getQuarkFolder, getQuarkUser, handleSecond };

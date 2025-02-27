@@ -1,0 +1,109 @@
+<template>
+  <view class="quark-webview">
+    <wil-navbar class="wil-navbar" title="夸克网盘" @handleConfirm="handleConfirm"></wil-navbar>
+    <wil-webview type="web" :src="url" style="width: 750rpx;flex: 1;" @getcookies="getCookies" class="wil-webview" />
+  </view>
+</template>
+
+<script>
+import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import { getQuarkFolder, getQuarkUser } from "../video/components/common";
+export default {
+  components: {
+    wilNavbar,
+  },
+  data() {
+    return {
+      url: "",
+      sum: 0,
+      debounceCookie: null,
+      timeout: null,
+      sourceList: [],
+      quarkCookie: "",
+    };
+  },
+  methods: {
+    getCookies(event) {
+      this.quarkCookie = event.detail.cookies;
+      this.sourceList = uni.getStorageSync("sourceList");
+    },
+    async handleConfirm() {
+      let cloudQuark = this.sourceList.find((item) => {
+        return item.type == "夸克网盘";
+      });
+      if (!this.quarkCookie) {
+        uni.showToast({
+          title: "权限校验失败，请稍后再试",
+          icon: "none",
+        });
+        return;
+      }
+      let res = await getQuarkFolder(
+        {
+          fid: "0",
+        },
+        {
+          Cookie: this.quarkCookie,
+        }
+      );
+
+      if (res.status == 200) {
+        let res1 = await getQuarkUser({
+          Cookie: this.quarkCookie,
+        });
+        if (cloudQuark.list.length) {
+          cloudQuark.list[0].name = res1.data.nickname;
+          cloudQuark.list[0].Cookie = this.quarkCookie;
+          uni.setStorageSync("sourceList", this.sourceList);
+          uni.showToast({
+            title: "修改成功",
+            icon: "none",
+            success: (result) => {
+              uni.navigateBack({
+                delta: 2,
+              });
+            },
+          });
+        } else {
+          let obj = {
+            name: res1.data.nickname,
+            Cookie: this.quarkCookie,
+          };
+          cloudQuark.list.push(obj);
+          uni.setStorageSync("sourceList", this.sourceList);
+          uni.showToast({
+            title: "添加成功",
+            icon: "none",
+            success: (result) => {
+              uni.navigateBack({
+                delta: 2,
+              });
+            },
+          });
+        }
+      } else {
+        uni.showToast({
+          title: "权限校验失败，请稍后再试",
+          icon: "none",
+        });
+        return;
+      }
+    },
+  },
+  onLoad(options) {
+    this.url = decodeURIComponent(options.url);
+  },
+};
+</script>
+
+<style lang="scss">
+.quark-webview {
+  width: 750rpx;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  .wil-webview {
+    flex: 1;
+  }
+}
+</style>

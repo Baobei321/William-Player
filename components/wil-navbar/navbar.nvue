@@ -1,0 +1,68 @@
+<template>
+  <view class="navbar-nvue" :style="{height:navBarHeight}">
+    <view class="navbar-nvue-container" :style="{height:contentHeight}">
+      <image src="@/static/rect-left.png" class="navbar-nvue-container__back" @click="toBack"></image>
+      <span>{{ title }}</span>
+      <image src="@/static/bingo-icon.png" class="navbar-nvue-container__bingo" @click="toConfirm"></image>
+    </view>
+  </view>
+</template>
+  
+  <script>
+export default {
+  props: {
+    title: String,
+  },
+  data() {
+    return {
+      navBarHeight: "",
+      contentHeight: "",
+    };
+  },
+  methods: {
+    toBack() {
+      uni.navigateBack();
+    },
+    toConfirm(){
+        this.$emit('handleConfirm')
+    },
+
+    //计算微信navBar高度
+    getNavHeight() {
+      let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+      let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
+      this.navBarHeight = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
+      this.contentHeight = "44px";
+    },
+  },
+  created() {
+    this.getNavHeight();
+  },
+  onLoad(options) {},
+};
+</script>
+  
+  <style lang="scss">
+.navbar-nvue {
+  width: 750rpx;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  .navbar-nvue-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24rpx;
+    .navbar-nvue-container__back {
+      width: 40rpx;
+      height: 40rpx;
+    }
+    .navbar-nvue-container__bingo {
+      width: 46rpx;
+      height: 46rpx;
+    }
+  }
+}
+</style>

@@ -16,7 +16,7 @@
                 <image :src="item.img"></image>
               </div>
               <div class="list-item-name" :style="{color:vitem.active?'#ff6701':'#000'}">{{ vitem.name }}</div>
-              <image class="list-item-button" src="../../static/more-button.png"></image>
+              <image class="list-item-button" src="../../static/more-button.png" @click.stop="toShowMoreButton(item,vitem)"></image>
             </div>
           </div>
         </template>
@@ -31,25 +31,60 @@
       </nut-button>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
+    <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消" @choose="chooseOperation" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { onShow } from "@dcloudio/uni-app";
 import wilModal from "@/components/wil-modal/index.vue";
-import { loginUser } from "./components/common";
+import { toParse, toStringfy } from "../mine/common";
 
 const sourceList = ref([]);
+const selectMedia = ref({});
 
 const show = ref(true);
 const wil_modal = ref(null);
 
+const showBottom = ref(false);
+
+const operationList = [{ name: "修改" }, { name: "删除" }];
+let selectType = {};
+
+const mapping = {
+  "WebDAV": {
+    path: "/pages/video/add-webdav",
+    query: { title: "修改WebDAV" },
+  },
+  "天翼云盘": {
+    path: "/pages/backend/cloud189-webview",
+    query: {
+      url: "https://cloud.189.cn",
+      title: "天翼云盘",
+    },
+  },
+  "夸克网盘": {
+    path: "/pages/backend/quark-webview",
+    query: {
+      url: "https://pan.quark.cn",
+      title: "夸克网盘",
+    },
+  },
+};
+
 const toAddFile = () => {
   uni.navigateTo({
     url: "/pages/video/file-source",
+  });
+};
+
+const clearAcitve = () => {
+  sourceList.value.forEach((item) => {
+    item.list.forEach((v) => {
+      v.active = false;
+    });
   });
 };
 
@@ -59,6 +94,7 @@ const handleSelect = (vitem) => {
     content: "是否确认选择此资源",
     confirmColor: "#ff6701",
     confirm: async () => {
+      clearAcitve();
       vitem.active = true;
       uni.setStorageSync("isreload", true);
       uni.setStorageSync("sourceList", sourceList.value);
@@ -67,13 +103,37 @@ const handleSelect = (vitem) => {
   });
 };
 
+const toShowMoreButton = (item, vitem) => {
+  selectType = item;
+  selectMedia.value = vitem;
+  showBottom.value = true;
+};
+
+const chooseOperation = (item) => {
+  if (item.name == "修改") {
+    uni.navigateTo({
+      url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query),
+    });
+  } else if (item.name == "删除") {
+    wil_modal.value.showModal({
+      title: "温馨提示",
+      content: "是否确认删除该文件源？，此操作将一并删除海报墙",
+      confirmColor: "#ff6701",
+      confirm: async () => {
+        selectType.list = selectType.list.filter((i) => i.name != selectMedia.value.name);
+        uni.setStorageSync("sourceList", sourceList.value);
+        uni.removeStorageSync("localMovieTvData");
+      },
+    });
+  }
+};
+
 const judegeShow = () => {
   sourceList.value = uni.getStorageSync("sourceList");
-  
+
   show.value = !sourceList.value.every((item) => {
     return !item.list.length;
   });
-  console.log("展示onshow",sourceList.value);
 };
 
 onShow(() => {
@@ -202,6 +262,25 @@ page {
     height: 100%;
     ::v-deep .nut-button {
       border-radius: 12rpx;
+    }
+  }
+
+  ::v-deep .nut-popup {
+    .nut-action-sheet {
+      .nut-action-sheet__title {
+        color: gray;
+      }
+      .nut-action-sheet__menu {
+        .nut-action-sheet__item {
+          border-top: 2rpx solid #f6f6f6;
+          &:first-child {
+            border-top: none;
+          }
+        }
+      }
+      .nut-action-sheet__cancel {
+        border-top: 20rpx solid #f6f7f8;
+      }
     }
   }
 }

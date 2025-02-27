@@ -27,77 +27,103 @@
 
 <script setup>
 import { ref } from "vue";
-import playVideoButton from '../../../static/playVideo-button.png'
-import { handleSecond } from './common'
-import { onShow } from '@dcloudio/uni-app';
+import playVideoButton from "../../../static/playVideo-button.png";
+import { handleSecond } from "./common";
+import { onShow } from "@dcloudio/uni-app";
 
-const listData = ref(uni.getStorageSync('historyPlay') || [])
+const listData = ref(uni.getStorageSync("historyPlay") || []);
 
-const webdavInfo = ref(uni.getStorageSync('webdavInfo'))
+const selectType = ref({});
+
+//判断选择的是webdav还是天翼云盘还是夸克
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync("sourceList");
+  selectType.value = sourceList.find((item) => {
+    let select = item.list.find((i) => i.active);
+    if (select) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
 
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf('.');
+  const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   if (name.length > 17) {
-    name = name.slice(0, 16) + '...'
+    name = name.slice(0, 16) + "...";
   }
-  return name
+  return name;
 };
 
 //裁剪格式获取电影名
 const getMovieName = (val) => {
-  const lastDotIndex = val.lastIndexOf('.');
+  const lastDotIndex = val.lastIndexOf(".");
   let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
-  return name
-}
+  return name;
+};
 
 //将点击了的视频放置到数组的第一个去
 const setItemFirst = (item) => {
-  let index = null
-  if (item.type == 'tv') {
-    index = listData.value.findIndex(i => i.type == item.type && i.titlePlay == item.titlePlay)
-  } else if (item.type == 'movie') {
-    index = listData.value.findIndex(i => i.type == item.type && getMovieName(i.name) == getMovieName(item.name))
+  let index = null;
+  if (item.type == "tv") {
+    index = listData.value.findIndex((i) => i.type == item.type && i.titlePlay == item.titlePlay);
+  } else if (item.type == "movie") {
+    index = listData.value.findIndex((i) => i.type == item.type && getMovieName(i.name) == getMovieName(item.name));
   }
   if (index > -1) {
-    listData.value.splice(index, 1)
-    listData.value.unshift(item)
+    listData.value.splice(index, 1);
+    listData.value.unshift(item);
   } else {
-    listData.value.unshift(item)
+    listData.value.unshift(item);
   }
-  uni.setStorageSync('historyPlay', listData.value)
-}
+  uni.setStorageSync("historyPlay", listData.value);
+};
 
 const toVideoPlayer = (item) => {
-  if (item.type == 'movie') {
-    uni.navigateTo({
-      url: `/pages/video/video-player?path=${item.path}&type=movie`,
-      success: () => {
-        setItemFirst(item)
-      }
-    })
-
-  } else if (item.type == 'tv') {
-    uni.navigateTo({
-      url: `/pages/video/video-player?path=${item.path}&type=tv`,
-      success: () => {
-        setItemFirst(item)
-      }
-    })
+  if (item.type == "movie") {
+    if (selectType.value.type == "WebDAV") {
+      uni.navigateTo({
+        url: `/pages/video/video-player?path=${item.path}&type=movie`,
+        success: () => {
+          setItemFirst(item);
+        },
+      });
+    } else {
+      uni.navigateTo({
+        url: `/pages/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=movie`,
+        success: () => {
+          setItemFirst(item);
+        },
+      });
+    }
+  } else if (item.type == "tv") {
+    if (selectType.value.type == "WebDAV") {
+      uni.navigateTo({
+        url: `/pages/video/video-player?path=${item.path}&type=tv`,
+        success: () => {
+          setItemFirst(item);
+        },
+      });
+    } else {
+      uni.navigateTo({
+        url: `/pages/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=tv`,
+      });
+    }
   }
-}
+};
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=最近观看`
-  })
-}
+    url: `/pages/video/video-all?title=最近观看`,
+  });
+};
 
-
-onShow(()=>{
-  listData.value = uni.getStorageSync('historyPlay') || []
-})
-
+onShow(() => {
+  judgeSelect();
+  listData.value = uni.getStorageSync("historyPlay") || [];
+});
 </script>
 
 <style lang="scss" scoped>

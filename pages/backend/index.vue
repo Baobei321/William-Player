@@ -18,7 +18,7 @@ export default {
 	  }
   },
   onLoad(options) {
-    this.url = options.url
+    this.url = decodeURIComponent(options.url);
   }
 }
 </script>

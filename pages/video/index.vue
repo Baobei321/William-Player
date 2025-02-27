@@ -51,7 +51,7 @@ import { setTmdbKey, getUntokenDicts } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
-import { loginUser, getFolder, get189Folder } from "./components/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
 
 const video_navbar = ref(null);
 
@@ -100,7 +100,7 @@ const searchMovieTv = (data, type) => {
       },
       method: "GET",
       header: { "Content-Type": "application/json" },
-      success: res => {
+      success: (res) => {
         resolve(res.data);
       },
     });
@@ -108,7 +108,7 @@ const searchMovieTv = (data, type) => {
 };
 
 //处理内存大小
-const handleSize = size => {
+const handleSize = (size) => {
   if (size == 0) return "0";
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(size) / Math.log(1024));
@@ -117,9 +117,9 @@ const handleSize = size => {
 };
 
 //groupBy视频来源，将多个网盘来的视频合成一个
-const groupBySource = arr => {
+const groupBySource = (arr) => {
   const map = new Map();
-  arr.forEach(item => {
+  arr.forEach((item) => {
     if (!map.has(removeExtension(item.name))) {
       map.set(removeExtension(item.name), {
         ...item,
@@ -129,8 +129,9 @@ const groupBySource = arr => {
     }
     map.get(removeExtension(item.name)).source.push({
       provider: item.provider,
-      size: handleSize(item.size),
+      size: handleSize(item.size) || 0,
       path: item.path,
+      folderFileId: item.id,
       name: item.name,
     });
   });
@@ -138,13 +139,13 @@ const groupBySource = arr => {
   return result;
 };
 
-const removeExtension = filename => {
+const removeExtension = (filename) => {
   const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   return name;
 };
 
-const handleSeasonName = filename => {
+const handleSeasonName = (filename) => {
   const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   const lastKgIndex = name.lastIndexOf(" ");
@@ -152,11 +153,15 @@ const handleSeasonName = filename => {
   return name;
 };
 
-const refreshVideo = async () => {
+const refreshWebDavVideo = async () => {
   refreshData.value = { found: 0, toupdate: 0, updated: 0 };
   movieTvData.value = { movie: [], tv: [] };
+  if (selectMedia.value.name) {
+    let res1 = await loginUser(selectMedia.value);
+    selectMedia.value.token = res1.data.token;
+  }
   await getMovieTv(listData.value, "/");
-  if (!movieTvData.value.movie.length || !movieTvData.value.tv.length) {
+  if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
     refreshLoading.value = false;
     return;
   }
@@ -165,7 +170,7 @@ const refreshVideo = async () => {
   compareMovieTv(movie, "movie");
   compareMovieTv(tv, "tv");
   await setMovieTvImg(movie, "movie")
-    .then(res => {
+    .then((res) => {
       localMovieTvData.value.movie = res;
     })
     .catch(() => {
@@ -186,12 +191,12 @@ const refreshVideo = async () => {
 //比较新刮削出来的影片是否已经存在或者删除，不存在就是待更新
 const compareMovieTv = (arr, type) => {
   if (type == "movie") {
-    const deleteNumber = localMovieTvData.value.movie?.filter(item => arr?.every(i => i.name != item.name))?.length || 0;
-    const addNumber = arr?.filter(item => localMovieTvData.value.movie?.every(i => i.name != item.name))?.length || 0;
+    const deleteNumber = localMovieTvData.value.movie?.filter((item) => arr?.every((i) => i.name != item.name))?.length || 0;
+    const addNumber = arr?.filter((item) => localMovieTvData.value.movie?.every((i) => i.name != item.name))?.length || 0;
     refreshData.value.toupdate += deleteNumber + addNumber;
   } else if (type == "tv") {
-    const deleteNumber = localMovieTvData.value.tv?.filter(item => arr?.every(i => i.name != item.name))?.length || 0;
-    const addNumber = arr?.filter(item => localMovieTvData.value.tv?.every(i => i.name != item.name))?.length || 0;
+    const deleteNumber = localMovieTvData.value.tv?.filter((item) => arr?.every((i) => i.name != item.name))?.length || 0;
+    const addNumber = arr?.filter((item) => localMovieTvData.value.tv?.every((i) => i.name != item.name))?.length || 0;
     refreshData.value.toupdate += deleteNumber + addNumber;
   }
 };
@@ -206,7 +211,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
       if (item.name == "电影") {
         uni.hideLoading();
         let movieResult = await getFolder({ path: path + "电影" }, selectMedia.value);
-        movieResult.data.content.forEach(v => {
+        movieResult.data.content.forEach((v) => {
           v.path = path + "电影";
           v.provider = movieResult.data.provider;
         });
@@ -216,7 +221,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
       if (item.name == "电视剧") {
         uni.hideLoading();
         let tvResult = await getFolder({ path: path + "电视剧" }, selectMedia.value);
-        tvResult.data.content.forEach(v => {
+        tvResult.data.content.forEach((v) => {
           v.path = path + "电视剧";
           v.provider = tvResult.data.provider;
         });
@@ -278,21 +283,23 @@ const handleGx = async () => {
   let isreload = uni.getStorageSync("isreload");
   if (isreload) {
     uni.removeStorageSync("isreload");
-    // webdavInfo.value = uni.getStorageSync("webdavInfo");
     sourceList.value = uni.getStorageSync("sourceList");
+    if (selectType.value.type == "WebDAV") {
+      if (selectMedia.value.name) {
+        let res1 = await loginUser(selectMedia.value);
+        selectMedia.value.token = res1.data.token;
 
-    if (selectMedia.value.name) {
-      let res1 = await loginUser(selectMedia.value);
-      selectMedia.value = { ...selectMedia.value, token: res1.data.token };
-      let res = await getFolder({}, selectMedia.value);
-      console.log(res, "res111");
+        uni.setStorageSync("sourceList", sourceList.value);
+        let res = await getFolder({}, selectMedia.value);
+        console.log(res, "res111");
 
-      listData.value = res.data.content.map(item => {
-        if (item.type == "1") {
-          item.leftIcon = Folder;
-        }
-        return item;
-      });
+        listData.value = res.data.content.map((item) => {
+          if (item.type == "1") {
+            item.leftIcon = Folder;
+          }
+          return item;
+        });
+      }
     }
     if (!uni.getStorageSync("tmdbKey")) {
       showDialog.value = true;
@@ -300,6 +307,155 @@ const handleGx = async () => {
     } else {
       video_navbar.value.showProgress();
     }
+  }
+};
+
+//天翼云盘refresh
+const refresh189Video = async () => {
+  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  movieTvData.value = { movie: [], tv: [] };
+  await get189MovieTv(listData.value[0]);
+  if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
+    refreshLoading.value = false;
+    return;
+  }
+  console.log(movieTvData.value, "movieTvData");
+
+  let movie = groupBySource(movieTvData.value.movie);
+  let tv = groupBySource(movieTvData.value.tv);
+  compareMovieTv(movie, "movie");
+  compareMovieTv(tv, "tv");
+  await setMovieTvImg(movie, "movie")
+    .then((res) => {
+      localMovieTvData.value.movie = res;
+    })
+    .catch(() => {
+      refreshLoading.value = false;
+      showDialog.value = true;
+      uni.showToast({
+        title: "请填写正确的api_key",
+        icon: "none",
+      });
+    });
+  localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
+  refreshData.value.updated = refreshData.value.toupdate;
+  refreshData.value.toupdate = 0;
+  uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+  refreshLoading.value = false;
+};
+
+//查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
+const get189MovieTv = async (obj) => {
+  if (!obj?.count) return;
+  refreshLoading.value = true;
+
+  let myVideo = obj.folderList.find((i) => i.name == "我的视频");
+  let res1 = await get189Folder({ folderId: myVideo.id }, selectMedia.value);
+
+  for (let item of res1.fileListAO.folderList) {
+    if (item.name == "电影") {
+      let movieResult = await get189Folder({ folderId: item.id }, selectMedia.value);
+
+      movieResult.fileListAO.fileList.forEach((v) => {
+        v.path = "/我的视频/电影";
+        v.provider = "189CloudPC";
+      });
+      movieTvData.value.movie.push(...movieResult.fileListAO.fileList);
+      refreshData.value.found += movieResult.fileListAO.fileList.length;
+    }
+    if (item.name == "电视剧") {
+      let tvResult = await get189Folder({ folderId: item.id }, selectMedia.value);
+
+      tvResult.fileListAO.folderList.forEach((v) => {
+        v.path = "/我的视频/电视剧";
+        v.provider = "189CloudPC";
+      });
+      movieTvData.value.tv.push(...tvResult.fileListAO.folderList);
+      refreshData.value.found += tvResult.fileListAO.folderList.length;
+    }
+  }
+  if (res1.fileListAO.folderList.every((i) => i.name != "电影" && i.name != "电视剧")) {
+    uni.showToast({
+      title: "请按照规则设置文件夹",
+      icon: "none",
+    });
+  }
+};
+//夸克网盘refresh
+const refreshQuarkVideo = async () => {
+  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  movieTvData.value = { movie: [], tv: [] };
+  await getQuarkMovieTv(listData.value[0]);
+  if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
+    refreshLoading.value = false;
+    return;
+  }
+  console.log(movieTvData.value, "movieTvData");
+
+  let movie = groupBySource(movieTvData.value.movie);
+  let tv = groupBySource(movieTvData.value.tv);
+  compareMovieTv(movie, "movie");
+  compareMovieTv(tv, "tv");
+  await setMovieTvImg(movie, "movie")
+    .then((res) => {
+      localMovieTvData.value.movie = res;
+    })
+    .catch(() => {
+      refreshLoading.value = false;
+      showDialog.value = true;
+      uni.showToast({
+        title: "请填写正确的api_key",
+        icon: "none",
+      });
+    });
+  localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
+  refreshData.value.updated = refreshData.value.toupdate;
+  refreshData.value.toupdate = 0;
+  uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+  refreshLoading.value = false;
+};
+
+//查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
+const getQuarkMovieTv = async (obj) => {
+  if (!obj.list?.length) return;
+  refreshLoading.value = true;
+  let myVideo = obj.list.find((i) => i.file_name == "我的视频");
+  let res1 = await getQuarkFolder({ fid: myVideo.fid }, selectMedia.value);
+
+  for (let item of res1.data.list) {
+    if (item.file_name == "电影") {
+      let movieResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
+      movieResult.data.list = movieResult.data.list.map((v) => {
+        return { id: v.fid, name: v.file_name, path: "/我的视频/电影", provider: "Quark", size: v.size };
+      });
+      movieTvData.value.movie.push(...movieResult.data.list);
+      refreshData.value.found += movieResult.data.list.length;
+    }
+    if (item.file_name == "电视剧") {
+      let tvResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
+
+      tvResult.data.list = tvResult.data.list.map((v) => {
+        return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧", provider: "Quark", size: v.size };
+      });
+      movieTvData.value.tv.push(...tvResult.data.list);
+      refreshData.value.found += tvResult.data.list.length;
+    }
+  }
+  if (res1.data.list.every((i) => i.file_name != "电影" && i.file_name != "电视剧")) {
+    uni.showToast({
+      title: "请按照规则设置文件夹",
+      icon: "none",
+    });
+  }
+};
+
+const refreshVideo = () => {
+  if (selectType.value.type == "WebDAV") {
+    refreshWebDavVideo();
+  } else if (selectType.value.type == "天翼云盘") {
+    refresh189Video();
+  } else if (selectType.value.type == "夸克网盘") {
+    refreshQuarkVideo();
   }
 };
 
@@ -325,8 +481,8 @@ const getAppUpdateInfo = async () => {
 const judgeSelect = () => {
   sourceList.value = uni.getStorageSync("sourceList");
   selectType.value =
-    sourceList.value.find(item => {
-      let select = item.list.find(i => i.active);
+    sourceList.value.find((item) => {
+      let select = item.list.find((i) => i.active);
       if (select) {
         selectMedia.value = select;
         return true;
@@ -336,15 +492,20 @@ const judgeSelect = () => {
     }) || {};
 };
 
-onShow(() => {
+onShow(async () => {
   sourceList.value = uni.getStorageSync("sourceList");
   if (!sourceList.value) {
     sourceList.value = [
       { type: "WebDAV", list: [], img: webdavFileIcon },
       {
         type: "天翼云盘",
-        list: [{ name: "19994643173", JSESSIONID: "4E99BA8CFFC320EF374143C1D08DC97F", COOKIE_LOGIN_USER: "C5FE88B243BC774F7985E2CAF38A04A4621CA7B7D218BE749991D64F85C531287E4921BEDFA9E3E67AEBB0D992047DD0CEEE30A4EEA3BF4726441412" }],
+        list: [],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
+      },
+      {
+        type: "夸克网盘",
+        list: [],
+        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
       },
     ];
     uni.setStorageSync("sourceList", sourceList.value);
@@ -355,7 +516,46 @@ onShow(() => {
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   judgeSelect();
   if (selectType.value.type == "WebDAV") {
+    // if (selectMedia.value.name) {
+    //   let res = await loginUser(selectMedia.value);
+    //   selectMedia.value = { ...selectMedia.value, token: res.data.token };
+    //   if (!listData.value.length) {
+    //     let res1 = await getFolder({}, selectMedia.value);
+    //     listData.value = res1.data.content.map((item) => {
+    //       if (item.type == "1") {
+    //         item.leftIcon = Folder;
+    //       }
+    //       return item;
+    //     });
+    //   }
+    // }
     handleGx();
+  } else if (selectType.value.type == "天翼云盘") {
+    let isreload = uni.getStorageSync("isreload");
+    if (isreload) {
+      uni.removeStorageSync("isreload");
+      let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
+      listData.value = [res.fileListAO];
+      if (!uni.getStorageSync("tmdbKey")) {
+        showDialog.value = true;
+        return;
+      } else {
+        video_navbar.value.showProgress();
+      }
+    }
+  } else if (selectType.value.type == "夸克网盘") {
+    let isreload = uni.getStorageSync("isreload");
+    if (isreload) {
+      uni.removeStorageSync("isreload");
+      let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
+      listData.value = [res.data];
+      if (!uni.getStorageSync("tmdbKey")) {
+        showDialog.value = true;
+        return;
+      } else {
+        video_navbar.value.showProgress();
+      }
+    }
   }
   //初始化资源库列表
 });
@@ -364,9 +564,12 @@ onBeforeMount(async () => {
   judgeSelect();
   if (selectType.value.type == "WebDAV") {
     if (selectMedia.value.name) {
-      await loginUser(selectMedia.value);
+      let res1 = await loginUser(selectMedia.value);
+      selectMedia.value.token = res1.data.token;
+      uni.setStorageSync("sourceList", sourceList.value);
+
       let res = await getFolder({}, selectMedia.value);
-      listData.value = res.data.content.map(item => {
+      listData.value = res.data.content.map((item) => {
         if (item.type == "1") {
           item.leftIcon = Folder;
         }
@@ -376,19 +579,12 @@ onBeforeMount(async () => {
   } else if (selectType.value.type == "天翼云盘") {
     if (selectMedia.value.name) {
       let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
-      console.log(res, "res天翼");
-      uni.showToast({
-        title:res,
-        icon:'none',
-        duration:7000
-      })
-
-      // listData.value = res.data.content.map(item => {
-      //   if (item.type == "1") {
-      //     item.leftIcon = Folder;
-      //   }
-      //   return item;
-      // });
+      listData.value = [res.fileListAO];
+    }
+  } else if (selectType.value.type == "夸克网盘") {
+    if (selectMedia.value.name) {
+      let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
+      listData.value = [res.data];
     }
   }
 });
