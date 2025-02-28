@@ -18,6 +18,29 @@ const getFolder = (data, webdavInfo) => {
   });
 };
 
+//webdav获取视频链接
+const getWebDAVUrl = (data, webdavInfo) => {
+  requestUrl = "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
+  return new Promise((resolve) => {
+    uni.request({
+      url: requestUrl,
+      data: JSON.stringify({
+        path: "/" + data.path,
+        password: "",
+      }),
+      timeout: 5000,
+      method: "POST",
+      header: {
+        Authorization: webdavInfo.token,
+        "Content-Type": "application/json",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
 //webdav登录
 const loginUser = (webdavInfo) => {
   return new Promise((resolve, reject) => {
@@ -86,6 +109,53 @@ const get189Folder = (data, cookieInfo) => {
     });
   });
 }
+
+//天翼云盘获取视频链接
+const get189VideoUrl = (data, cookieInfo) => {
+  let cookieStr = "";
+  let randomDigits = "";
+  for (let i = 0; i < 16; i++) {
+    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
+  }
+  let cookie = { JSESSIONID: cookieInfo.JSESSIONID, COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER };
+  let arr = Object.keys(cookie);
+  arr.forEach((item, index) => {
+    let str = "";
+    if (index == arr.length - 1) {
+      str = `${item}=${cookie[item]}`;
+      cookieStr = cookieStr + str;
+    } else {
+      str = `${item}=${cookie[item]};`;
+      cookieStr = cookieStr + str;
+    }
+  });
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
+      timeout: 5000,
+      method: "GET",
+      header: {
+        Accept: "application/json;charset=UTF-8",
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "keep-alive",
+        Cookie: cookieStr,
+        Host: "cloud.189.cn",
+        Priority: "u=0",
+        // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Sign-Type": "1",
+        TE: "trailers",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
 //天翼云盘获取用户信息
 const get189User = (obj) => {
   let randomDigits = "";
@@ -114,7 +184,6 @@ const get189User = (obj) => {
       },
     });
   })
-
 }
 
 //天翼云盘处理网络ip变化刷新cookie
@@ -137,6 +206,54 @@ const getQuarkFolder = (data, cookieInfo) => {
         "Host": 'drive-pc.quark.cn',
         'Referer': 'https://pan.quark.cn/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
+//夸克网盘获取视频链接
+const getQuarkVideoUrl = (data, cookieInfo) => {
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://drive-pc.quark.cn/1/clouddrive/file/download?pr=ucpro&uc_param_str=&fr=pc&sys=win32&ve=3.2.8`,
+      timeout: 5000,
+      data: JSON.stringify({ fids: [data.folderFileId], speedup_session: "" }),
+      method: "POST",
+      header: {
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "keep-alive",
+        "Content-Type": "application/json;charset=utf-8",
+        Cookie: cookieInfo.Cookie,
+        Host: "drive-pc.quark.cn",
+        Referer: "https://pan.quark.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
+//夸克网盘获取不同清晰度的视频链接
+const getQuarkResolutionUrl = (data, cookieInfo) => {
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://drive-pc.quark.cn/1/clouddrive/file/v2/play?pr=ucpro&uc_param_str=&fr=pc`,
+      timeout: 5000,
+      data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: "fmp4,m3u8" }),
+      method: "POST",
+      header: {
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "keep-alive",
+        "Content-Type": "application/json;charset=utf-8",
+        Cookie: cookieInfo.Cookie,
+        Host: "drive-pc.quark.cn",
+        Referer: "https://pan.quark.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
       },
       success: (res) => {
         resolve(res.data);
@@ -190,4 +307,4 @@ const handleSecond = (val) => {
   return time
 }
 
-export { getFolder, loginUser, get189Folder, get189User, getQuarkFolder, getQuarkUser, handleSecond };
+export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond };

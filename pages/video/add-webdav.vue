@@ -1,9 +1,9 @@
 <template>
   <div class="add-webdav-form">
-    <wil-navbar :title="routerParams.title"></wil-navbar>
+    <wil-navbar :title="title"></wil-navbar>
     <div class="add-webdav-form__container">
       <base-form v-model="state.formData" :options="options" ref="base_form"></base-form>
-      <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ routerParams.title=='添加WebDAV'?'添加':'修改' }}</nut-button>
+      <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title=='添加WebDAV'?'添加':'修改' }}</nut-button>
       <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
     </div>
   </div>
@@ -24,6 +24,8 @@ const base_form = ref(null);
 // const showLoginPopup = ref(false)
 
 const routerParams = ref({});
+
+const title = ref("");
 
 const options = ref([
   { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
@@ -49,29 +51,31 @@ const confirmSubmit = () => {
           title: "存在重复的WebDAV地址，请修改",
           icon: "none",
         });
-      } else {
-        let res = await loginUser(state.formData);
-        sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
-        uni.setStorageSync("sourceList", sourceList);
-        uni.navigateBack({
-          delta: 2,
-        });
+        return;
       }
-      // let pages = getCurrentPages();
-      // let prevPage = pages[pages.length - 2];
-      // if (prevPage.route == "pages/video/index") {
-      //   uni.setStorageSync("isreload", true);
-      // }
+      if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name)) {
+        uni.showToast({
+          title: "存在同名的WebDAV，请修改",
+          icon: "none",
+        });
+        return;
+      }
+      let res = await loginUser(state.formData);
+      sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+      uni.setStorageSync("sourceList", sourceList);
+      uni.navigateBack({
+        delta: 2,
+      });
     }
   });
 };
 
 onLoad((options) => {
-  routerParams.value.title = decodeURIComponent(options.title);
-  let title = "";
-  title = routerParams.value.title;
-  if (title == "修改WebDAV") {
-    state.formData = uni.getStorageSync("webdavInfo");
+  routerParams.value = options;
+  title.value = decodeURIComponent(routerParams.value.title);
+  if (title.value == "修改WebDAV") {
+    let sourceList = uni.getStorageSync("sourceList");
+    state.formData = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
   }
 });
 </script>

@@ -111,9 +111,15 @@ const toShowMoreButton = (item, vitem) => {
 
 const chooseOperation = (item) => {
   if (item.name == "修改") {
-    uni.navigateTo({
-      url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query),
-    });
+    if (selectType.type == "WebDAV") {
+      uni.navigateTo({
+        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}`,
+      });
+    } else {
+      uni.navigateTo({
+        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query),
+      });
+    }
   } else if (item.name == "删除") {
     wil_modal.value.showModal({
       title: "温馨提示",

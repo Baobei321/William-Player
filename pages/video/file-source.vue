@@ -49,16 +49,16 @@ const sourceList = ref([
         name: "夸克网盘",
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
         path: "/pages/backend/quark-webview",
-        query:{
-          url:"https://pan.quark.cn",
-          title:'夸克网盘'
-        }
+        query: {
+          url: "https://pan.quark.cn",
+          title: "夸克网盘",
+        },
       },
     ],
   },
 ]);
 
-const toPath = (vitem) => {
+const toPath = vitem => {
   if (vitem.path) {
     uni.navigateTo({
       url: vitem.path + "?" + toStringfy(vitem.query),

@@ -170,7 +170,7 @@ page {
       margin-left: 20rpx;
       .item-right-name {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         font-size: 30rpx;
         color: #000;
         font-weight: bold;

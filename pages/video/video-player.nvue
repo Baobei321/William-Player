@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, getQuarkResolutionUrl } from "./components/common";
 export default {
   data() {
     return {
@@ -70,99 +71,22 @@ export default {
           }
         }) || {};
     },
-    getVideoUrl() {
+    async getVideoUrl() {
       this.judgeSelect();
-      let requestUrl = "";
       if (this.selectType.type == "WebDAV") {
         if (this.selectMedia.name) {
-          requestUrl = "http://" + this.selectMedia.address + ":" + this.selectMedia.port + "/api/fs/get";
-          return new Promise((resolve) => {
-            uni.request({
-              url: requestUrl,
-              data: JSON.stringify({
-                path: "/" + this.routerParams.path,
-                password: "",
-              }),
-              timeout: 5000,
-              method: "POST",
-              header: {
-                Authorization: this.selectMedia.token,
-                "Content-Type": "application/json",
-              },
-              success: (res) => {
-                resolve(res.data);
-              },
-            });
-          });
+          let res = await getWebDAVUrl({ path: this.routerParams.path }, this.selectMedia);
+          return res;
         }
       } else if (this.selectType.type == "天翼云盘") {
         if (this.selectMedia.name) {
-          let randomDigits = "";
-          for (let i = 0; i < 16; i++) {
-            randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
-          }
-          let cookie = { JSESSIONID: this.selectMedia.JSESSIONID, COOKIE_LOGIN_USER: this.selectMedia.COOKIE_LOGIN_USER };
-          let arr = Object.keys(cookie);
-          arr.forEach((item, index) => {
-            let str = "";
-            if (index == arr.length - 1) {
-              str = `${item}=${cookie[item]}`;
-              this.cookieStr = this.cookieStr + str;
-            } else {
-              str = `${item}=${cookie[item]};`;
-              this.cookieStr = this.cookieStr + str;
-            }
-          });
-          requestUrl = `https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action?noCache=0.${randomDigits}&fileId=${this.routerParams.folderFileId}&type=2`;
-          return new Promise((resolve) => {
-            uni.request({
-              url: requestUrl,
-              timeout: 5000,
-              method: "GET",
-              header: {
-                Accept: "application/json;charset=UTF-8",
-                "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-                Connection: "keep-alive",
-                Cookie: this.cookieStr,
-                Host: "cloud.189.cn",
-                Priority: "u=0",
-                // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
-                "Sec-Fetch-Dest": "empty",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Site": "same-origin",
-                "Sign-Type": "1",
-                TE: "trailers",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
-              },
-              success: (res) => {
-                resolve(res.data);
-              },
-            });
-          });
+          let res = await get189VideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
+          return res;
         }
       } else if (this.selectType.type == "夸克网盘") {
         if (this.selectMedia.name) {
-          requestUrl = `https://drive-pc.quark.cn/1/clouddrive/file/download?pr=ucpro&uc_param_str=&fr=pc&sys=win32&ve=3.2.8`;
-          return new Promise((resolve) => {
-            uni.request({
-              url: requestUrl,
-              timeout: 5000,
-              data: JSON.stringify({ fids: [this.routerParams.folderFileId], speedup_session: "" }),
-              method: "POST",
-              header: {
-                "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-                Connection: "keep-alive",
-                "Content-Type":"application/json;charset=utf-8",
-                Cookie: this.selectMedia.Cookie,
-                Host: "drive-pc.quark.cn",
-                Referer: "https://pan.quark.cn/",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
-              },
-              success: (res) => {
-                resolve(res.data);
-              },
-            });
-          });
+          let res = await getQuarkResolutionUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
+          return res;
         }
       }
     },
@@ -174,7 +98,6 @@ export default {
     },
     setHistory(event) {
       if (!this.routerParams.type) return;
-
       if (this.plateForm == "ios") {
         this.sum += 1;
         if (this.sum == 5) {
@@ -221,12 +144,12 @@ export default {
       let obj = {};
       if (this.routerParams.type == "movie") {
         let name = this.routerParams.path.substring(lastIndex + 1);
-        obj = this.historyPlay?.find((i) => i.name == name)||{};
+        obj = this.historyPlay?.find((i) => i.name == name) || {};
       } else if (this.routerParams.type == "tv") {
         let name = this.routerParams.path.substring(lastIndex + 1);
         const secondLastSlashIndex = this.routerParams.path.lastIndexOf("/", lastIndex - 1);
         let titlePlay = this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex);
-        obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay)||{};
+        obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay) || {};
       }
 
       if (this.routerParams.item) {
@@ -244,7 +167,7 @@ export default {
         }
       }
       this.config.initialTime = Number(this.historyObj.initialTime);
-      this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+      this.config.title = this.routerParams.type == "movie" ? this.getMovieName(this.historyObj.title) : this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
     },
     reloadVideo() {
       this.showReload = false;
@@ -284,8 +207,8 @@ export default {
         },
         (error) => {}
       );
-    }else if(this.selectType.type=='夸克网盘'){
-      this.config.url = res.data[0].download_url;
+    } else if (this.selectType.type == "夸克网盘") {
+      this.config.url = res.data.video_list[0].video_info.url;
     }
   },
 };

@@ -70,7 +70,9 @@ const cellOptions = ref([
     {
       title: "数据同步",
       leftIcon: iconTb,
-      path: "/pages/backend/data-sync",
+      // path: "/pages/backend/data-sync",
+      path: null,
+      tip: "正在开发中...",
     },
     {
       title: "下载管理",

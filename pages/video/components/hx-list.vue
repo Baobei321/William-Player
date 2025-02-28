@@ -22,40 +22,38 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref, nextTick } from "vue";
 
 const props = defineProps({
-  title: { type: String, default: '电影' },
-  number: { type: String, default: '0' },
+  title: { type: String, default: "电影" },
+  number: { type: String, default: "0" },
   listData: { type: Array, default: [] },
-})
+});
 
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf('.');
+  const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   if (name.length > 7) {
-    name = name.slice(0, 6) + '...'
+    name = name.slice(0, 6) + "...";
   }
-  return name
+  return name;
 };
 
 const typeMapping = {
-  '电影': 'movie',
-  '电视剧': 'tv'
-}
-
+  "电影": "movie",
+  "电视剧": "tv",
+};
 const toVideoDetail = (item) => {
   uni.navigateTo({
     url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
-  })
-}
+  });
+};
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=${props.title}`
-  })
-}
-
+    url: `/pages/video/video-all?title=${props.title}`,
+  });
+};
 </script>
 <style lang="scss" scoped>
 @keyframes opacityIn {

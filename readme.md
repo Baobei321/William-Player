@@ -1,2 +1,80 @@
-1.0.0版本
-一、完成了数据同步，后续再进行更改，通过电影电视剧的id去查询tmdb接口，减少数据库存储。
+![WilliamPlayer](https://i-blog.csdnimg.cn/direct/bc4a70da417f489082d15b5fc8faae90.png#pic_center)
+# William Player
+一款适配📱 Android Phone 和的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
+
+---
+
+喜欢或者对您有用的话就给颗🌟Star吧，您的支持是我维护的最大动力(′･ω･`)
+
+## Features
+
+- 支持 **Android TV** 和 **Android Phone** (桌面端开发中)
+- 支持阿里云盘、夸克网盘、Webdav和本地媒体文件播放
+- 纯本地运行，无需后端服务支持 [^1]
+- 支持跳过片头/片尾
+- 支持视频轨道选择
+- 支持内嵌字幕和外置字幕播放[^2]
+- 支持文件下载和边下边播
+- 支持多线程网络加速
+- 支持网盘文件的整理
+- 多账号登录
+- 支持中英双语
+- 支持手机端辅助TV端输入
+- 浅色和深色模式
+- 观看IPTV直播
+- DLNA投屏
+- 软件体积小 (≈ 15 MB)
+- 设备间的数据同步
+- 自动更新
+
+[^1]: 网盘由网盘供应商提供服务支持，与本项目无关
+
+
+## 安装
+
+[Releases](https://gitee.com/CWLcwl0219/drawing-bed/releases/download/1.0.0/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+
+| 架构          | APK                         | 说明                   |
+|-------------|-----------------------------|----------------------|
+| arm64-v8a   | app-arm64-v8a-release.apk   | 适合大部分设备，手机多数为此架构     |
+
+## 版本适配
+
+Android 8+
+
+## 预览 [^3]
+
+### Android Phone 截图
+
+<div style="display: flex;">
+<img src="https://i-blog.csdnimg.cn/direct/3cc62e3fa81a4baa88a2c6eacf9be879.jpeg" alt="Mobile Screenshot 1" width="24%"/>
+<img src="https://i-blog.csdnimg.cn/direct/c548f17d999245ba8cf9174ee8870969.jpeg" alt="Mobile Screenshot 2" width="24%"/>
+<img src="https://i-blog.csdnimg.cn/direct/1534097f7e8049baacb8ee5bde7eb179.jpeg" alt="Mobile Screenshot 3" width="24%"/>
+<img src="https://i-blog.csdnimg.cn/direct/71d1bf3f8cd84a3bb0b2d783f45339cb.jpeg" alt="Mobile Screenshot 4" width="24%"/>
+</div>
+
+[^3]: 预览中的影视媒体仅作为展示用
+
+## 其他说明
+
+如果遇到Bug或者有应用优化建议，欢迎提 [Issue](https://gitee.com/CWLcwl0219/webdav-video-player/issues)，我会在第一时间回复 😊
+
+## 后续要增加的新功能
+
+按照以下顺序进行开发
+
+- [ ] 根据网络速度选择合适的夸克视频播放
+- [ ] 尝试解决夸克大文件下载链接的限速问题
+- [ ] 增加数据同步功能
+- [ ] 增加帮助页面
+- [ ] DLNA投屏
+
+## 声明
+
+本项目仅作为个人学习使用
+
+本项目不提供任何的内容资源，若出现任何内容侵权行为皆与本项目开发人员无关
+
+在使用本程序之前，你应了解并承担相应的风险，包括但不限于账号被ban，下载限速等，与本程序无关
+
+

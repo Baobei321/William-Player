@@ -20,8 +20,8 @@
             </div>
           </div>
           <div class="img-bottom">
-            <span>{{ imgData.genres }}</span>
-            <span v-if="routerParams.type == 'movie'">{{ selectSource.size }}</span>
+            <span class="img-bottom-genres">{{ imgData.genres }}</span>
+            <span v-if="routerParams.type == 'movie'" class="img-bottom-size">{{ selectSource.size }}</span>
           </div>
         </div>
       </div>
@@ -590,7 +590,7 @@ page {
             align-items: center;
             padding: 0 14rpx;
             padding-left: 0;
-            height:40rpx;
+            height: 40rpx;
             position: relative;
             &::after {
               position: absolute;
@@ -608,6 +608,7 @@ page {
             }
             span {
               font-size: 28rpx;
+              line-height: 15px;
               color: #c2c5c6;
               padding-left: 10rpx;
             }
@@ -616,7 +617,7 @@ page {
             display: flex;
             align-items: center;
             padding: 0 14rpx;
-            height:40rpx;
+            height: 40rpx;
             position: relative;
             &::after {
               position: absolute;
@@ -642,7 +643,7 @@ page {
             display: flex;
             align-items: center;
             padding: 0 14rpx;
-            height:40rpx;
+            height: 40rpx;
             image {
               width: 28rpx;
               height: 28rpx;
@@ -659,26 +660,30 @@ page {
         position: relative;
         z-index: 2;
         display: flex;
-        align-items: center;
-        span {
+        align-items: baseline;
+        .img-bottom-genres {
           padding: 0 14rpx;
           font-size: 28rpx;
           color: #c2c5c6;
-          &:first-child {
-            padding-left: 0;
-          }
-          &:nth-child(2) {
-            position: relative;
-            &::before {
-              position: absolute;
-              content: "";
-              width: 2rpx;
-              height: 24rpx;
-              background-color: #c2c5c6;
-              left: 0;
-              top: 50%;
-              transform: translateY(-50%);
-            }
+          display: block;
+          padding-left: 0;
+        }
+        .img-bottom-size {
+          position: relative;
+          padding: 0 14rpx;
+          font-size: 28rpx;
+          color: #c2c5c6;
+          display: block;
+          &::before {
+            position: absolute;
+            display: block;
+            content: "";
+            width: 3rpx;
+            height: 24rpx;
+            background-color: #c2c5c6;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
           }
         }
       }
