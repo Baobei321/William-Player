@@ -1,4 +1,4 @@
-![WilliamPlayer](https://i-blog.csdnimg.cn/direct/bc4a70da417f489082d15b5fc8faae90.png#pic_center)
+![WilliamPlayer](https://gitee.com/CWLcwl0219/webdav-video-player/raw/master/static/app-logo1.png)
 # William Player
 一款适配📱 Android Phone 和的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
 
@@ -47,10 +47,10 @@ Android 8+
 ### Android Phone 截图
 
 <div style="display: flex;">
-<img src="https://i-blog.csdnimg.cn/direct/3cc62e3fa81a4baa88a2c6eacf9be879.jpeg" alt="Mobile Screenshot 1" width="24%"/>
-<img src="https://i-blog.csdnimg.cn/direct/c548f17d999245ba8cf9174ee8870969.jpeg" alt="Mobile Screenshot 2" width="24%"/>
-<img src="https://i-blog.csdnimg.cn/direct/1534097f7e8049baacb8ee5bde7eb179.jpeg" alt="Mobile Screenshot 3" width="24%"/>
-<img src="https://i-blog.csdnimg.cn/direct/71d1bf3f8cd84a3bb0b2d783f45339cb.jpeg" alt="Mobile Screenshot 4" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/9d25a057431b3a0fa4b8ea748b98a4b.jpg" alt="Mobile Screenshot 1" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/05cfd863ab202929f64fd6d44e291f0.jpg" alt="Mobile Screenshot 2" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/e1358cc49b75a1d8d570465eb009efe.jpg" alt="Mobile Screenshot 3" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/a33afbdf6774f504d1990453d99b421.jpg" alt="Mobile Screenshot 4" width="24%"/>
 </div>
 
 [^3]: 预览中的影视媒体仅作为展示用
