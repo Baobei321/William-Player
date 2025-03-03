@@ -196,7 +196,7 @@ const getQuarkFolder = (data, cookieInfo) => {
   let cookieStr = cookieInfo.Cookie;
   return new Promise((resolve) => {
     uni.request({
-      url: `https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=${data.fid}&_page=1&_size=100&_fetch_total=1`,
+      url: `https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=${data.fid}&_page=1&_size=100&_fetch_total=1&_sort=file_type:asc,file_name:asc`,
       timeout: 3000,
       method: "GET",
       header: {

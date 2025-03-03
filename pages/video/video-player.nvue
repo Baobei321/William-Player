@@ -208,7 +208,14 @@ export default {
         (error) => {}
       );
     } else if (this.selectType.type == "夸克网盘") {
-      this.config.url = res.data.video_list[0].video_info.url;
+      if (res.data.video_list[0].video_info?.url) {
+        this.config.url = res.data.video_list[0].video_info.url;
+      } else {
+        uni.showToast({
+          title: "请使用88vip以上的夸克网盘",
+          icon: "none",
+        });
+      }
     }
   },
 };

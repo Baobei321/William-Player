@@ -128,7 +128,9 @@ const chooseOperation = (item) => {
       confirm: async () => {
         selectType.list = selectType.list.filter((i) => i.name != selectMedia.value.name);
         uni.setStorageSync("sourceList", sourceList.value);
-        uni.removeStorageSync("localMovieTvData");
+        if(selectMedia.value.active){
+          uni.removeStorageSync("localMovieTvData");
+        }
       },
     });
   }

@@ -82,9 +82,11 @@ export default {
           });
         }
         uni.setStorageSync("sourceList", this.sourceList);
-        uni.navigateBack({
-          delta: 2,
-        });
+        setTimeout(() => {
+          uni.navigateBack({
+            delta: 2,
+          });
+        }, 1500);
       } else {
         uni.showToast({
           title: "权限校验失败，请稍后再试",
