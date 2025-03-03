@@ -13,7 +13,7 @@
         <div class="mine-loged__left">
           <div class="left-img">
             <img
-              src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
+              :src="userInfo.avatar||'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
           </div>
           <div class="left-info">
             <div class="left-info-name">
@@ -249,6 +249,7 @@ page {
         height: 136rpx;
 
         img {
+          border-radius: 50%;
           width: 100%;
           height: 100%;
         }

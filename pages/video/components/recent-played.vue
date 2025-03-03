@@ -14,7 +14,7 @@
           <div class="recent-played-list-movie__item" v-for="item in listData" :key="item.name" @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img" :style="{backgroundImage:`url(${item.poster})`}">
               <image :src="playVideoButton" />
-              <span class="img-runtime">{{ item.initialTime=='-1'?'跳转浏览器播放':handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
+              <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
             </div>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ removeExtension(item.name) }}</span>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='tv'">{{ removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>

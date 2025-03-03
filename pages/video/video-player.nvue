@@ -2,7 +2,7 @@
   <view class="video-player" style="width:750rpx;height:650rpx">
     <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
       :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
-      v-if="config.url&&!showReload&&plateForm=='ios'" @error="error" @waiting="waiting">
+      v-if="config.url&&!showReload&&plateForm=='ios'">
     </video>
     <button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
       <text style="color:#fff">重新加载</text>

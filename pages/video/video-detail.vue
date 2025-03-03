@@ -350,15 +350,6 @@ const getMovieName = (val) => {
 
 //点击播放按钮
 const clickPlayButton = () => {
-  if (buttonText.value.indexOf("跳转浏览器播放") > -1) {
-    let history = {};
-    if (routerParams.value.type == "movie") {
-      history = historyPlay.value?.find((i) => getMovieName(i.name) == getMovieName(selectSource.value.name));
-    } else if (routerParams.value.type == "tv") {
-      history = historyPlay.value?.find((i) => i.titlePlay == selectSource.value.name);
-    }
-    return;
-  }
   if (routerParams.value.type == "movie") {
     let history = historyPlay.value?.find((i) => getMovieName(i.name) == getMovieName(selectSource.value.name));
     if (history) {
@@ -482,14 +473,14 @@ const setButtonText = () => {
   if (routerParams.value.type == "movie") {
     let history = historyPlay.value?.find((i) => i.name == selectSource.value.name);
     if (history) {
-      history.initialTime == "-1" ? (buttonText.value = "跳转浏览器播放") : "播放 " + handleSecond(history.initialTime);
+      buttonText.value = "播放 " + handleSecond(history.initialTime);
     } else {
       buttonText.value = "播放";
     }
   } else if (routerParams.value.type == "tv") {
     let history = historyPlay.value?.find((i) => i.titlePlay == selectSource.value.name);
     if (history) {
-      let time = history.initialTime == "-1" ? "跳转浏览器播放" : handleSecond(history.initialTime);
+      let time = handleSecond(history.initialTime);
       buttonText.value = `第${history.ji}集 ${time}`;
     } else {
       buttonText.value = "播放";

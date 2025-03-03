@@ -9,8 +9,8 @@
       </template>
     </base-form>
     <div class="user-agreement" @click="checkAgree">
-      <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon"/>
-      <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon"/>
+      <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon" />
+      <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon" />
       <div class="user-agreement-word">
         <span>我已阅读并同意</span>
         <span>《用户协议》</span>
@@ -22,79 +22,77 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import baseForm from '../../components/wil-form/index.vue'
-import checkIcon from '../../static/check.png'
-import checkActiveIcon from '../../static/check-active.png'
-import { loginByPhone, getWeUserByopenId } from '../../network/apis';
+import { ref } from "vue";
+import baseForm from "../../components/wil-form/index.vue";
+import checkIcon from "../../static/check.png";
+import checkActiveIcon from "../../static/check-active.png";
+import { loginByPhone, getWeUserByopenId } from "../../network/apis";
 // import { getUserByopenId } from '../../utils/user'
-import { encrypt } from '../../utils/jsencrypt.js'
-import * as CONFIG from '../../utils/config';
+import { encrypt } from "../../utils/jsencrypt.js";
+import * as CONFIG from "../../utils/config";
 
 //手机号校验
 const validatorPhone = (val) => {
   if (!val) {
-    return false
+    return false;
   } else {
     const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
     if (!reg.test(val)) {
-      return false
+      return false;
     } else {
       return true;
     }
   }
-}
+};
 const settings = ref([
-  { label: '手机号', type: 'input', prop: 'phone', formItemProps: { placeholder: '请输入手机号', type: 'number', inputmode: 'numeric' }, rule: [{ validator: validatorPhone, message: '请输入正确的手机号' }] },
-  { label: '密码', type: 'input', prop: 'password', formItemProps: { placeholder: '请输入密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
-])
+  { label: "手机号", type: "input", prop: "phone", formItemProps: { placeholder: "请输入手机号", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone, message: "请输入正确的手机号" }] },
+  { label: "密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
+]);
 
-const base_form = ref(null)
-const formData = ref({})
-const userAgree = ref(false)
+const base_form = ref(null);
+const formData = ref({});
+const userAgree = ref(false);
 
 const checkAgree = () => {
-  userAgree.value = !userAgree.value
-}
+  userAgree.value = !userAgree.value;
+};
 
 const getUserByopenId = async () => {
-  let res = await getWeUserByopenId({ openId: uni.getStorageSync(CONFIG.OPEN_ID) })
-  uni.setStorageSync(CONFIG.USER_ID, res.data.userId)
-  uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, ...res.data.wuser })
-  uni.setStorageSync('Authorization', res.data.token)
-  uni.setStorageSync('tmdbKey', res.data.wuser.tmdbKey)
-}
+  let res = await getWeUserByopenId({ openId: uni.getStorageSync(CONFIG.OPEN_ID) });
+  uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
+  uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
+  uni.setStorageSync("Authorization", res.data.token);
+  uni.setStorageSync("tmdbKey", res.data.wuser.tmdbKey);
+};
 
 const confirmCommit = async () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
-      let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) })
-      uni.setStorageSync(CONFIG.OPEN_ID, res.openId)
-      getUserByopenId()
+      let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) });
+      uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+      getUserByopenId();
       uni.reLaunch({
-        url: '/pages/video/index'
-      })
+        url: "/pages/video/index",
+      });
     }
-  })
-}
+  });
+};
 
 const toWechatApp = () => {
   wx.miniapp.launchMiniProgram({
-    userName: 'gh_f92f01cae1ce',
-    path: '/pages/mine/register',
-    miniprogramType: '2',
-  })
-}
+    userName: "gh_f92f01cae1ce",
+    path: "/pages/mine/register",
+    miniprogramType: "2",
+  });
+};
 
 const clickNoAgree = () => {
   uni.showToast({
-    title: '请先勾选用户协议',
-    icon: 'none',
+    title: "请先勾选用户协议",
+    icon: "none",
     duration: 2000,
-  })
-}
-
-
+  });
+};
 </script>
 
 <style lang="scss" scoped>
