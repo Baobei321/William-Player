@@ -1,5 +1,5 @@
 <template>
-  <div class="recent-played" v-if="listData.length">
+  <div class="recent-played">
     <div class="recent-played-title">
       <div class="recent-played-title-left">最近观看</div>
       <div class="recent-played-title-right" @click="toVideoAll">

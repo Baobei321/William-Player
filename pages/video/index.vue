@@ -477,7 +477,7 @@ const judgeSelect = () => {
     sourceList.value.find((item) => {
       let select = item.list.find((i) => i.active);
       if (select) {
-        selectMedia.value.name != select.name ? uni.setStorageSync("historyPlay", []) : "";
+        (selectMedia.value.name && selectMedia.value.name != select.name) ? uni.setStorageSync("historyPlay", []) : "";
         selectMedia.value = select;
         return true;
       } else {
@@ -510,11 +510,11 @@ onShow(async () => {
     ];
     uni.setStorageSync("sourceList", sourceList.value);
   }
+  judgeSelect();
   tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   webdavInfo.value = uni.getStorageSync("webdavInfo");
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
-  judgeSelect();
   if (selectType.value.type == "WebDAV") {
     // if (selectMedia.value.name) {
     //   let res = await loginUser(selectMedia.value);
