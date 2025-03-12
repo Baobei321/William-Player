@@ -108,8 +108,7 @@ const judegeShow = () => {
 
 const getUpdateInfo = async () => {
   let systemInfo = uni.getSystemInfoSync();
-  console.log(systemInfo, "systemInfo");
-  // if (systemInfo.osName != 'android') return
+  // if (systemInfo.platform != 'android') return
   let res = await props.updateFunction();
   newVersion.value = res.data[res.data.length - 1];
   let version = "";
@@ -117,8 +116,11 @@ const getUpdateInfo = async () => {
   if (compareVersions(newVersion.value.dictLabel, version) == 1) {
     //此时后台设置已有新版本
     if (props.enableControl) {
-      console.log("打开1");
       let remindTime = uni.getStorageSync("remindTime");
+      if (!remindTime) {
+        remindTime = { type: "总是", lastTime: null };
+        uni.setStorageSync("remindTime", remindTime);
+      }
       if (remindTime.type == "总是") {
         showBottom.value = true;
       } else if (remindTime.type == "每天") {
@@ -130,7 +132,6 @@ const getUpdateInfo = async () => {
         showBottom.value = true;
       }
     } else {
-      console.log("打开2");
       showBottom.value = true;
     }
   }
@@ -252,8 +253,8 @@ const closedPopup = () => {
         // console.log('无法解析文件路径: ' + e.message);
       }
     );
+    plus.downloader.clear();
   }
-  plus.downloader.clear();
   emits("closed");
 };
 
@@ -278,7 +279,13 @@ watch(
   () => props.visible,
   (val) => {
     if (val) {
-      getUpdateInfo();
+      if (!props.enableControl) {
+        getUpdateInfo();
+      }
+    } else {
+      if(props.enableControl){
+        getUpdateInfo();
+      }
     }
     showBottom.value = val;
   },
@@ -286,10 +293,11 @@ watch(
 );
 
 onHide(() => {
-  console.log("隐藏");
   uni.setStorageSync("downloadedSize", downloadedSize.value);
   if (downStatus.value != 1) {
-    dTask.value.abort();
+    if (props.type == "inApp") {
+      dTask.value.abort();
+    }
   }
 });
 </script>
