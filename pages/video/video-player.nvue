@@ -1,14 +1,16 @@
 <template>
   <view class="video-player" style="width:750rpx;height:650rpx">
-    <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
-      :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
-      v-if="config.url&&!showReload&&plateForm=='ios'">
-    </video>
-    <button class="video-button" v-if="showReload&&plateForm=='ios'" @click="reloadVideo">
-      <text style="color:#fff">重新加载</text>
-    </button>
-    <video-view v-if="plateForm=='android'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
+    <video-view v-if="plateForm=='android'&&uniPlatform=='app'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
       style="width:750rpx;height:650rpx"></video-view>
+    <template v-else>
+      <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
+        :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
+        v-if="config.url&&!showReload">
+      </video>
+      <button class="video-button" v-if="showReload" @click="reloadVideo">
+        <text style="color:#fff">重新加载</text>
+      </button>
+    </template>
   </view>
 </template>
 
@@ -29,6 +31,7 @@ export default {
       reloadTimeout: null,
       showReload: false,
       plateForm: "",
+      uniPlatform: "",
       emptyUrl:
         "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
       config: {
@@ -97,6 +100,7 @@ export default {
       return name;
     },
     setHistory(event) {
+      if (this.routerParams.noSetHistory == 0) return;
       if (!this.routerParams.type) return;
       if (this.plateForm == "ios") {
         this.sum += 1;
@@ -176,7 +180,8 @@ export default {
   async onLoad(options) {
     let systemInfo = uni.getSystemInfoSync();
     this.plateForm = systemInfo.platform;
-    if (this.plateForm == "ios") {
+    this.uniPlatform = systemInfo.uniPlatform;
+    if (this.uniPlatform != "app") {
       uni.showToast({
         title: "目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕",
         duration: 3000,
@@ -198,11 +203,6 @@ export default {
           method: "GET",
         },
         (res1) => {
-          uni.showToast({
-            title: res1.location,
-            icon: "none",
-            duration: 7000,
-          });
           this.config.url = res1.location;
         },
         (error) => {}

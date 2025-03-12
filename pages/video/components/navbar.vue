@@ -308,12 +308,13 @@ onMounted(() => {
             margin-top: 20rpx;
             .popover-list-item {
               display: flex;
-              align-items: center;
+              align-items: baseline;
               span:first-child {
                 font-size: 28rpx;
                 color: #d0d0d0;
               }
               span:last-child {
+                font-size: 28rpx;
                 padding-left: 6rpx;
                 color: #fff;
                 font-weight: bold;

@@ -1,6 +1,7 @@
 <template>
   <div class="video-list">
-    <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData" :refresher-enabled="false">
+    <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData"
+      :refresher-enabled="false">
       <template #default="item">
         <nut-cell is-link :class="[item.$index==data.total-1?'last-cell':'']" @click="clickCell(item)">
           <template #title>
@@ -22,19 +23,20 @@
 
 <script setup>
 import { ref } from "vue";
-import loadList from '../../components/wil-list/index.vue'
-import Folder from '../../static/folder.png'
-import videoPlayer from '../../static/video-player.png'
-import { onShow, onLoad } from '@dcloudio/uni-app';
+import loadList from "../../components/wil-list/index.vue";
+import Folder from "../../static/folder.png";
+import videoPlayer from "../../static/video-player.png";
+import { get189Folder, getQuarkFolder } from "./components/common.js";
+import { onShow, onLoad } from "@dcloudio/uni-app";
 
-const webdavInfo = ref({})
-const data = ref({})
-const load_list = ref(null)
+const webdavInfo = ref({});
+const data = ref({});
+const load_list = ref(null);
 
-const routerParams = ref({})
-
-
-
+const routerParams = ref({});
+const sourceList = ref([]);
+const selectType = ref({});
+const selectMedia = ref({});
 const responseAdapter = (result) => {
   if (!result) {
     return {
@@ -46,64 +48,112 @@ const responseAdapter = (result) => {
     listData: result.data.content || [],
     listTotal: +result.data.total,
   };
-}
-const getFileList = (data) => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  let path = ''
-  path = routerParams.value.path
-  return new Promise(resolve => {
-    uni.request({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/fs/list',
-      data: JSON.stringify({ path: '/' + path, page: data.pageNum, per_page: data.pageSize, refresh: false }),
-      method: 'POST',
-      header: { Authorization: webdavInfo.value.token, 'Content-Type': 'application/json' },
-      success: (res) => {
-        resolve(res.data)
+};
+
+const judgeSelect = () => {
+  sourceList.value = uni.getStorageSync("sourceList");
+  selectType.value =
+    sourceList.value.find((item) => {
+      let select = item.list.find((i) => i.active);
+      if (select) {
+        selectMedia.value = select;
+        return true;
+      } else {
+        return false;
       }
-    })
-  })
-}
+    }) || {};
+};
+const getFileList = async (data) => {
+  judgeSelect();
+  if (selectType.value.type == "WebDAV") {
+    webdavInfo.value = uni.getStorageSync("webdavInfo");
+    let path = "";
+    path = routerParams.value.path;
+    return new Promise((resolve) => {
+      uni.request({
+        url: "http://" + webdavInfo.value.address + ":" + webdavInfo.value.port + "/api/fs/list",
+        data: JSON.stringify({ path: "/" + path, page: data.pageNum, per_page: data.pageSize, refresh: false }),
+        method: "POST",
+        header: { Authorization: webdavInfo.value.token, "Content-Type": "application/json" },
+        success: (res) => {
+          resolve(res.data);
+        },
+      });
+    });
+  } else if (selectType.value.type == "天翼云盘") {
+    let res = await get189Folder({ ...data, folderId: routerParams.value.folderFileId }, selectMedia.value);
+    res.fileListAO.fileList.forEach((v) => {
+      v?.icon?.largeUrl ? (v.thumb = v.icon.largeUrl) : "";
+      v.type = 0;
+      v.folderFileId = v.id;
+    });
+    res.fileListAO.folderList.forEach((v) => {
+      v.type = 1;
+      v.folderFileId = v.id;
+    });
+
+    return { data: { content: [...res.fileListAO.folderList, ...res.fileListAO.fileList], total: res.fileListAO.count } };
+  } else if (selectType.value.type == "夸克网盘") {
+    let res = await getQuarkFolder({ ...data, fid: routerParams.value.folderFileId }, selectMedia.value);
+    res.data.list.forEach((v) => {
+      v.file_type == 0 ? (v.type = 1) : (v.type = 0);
+      v.name = v.file_name;
+      v.big_thumbnail ? (v.thumb = v.big_thumbnail) : "";
+      v.folderFileId = v.fid;
+    });
+    return { data: { content: res.data.list, total: res.data.list.length } };
+  }
+};
 
 //处理内存大小
 const handleSize = (size) => {
-  if (size == 0) return '0';
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (size == 0) return "0";
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(size) / Math.log(1024));
   const formatted = parseFloat((size / Math.pow(1024, i)).toFixed(2));
-  return formatted + ' ' + sizes[i];
-}
+  return formatted + " " + sizes[i];
+};
 
 const handleData = (val) => {
-  data.value = val
-}
+  data.value = val;
+};
 
 const clickCell = (item) => {
-  let path = ''
-  path = routerParams.value.path
-  if (item.type == '1') {
-    uni.navigateTo({
-      url: '/pages/video/catelog-list?path=' + path + '/' + item.name
-    })
+  let path = "";
+  path = routerParams.value.path;
+  if (item.type == "1") {
+    if (selectType.value.type == "WebDAV") {
+      uni.navigateTo({
+        url: `/pages/video/catelog-list?path=${path}/${item.name}`,
+      });
+    } else if (selectType.value.type == "天翼云盘") {
+      uni.navigateTo({
+        url: `/pages/video/catelog-list?path=${path}/${item.name}&folderFileId=${item.folderFileId}`,
+      });
+    } else if (selectType.value.type == "夸克网盘") {
+      uni.navigateTo({
+        url: `/pages/video/catelog-list?path=${path}/${item.name}&folderFileId=${item.folderFileId}`,
+      });
+    }
   } else {
-    let type = ''
-    if (path.indexOf('电视剧') > -1) {
-      type = 'tv'
-    } else if (path.indexOf('电影') > -1) {
-      type = 'movie'
+    let type = "";
+    if (path.indexOf("电视剧") > -1) {
+      type = "tv";
+    } else if (path.indexOf("电影") > -1) {
+      type = "movie";
     }
     uni.navigateTo({
-      url: '/pages/video/video-player?path=' + path + '/' + item.name + '&type=' + type
-    })
+      url: `/pages/video/video-player?path=${path}/${item.name}&type=${type}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
+    });
   }
-}
+};
 
 onLoad((options) => {
-  routerParams.value = options
+  routerParams.value = options;
   uni.setNavigationBarTitle({
-    title: routerParams.value.path.split('/')[routerParams.value.path.split('/').length - 1]
-  })
-})
-
+    title: routerParams.value.path.split("/")[routerParams.value.path.split("/").length - 1],
+  });
+});
 </script>
 
 <style lang="scss" scoped>

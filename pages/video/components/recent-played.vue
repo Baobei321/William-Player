@@ -15,6 +15,7 @@
             <div class="recent-played-list-movie__item-img" :style="{backgroundImage:`url(${item.poster})`}">
               <image :src="playVideoButton" />
               <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
+              <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>
             </div>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ removeExtension(item.name) }}</span>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='tv'">{{ removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
@@ -28,7 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import playVideoButton from "../../../static/playVideo-button.png";
-import { handleSecond } from "./common";
+import { handleSecond, parseTime } from "./common";
 import { onShow } from "@dcloudio/uni-app";
 
 const listData = ref(uni.getStorageSync("historyPlay") || []);
@@ -178,6 +179,7 @@ onShow(() => {
             width: 100%;
             border-radius: 20rpx;
             position: relative;
+            overflow: hidden;
             image {
               width: 80rpx;
               height: 80rpx;
@@ -196,6 +198,13 @@ onShow(() => {
               font-size: 24rpx;
               border-radius: 8rpx;
               padding: 4rpx 8rpx;
+            }
+            .img-process {
+              height: 7rpx;
+              background: #ff6701;
+              position: absolute;
+              bottom: 0;
+              left: 0;
             }
           }
           &-name {

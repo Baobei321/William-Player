@@ -128,7 +128,7 @@ const chooseOperation = (item) => {
       confirm: async () => {
         selectType.list = selectType.list.filter((i) => i.name != selectMedia.value.name);
         uni.setStorageSync("sourceList", sourceList.value);
-        if(selectMedia.value.active){
+        if (selectMedia.value.active) {
           uni.removeStorageSync("localMovieTvData");
         }
       },
@@ -201,18 +201,28 @@ page {
           align-items: center;
           position: relative;
           border: 2prx solid transparent;
-
+          &::before {
+            position: absolute;
+            content: "";
+            height: 2rpx;
+            background: rgb(241, 241, 241);
+            width: 100%;
+            left: 0;
+            top: 0;
+          }
           &:active {
             background: rgb(241, 241, 241);
           }
 
           &:first-child {
-            border-radius: 14rpx 14rpx 0 0;
+            border-radius: 14rpx;
+            &::before{
+              display: none;
+            }
           }
 
           &:last-child {
-            border-top: 2rpx solid rgb(241, 241, 241);
-            border-radius: 0 0 14rpx 14rpx;
+            border-radius: 14rpx;
           }
 
           .list-item-img {

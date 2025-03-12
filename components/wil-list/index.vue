@@ -105,6 +105,7 @@ const deletePage = ref(1)
 const load = async () => {
   deletePage.value = paginationData.currentPage
   await promiseData.then(result => {
+
     if (promiseId != result.promiseId) {
       return
     }
@@ -119,7 +120,7 @@ const load = async () => {
       list.value = [...list.value, ...listData];
     }
     paginationData.total = listTotal;
-
+    
     if (props.useListTotal) {
       paginationData.total = listData.length;
     }

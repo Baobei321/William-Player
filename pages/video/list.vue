@@ -13,214 +13,312 @@
       </div>
     </div>
     <div class="video-list1">
-      <div class="video-list1-title">WebDAV-我的WebDAV</div>
+      <div class="video-list1-title">我的文件</div>
       <div class="video-list1-container" v-if="listData.length">
         <base-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></base-cell>
       </div>
-      <div class="video-list1-tip" v-else>暂无WebDAV，请查看Alist是否开启</div>
+      <div class="video-list1-tip" v-else>暂无文件，请查看资源是否开启</div>
     </div>
-    <div class="video-addbutton" @click="openPopup">
-      <image :src="rocketIcon" />
-      <span>添加媒体</span>
-    </div>
-    <nut-popup v-model:visible="showPopup" position="bottom" round class="video-popup" @closed="closedPopup" :destroy-on-close="true">
-      <div class="video-popup-title">
-        <span>添加媒体</span>
-        <nut-icon name="close" size="14" @click="closedPopup"></nut-icon>
-      </div>
-      <div class="video-popup-container">
-        <div class="video-popup-container__webdav" v-if="webdavInfo.name" @click="toEditWebdav">
-          <div class="webdav-left">
-            <image :src="Alist" /><span>{{ webdavInfo.name }}</span>
-          </div>
-          <nut-icon name="edit" size="14" class="webdav-right"></nut-icon>
-        </div>
-        <div class="video-popup-container__add" @click="toAddWebdav">
-          <div class="add-left">
-            <image :src="Webdav" /><span>从WebDAV导入</span>
-          </div>
-          <nut-icon name="rect-right" size="14" class="add-right"></nut-icon>
-        </div>
-      </div>
-    </nut-popup>
-    <!-- <music-player></music-player> -->
   </div>
 </template>
   
   <script setup>
 import { onBeforeMount, onMounted, ref, nextTick } from "vue";
-import rocketIcon from '../../static/rocket-icon.png'
-import Alist from '../../static/alist.png'
-import Webdav from '../../static/webdav.png'
-import baseCell from '../../components/wil-cell/index.vue'
-import Folder from '../../static/folder.png'
-import { dayjs } from '@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js'
-import wilNavbar from '../../components/wil-navbar/index.vue'
-import { getFolder } from './components/common.js'
-import { onShow } from '@dcloudio/uni-app';
+import baseCell from "../../components/wil-cell/index.vue";
+import Folder from "../../static/folder.png";
+import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
+import { getFolder, get189Folder, getQuarkFolder } from "./components/common.js";
+import { onShow } from "@dcloudio/uni-app";
 
-const date = ref('暂未更新')
-const showPopup = ref(false)
+const date = ref("暂未更新");
 
 const moduleList = ref([
-  { name: '电影', value: 0 },
-  { name: '电视剧', value: 0 },
-  { name: '其他', value: 0 },
-])
+  { name: "电影", value: 0 },
+  { name: "电视剧", value: 0 },
+  { name: "其他", value: 0 },
+]);
 
-const listData = ref([])
-const webdavInfo = ref({})
-const isRefresh = ref(false)
-const refreshWidth = ref(0)
+const listData = ref([]);
+const isRefresh = ref(false);
+const refreshWidth = ref(0);
 
-const toEditWebdav = () => {
-  uni.navigateTo({
-    url: '/pages/video/add-webdav?title=修改WebDAV'
-  })
-  showPopup.value = false
-}
-
-const toAddWebdav = () => {
-  uni.navigateTo({
-    url: '/pages/video/add-webdav?title=添加WebDAV'
-  })
-  // uni.navigateTo({
-  //   url: '/media/video-player'
-  // })
-  showPopup.value = false
-}
+const sourceList = ref([]);
+const selectType = ref({});
+const selectMedia = ref({});
 
 const loginUser = () => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     uni.request({
-      url: 'http://' + webdavInfo.value.address + ':' + webdavInfo.value.port + '/api/auth/login',
-      data: JSON.stringify({ username: webdavInfo.value.username, password: webdavInfo.value.password }),
+      url: "http://" + selectMedia.value.address + ":" + selectMedia.value.port + "/api/auth/login",
+      data: JSON.stringify({ username: selectMedia.value.username, password: selectMedia.value.password }),
       timeout: 3000,
-      method: 'POST',
-      header: { 'Content-Type': 'application/json' },
+      method: "POST",
+      header: { "Content-Type": "application/json" },
       success: (res) => {
-        uni.setStorageSync('webdavInfo', { ...webdavInfo.value, token: res.data.data.token })
-        resolve(res.data)
-      }
-    })
+        uni.setStorageSync("webdavInfo", { ...selectMedia.value, token: res.data.data.token });
+        resolve(res.data);
+      },
+    });
   });
-}
+};
 
 const clickCell = (item) => {
-  uni.navigateTo({
-    url: '/pages/video/catelog-list?path=' + item.name
-  })
-}
-
-const openPopup = () => {
-  showPopup.value = true
-}
-
-const closedPopup = () => {
-  showPopup.value = false
-}
-
-const refreshModule = async () => {
-  if (!webdavInfo.value.name) {
-    uni.showToast({
-      title: '请先添加WebDAV',
-      icon: 'none'
-    })
-    return
+  if (selectType.value.type == "WebDAV") {
+    uni.navigateTo({
+      url: "/pages/video/catelog-list?path=" + item.name,
+    });
+  } else if (selectType.value.type == "天翼云盘") {
+    uni.navigateTo({
+      url: `/pages/video/catelog-list?path=${item.name}&folderFileId=${item.id}`,
+    });
+  } else if (selectType.value.type == "夸克网盘") {
+    uni.navigateTo({
+      url: `/pages/video/catelog-list?path=${item.name}&folderFileId=${item.fid}`,
+    });
   }
+};
+
+const refreshWebDAVModule = async () => {
   if (!listData.value.length) {
     uni.showToast({
-      title: '请先开启Alist',
-      icon: 'none'
-    })
-    return
+      title: "请先开启Alist",
+      icon: "none",
+    });
+    return;
   }
-  if (isRefresh.value) return
-  isRefresh.value = true
-  let num1 = 0
-  let num2 = 0
-  let num3 = 0
-  setTimeout(() => {
-    refreshWidth.value = 0
-  }, 1000);
-  await Promise.all(listData.value.map(async (item) => {
-    let res = await getFolder({ path: '/' + item.name })
-    let movie = res.data.content.find(i => i.name == '电影')
-    let tv = res.data.content.find(i => i.name == '电视剧')
-    let other = res.data.content.find(i => i.name == '其他')
-    if (movie) {
-      let resmovie = await getFolder({ path: '/' + item.name + '/电影' })
-      num1 += resmovie.data.total
-    }
-    if (tv) {
-      let restv = await getFolder({ path: '/' + item.name + '/电视剧' })
-      num2 += restv.data.total
-    }
-    if (other) {
-      let resother = await getFolder({ path: '/' + item.name + '/其他' })
-      num3 += resother.data.total
-    }
-  })).then(() => {
-    setTimeout(async () => {
-      moduleList.value.find(i => i.name == '电影').value = num1
-      moduleList.value.find(i => i.name == '电视剧').value = num2
-      moduleList.value.find(i => i.name == '其他').value = num3
-      webdavInfo.value.moduleData = { movie: num1, tv: num2, other: num3 }
-      webdavInfo.value.refreshDate = dayjs().format('MM-DD HH:mm')
-      date.value = '今天 ' + webdavInfo.value.refreshDate.split(' ')[1]
-      uni.setStorageSync('webdavInfo', webdavInfo.value)
-      isRefresh.value = false
-      await setTimeWidth()
+  let num1 = 0;
+  let num2 = 0;
+  let num3 = 0;
+  await Promise.all(
+    listData.value.map(async (item) => {
+      let res = await getFolder({ path: "/" + item.name },selectMedia.value);
+      let movie = res.data.content.find((i) => i.name == "电影");
+      let tv = res.data.content.find((i) => i.name == "电视剧");
+      let other = res.data.content.find((i) => i.name == "其他");
+      if (movie) {
+        let resmovie = await getFolder({ path: "/" + item.name + "/电影" },selectMedia.value);
+        num1 += resmovie.data.total;
+      }
+      if (tv) {
+        let restv = await getFolder({ path: "/" + item.name + "/电视剧" },selectMedia.value);
+        num2 += restv.data.total;
+      }
+      if (other) {
+        let resother = await getFolder({ path: "/" + item.name + "/其他" },selectMedia.value);
+        num3 += resother.data.total;
+      }
+    })
+  ).then(() => {
+    setTimeout(() => {
+      moduleList.value.find((i) => i.name == "电影").value = num1;
+      moduleList.value.find((i) => i.name == "电视剧").value = num2;
+      moduleList.value.find((i) => i.name == "其他").value = num3;
+      selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
+      selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
+      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      uni.setStorageSync("webdavInfo", selectMedia.value);
+      nextTick(async () => {
+        isRefresh.value = false;
+        await setTimeWidth();
+      });
     }, 2000);
-  })
-}
+  });
+};
 
+//天翼云盘的刷新方法
+const refresh189Module = async () => {
+  let num1 = 0;
+  let num2 = 0;
+  let num3 = 0;
+  await Promise.all(
+    listData.value.map(async (item) => {
+      let res = {};
+      if (item.name == "我的视频") {
+        res = await get189Folder({ folderId: item.id }, selectMedia.value);
+        let movie = res.fileListAO.folderList.find((i) => i.name == "电影");
+        let tv = res.fileListAO.folderList.find((i) => i.name == "电视剧");
+        let other = res.fileListAO.folderList.find((i) => i.name == "其他");
+        if (movie) {
+          let resmovie = await get189Folder({ folderId: movie.id }, selectMedia.value);
+          num1 += resmovie.fileListAO.count;
+        }
+        if (tv) {
+          let restv = await get189Folder({ folderId: tv.id }, selectMedia.value);
+          num2 += restv.fileListAO.count;
+        }
+        if (other) {
+          let resother = await get189Folder({ folderId: other.id }, selectMedia.value);
+          num3 += resother.fileListAO.count;
+        }
+      }
+    })
+  ).then(() => {
+    setTimeout(() => {
+      moduleList.value.find((i) => i.name == "电影").value = num1;
+      moduleList.value.find((i) => i.name == "电视剧").value = num2;
+      moduleList.value.find((i) => i.name == "其他").value = num3;
+      selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
+      selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
+      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      nextTick(async () => {
+        isRefresh.value = false;
+        await setTimeWidth();
+      });
+    }, 2000);
+  });
+};
+
+//夸克网盘刷新方法
+const refreshQuarkModule = async () => {
+  let num1 = 0;
+  let num2 = 0;
+  let num3 = 0;
+  await Promise.all(
+    listData.value.map(async (item) => {
+      let res = {};
+      if (item.name == "我的视频") {
+        res = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
+
+        let movie = res.data.list.find((i) => i.file_name == "电影");
+        let tv = res.data.list.find((i) => i.file_name == "电视剧");
+        let other = res.data.list.find((i) => i.file_name == "其他");
+        if (movie) {
+          let resmovie = await getQuarkFolder({ fid: movie.fid }, selectMedia.value);
+          num1 += resmovie.data.list.length;
+        }
+        if (tv) {
+          let restv = await getQuarkFolder({ fid: tv.fid }, selectMedia.value);
+          num2 += restv.data.list.length;
+        }
+        if (other) {
+          let resother = await getQuarkFolder({ fid: other.fid }, selectMedia.value);
+          num3 += resother.data.list.length;
+        }
+      }
+    })
+  ).then(() => {
+    setTimeout(() => {
+      moduleList.value.find((i) => i.name == "电影").value = num1;
+      moduleList.value.find((i) => i.name == "电视剧").value = num2;
+      moduleList.value.find((i) => i.name == "其他").value = num3;
+      selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
+      selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
+      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      nextTick(async () => {
+        isRefresh.value = false;
+        await setTimeWidth();
+      });
+    }, 2000);
+  });
+};
+
+const refreshModule = () => {
+  if (!selectMedia.value.name) {
+    uni.showToast({
+      title: "请先添加资源",
+      icon: "none",
+    });
+    return;
+  }
+  if (isRefresh.value) return;
+  isRefresh.value = true;
+
+  setTimeout(() => {
+    refreshWidth.value = 0;
+  }, 1000);
+  if (selectType.value.type == "WebDAV") {
+    refreshWebDAVModule();
+  } else if (selectType.value.type == "天翼云盘") {
+    refresh189Module();
+  } else if (selectType.value.type == "夸克网盘") {
+    refreshQuarkModule();
+  }
+};
 
 const setTimeWidth = () => {
   return new Promise((resolve) => {
     const query = uni.createSelectorQuery();
-    query.select('.video-refresh-timefixed').fields({
-      size: true
-    }, res => {
-      if (!res) {
-        return;
+    query
+      .select(".video-refresh-timefixed")
+      .fields(
+        {
+          size: true,
+        },
+        (res) => {
+          if (!res) {
+            return;
+          }
+          refreshWidth.value = res.width;
+          resolve();
+        }
+      )
+      .exec();
+  });
+};
+
+const judgeSelect = () => {
+  sourceList.value = uni.getStorageSync("sourceList");
+  selectType.value =
+    sourceList.value.find((item) => {
+      let select = item.list.find((i) => i.active);
+      if (select) {
+        selectMedia.value = select;
+        return true;
+      } else {
+        return false;
       }
-      refreshWidth.value = res.width
-      resolve()
-    }).exec();
-  })
-}
+    }) || {};
+};
 
 onShow(async () => {
-  webdavInfo.value = uni.getStorageSync('webdavInfo')
-  if (webdavInfo.value.name) {
-    await loginUser()
-    let res = await getFolder()
-    listData.value = res.data.content.map(item => {
-      if (item.type == '1') {
-        item.leftIcon = Folder
-      }
-      delete item.size
-      return item
-    })
-    moduleList.value.find(i => i.name == '电影').value = webdavInfo.value.moduleData?.movie || 0
-    moduleList.value.find(i => i.name == '电视剧').value = webdavInfo.value.moduleData?.tv || 0
-    moduleList.value.find(i => i.name == '其他').value = webdavInfo.value.moduleData?.other || 0
-    if (webdavInfo.value.refreshDate) {
-      if (webdavInfo.value.refreshDate?.split(' ')[0] == dayjs().format('MM-DD')) {
-        date.value = '今天 ' + webdavInfo.value.refreshDate.split(' ')[1]
-      } else {
-        date.value = webdavInfo.value.refreshDate
-      }
+  judgeSelect();
+  if (selectType.value.type == "WebDAV") {
+    if (selectMedia.value.name) {
+      await loginUser();
+      let res = await getFolder({}, selectMedia.value);
+      listData.value = res.data.content.map((item) => {
+        if (item.type == "1") {
+          item.leftIcon = Folder;
+        }
+        delete item.size;
+        return item;
+      });
     }
-    nextTick(() => {
-      setTimeWidth()
-    })
+  } else if (selectType.value.type == "天翼云盘") {
+    if (selectMedia.value.name) {
+      let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
+      listData.value = res.fileListAO.folderList.map((item) => {
+        item.leftIcon = Folder;
+        return item;
+      });
+    }
+  } else if (selectType.value.type == "夸克网盘") {
+    if (selectMedia.value.name) {
+      let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
+      listData.value = res.data.list
+        .filter((item) => item.file_type == 0)
+        .map((item) => {
+          item.name = item.file_name;
+          item.leftIcon = Folder;
+          return item;
+        });
+    }
   }
-})
-
-  </script>
+  // moduleList.value.find((i) => i.name == "电影").value = selectMedia.value.moduleData?.movie || 0;
+  // moduleList.value.find((i) => i.name == "电视剧").value = selectMedia.value.moduleData?.tv || 0;
+  // moduleList.value.find((i) => i.name == "其他").value = selectMedia.value.moduleData?.other || 0;
+  if (selectMedia.value.refreshDate) {
+    if (selectMedia.value.refreshDate?.split(" ")[0] == dayjs().format("MM-DD")) {
+      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+    } else {
+      date.value = selectMedia.value.refreshDate;
+    }
+  }
+  nextTick(() => {
+    setTimeWidth();
+  });
+});
+</script>
   
   <style lang="scss" scoped>
 @keyframes rotate1 {

@@ -159,6 +159,16 @@ const refreshWebDavVideo = async () => {
   if (selectMedia.value.name) {
     let res1 = await loginUser(selectMedia.value);
     selectMedia.value.token = res1.data.token;
+    uni.setStorageSync("sourceList", sourceList.value);
+    if (!listData.value.length) {
+      let res = await getFolder({}, selectMedia.value);
+      listData.value = res.data.content.map((item) => {
+        if (item.type == "1") {
+          item.leftIcon = Folder;
+        }
+        return item;
+      });
+    }
   }
   await getMovieTv(listData.value, "/");
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
@@ -281,6 +291,7 @@ const handleGx = async () => {
       if (selectMedia.value.name) {
         let res1 = await loginUser(selectMedia.value);
         selectMedia.value.token = res1.data.token;
+        uni.setStorageSync("sourceList", sourceList.value);
 
         uni.setStorageSync("sourceList", sourceList.value);
         let res = await getFolder({}, selectMedia.value);
@@ -477,7 +488,7 @@ const judgeSelect = () => {
     sourceList.value.find((item) => {
       let select = item.list.find((i) => i.active);
       if (select) {
-        (selectMedia.value.name && selectMedia.value.name != select.name) ? uni.setStorageSync("historyPlay", []) : "";
+        selectMedia.value.name && selectMedia.value.name != select.name ? uni.setStorageSync("historyPlay", []) : "";
         selectMedia.value = select;
         return true;
       } else {
@@ -516,19 +527,6 @@ onShow(async () => {
   webdavInfo.value = uni.getStorageSync("webdavInfo");
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   if (selectType.value.type == "WebDAV") {
-    // if (selectMedia.value.name) {
-    //   let res = await loginUser(selectMedia.value);
-    //   selectMedia.value = { ...selectMedia.value, token: res.data.token };
-    //   if (!listData.value.length) {
-    //     let res1 = await getFolder({}, selectMedia.value);
-    //     listData.value = res1.data.content.map((item) => {
-    //       if (item.type == "1") {
-    //         item.leftIcon = Folder;
-    //       }
-    //       return item;
-    //     });
-    //   }
-    // }
     handleGx();
   } else if (selectType.value.type == "天翼云盘") {
     let isreload = uni.getStorageSync("isreload");

@@ -18,6 +18,7 @@ import { loginUser } from "./components/common";
 
 const state = reactive({
   formData: {},
+  oldData: {},
 });
 
 const base_form = ref(null);
@@ -46,26 +47,51 @@ const confirmSubmit = () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
       let sourceList = uni.getStorageSync("sourceList");
-      if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address)) {
-        uni.showToast({
-          title: "存在重复的WebDAV地址，请修改",
-          icon: "none",
+      if (title.value == "添加WebDAV") {
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address)) {
+          uni.showToast({
+            title: "存在重复的WebDAV地址，请修改",
+            icon: "none",
+          });
+          return;
+        }
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name)) {
+          uni.showToast({
+            title: "存在同名的WebDAV，请修改",
+            icon: "none",
+          });
+          return;
+        }
+        let res = await loginUser(state.formData);
+        sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+        uni.setStorageSync("sourceList", sourceList);
+        uni.navigateBack({
+          delta: 2,
         });
-        return;
+      } else if (title.value == "修改WebDAV") {
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address) && state.oldData.address != state.formData.address) {
+          uni.showToast({
+            title: "存在重复的WebDAV地址，请修改",
+            icon: "none",
+          });
+          return;
+        }
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name) && state.oldData.name != state.formData.name) {
+          uni.showToast({
+            title: "存在同名的WebDAV，请修改",
+            icon: "none",
+          });
+          return;
+        }
+        let res = await loginUser(state.formData);
+        state.formData.token = res.data.token;
+        let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address)
+        Object.keys(state.formData).forEach(v=>{
+          obj[v] = state.formData[v]
+        })
+        uni.setStorageSync("sourceList", sourceList);
+        uni.navigateBack();
       }
-      if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name)) {
-        uni.showToast({
-          title: "存在同名的WebDAV，请修改",
-          icon: "none",
-        });
-        return;
-      }
-      let res = await loginUser(state.formData);
-      sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
-      uni.setStorageSync("sourceList", sourceList);
-      uni.navigateBack({
-        delta: 2,
-      });
     }
   });
 };
@@ -76,6 +102,7 @@ onLoad((options) => {
   if (title.value == "修改WebDAV") {
     let sourceList = uni.getStorageSync("sourceList");
     state.formData = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
+    state.oldData = JSON.parse(JSON.stringify(state.formData));
   }
 });
 </script>

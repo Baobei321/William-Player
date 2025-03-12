@@ -1,7 +1,7 @@
 //webdav
 
 const getFolder = (data, webdavInfo) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
       data: JSON.stringify({ ...data, page: 1, per_page: 100, refresh: false }),
@@ -14,14 +14,17 @@ const getFolder = (data, webdavInfo) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   });
 };
 
 //webdav获取视频链接
 const getWebDAVUrl = (data, webdavInfo) => {
-  requestUrl = "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
-  return new Promise((resolve) => {
+  let requestUrl = "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
+  return new Promise((resolve, reject) => {
     uni.request({
       url: requestUrl,
       data: JSON.stringify({
@@ -36,6 +39,9 @@ const getWebDAVUrl = (data, webdavInfo) => {
       },
       success: (res) => {
         resolve(res.data);
+      },
+      fail: (error) => {
+        reject(error);
       },
     });
   });
@@ -55,14 +61,14 @@ const loginUser = (webdavInfo) => {
         username: webdavInfo.username,
         password: webdavInfo.password,
       }),
-      timeout: 1500,
+      timeout: 3000,
       method: "POST",
       header: { "Content-Type": "application/json" },
       success: (res) => {
         resolve(res.data);
       },
-      fail: () => {
-        reject("");
+      fail: (error) => {
+        reject(error);
       },
     });
   });
@@ -83,9 +89,9 @@ const get189Folder = (data, cookieInfo) => {
       cookieStr = cookieStr + str
     }
   })
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://cloud.189.cn/api/open/file/listFiles.action?pageNum=1&pageSize=60&folderId=${data.folderId}`,
+      url: `https://cloud.189.cn/api/open/file/listFiles.action?iconOption=5&orderBy=filename&&descending=false&pageNum=1&pageSize=60&folderId=${data.folderId}`,
       timeout: 3000,
       method: "GET",
       header: {
@@ -105,6 +111,9 @@ const get189Folder = (data, cookieInfo) => {
       },
       success: (res) => {
         resolve(res.data);
+      },
+      fail: (error) => {
+        reject(error);
       },
     });
   });
@@ -129,7 +138,7 @@ const get189VideoUrl = (data, cookieInfo) => {
       cookieStr = cookieStr + str;
     }
   });
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
       timeout: 5000,
@@ -152,6 +161,9 @@ const get189VideoUrl = (data, cookieInfo) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   });
 }
@@ -162,9 +174,10 @@ const get189User = (obj) => {
   for (let i = 0; i < 16; i++) {
     randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
   }
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://cloud.189.cn/api/open/user/getUserInfoForPortal.action?noCache=0.${randomDigits}`,
+      timeout: 3000,
       header: {
         Accept: "application/json;charset=UTF-8",
         "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
@@ -182,6 +195,9 @@ const get189User = (obj) => {
       success: (res) => {
         resolve(res.data)
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   })
 }
@@ -194,7 +210,7 @@ const setCloud189Cookie = () => {
 //夸克网盘
 const getQuarkFolder = (data, cookieInfo) => {
   let cookieStr = cookieInfo.Cookie;
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=${data.fid}&_page=1&_size=100&_fetch_total=1&_sort=file_type:asc,file_name:asc`,
       timeout: 3000,
@@ -210,13 +226,16 @@ const getQuarkFolder = (data, cookieInfo) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   });
 }
 
 //夸克网盘获取视频链接
 const getQuarkVideoUrl = (data, cookieInfo) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://drive-pc.quark.cn/1/clouddrive/file/download?pr=ucpro&uc_param_str=&fr=pc&sys=win32&ve=3.2.8`,
       timeout: 5000,
@@ -234,13 +253,16 @@ const getQuarkVideoUrl = (data, cookieInfo) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   });
 }
 
 //夸克网盘获取不同清晰度的视频链接
 const getQuarkResolutionUrl = (data, cookieInfo) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://drive-pc.quark.cn/1/clouddrive/file/v2/play?pr=ucpro&uc_param_str=&fr=pc`,
       timeout: 5000,
@@ -258,6 +280,9 @@ const getQuarkResolutionUrl = (data, cookieInfo) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      },
     });
   });
 }
@@ -265,7 +290,7 @@ const getQuarkResolutionUrl = (data, cookieInfo) => {
 //夸克网盘获取用户信息
 const getQuarkUser = (obj) => {
   let cookieStr = obj.Cookie;
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://pan.quark.cn/account/info?fr=pc&platform=pc`,
       header: {
@@ -278,6 +303,9 @@ const getQuarkUser = (obj) => {
       },
       success: (res) => {
         resolve(res.data)
+      },
+      fail: (error) => {
+        reject(error);
       },
     });
   })
@@ -307,4 +335,36 @@ const handleSecond = (val) => {
   return time
 }
 
-export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond };
+//处理时间，例如1:10:00和1小时10分钟返回分钟
+const parseTime = (timeStr) => {
+  // 中文格式解析（如："1小时10分钟" 或 "50分钟"）
+  if (timeStr.includes('小时') || timeStr.includes('分钟')) {
+    const cnRegex = /(\d+)小时?(\d+)?分钟?/;
+    const matches = timeStr.match(cnRegex);
+
+    let hours = 0, mins = 0;
+    if (matches) {
+      hours = matches[1] ? parseInt(matches[1], 10) : 0;
+      mins = matches[2] ? parseInt(matches[2], 10) : 0;
+    }
+    return hours * 60 + mins;
+
+    // 英文格式解析（如："1:10:00" 或 "45:00"）
+  } else if (timeStr.includes(':')) {
+    const parts = timeStr.split(':');
+    // 兼容带小时和不带小时的格式
+    const hasHour = parts.length >= 2 && parts[2] === '00';
+    if (hasHour) {
+      const hours = parseInt(parts[0], 10);
+      const mins = parseInt(parts[1], 10);
+      return hours * 60 + mins;
+    } else {
+      return parseInt(parts[0], 10);
+    }
+  }
+
+  // 无法解析时返回 0 或抛出错误
+  return 0;
+};
+
+export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime };
