@@ -1,22 +1,29 @@
 <template>
-  <view class="video-player" style="width:750rpx;height:650rpx">
-    <video-view v-if="plateForm=='android'&&uniPlatform=='app'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
-      style="width:750rpx;height:650rpx"></video-view>
-    <template v-else>
-      <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
-        :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
-        v-if="config.url&&!showReload">
-      </video>
-      <button class="video-button" v-if="showReload" @click="reloadVideo">
-        <text style="color:#fff">重新加载</text>
-      </button>
-    </template>
+  <view class="video-player" style="width:750rpx">
+    <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
+    <view class="video-player-container">
+      <video-view v-if="plateForm=='android'&&uniPlatform=='app'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
+        @getpipstatus="getPipStatus" :style="{width:'750rpx',height:videoHeight}"></video-view>
+      <template v-else>
+        <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
+          :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
+          v-if="config.url&&!showReload">
+        </video>
+        <button class="video-button" v-if="showReload" @click="reloadVideo">
+          <text style="color:#fff">重新加载</text>
+        </button>
+      </template>
+    </view>
   </view>
 </template>
 
 <script>
+import wilNavbar from "@/components/wil-navbar/navbar.nvue";
 import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, getQuarkResolutionUrl } from "./components/common";
 export default {
+  components: {
+    wilNavbar,
+  },
   data() {
     return {
       webdavInfo: {},
@@ -32,6 +39,8 @@ export default {
       showReload: false,
       plateForm: "",
       uniPlatform: "",
+      pipStatus: false,
+      videoHeight: "650rpx",
       emptyUrl:
         "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
       config: {
@@ -176,6 +185,14 @@ export default {
     reloadVideo() {
       this.showReload = false;
     },
+    getPipStatus(event) {
+      this.pipStatus = event.detail.isPip;
+      if (this.pipStatus) {
+        this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + "rpx";
+      } else {
+        this.videoHeight = "650rpx";
+      }
+    },
   },
   async onLoad(options) {
     let systemInfo = uni.getSystemInfoSync();
@@ -217,6 +234,7 @@ export default {
         });
       }
     }
+    console.log(element, "elemtn");
   },
 };
 </script>
@@ -225,20 +243,24 @@ export default {
 .video-player {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  .video-button {
-    width: 200rpx;
-    bordercolor: #00b2a0;
-    height: 80rpx;
-    background: #00b2a0;
-    color: #ffffff;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    border-radius: 30rpx;
-    line-height: 80rpx;
+  flex: 1;
+  .video-player-container {
+    flex: 1;
+    .video-button {
+      width: 200rpx;
+      bordercolor: #00b2a0;
+      height: 80rpx;
+      background: #00b2a0;
+      color: #ffffff;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      border-radius: 30rpx;
+      line-height: 80rpx;
+    }
   }
 }
 </style>

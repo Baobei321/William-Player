@@ -62,12 +62,20 @@ const confirmSubmit = () => {
           });
           return;
         }
-        let res = await loginUser(state.formData);
-        sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
-        uni.setStorageSync("sourceList", sourceList);
-        uni.navigateBack({
-          delta: 2,
-        });
+        await loginUser(state.formData)
+          .then((res) => {
+            sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+            uni.setStorageSync("sourceList", sourceList);
+            uni.navigateBack({
+              delta: 2,
+            });
+          })
+          .catch(() => {
+            uni.showToast({
+              title: "权限校验失败，请检查",
+              icon: "none",
+            });
+          });
       } else if (title.value == "修改WebDAV") {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address) && state.oldData.address != state.formData.address) {
           uni.showToast({
@@ -83,14 +91,22 @@ const confirmSubmit = () => {
           });
           return;
         }
-        let res = await loginUser(state.formData);
-        state.formData.token = res.data.token;
-        let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address)
-        Object.keys(state.formData).forEach(v=>{
-          obj[v] = state.formData[v]
-        })
-        uni.setStorageSync("sourceList", sourceList);
-        uni.navigateBack();
+        await loginUser(state.formData)
+          .then((res) => {
+            state.formData.token = res.data.token;
+            let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
+            Object.keys(state.formData).forEach((v) => {
+              obj[v] = state.formData[v];
+            });
+            uni.setStorageSync("sourceList", sourceList);
+            uni.navigateBack();
+          })
+          .catch(() => {
+            uni.showToast({
+              title: "权限校验失败，请检查",
+              icon: "none",
+            });
+          });
       }
     }
   });

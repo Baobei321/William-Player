@@ -3,7 +3,7 @@
     <view class="navbar-nvue-container" :style="{height:contentHeight}">
       <image src="@/static/rect-left.png" class="navbar-nvue-container__back" @click="toBack"></image>
       <span>{{ title }}</span>
-      <image src="@/static/bingo-icon.png" class="navbar-nvue-container__bingo" @click="toConfirm"></image>
+      <image src="@/static/bingo-icon.png" class="navbar-nvue-container__bingo" @click="toConfirm" v-if="showRightIcon"></image>
     </view>
   </view>
 </template>
@@ -12,6 +12,7 @@
 export default {
   props: {
     title: String,
+    showRightIcon: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -23,8 +24,8 @@ export default {
     toBack() {
       uni.navigateBack();
     },
-    toConfirm(){
-        this.$emit('handleConfirm')
+    toConfirm() {
+      this.$emit("handleConfirm");
     },
 
     //计算微信navBar高度
@@ -53,15 +54,25 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    position: relative;
     padding: 0 24rpx;
     .navbar-nvue-container__back {
       width: 40rpx;
       height: 40rpx;
+      position: absolute;
+      left: 24rpx;
     }
     .navbar-nvue-container__bingo {
       width: 46rpx;
       height: 46rpx;
+      position: absolute;
+      right: 24rpx;
+    }
+    .navbar-nvue-container__empty{
+      width: 40rpx;
+      height: 40rpx;
+   
     }
   }
 }

@@ -190,7 +190,7 @@ page {
         border-radius: 0;
         &::after {
           border-bottom: 2rpx solid #f5f6f7 !important;
-          position: absolute !important;
+          /* position: absolute !important;
           box-sizing: border-box !important;
           content: " " !important;
           pointer-events: none !important;
@@ -199,7 +199,7 @@ page {
           left: 32rpx !important;
           -webkit-transform: scaleY(0.5) !important;
           -ms-transform: scaleY(0.5) !important;
-          transform: scaleY(0.5) !important;
+          transform: scaleY(0.5) !important; */
         }
         .nut-cell__icon {
           margin-right: 16rpx;
@@ -223,6 +223,8 @@ page {
           justify-content: center;
           font-size: 30rpx;
           color: #353a45;
+          line-height: normal;
+
           .base-cell__title {
             display: flex;
             align-items: center;
