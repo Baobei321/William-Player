@@ -11,8 +11,8 @@
     <div class="hxList-list">
       <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="hxList-list-movie">
-          <div class="hxList-list-movie__item" v-for="item in props.listData" :key="item.name" @click="toVideoDetail(item)">
-            <img :src="item.poster" mode="aspectFill">
+          <div class="hxList-list-movie__item" v-for="item in listData1" :key="item.name" @click="toVideoDetail(item)">
+            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)"></image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
             <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
           </div>
@@ -22,12 +22,20 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref, nextTick } from "vue";
+import { ref } from "vue";
+import emptyBg from "@/static/empty_bg.png";
+import { onShow } from "@dcloudio/uni-app";
 
 const props = defineProps({
   title: { type: String, default: "电影" },
   number: { type: String, default: "0" },
   listData: { type: Array, default: [] },
+  isConnected: { type: Boolean, default: false }, //手机是否连接网络
+});
+
+const listData1 = ref(JSON.parse(JSON.stringify(props.listData)));
+listData1.value.forEach((item) => {
+  item.loadImg = true;
 });
 
 const removeExtension = (filename) => {
@@ -51,8 +59,17 @@ const toVideoDetail = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=${props.title}`,
+    url: `/pages/video/video-all?title=${props.title}&isConnected=${props.isConnected}`,
   });
+};
+
+const imgError = (item) => {
+  item.loadImg = false;
+};
+
+const imgLoad = (item) => {
+  if (!props.isConnected && !item.loadImg) return;
+  item.loadImg = true;
 };
 </script>
 <style lang="scss" scoped>
@@ -111,7 +128,7 @@ const toVideoAll = () => {
         .hxList-list-movie__item {
           margin-left: 24rpx;
           flex: 0 0 214rpx;
-          img {
+          image {
             object-fit: cover;
             width: 100%;
             height: 320rpx;

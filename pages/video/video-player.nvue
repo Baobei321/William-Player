@@ -180,7 +180,15 @@ export default {
         }
       }
       this.config.initialTime = Number(this.historyObj.initialTime);
-      this.config.title = this.routerParams.type == "movie" ? this.getMovieName(this.historyObj.title) : this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+      if (this.routerParams.type == "movie") {
+        this.config.title = this.getMovieName(this.historyObj.title);
+      } else {
+        if (this.historyObj.titlePlay) {
+          this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+        } else {
+          this.config.title = this.routerParams.path.substring(lastIndex + 1);
+        }
+      }
     },
     reloadVideo() {
       this.showReload = false;

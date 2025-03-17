@@ -7,9 +7,9 @@
         <scroll-view :scroll-y="true" class="video-container-scroll">
           <div class="scroll-list">
             <recent-played v-if="historyPlay.length" :catchtouchmove="true"></recent-played>
-            <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"></hx-list>
-            <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
-            <Classify></Classify>
+            <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
+            <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
+            <Classify :isConnected="isConnected"></Classify>
           </div>
         </scroll-view>
       </div>
@@ -43,7 +43,7 @@ import { ref, onBeforeMount } from "vue";
 import Folder from "../../static/folder.png";
 import videoNavbar from "./components/navbar.vue";
 import Skeleton from "./components/skeleton.vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow, onUnload } from "@dcloudio/uni-app";
 import hxList from "./components/hx-list.vue";
 import recentPlayed from "./components/recent-played.vue";
 import Classify from "./components/classify.vue";
@@ -80,6 +80,8 @@ const historyPlay = ref([]);
 
 const selectMedia = ref({});
 const selectType = ref({});
+
+const isConnected = ref(false); //手机是否连接网络
 
 //通过tmdb接口获取更详细的信息
 const searchMovieTv = (data, type) => {
@@ -259,8 +261,10 @@ const setMovieTvImg = async (arr, type) => {
         item.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
         if (type == "movie") {
           item.releaseTime = data.release_date;
+          item.type = "2";
         } else if (type == "tv") {
           item.releaseTime = data.first_air_date;
+          item.type = "1";
         }
         item.movieTvId = data.id;
         item.genre_ids = data.genre_ids;
@@ -585,6 +589,23 @@ onBeforeMount(async () => {
       listData.value = [res.data];
     }
   }
+});
+
+const listenerNetwork = (res) => {
+  isConnected.value = res.isConnected;
+};
+uni.getNetworkType({
+  success: (res) => {
+    if (res.networkType != "none") {
+      isConnected.value = true;
+    } else {
+      isConnected.value = false;
+    }
+  },
+});
+uni.onNetworkStatusChange(listenerNetwork);
+onUnload(() => {
+  uni.offNetworkStatusChange(listenerNetwork);
 });
 </script>
 

@@ -12,8 +12,10 @@
       <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="recent-played-list-movie">
           <div class="recent-played-list-movie__item" v-for="item in listData" :key="item.name" @click="toVideoPlayer(item)">
-            <div class="recent-played-list-movie__item-img" :style="{backgroundImage:`url(${item.poster})`}">
-              <image :src="playVideoButton" />
+            <div class="recent-played-list-movie__item-img">
+              <image :src="!isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
+                style="width: 100%;height: 100%;position: static;"></image>
+              <image :src="playVideoButton" class="img-button" />
               <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
               <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>
             </div>
@@ -31,6 +33,11 @@ import { ref } from "vue";
 import playVideoButton from "../../../static/playVideo-button.png";
 import { handleSecond, parseTime } from "./common";
 import { onShow } from "@dcloudio/uni-app";
+import emptyBg from "@/static/empty_bg.png";
+
+const props = defineProps({
+  isConnected: { type: Boolean, default: false }, //手机是否连接网络
+});
 
 const listData = ref(uni.getStorageSync("historyPlay") || []);
 
@@ -117,13 +124,23 @@ const toVideoPlayer = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=最近观看`,
+    url: `/pages/video/video-all?title=最近观看&isConnected=${props.isConnected}`,
   });
 };
+const imgError = (item) => {
+  item.loadImg = false;
+};
 
+const imgLoad = (item) => {
+  if (!props.isConnected && !item.loadImg) return;
+  item.loadImg = true;
+};
 onShow(() => {
   judgeSelect();
   listData.value = uni.getStorageSync("historyPlay") || [];
+  listData.value.forEach((item) => {
+    item.loadImg = true;
+  });
 });
 </script>
 
@@ -180,7 +197,7 @@ onShow(() => {
             border-radius: 20rpx;
             position: relative;
             overflow: hidden;
-            image {
+            .img-button {
               width: 80rpx;
               height: 80rpx;
               position: absolute;
