@@ -127,7 +127,7 @@ const imgLoad = (item) => {
   });
 };
 onLoad((options) => {
-  routerParams.value = options;
+  routerParams.value = options; 
   uni.setNavigationBarTitle({
     title: routerParams.value.title,
   });
