@@ -1,5 +1,6 @@
+import * as CONFIG from '@/utils/config.js'
 // 全局请求封装
-const base_url = 'http://111.173.105.111:4040/ruoyi'
+const base_url = CONFIG.BASE_URL
 // const base_url = 'http://10.106.18.108:4040/ruoyi'
 // 请求超出时间
 const timeout = 5000
@@ -61,7 +62,7 @@ export default (params) => {
             } else {
               uni.showToast({
                 title: res.data.msg,
-                icon:'none',
+                icon: 'none',
                 duration: 2000,
               })
             }
