@@ -11,7 +11,7 @@
           <div class="source-list-item__title">{{ item.type }}</div>
           <div class="source-list-item__list">
             <div :class="['list-item', item.list.length == 1 ? 'list-one' : '',vitem.active?'list-active':'']" v-for="vitem in item.list" :key="vitem.name"
-              @click="handleSelect(vitem)">
+              @click="handleSelect(item,vitem)">
               <div class="list-item-img">
                 <image :src="item.img"></image>
               </div>
@@ -41,6 +41,7 @@ import wilNavbar from "@/components/wil-navbar/index.vue";
 import { onShow } from "@dcloudio/uni-app";
 import wilModal from "@/components/wil-modal/index.vue";
 import { toParse, toStringfy } from "../mine/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
 
 const sourceList = ref([]);
 const selectMedia = ref({});
@@ -88,17 +89,69 @@ const clearAcitve = () => {
   });
 };
 
-const handleSelect = (vitem) => {
+const resetSelect = (vitem) => {
+  clearAcitve();
+  vitem.active = true;
+  uni.setStorageSync("isreload", true);
+  uni.setStorageSync("sourceList", sourceList.value);
+  uni.navigateBack();
+};
+
+const handleSelect = (item, vitem) => {
   wil_modal.value.showModal({
     title: "温馨提示",
     content: "是否确认选择此资源",
     confirmColor: "#ff6701",
     confirm: async () => {
-      clearAcitve();
-      vitem.active = true;
-      uni.setStorageSync("isreload", true);
-      uni.setStorageSync("sourceList", sourceList.value);
-      uni.navigateBack();
+      if (item.type == "WebDAV") {
+        await loginUser(vitem)
+          .then((res) => {
+            vitem.token = res.data.token;
+            resetSelect(vitem);
+          })
+          .catch((error) => {
+            uni.showToast({
+              title: "请先开启Alist",
+              icon: "none",
+            });
+          });
+      } else if (item.type == "天翼云盘") {
+        await get189Folder({ folderId: "-11" }, { JSESSIONID: vitem.JSESSIONID, COOKIE_LOGIN_USER: vitem.COOKIE_LOGIN_USER })
+          .then((res) => {
+            if (res.res_code == 0) {
+              resetSelect(vitem);
+            } else {
+              uni.showToast({
+                title: "请重新登录天翼云盘",
+                icon: "none",
+              });
+            }
+          })
+          .catch((error) => {
+            uni.showToast({
+              title: "请重新登录天翼云盘",
+              icon: "none",
+            });
+          });
+      } else if (item.type == "夸克网盘") {
+        await getQuarkFolder({ fid: "0" }, { Cookie: this.quarkCookie })
+          .then((res) => {
+            if (res.status == 200) {
+              resetSelect(vitem);
+            } else {
+              uni.showToast({
+                title: "请重新登录夸克网盘",
+                icon: "none",
+              });
+            }
+          })
+          .catch((error) => {
+            uni.showToast({
+              title: "请重新登录夸克网盘",
+              icon: "none",
+            });
+          });
+      }
     },
   });
 };
@@ -216,7 +269,7 @@ page {
 
           &:first-child {
             border-radius: 14rpx;
-            &::before{
+            &::before {
               display: none;
             }
           }
