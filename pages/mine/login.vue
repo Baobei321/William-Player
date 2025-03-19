@@ -5,7 +5,7 @@
       <template #bottom>
         <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
         <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree">登录</nut-button>
-        <!-- <div class="register-button" @click="toWechatApp">立即注册</div> -->
+        <div class="register-button" @click="touristEnter">游客进入</div>
       </template>
     </base-form>
     <div class="user-agreement" @click="checkAgree">
@@ -84,6 +84,13 @@ const toWechatApp = () => {
     path: "/pages/mine/register",
     miniprogramType: "2",
   });
+};
+
+const touristEnter = () => {
+  uni.reLaunch({
+    url: "/pages/video/index",
+  });
+  uni.setStorageSync("tmdbKey", "9e0add7c02b66868ab0a368df820a335");
 };
 
 const clickNoAgree = () => {

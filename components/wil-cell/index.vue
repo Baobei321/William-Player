@@ -1,7 +1,7 @@
 <template>
   <nut-cell-group class="base-cell">
-    <nut-cell v-for="item in props.options" :key="item[props.defaultProps.title]"
-      :is-link="item[props.defaultProps.isLink] || true" v-bind="item" @click="clickItem(item)">
+    <nut-cell v-for="item in props.options" :key="item[props.defaultProps.title]" :is-link="item[props.defaultProps.isLink] || true" v-bind="item"
+      @click="clickItem(item)">
       <template #title>
         <slot v-if="$slots.title" name="title" v-bind="item"></slot>
         <template v-else>
@@ -19,37 +19,42 @@
 </template>
 
 <script setup>
-import icInto from '../../static/ic-into.png'
-import { toStringfy, toParse } from '../../pages/mine/common';
+import icInto from "../../static/ic-into.png";
+import { toStringfy, toParse } from "../../pages/mine/common";
 const props = defineProps({
   options: { type: Array, default: [] },
   defaultProps: {
-    type: Object, default: {
-      title: 'title',
-      isLink: 'isLink',
-      leftIcon: 'leftIcon',
-      path: 'path',
-      query: 'query'
-    }
-  }
-})
+    type: Object,
+    default: {
+      title: "title",
+      isLink: "isLink",
+      leftIcon: "leftIcon",
+      path: "path",
+      query: "query",
+    },
+  },
+});
 
-const emits = defineEmits(['clickItem'])
+const emits = defineEmits(["clickItem"]);
 
 const clickItem = (item) => {
   if (item[props.defaultProps.path]) {
-    if (uni.getStorageSync('Authorization')) { //还在登录状态
-      uni.navigateTo({
-        url: item[props.defaultProps.path] + '?' + toStringfy(item[props.defaultProps.query])
-      })
-    } else { //退出登录状态
-      emits('toLogin', item)
-    }
-  } else {
-    emits('clickItem', item)
-  }
-}
+    // if (uni.getStorageSync('Authorization')) { //还在登录状态
+    //   uni.navigateTo({
+    //     url: item[props.defaultProps.path] + '?' + toStringfy(item[props.defaultProps.query])
+    //   })
+    // } else { //退出登录状态
+    //   emits('toLogin', item)
+    // }
 
+    //不需要判断token是否存在，是直接跳转页面
+    uni.navigateTo({
+      url: item[props.defaultProps.path] + "?" + toStringfy(item[props.defaultProps.query]),
+    });
+  } else {
+    emits("clickItem", item);
+  }
+};
 </script>
 
 <style lang="scss" scoped>

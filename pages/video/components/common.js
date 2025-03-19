@@ -1,5 +1,6 @@
-//webdav
+import * as CONFIG from '@/utils/config.js'
 
+//webdav
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
@@ -91,7 +92,7 @@ const get189Folder = (data, cookieInfo) => {
   })
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://cloud.189.cn/api/open/file/listFiles.action?iconOption=5&orderBy=filename&&descending=false&pageNum=1&pageSize=60&folderId=${data.folderId}`,
+      url: `${CONFIG.Folder189Url}&folderId=${data.folderId}`,
       timeout: 3000,
       method: "GET",
       header: {
@@ -140,7 +141,7 @@ const get189VideoUrl = (data, cookieInfo) => {
   });
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://cloud.189.cn/api/portal/getNewVlcVideoPlayUrl.action?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
+      url: `${CONFIG.Video189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
       timeout: 5000,
       method: "GET",
       header: {
@@ -176,7 +177,7 @@ const get189User = (obj) => {
   }
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://cloud.189.cn/api/open/user/getUserInfoForPortal.action?noCache=0.${randomDigits}`,
+      url: `${CONFIG.User189Url}?noCache=0.${randomDigits}`,
       timeout: 3000,
       header: {
         Accept: "application/json;charset=UTF-8",
@@ -202,17 +203,12 @@ const get189User = (obj) => {
   })
 }
 
-//天翼云盘处理网络ip变化刷新cookie
-const setCloud189Cookie = () => {
-
-}
-
 //夸克网盘
 const getQuarkFolder = (data, cookieInfo) => {
   let cookieStr = cookieInfo.Cookie;
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=${data.fid}&_page=1&_size=100&_fetch_total=1&_sort=file_type:asc,file_name:asc`,
+      url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}`,
       timeout: 3000,
       method: "GET",
       header: {
@@ -237,7 +233,7 @@ const getQuarkFolder = (data, cookieInfo) => {
 const getQuarkVideoUrl = (data, cookieInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://drive-pc.quark.cn/1/clouddrive/file/download?pr=ucpro&uc_param_str=&fr=pc&sys=win32&ve=3.2.8`,
+      url: CONFIG.QuarkVideoUrl,
       timeout: 5000,
       data: JSON.stringify({ fids: [data.folderFileId], speedup_session: "" }),
       method: "POST",
@@ -264,7 +260,7 @@ const getQuarkVideoUrl = (data, cookieInfo) => {
 const getQuarkResolutionUrl = (data, cookieInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://drive-pc.quark.cn/1/clouddrive/file/v2/play?pr=ucpro&uc_param_str=&fr=pc`,
+      url: CONFIG.QuarkResolutionUrl,
       timeout: 5000,
       data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: "fmp4,m3u8" }),
       method: "POST",
@@ -292,7 +288,7 @@ const getQuarkUser = (obj) => {
   let cookieStr = obj.Cookie;
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `https://pan.quark.cn/account/info?fr=pc&platform=pc`,
+      url: CONFIG.QuarkUserUrl,
       header: {
         "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
         Connection: "Keep-Alive",
