@@ -3,13 +3,13 @@
     <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData"
       :refresher-enabled="false">
       <template #default="item">
-        <nut-cell is-link :class="[item.$index==data.total-1?'last-cell':'']" @click="clickCell(item)">
+        <nut-cell is-link :class="[item.$index==data.total-1 ? 'last-cell' : '']" @click="clickCell(item)">
           <template #title>
             {{ item.name.length>12 ? item.name.slice(0,12)+'...' : item.name}}
           </template>
           <template #icon>
             <image :src="Folder" v-if="item.type=='1'" />
-            <image :src="item.thumb||videoPlayer" v-else />
+            <image :src="item.thumb || videoPlayer" v-else />
           </template>
           <template #link>
             <span v-if="item.type!='1'">{{ handleSize(item.size) }}</span>

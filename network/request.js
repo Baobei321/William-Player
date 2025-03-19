@@ -3,7 +3,9 @@ import * as CONFIG from '@/utils/config.js'
 const base_url = CONFIG.BASE_URL
 // const base_url = 'http://10.106.18.108:4040/ruoyi'
 // 请求超出时间
-const timeout = 5000
+const timeout = 3000
+
+const noToastUrl = ['/phone/login']
 
 // 需要修改token，和根据实际修改请求头
 export default (params) => {
@@ -29,7 +31,7 @@ export default (params) => {
       method: method,
       header: header,
       data: data,
-      timeout,
+      timeout: noToastUrl.indexOf(url) > -1 ? 1000 : timeout,
       success(response) {
         const res = response
         // 根据返回的状态码做出对应的操作
@@ -104,13 +106,14 @@ export default (params) => {
         }
       },
       fail(err) {
-        console.log(err)
         if (err.errMsg.indexOf('request:fail') !== -1) {
-          uni.showToast({
-            title: '网络异常',
-            icon: "error",
-            duration: 2000
-          })
+          if (noToastUrl.indexOf(params.url) < 0) {
+            uni.showToast({
+              title: '网络异常',
+              icon: "error",
+              duration: 2000
+            })
+          }
         } else {
           uni.showToast({
             title: '未知异常',

@@ -4,7 +4,8 @@
     <div class="mine-container">
       <div class="mine-notLog" v-if="!isLogin">
         <div class="mine-notLog__left">
-          <img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
+          <img
+            src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
           <span>游客用户</span>
         </div>
         <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button>
@@ -127,7 +128,7 @@ const judgeLogin = () => {
   userInfo.value = uni.getStorageSync(CONFIG.USER_KEY);
   Authorization.value = uni.getStorageSync("Authorization");
   if (Authorization.value) {
-    isLogin.value = true;
+    isLogin.value = userInfo.value.phonenumber == "19994658532" ? false : true;
   } else {
     isLogin.value = false;
   }

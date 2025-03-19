@@ -12,7 +12,7 @@
       <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="hxList-list-movie">
           <div class="hxList-list-movie__item" v-for="item in listData1" :key="item.name" @click="toVideoDetail(item)">
-            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)"></image>
+            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill"></image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
             <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
           </div>

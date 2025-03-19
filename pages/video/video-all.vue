@@ -5,7 +5,7 @@
         :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="12" :changeItemFn="changeItemFn">
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)">
-            <image :src="(routerParams.isConnected=='false' && !item.loadImg) ? emptyBg : item.poster" class="item-poster" style="object-fit: cover;"
+            <image :src="(routerParams.isConnected=='false' && !item.loadImg) ? emptyBg : item.poster" class="item-poster" mode="aspectFill"
               @error="imgError(item)" @load="imgLoad(item)"></image>
             <span class="item-name">{{ removeExtension(item) }}</span>
             <span class="item-time" v-if="routerParams.title!='最近观看'">{{ item.releaseTime }}</span>

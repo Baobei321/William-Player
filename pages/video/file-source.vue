@@ -3,8 +3,7 @@
     <div class="fileSource-item" v-for="item in sourceList" :key="item.type">
       <div class="fileSource-item__title">{{ item.type }}</div>
       <div class="fileSource-item__list">
-        <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list" :key="vitem.name" @click="toPath(vitem)" a="1" b="1" c="1" d="1"
-          e="1" f="1" g="1" h="1" i="1" j="1">
+        <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list" :key="vitem.name" @click="toPath(vitem)">
           <div class="list-item-img">
             <image :src="vitem.img"></image>
           </div>

@@ -86,11 +86,21 @@ const toWechatApp = () => {
   });
 };
 
-const touristEnter = () => {
-  uni.reLaunch({
-    url: "/pages/video/index",
-  });
-  uni.setStorageSync("tmdbKey", "9e0add7c02b66868ab0a368df820a335");
+const touristEnter = async () => {
+  await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
+    .then((res) => {
+      uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+      getUserByopenId();
+      uni.reLaunch({
+        url: "/pages/video/index",
+      });
+    })
+    .catch((error) => {
+      uni.reLaunch({
+        url: "/pages/video/index",
+      });
+      uni.setStorageSync("tmdbKey", "9e0add7c02b66868ab0a368df820a335");
+    });
 };
 
 const clickNoAgree = () => {

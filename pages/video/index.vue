@@ -52,6 +52,7 @@ import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
+import emptyBg from "@/static/empty_bg.png";
 
 const video_navbar = ref(null);
 
@@ -269,7 +270,7 @@ const setMovieTvImg = async (arr, type) => {
         item.movieTvId = data.id;
         item.genre_ids = data.genre_ids;
       } else {
-        item.poster = "https://img0.baidu.com/it/u=3410216376,4211467608&fm=253&fmt=auto&app=138&f=JPEG?w=750&h=465";
+        item.poster = emptyBg;
         item.releaseTime = "暂无时间";
       }
     } catch (error) {

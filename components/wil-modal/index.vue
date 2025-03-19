@@ -13,47 +13,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from "vue";
 const data = ref({
-  title: '温馨提示',
-  content: '是否退出登录',
-  confirmText: '确定',
-  confirmColor: '#00B2A0',
-  cancelText: '取消',
-  cancelColor: '#000',
-  confirm: () => { },
-  cancel: () => { }
-})
+  title: "温馨提示",
+  content: "是否退出登录",
+  confirmText: "确定",
+  confirmColor: "#00B2A0",
+  cancelText: "取消",
+  cancelColor: "#000",
+  confirm: () => {},
+  cancel: () => {},
+});
 
-const show = ref(false)
-const animation = ref(false)
+const show = ref(false);
+const animation = ref(false);
 
 const showModal = (obj) => {
-  data.value = { ...data.value, ...obj }
-  show.value = true
-  animation.value = true
-}
+  data.value = { ...data.value, ...obj };
+  show.value = true;
+  animation.value = true;
+};
 
 const cancel = () => {
-  animation.value = false
-  data.value.cancel()
+  animation.value = false;
+  data.value.cancel();
   setTimeout(() => {
-    show.value = false
+    show.value = false;
   }, 180);
-}
+};
 
 const confirm = () => {
-  animation.value = false
-  data.value.confirm()
+  animation.value = false;
   setTimeout(() => {
-    show.value = false
+    show.value = false;
+    nextTick(() => {
+      data.value.confirm();
+    });
   }, 180);
-}
+};
 
 defineExpose({
-  showModal
-})
-
+  showModal,
+});
 </script>
 
 <style lang="scss" scoped>

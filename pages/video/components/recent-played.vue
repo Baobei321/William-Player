@@ -14,7 +14,7 @@
           <div class="recent-played-list-movie__item" v-for="item in listData" :key="item.name" @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img">
               <image :src="!isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
-                style="width: 100%;height: 100%;position: static;"></image>
+                style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
               <image :src="playVideoButton" class="img-button" />
               <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
               <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>

@@ -76,16 +76,16 @@
           <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="related-actors-list">
               <div class="related-actors-list__item" v-if="director.name">
-                <img class="item-avatar"
-                  :src="director.profile_path?'https://media.themoviedb.org/t/p/w100_and_h100_bestv2'+director.profile_path:'https://szrcapi.mouldsdata.com/minio/tzgcs/2024/06/13/6aab190d557c47ddb18f89755a3a7732.png'"
-                  mode="aspectFill">
+                <image class="item-avatar"
+                  :src="director.profile_path ? 'https://media.themoviedb.org/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://szrcapi.mouldsdata.com/minio/tzgcs/2024/06/13/6aab190d557c47ddb18f89755a3a7732.png'"
+                  mode="aspectFill" />
                 <div class="item-name">{{director.name}}</div>
                 <div class="item-job">导演</div>
               </div>
               <div class="related-actors-list__item" v-for="item in actors" :key="item.name">
-                <img class="item-avatar"
+                <image class="item-avatar"
                   :src="item.profile_path?'https://media.themoviedb.org/t/p/w100_and_h100_bestv2'+item.profile_path :'https://szrcapi.mouldsdata.com/minio/tzgcs/2024/06/13/6aab190d557c47ddb18f89755a3a7732.png'"
-                  mode="aspectFill">
+                  mode="aspectFill" />
                 <div class="item-name">{{item.name}}</div>
                 <div class="item-role">饰 {{ item.character }}</div>
               </div>

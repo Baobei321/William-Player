@@ -134,7 +134,7 @@ const handleSelect = (item, vitem) => {
             });
           });
       } else if (item.type == "夸克网盘") {
-        await getQuarkFolder({ fid: "0" }, { Cookie: this.quarkCookie })
+        await getQuarkFolder({ fid: "0" }, vitem)
           .then((res) => {
             if (res.status == 200) {
               resetSelect(vitem);
