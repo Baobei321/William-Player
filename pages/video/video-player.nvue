@@ -2,8 +2,10 @@
   <view class="video-player" style="width:750rpx">
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container">
-      <video-view v-if="plateForm=='android'&&uniPlatform=='app'" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory"
-        @getpipstatus="getPipStatus" :style="{width:'750rpx',height:videoHeight}"></video-view>
+      <view :style="{width:'750rpx',height:videoHeight,background:'#000'}" v-if="plateForm=='android'&&uniPlatform=='app'">
+        <video-view v-if="config.url" :initialTime="config.initialTime" :title="config.title" :src="config.url"
+          @timeupdate="setHistory" @getpipstatus="getPipStatus" :style="{width:'750rpx',height:videoHeight}"></video-view>
+      </view>
       <template v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
           :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"

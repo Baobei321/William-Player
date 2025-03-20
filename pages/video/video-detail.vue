@@ -46,9 +46,12 @@
         </div>
         <!-- 电视专用 -->
         <div class="tv-version" v-if="routerParams.type=='tv'">
-          <nut-tabs v-model="activeTab" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSource">
-            <nut-tab-pane :title="item.sourceName" :pane-key="item.provider" v-for="item in sourceList" :key="item.provider"></nut-tab-pane>
-          </nut-tabs>
+          <div class="tv-version-tabs">
+            <nut-tabs v-model="activeTab" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSource">
+              <nut-tab-pane :title="item.sourceName" :pane-key="item.provider" v-for="item in sourceList" :key="item.provider"></nut-tab-pane>
+            </nut-tabs>
+            <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
+          </div>
           <scroll-view class="tv-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="tv-version-list" v-if="tvList.length">
               <div class="tv-version-list__item" v-for="(item,index) in tvList" :key="item.name" @click="toPlayVideo(item,index)">
@@ -422,6 +425,14 @@ const changeSource = (item) => {
 const changeTvSource = (obj) => {
   selectSource.value = sourceList.value.find((i) => i.provider == obj.paneKey);
   handleTv();
+};
+
+//电视集数还在加载中，点击提示
+const disabledTip = () => {
+  uni.showToast({
+    title: "等待加载完成后，再继续操作",
+    icon: "none",
+  });
 };
 
 //裁剪格式获取电影名
@@ -903,7 +914,17 @@ page {
             display: none;
           }
         }
-
+        .tv-version-tabs {
+          position: relative;
+          .tv-version-tabs__disabled {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            z-index: 99;
+          }
+        }
         .tv-version-scroll {
           .tv-version-list {
             display: flex;
