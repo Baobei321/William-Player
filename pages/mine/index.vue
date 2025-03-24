@@ -26,7 +26,7 @@
       </div>
       <div class="mine-cell">
         <base-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell" @toLogin="openLoginPopup"></base-cell>
-        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization"></base-cell>
+        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization&&userInfo.value.phonenumber != '19994658532'"></base-cell>
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
@@ -44,6 +44,8 @@ import iconMedia from "../../static/icon-media.png";
 import iconTb from "../../static/icon-tb.png";
 import iconDownload from "../../static/icon-download.png";
 import iconDeepseek from "../../static/icon-deepseek.png";
+import iconFeedback from "../../static/icon-feedback.png";
+import iconGift from "../../static/icon-gift.png";
 import iconSetting from "../../static/icon-setting.png";
 import iconAbout from "../../static/icon-about.png";
 import { onShow } from "@dcloudio/uni-app";
@@ -92,6 +94,18 @@ const cellOptions = ref([
     },
   ],
   [
+    {
+      title: "反馈",
+      leftIcon: iconFeedback,
+      path: null,
+      outside: true,
+      outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
+    },
+    {
+      title: "赞赏",
+      leftIcon: iconGift,
+      path: "/pages/backend/appreciate",
+    },
     {
       title: "设置",
       leftIcon: iconSetting,
@@ -142,6 +156,13 @@ const clickCell = (item) => {
     uni.showToast({
       title: item.tip,
       icon: "none",
+    });
+  }
+  if (item.outside) {
+    plus.runtime.openURL(item.outsideUrl, (error) => {
+      if (error) {
+        uni.showToast({ title: "打开浏览器失败", icon: "none" });
+      }
     });
   }
 };
@@ -207,7 +228,8 @@ page {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 34rpx;
+    // margin-top: 34rpx;
+    margin-top: 0;
 
     &__left {
       display: flex;
@@ -239,8 +261,8 @@ page {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 34rpx;
-
+    // margin-top: 34rpx;
+    margin-top: 0;
     &__left {
       display: flex;
       align-items: center;

@@ -64,7 +64,7 @@ const getMovieTvList = async (params) => {
   let res = null;
   if (routerParams.value.title == "最近观看") {
     res = uni.getStorageSync("historyPlay");
-    ref.forEach((item) => {
+    res.forEach((item) => {
       item.loadImg = true;
     });
     return {

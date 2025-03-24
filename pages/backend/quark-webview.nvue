@@ -59,6 +59,23 @@ export default {
             title: "修改成功",
             icon: "none",
           });
+          const pages = getCurrentPages();
+          // 上一级页面实例（pages[pages.length - 2]）
+          const prevPage = pages[pages.length - 2];
+          console.log(prevPage);
+          // 直接获取上一级页面的数据或调用方法
+          if (prevPage.route == "pages/video/source-list") {
+            if (this.routerParams.isActive == "1") {
+              uni.setStorageSync("isreload", true);
+            } else if (this.routerParams.isActive == "0") {
+              setTimeout(() => {
+                uni.navigateBack({
+                  delta: 1,
+                });
+              }, 1500);
+              return;
+            }
+          }
         } else {
           let obj = {
             name: res1.data.nickname,

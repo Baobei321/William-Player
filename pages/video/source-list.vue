@@ -166,11 +166,11 @@ const chooseOperation = (item) => {
   if (item.name == "修改") {
     if (selectType.type == "WebDAV") {
       uni.navigateTo({
-        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}`,
+        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}&isActive=${selectMedia.value.active ? "1" : "0"}`,
       });
     } else {
       uni.navigateTo({
-        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query),
+        url: `${mapping[selectType.type].path}?${toStringfy(mapping[selectType.type].query)}&isActive=${selectMedia.value.active ? "1" : "0"}`,
       });
     }
   } else if (item.name == "删除") {

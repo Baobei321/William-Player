@@ -99,6 +99,13 @@ const confirmSubmit = () => {
               obj[v] = state.formData[v];
             });
             uni.setStorageSync("sourceList", sourceList);
+            if (routerParams.value.isActive == "1") {
+              uni.setStorageSync("isreload", true);
+              uni.navigateBack({
+                delta: 2,
+              });
+              return
+            }
             uni.navigateBack();
           })
           .catch(() => {

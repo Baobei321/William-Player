@@ -108,6 +108,13 @@
       }
     },
     {
+      "path": "pages/backend/appreciate",
+      "style": {
+        "navigationBarTitleText": "赞赏",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
       "path": "pages/backend/cloud189-webview",
       "style": {
         "navigationStyle": "custom"

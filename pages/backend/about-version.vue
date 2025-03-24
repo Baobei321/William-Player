@@ -7,6 +7,7 @@
                     <span>William Player</span>
                     <span>{{ systemInfo.appVersion }}</span>
                 </div>
+                <div class="main-time">2025-03-21</div>
             </div>
             <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true"></nut-cell>
         </div>
@@ -170,6 +171,10 @@ page {
                     right: 0;
                     transform: translateX(100%);
                 }
+            }
+            .main-time{
+                font-size: 28rpx;
+                margin-top: 20rpx;
             }
         }
 

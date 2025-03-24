@@ -150,9 +150,12 @@ const clickCell = (item) => {
 
 onLoad((options) => {
   routerParams.value = options;
-  uni.setNavigationBarTitle({
-    title: routerParams.value.path.split("/")[routerParams.value.path.split("/").length - 1],
-  });
+  let arr = routerParams.value.path.split("/");
+  setTimeout(() => {
+    uni.setNavigationBarTitle({
+      title: arr[arr.length - 1],
+    });
+  }, 0);
 });
 </script>
 
