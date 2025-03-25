@@ -184,6 +184,7 @@ const chooseOperation = (item) => {
         if (selectMedia.value.active) {
           uni.removeStorageSync("localMovieTvData");
         }
+        judegeShow();
       },
     });
   }
@@ -191,7 +192,6 @@ const chooseOperation = (item) => {
 
 const judegeShow = () => {
   sourceList.value = uni.getStorageSync("sourceList");
-
   show.value = !sourceList.value.every((item) => {
     return !item.list.length;
   });

@@ -26,7 +26,7 @@
       </div>
       <div class="mine-cell">
         <base-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell" @toLogin="openLoginPopup"></base-cell>
-        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization&&userInfo.value.phonenumber != '19994658532'"></base-cell>
+        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization&&userInfo.phonenumber != '19994658532'"></base-cell>
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>

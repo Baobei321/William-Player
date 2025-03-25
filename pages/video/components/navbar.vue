@@ -214,7 +214,8 @@ onMounted(() => {
   background: #fff;
   z-index: 99;
   top: 0;
-
+  border-bottom: 2rpx solid #f6f7f8;
+  box-sizing: border-box;
   ::v-deep .nut-navbar {
     position: absolute;
     width: 100%;

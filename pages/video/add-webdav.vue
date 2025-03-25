@@ -64,7 +64,15 @@ const confirmSubmit = () => {
         }
         await loginUser(state.formData)
           .then((res) => {
-            sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+            let isHaveData = !sourceList.every((item) => {
+              return !item.list.length;
+            });
+            if (!isHaveData) {
+              sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token, active: true });
+              uni.setStorageSync("isreload", true);
+            } else {
+              sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
+            }
             uni.setStorageSync("sourceList", sourceList);
             uni.navigateBack({
               delta: 2,
@@ -104,7 +112,7 @@ const confirmSubmit = () => {
               uni.navigateBack({
                 delta: 2,
               });
-              return
+              return;
             }
             uni.navigateBack();
           })

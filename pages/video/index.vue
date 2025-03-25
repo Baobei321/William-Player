@@ -253,7 +253,8 @@ const getMovieTv = async (arr1, path1 = "/") => {
 
 //将网盘中的电影等都设置详细信息
 const setMovieTvImg = async (arr, type) => {
-  for (let item of arr) {
+  for (let i = 0; i < arr.length; i++) {
+    let item = arr[i];
     if (showDialog.value) return;
     try {
       let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
@@ -270,8 +271,10 @@ const setMovieTvImg = async (arr, type) => {
         item.movieTvId = data.id;
         item.genre_ids = data.genre_ids;
       } else {
-        item.poster = emptyBg;
-        item.releaseTime = "暂无时间";
+        // item.poster = emptyBg;
+        // item.releaseTime = "暂无时间";
+        arr.splice(i, 1);
+        i--;
       }
     } catch (error) {
       return Promise.reject();

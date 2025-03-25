@@ -88,8 +88,8 @@ const getMovieTvList = async (params) => {
   } else {
     res = uni.getStorageSync("localMovieTvData");
     let arr = [];
-    arr.push(...res.movie.filter((i) => i.genre_ids.indexOf(+routerParams.value.genreId) > -1));
-    arr.push(...res.tv.filter((i) => i.genre_ids.indexOf(+routerParams.value.genreId) > -1));
+    arr.push(...res.movie.filter((i) => i.genre_ids?.indexOf(+routerParams.value.genreId) > -1));
+    arr.push(...res.tv.filter((i) => i.genre_ids?.indexOf(+routerParams.value.genreId) > -1));
     arr.forEach((item) => {
       item.loadImg = true;
     });

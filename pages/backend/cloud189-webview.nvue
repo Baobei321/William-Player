@@ -89,10 +89,17 @@ export default {
             }
           }
         } else {
+          let isHaveData = !this.sourceList.every((item) => {
+            return !item.list.length;
+          });
           let obj = { name: res1.loginName };
           Object.keys(this.cookieObj).forEach((item) => {
             obj[item] = this.cookieObj[item];
           });
+          if (!isHaveData) {
+            obj.active = true;
+            uni.setStorageSync("isreload", true);
+          }
           cloud189.list.push(obj);
           uni.showToast({
             title: "添加成功",

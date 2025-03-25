@@ -81,6 +81,13 @@ export default {
             name: res1.data.nickname,
             Cookie: this.quarkCookie,
           };
+          let isHaveData = !this.sourceList.every((item) => {
+            return !item.list.length;
+          });
+          if (!isHaveData) {
+            obj.active = true;
+            uni.setStorageSync("isreload", true);
+          }
           cloudQuark.list.push(obj);
           uni.setStorageSync("sourceList", this.sourceList);
           uni.showToast({
