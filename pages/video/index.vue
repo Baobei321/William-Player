@@ -33,7 +33,7 @@
         </nut-dialog>
       </div>
     </template>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :enableControl="true">
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :enableControl="true" :appVersion="CONFIG.VERSIOIN">
     </wil-upgrade>
   </div>
 </template>
@@ -53,7 +53,7 @@ import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
 import emptyBg from "@/static/empty_bg.png";
-
+import * as CONFIG from '@/utils/config'
 const video_navbar = ref(null);
 
 const listData = ref([]);

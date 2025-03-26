@@ -5,7 +5,7 @@
                 <image src="../../static/app-logo1.png"></image>
                 <div class="main-name">
                     <span>William Player</span>
-                    <span>{{ systemInfo.appVersion }}</span>
+                    <span>{{ appVersion }}</span>
                 </div>
                 <div class="main-time">2025-03-21</div>
             </div>
@@ -25,7 +25,7 @@
             <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm"
                 @cancel="showPopover = false" />
         </nut-popup>
-        <wil-upgrade :updateFunction="backInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
+        <wil-upgrade :updateFunction="backInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :appVersion="appVersion"
             @closed="closedPopup" v-model:visible="showUpgrade">
         </wil-upgrade>
     </view>
@@ -37,6 +37,7 @@ import { onLoad } from '@dcloudio/uni-app';
 import wilUpgrade from '@/components/wil-upgrade/index.vue'
 import { getUntokenDicts } from '../../network/apis'
 import appLogo from '../../static/app-logo1.png'
+import * as CONFIG from '@/utils/config'
 
 const url = ref('')
 
@@ -53,7 +54,7 @@ const showButton = ref(true)
 const showUpgrade = ref(false)
 const versionData = ref({})
 
-const systemInfo = ref({})
+const appVersion= ref(CONFIG.VERSIOIN)
 
 const upgradeInfo = ref({
     logo: appLogo,
@@ -92,11 +93,9 @@ const compareVersions = (newBb, oldBb) => {
 const getAppUpdateInfo = async () => {
     let res = await getUntokenDicts("app_version")
     isLoading.value = false
-    systemInfo.value = uni.getSystemInfoSync()
     let newVersion = res.data[res.data.length - 1]
-    let version = systemInfo.value.appVersion
     versionData.value = res
-    if (compareVersions(newVersion.dictLabel, version) == 1) { //此时后台设置已有新版本
+    if (compareVersions(newVersion.dictLabel, appVersion.value) == 1) { //此时后台设置已有新版本
         showUpgrade.value = true
     } else {
         showButton.value = false
@@ -112,7 +111,6 @@ const closedPopup = () => {
 }
 
 onLoad((options) => {
-    systemInfo.value = uni.getSystemInfoSync()
     status.value = uni.getStorageSync('remindTime').type ? [uni.getStorageSync('remindTime').type] : ['总是']
     url.value = decodeURIComponent(options.url)
 })

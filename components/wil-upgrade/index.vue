@@ -44,6 +44,7 @@ const props = defineProps({
   type: { type: String, default: "outApp" }, //inApp是在应用内更新，outApp是跳转到外部浏览器下载安装包更新
   logo: { type: String, default: "" },
   appName: { type: String, default: "" },
+  appVersion: { type: String, default: "" },
   updateFunction: { type: Function },
   visible: { type: Boolean, default: false },
   enableControl: { type: Boolean, default: false },
@@ -107,12 +108,10 @@ const judegeShow = () => {
 };
 
 const getUpdateInfo = async () => {
-  let systemInfo = uni.getSystemInfoSync();
   // if (systemInfo.platform != 'android') return
   let res = await props.updateFunction();
   newVersion.value = res.data[res.data.length - 1];
-  let version = "";
-  version = systemInfo.appVersion;
+  let version = props.appVersion;
   if (compareVersions(newVersion.value.dictLabel, version) == 1) {
     //此时后台设置已有新版本
     if (props.enableControl) {
@@ -283,7 +282,7 @@ watch(
         getUpdateInfo();
       }
     } else {
-      if(props.enableControl){
+      if (props.enableControl) {
         getUpdateInfo();
       }
     }
