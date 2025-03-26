@@ -48,12 +48,10 @@ export default (params) => {
                 title: "提示",
                 content: "请登录",
                 showCancel: false,
-                success() {
-                  setTimeout(() => {
-                    uni.navigateTo({
-                      url: "/pages/login/index",
-                    })
-                  }, 1000);
+                success: () => {
+                  uni.navigateTo({
+                    url: "/pages/mine/login",
+                  })
                 },
               });
             } else if (code == 404) {
@@ -84,7 +82,7 @@ export default (params) => {
                 success() {
                   setTimeout(() => {
                     uni.navigateTo({
-                      url: "/pages/login/index",
+                      url: "/pages/mine/login",
                     })
                   }, 1000);
                 },

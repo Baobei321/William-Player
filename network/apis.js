@@ -97,3 +97,12 @@ export const getShareData = data => {
     data: data
   })
 }
+
+//添加操作日志
+export const addOperLog = data => {
+  return request({
+    url: `/monitor/operlog/add`,
+    method: 'post',
+    data: data
+  })
+}

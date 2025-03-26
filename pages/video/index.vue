@@ -47,7 +47,7 @@ import { onShow, onUnload } from "@dcloudio/uni-app";
 import hxList from "./components/hx-list.vue";
 import recentPlayed from "./components/recent-played.vue";
 import Classify from "./components/classify.vue";
-import { setTmdbKey, getUntokenDicts } from "../../network/apis";
+import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
@@ -199,6 +199,7 @@ const refreshWebDavVideo = async () => {
   refreshData.value.toupdate = 0;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
+  addOperLog({ title: "WebDAV生成海报墙", businessType: 11, operatorType: 2 });
 };
 
 //比较新刮削出来的影片是否已经存在或者删除，不存在就是待更新
@@ -354,6 +355,7 @@ const refresh189Video = async () => {
   refreshData.value.toupdate = 0;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
+  addOperLog({ title: "天翼云盘生成海报墙", businessType: 11, operatorType: 2 });
 };
 
 //查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
@@ -425,6 +427,7 @@ const refreshQuarkVideo = async () => {
   refreshData.value.toupdate = 0;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
+  addOperLog({ title: "夸克网盘生成海报墙", businessType: 11, operatorType: 2 });
 };
 
 //查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险

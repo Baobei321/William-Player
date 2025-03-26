@@ -3,8 +3,8 @@
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container">
       <view :style="{width:'750rpx',height:videoHeight,background:'#000'}" v-if="plateForm=='android'&&uniPlatform=='app'">
-        <video-view v-if="config.url" :initialTime="config.initialTime" :title="config.title" :src="config.url"
-          @timeupdate="setHistory" @getpipstatus="getPipStatus" :style="{width:'750rpx',height:videoHeight}"></video-view>
+        <video-view v-if="config.url" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory" @getpipstatus="getPipStatus"
+          :style="{width:'750rpx',height:videoHeight}"></video-view>
       </view>
       <template v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
@@ -21,6 +21,7 @@
 
 <script>
 import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, getQuarkResolutionUrl } from "./components/common";
 export default {
   components: {
@@ -244,7 +245,7 @@ export default {
         });
       }
     }
-    console.log(element, "elemtn");
+    addOperLog({ title: this.config.title, businessType: 10, operatorType: 2 });
   },
 };
 </script>
