@@ -53,7 +53,7 @@ import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
 import emptyBg from "@/static/empty_bg.png";
-import * as CONFIG from '@/utils/config'
+import * as CONFIG from "@/utils/config";
 const video_navbar = ref(null);
 
 const listData = ref([]);
@@ -259,7 +259,12 @@ const setMovieTvImg = async (arr, type) => {
     if (showDialog.value) return;
     try {
       let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
-      let data = res.results[0];
+      let data = {};
+      if (res.results.length == 1) {
+        data = res.results[0];
+      } else {
+        data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
+      }
       if (data) {
         item.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
         if (type == "movie") {
