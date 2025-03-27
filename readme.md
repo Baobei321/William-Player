@@ -29,7 +29,7 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/drawing-bed/releases/download/1.0.0/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.0/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
@@ -60,7 +60,7 @@ Android 8+
 
 按照以下顺序进行开发
 
-- [ ] 修复可能无法匹配集数的问题
+- [ ] 增加手动编辑修改刮削信息的功能
 - [ ] 根据网络速度选择合适的夸克视频播放
 - [ ] 尝试解决夸克大文件下载链接的限速问题
 - [ ] 增加数据同步功能
