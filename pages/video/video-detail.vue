@@ -1,6 +1,10 @@
 <template>
   <div class="video-detail">
-    <wil-navbar style="position: fixed;z-index: 999;" arrow-color="#fff"></wil-navbar>
+    <wil-navbar style="position: fixed;z-index: 999;" arrow-color="#fff">
+      <template #right>
+        <nut-icon name="more-x" custom-color="#fff"></nut-icon>
+      </template>
+    </wil-navbar>
     <div class="video-detail-container">
       <div class="video-detail-container__img" :style="{backgroundImage:`url(${imgData.img})`}">
         <div class="img-container">
@@ -116,7 +120,8 @@ import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parse
 import { onShow, onLoad } from "@dcloudio/uni-app";
 
 const { getUntokenDict } = useDict();
-
+const showPopover = ref(false);
+const iconItemList = ref([{ name: "选项一" }, { name: "选项二" }, { name: "选项三" }]);
 const imgData = ref({}); //图片内的信息
 const overview = ref(""); //剧情简介
 
@@ -655,6 +660,17 @@ page {
   height: 100%;
   box-sizing: border-box;
   background: #fff;
+  ::v-deep .wil-navbar {
+    .nut-navbar {
+      .nut-navbar__right {
+        display: block;
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
 
   .video-detail-container {
     height: 100%;
