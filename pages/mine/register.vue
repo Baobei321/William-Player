@@ -10,8 +10,8 @@
         </template>
       </wil-form>
       <div class="user-agreement" @click="checkAgree">
-        <img :src="checkIcon" v-show="!userAgree">
-        <img :src="checkActiveIcon" v-show="userAgree">
+        <image :src="checkIcon" v-show="!userAgree" />
+        <image :src="checkActiveIcon" v-show="userAgree" />
         <div class="user-agreement-word">
           <span>我已阅读并同意</span>
           <span>《用户协议》</span>
@@ -195,9 +195,10 @@ page {
     box-sizing: border-box;
 
     // padding-bottom: 34px;
-    img {
+    image {
       width: 28rpx;
       height: 28rpx;
+      display: block;
     }
     &-word {
       padding-left: 4rpx;
