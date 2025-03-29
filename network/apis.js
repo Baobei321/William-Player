@@ -24,6 +24,16 @@ export const loginByPhone = data => {
     header: { 'Content-Type': 'application/json' },
   })
 }
+
+//注册
+export const registerUser = data => {
+  return request({
+    url: '/william/registerUser',
+    method: 'post',
+    data: data,
+    header: { 'Content-Type': 'application/json' },
+  })
+}
 //openId获取用户信息
 export const getWeUserByopenId = data => {
   return request({

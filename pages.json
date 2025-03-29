@@ -50,6 +50,18 @@
       }
     },
     {
+      "path": "pages/mine/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/register",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/video/add-webdav",
       "style": {
         "navigationStyle": "custom"
@@ -70,12 +82,6 @@
     },
     {
       "path": "pages/video/video-player",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/mine/login",
       "style": {
         "navigationStyle": "custom"
       }

@@ -95,11 +95,16 @@ const cellOptions = ref([
   ],
   [
     {
-      title: "反馈",
+      title: "问题与反馈",
       leftIcon: iconFeedback,
-      path: null,
-      outside: true,
-      outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
+      // path: null,
+      // outside: true,
+      // outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
+      path: "/pages/backend/index",
+      query: {
+        url: "https://yuanbao.tencent.com",
+        title: "腾讯元宝",
+      },
     },
     {
       title: "赞赏",
