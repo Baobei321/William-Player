@@ -23,6 +23,7 @@
       </div>
     </div>
     <div class="source-list-empty" v-else>
+      <image src="@/static/no-data.png" class="source-list-empty__img"></image>
       <span class="source-list-empty__tip">请按照【/我的视频/电影，/我的视频/电视剧】路径存储资源，否则无法生成海报墙，只能在我的页面的(媒体库列表)按照文件夹进行视频播放</span>
       <nut-button custom-color="#090909" @click="toAddFile">
         <template #icon>
@@ -332,6 +333,10 @@ page {
     justify-content: center;
     width: 100%;
     height: 100%;
+    .source-list-empty__img{
+      width:400rpx;
+      height:400rpx;
+    }
     .source-list-empty__tip{
       text-align: center;
       padding: 0 50rpx;

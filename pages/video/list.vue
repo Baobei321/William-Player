@@ -17,7 +17,10 @@
       <div class="video-list1-container" v-if="listData.length">
         <base-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></base-cell>
       </div>
-      <div class="video-list1-tip" v-else>暂无文件，请查看资源是否开启</div>
+      <div class="video-list1-tip" v-else>
+        <image src="@/static/no-data.png"></image>
+        <span>暂无文件，请查看资源是否开启</span>
+      </div>
     </div>
   </div>
 </template>
@@ -91,20 +94,20 @@ const refreshWebDAVModule = async () => {
   let num3 = 0;
   await Promise.all(
     listData.value.map(async (item) => {
-      let res = await getFolder({ path: "/" + item.name },selectMedia.value);
+      let res = await getFolder({ path: "/" + item.name }, selectMedia.value);
       let movie = res.data.content.find((i) => i.name == "电影");
       let tv = res.data.content.find((i) => i.name == "电视剧");
       let other = res.data.content.find((i) => i.name == "其他");
       if (movie) {
-        let resmovie = await getFolder({ path: "/" + item.name + "/电影" },selectMedia.value);
+        let resmovie = await getFolder({ path: "/" + item.name + "/电影" }, selectMedia.value);
         num1 += resmovie.data.total;
       }
       if (tv) {
-        let restv = await getFolder({ path: "/" + item.name + "/电视剧" },selectMedia.value);
+        let restv = await getFolder({ path: "/" + item.name + "/电视剧" }, selectMedia.value);
         num2 += restv.data.total;
       }
       if (other) {
-        let resother = await getFolder({ path: "/" + item.name + "/其他" },selectMedia.value);
+        let resother = await getFolder({ path: "/" + item.name + "/其他" }, selectMedia.value);
         num3 += resother.data.total;
       }
     })
@@ -445,6 +448,13 @@ page {
       margin-top: 24rpx;
       text-align: center;
       font-size: 28rpx;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      image {
+        width: 400rpx;
+        height: 400rpx;
+      }
     }
   }
   &-addbutton {
