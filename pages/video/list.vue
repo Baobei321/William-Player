@@ -17,10 +17,7 @@
       <div class="video-list1-container" v-if="listData.length">
         <base-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></base-cell>
       </div>
-      <div class="video-list1-tip" v-else>
-        <image src="@/static/no-data.png"></image>
-        <span>暂无文件，请查看资源是否开启</span>
-      </div>
+      <wil-empty v-else text="暂无文件，请查看资源是否开启" class="video-list1-tip"></wil-empty>
     </div>
   </div>
 </template>
@@ -32,6 +29,7 @@ import Folder from "../../static/folder.png";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { getFolder, get189Folder, getQuarkFolder } from "./components/common.js";
 import { onShow } from "@dcloudio/uni-app";
+import wilEmpty from "@/components/wil-empty/index.vue"
 
 const date = ref("暂未更新");
 

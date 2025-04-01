@@ -12,7 +12,8 @@
       <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="hxList-list-movie">
           <div class="hxList-list-movie__item" v-for="item in listData1" :key="item.name" @click="toVideoDetail(item)">
-            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill"></image>
+            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)"
+              mode="aspectFill"></image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
             <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
           </div>
@@ -22,7 +23,7 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow } from "@dcloudio/uni-app";
 
@@ -71,6 +72,15 @@ const imgLoad = (item) => {
   if (!props.isConnected && !item.loadImg) return;
   item.loadImg = true;
 };
+
+onShow(() => {
+  nextTick(() => {
+    listData1.value = JSON.parse(JSON.stringify(props.listData));
+    listData1.value.forEach((item) => {
+      item.loadImg = true;
+    });
+  });
+});
 </script>
 <style lang="scss" scoped>
 @keyframes opacityIn {

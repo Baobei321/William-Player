@@ -44,6 +44,13 @@
       }
     },
     {
+      "path": "pages/video/search-match",
+      "style": {
+        "navigationBarTitleText": "编辑信息",
+        "navigationBarBackgroundColor": "#f7f7f7"
+      }
+    },
+    {
       "path": "pages/mine/index",
       "style": {
         "navigationStyle": "custom"

@@ -6,7 +6,7 @@ const getFolder = (data, webdavInfo) => {
     uni.request({
       url: "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
       data: JSON.stringify({ ...data, page: 1, per_page: 100, refresh: false }),
-      timeout: 3000,
+      timeout: 10000,
       method: "POST",
       header: {
         Authorization: webdavInfo.token,

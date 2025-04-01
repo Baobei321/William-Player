@@ -1,8 +1,18 @@
 <template>
-  <div class="video-detail">
+  <div class="video-detail" :style="{overflow:showPopover?'hidden':'auto'}">
     <wil-navbar style="position: fixed;z-index: 999;" arrow-color="#fff">
       <template #right>
-        <nut-icon name="more-x" custom-color="#fff"></nut-icon>
+        <nut-icon name="more-x" custom-color="#fff" size="20" @click="showPopover=true"></nut-icon>
+        <nut-transition :show="showPopover" name="fade" :duration="200">
+          <div class="more-arrow"></div>
+          <div class="more-popover">
+            <div class="more-popover-item" @click="toEdit">
+              <nut-icon name="edit" custom-color="#000"></nut-icon>
+              <span class="more-popover-item__text">手动编辑</span>
+            </div>
+          </div>
+        </nut-transition>
+        <nut-overlay v-model:visible="showPopover" :z-index="2000" :lock-scroll="true"></nut-overlay>
       </template>
     </wil-navbar>
     <div class="video-detail-container">
@@ -145,6 +155,13 @@ const nowSourceList = ref([]);
 
 const showRehandleButton = ref(false);
 const historyTv = ref({});
+
+const toEdit = () => {
+  showPopover.value = false;
+  uni.navigateTo({
+    url: `/pages/video/search-match?type=${routerParams.value.type}`,
+  });
+};
 
 //通过tmdb接口获取更详细的信息
 const getMovieTvById = (data, type) => {
@@ -404,9 +421,10 @@ const getMovieTvDetail = async () => {
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
-    imgData.value.title = selectSource.value.name;
+    imgData.value.title = res.name;
   }
   overview.value = res.overview;
+  return res;
 };
 
 const getActorList = async () => {
@@ -640,8 +658,44 @@ onBeforeMount(() => {
   getActorList();
 });
 
-onShow(() => {
+onShow(async () => {
   setButtonText();
+  let resetMovieTv = uni.getStorageSync("resetMovieTv");
+  if (resetMovieTv) {
+    judgeSelect();
+    let oldMovieTvId = routerParams.value.movieTvId;
+    let oldType = routerParams.value.type;
+    routerParams.value.type = resetMovieTv.type;
+    routerParams.value.movieTvId = resetMovieTv.movieTvId;
+    routerParams.value.name = resetMovieTv.name;
+    uni.removeStorageSync("resetMovieTv");
+    selectSource.value = sourceList.value[0];
+    activeTab.value = selectSource.value.provider;
+    setButtonText();
+
+    let res = await getMovieTvDetail();
+    let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
+
+    if (resetMovieTv.type == "tv") {
+      let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == oldMovieTvId);
+      nowTv.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
+      nowTv.releaseTime = res.first_air_date;
+      nowTv.type = "1";
+      nowTv.movieTvId = res.id;
+      nowTv.genre_ids = res.genre_ids;
+      nowTv.name = res.name;
+    } else if (resetMovieTv.type == "movie") {
+      let nowMovie = localMovieTvData.movie.find((i) => i.movieTvId == oldMovieTvId);
+      nowMovie.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
+      nowMovie.releaseTime = res.release_date;
+      nowMovie.type = "2";
+      nowMovie.movieTvId = res.id;
+      nowMovie.genre_ids = res.genre_ids;
+      nowMovie.name = res.title;
+    }
+    uni.setStorageSync("localMovieTvData", localMovieTvData);
+    getActorList();
+  }
 });
 
 onLoad((options) => {
@@ -662,12 +716,51 @@ page {
   background: #fff;
   ::v-deep .wil-navbar {
     .nut-navbar {
+      overflow: visible;
       .nut-navbar__right {
         display: block;
         position: absolute;
         right: 0;
         display: flex;
         align-items: center;
+        .nut-transition {
+          position: absolute;
+          top: 25px;
+          right: 25%;
+          z-index: 3000;
+          .more-arrow {
+            width: 0;
+            height: 0;
+            position: absolute;
+            right: 14rpx;
+            transform: translateY(-100%);
+            border-left: 12rpx solid transparent;
+            border-right: 12rpx solid transparent;
+            border-bottom: 16rpx solid #fff;
+          }
+          .more-popover {
+            width: 280rpx;
+            background: #fff;
+            border-radius: 16rpx;
+            .more-popover-item {
+              display: flex;
+              align-items: center;
+              padding: 16rpx 24rpx;
+              .more-popover-item__text {
+                padding-left: 15rpx;
+                color: #000;
+              }
+            }
+          }
+        }
+        .nut-overlay {
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          top: 0;
+          left: 0;
+          background: transparent;
+        }
       }
     }
   }

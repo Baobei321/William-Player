@@ -1,57 +1,55 @@
 <template>
-  <div :class="['wil-modal',animation?'modal-show':'modal-hide']" v-if="show">
-    <div class="wil-modal-top">
-      <div class="wil-modal-title">{{data.title}}</div>
-      <div class="wil-modal-content">{{data.content}}</div>
+  <nut-transition :show="show" name="fade" :duration="200">
+    <div :class="['wil-modal']">
+      <div class="wil-modal-top">
+        <div class="wil-modal-title">{{data.title}}</div>
+        <div class="wil-modal-content">{{data.content}}</div>
+      </div>
+      <div class="wil-modal-button">
+        <div class="wil-modal-button__cancel" :style="{color:data.cancelColor}" @click="cancel">{{ data.cancelText }}</div>
+        <div class="wil-modal-button__confirm" :style="{color:data.confirmColor}" @click="confirm">{{ data.confirmText }}</div>
+      </div>
     </div>
-    <div class="wil-modal-button">
-      <div class="wil-modal-button__cancel" :style="{color:data.cancelColor}" @click="cancel">{{ data.cancelText }}</div>
-      <div class="wil-modal-button__confirm" :style="{color:data.confirmColor}" @click="confirm">{{ data.confirmText }}</div>
-    </div>
-  </div>
-  <div :class="['wil-overlay',animation?'overlay-show':'overlay-hide']" v-if="show"></div>
+    <div :class="['wil-overlay']"></div>
+  </nut-transition>
 </template>
 
 <script setup>
 import { ref, nextTick } from "vue";
-const data = ref({
-  title: "温馨提示",
-  content: "是否退出登录",
-  confirmText: "确定",
-  confirmColor: "#00B2A0",
-  cancelText: "取消",
-  cancelColor: "#000",
-  confirm: () => {},
-  cancel: () => {},
+
+const props = defineProps({
+  title: { type: String, default: "温馨提示" },
+  content: { type: String, default: "是否退出登录" },
+  confirmText: { type: String, default: "确定" },
+  confirmColor: { type: String, default: "#00B2A0" },
+  cancelText: { type: String, default: "取消" },
+  cancelColor: { type: String, default: "#000" },
+  confirm: { type: Function, default: () => {} },
+  cancel: { type: Function, default: () => {} },
 });
 
+const data = ref({}); //由于app端无法引入这个方法使用，所以还是使用组件的形式
+
 const show = ref(false);
-const animation = ref(false);
 
 const showModal = (obj) => {
-  data.value = { ...data.value, ...obj };
+  data.value = { ...data.value, ...props, ...obj };
   show.value = true;
-  animation.value = true;
 };
 
 const cancel = () => {
-  animation.value = false;
-  data.value.cancel();
+  show.value = false;
   setTimeout(() => {
-    show.value = false;
-  }, 180);
+    data.value.cancel();
+  }, 200);
 };
 
 const confirm = () => {
-  animation.value = false;
+  show.value = false;
   setTimeout(() => {
-    show.value = false;
-    nextTick(() => {
-      data.value.confirm();
-    });
-  }, 180);
+    data.value.confirm();
+  }, 200);
 };
-
 defineExpose({
   showModal,
 });

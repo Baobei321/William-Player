@@ -245,7 +245,7 @@ export default {
         });
       }
     }
-    addOperLog({ title: this.config.title, businessType: 10, operatorType: 2 });
+    addOperLog({ title: this.config.title, businessType: 10, operatorType: 2, operUrl: this.config.url });
   },
 };
 </script>

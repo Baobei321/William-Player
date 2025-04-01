@@ -32,8 +32,8 @@
         <span>添加新资源</span>
       </nut-button>
     </div>
-    <wil-modal ref="wil_modal"></wil-modal>
     <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消" @choose="chooseOperation" />
+    <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
@@ -41,9 +41,10 @@
 import { ref } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { onShow } from "@dcloudio/uni-app";
-import wilModal from "@/components/wil-modal/index.vue";
 import { toParse, toStringfy } from "../mine/common";
 import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
+import showModal from "@/components/wil-modal/index.js";
+import wilModal from "@/components/wil-modal/modal.vue";
 
 const sourceList = ref([]);
 const selectMedia = ref({});
@@ -333,11 +334,11 @@ page {
     justify-content: center;
     width: 100%;
     height: 100%;
-    .source-list-empty__img{
-      width:400rpx;
-      height:400rpx;
+    .source-list-empty__img {
+      width: 400rpx;
+      height: 400rpx;
     }
-    .source-list-empty__tip{
+    .source-list-empty__tip {
       text-align: center;
       padding: 0 50rpx;
       padding-bottom: 24rpx;

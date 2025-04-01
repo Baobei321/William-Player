@@ -1,6 +1,10 @@
 <template>
   <div class="mine">
-    <wil-navbar title="我的" :leftShow="false"></wil-navbar>
+    <wil-navbar title="我的" :leftShow="false">
+      <template #right>
+        <nut-icon name="scan" custom-color="#ff6701" size="16" @click="openUrl"></nut-icon>
+      </template>
+    </wil-navbar>
     <div class="mine-container">
       <div class="mine-notLog" v-if="!isLogin">
         <div class="mine-notLog__left">
@@ -50,8 +54,8 @@ import iconSetting from "../../static/icon-setting.png";
 import iconAbout from "../../static/icon-about.png";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "./common";
-import wilModal from "../../components/wil-modal/index.vue";
-
+import showModal from "@/components/wil-modal/index.js";
+import wilModal from "@/components/wil-modal/modal.vue";
 // const { getUntokenDict } = useDict()
 
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY));
@@ -124,9 +128,26 @@ const cellOptions = ref([
   ],
 ]);
 
+const openUrl = () => {
+  uni.scanCode({
+    success: async (res) => {
+      if (res.result.startsWith("http://") || res.result.startsWith("https://")) {
+        uni.navigateTo({
+          url: `/pages/backend/index?url=${res.result}`,
+        });
+      } else {
+        uni.showToast({
+          title: "不是网页地址，无法打开",
+          icon: "none",
+        });
+      }
+    },
+  });
+};
+
 //退出登录
 const toLogout = () => {
-  wil_modal.value.showModal({
+  wil_modal.value.valueshowModal({
     title: "温馨提示",
     content: "是否退出登录",
     confirmColor: "#ff6701",
@@ -217,6 +238,15 @@ page {
   flex-direction: column;
   position: relative;
   box-sizing: border-box;
+  ::v-deep .wil-navbar {
+    .nut-navbar {
+      .nut-navbar__right {
+        display: block;
+        position: absolute;
+        right: 0;
+      }
+    }
+  }
 
   &-container {
     flex: 1;
