@@ -133,6 +133,7 @@ export default {
               this.historyPlay.unshift(this.historyObj);
             }
           }
+          
           uni.setStorageSync("historyPlay", this.historyPlay);
         }
       } else if (this.plateForm == "android") {

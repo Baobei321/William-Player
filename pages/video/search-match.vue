@@ -47,6 +47,10 @@
       <wil-empty v-else text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
+    <nut-popup v-model:visible="showSeason" position="bottom" safe-area-inset-bottom>
+      <nut-picker v-model="popupValue" :columns="seasonColumns" title="选择季" @confirm="confirmPicker" @cancel="showSeason = false">
+      </nut-picker>
+    </nut-popup>
   </div>
 </template>
 
@@ -58,15 +62,20 @@ import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
 import showModal from "@/components/wil-modal/index.js";
 import wilModal from "@/components/wil-modal/modal.vue";
-import {  onLoad } from "@dcloudio/uni-app";
+import { onLoad } from "@dcloudio/uni-app";
 
 const searchValue = ref("");
 const requestParams = ref({});
 const activeIndex = ref(null);
 
-const routerParams= ref({})
+const showSeason = ref(false);
+const popupValue = ref([]);
+const seasonColumns = ref([]);
+const selectItem = ref({});
 
-const wil_modal=ref(null)
+const routerParams = ref({});
+
+const wil_modal = ref(null);
 
 const responseAdapter = (result) => {
   if (!result) {
@@ -100,6 +109,27 @@ const searchMovieTv = (data) => {
   });
 };
 
+//获取电视剧详情，包括有多季
+const getTvDetail = (id) => {
+  let url = `https://api.tmdb.org/3/tv/${id}`;
+  return new Promise((resolve) => {
+    uni.request({
+      url: url,
+      data: {
+        language: "zh-CN",
+        api_key: uni.getStorageSync("tmdbKey"),
+      },
+      method: "GET",
+      header: {
+        "Content-Type": "application/json",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+};
+
 const toSearch = () => {
   requestParams.value.query = searchValue.value;
 };
@@ -109,8 +139,17 @@ const toCancel = () => {
   requestParams.value.query = "";
 };
 
-const handleSelect = (item, index) => {
+const handleSelect = async (item, index) => {
   activeIndex.value = index;
+  selectItem.value = item;
+  let res = await getTvDetail(item.id);
+  if (res.seasons.length >= 2) {
+    seasonColumns.value = res.seasons.map((v) => {
+      return { text: v.name, value: v.season_number };
+    });
+    showSeason.value = true;
+    return;
+  }
   wil_modal.value.showModal({
     title: "温馨提示",
     content: "是否确认匹配该影片？",
@@ -124,12 +163,12 @@ const handleSelect = (item, index) => {
         });
         return;
       }
-      let type = item.media_type == "tv" ? "tv" : "movie"
+      let type = item.media_type == "tv" ? "tv" : "movie";
       const mapping = {
-        'tv':'电视剧',
-        'movie':'电影'
-      }
-      if(routerParams.value.type!=type){
+        "tv": "电视剧",
+        "movie": "电影",
+      };
+      if (routerParams.value.type != type) {
         uni.showToast({
           title: `当前影片为${mapping[routerParams.value.type]}类型，不能选择${mapping[type]}类型`,
           icon: "none",
@@ -142,9 +181,47 @@ const handleSelect = (item, index) => {
   });
 };
 
-onLoad((options)=>{
-routerParams.value=options
-})
+const confirmPicker = ({ selectedValue, selectedOptions }) => {
+  let localMovieTvData = uni.getStorageSync("localMovieTvData");
+  if (localMovieTvData.movie.some((i) => i.movieTvId == selectItem.value.id) || localMovieTvData.tv.some((i) => i.movieTvId == selectItem.value.id && selectedValue[0] == i.season)) {
+    uni.showToast({
+      title: "库里存在相同影片",
+      icon: "none",
+    });
+    return;
+  }
+  let type = selectItem.value.media_type == "tv" ? "tv" : "movie";
+  const mapping = {
+    "tv": "电视剧",
+    "movie": "电影",
+  };
+  if (routerParams.value.type != type) {
+    uni.showToast({
+      title: `当前影片为${mapping[routerParams.value.type]}类型，不能选择${mapping[type]}类型`,
+      icon: "none",
+    });
+    return;
+  }
+  const numberMapping = {
+    "1": "一",
+    "2": "二",
+    "3": "三",
+    "4": "四",
+    "5": "五",
+    "6": "六",
+    "7": "七",
+    "8": "八",
+  };
+  let season = numberMapping[selectedValue[0]] == "一" ? "" : ` 第${numberMapping[selectedValue[0]]}季`;
+  console.log(selectItem.value.name + season);
+
+  uni.setStorageSync("resetMovieTv", { type: type, movieTvId: selectItem.value.id, name: routerParams.value.type == "tv" ? selectItem.value.name + season : selectItem.value.title }); //设置到缓存，详情页去获取
+  uni.navigateBack();
+};
+
+onLoad((options) => {
+  routerParams.value = options;
+});
 </script>
 
 <style lang="scss" scoped>

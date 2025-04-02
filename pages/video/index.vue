@@ -6,7 +6,7 @@
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
         <scroll-view :scroll-y="true" class="video-container-scroll">
           <div class="scroll-list">
-            <recent-played v-if="historyPlay.length" :catchtouchmove="true"></recent-played>
+            <recent-played v-if="historyPlay.length"></recent-played>
             <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
             <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
             <Classify :isConnected="isConnected"></Classify>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, nextTick } from "vue";
 import Folder from "../../static/folder.png";
 import videoNavbar from "./components/navbar.vue";
 import Skeleton from "./components/skeleton.vue";
@@ -226,7 +226,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
         uni.hideLoading();
         let movieResult = await getFolder({ path: path + "电影" }, selectMedia.value);
         movieResult.data.content.forEach((v) => {
-          v.path = path + "电影";
+          v.path = path + "电影/" + v.name;
           v.provider = movieResult.data.provider;
         });
         movieTvData.value.movie.push(...movieResult.data.content);
@@ -236,7 +236,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
         uni.hideLoading();
         let tvResult = await getFolder({ path: path + "电视剧" }, selectMedia.value);
         tvResult.data.content.forEach((v) => {
-          v.path = path + "电视剧";
+          v.path = path + "电视剧/" + v.name;
           v.provider = tvResult.data.provider;
         });
         movieTvData.value.tv.push(...tvResult.data.content);
@@ -271,6 +271,17 @@ const setMovieTvImg = async (arr, type) => {
           item.releaseTime = data.release_date;
           item.type = "2";
         } else if (type == "tv") {
+          const numberMapping = {
+            "一": "1",
+            "二": "2",
+            "三": "3",
+            "四": "4",
+            "五": "5",
+            "六": "6",
+            "七": "7",
+          };
+          const match = item.name.match(/第(.*?)季/);
+          item.season = match ? numberMapping[match[1]] : "1";
           item.releaseTime = data.first_air_date;
           item.type = "1";
         }
@@ -309,8 +320,6 @@ const handleGx = async () => {
 
         uni.setStorageSync("sourceList", sourceList.value);
         let res = await getFolder({}, selectMedia.value);
-        console.log(res, "res111");
-
         listData.value = res.data.content.map((item) => {
           if (item.type == "1") {
             item.leftIcon = Folder;
@@ -337,8 +346,6 @@ const refresh189Video = async () => {
     refreshLoading.value = false;
     return;
   }
-  console.log(movieTvData.value, "movieTvData");
-
   let movie = groupBySource(movieTvData.value.movie);
   let tv = groupBySource(movieTvData.value.tv);
   compareMovieTv(movie, "movie");
@@ -376,7 +383,7 @@ const get189MovieTv = async (obj) => {
       let movieResult = await get189Folder({ folderId: item.id }, selectMedia.value);
 
       movieResult.fileListAO.fileList.forEach((v) => {
-        v.path = "/我的视频/电影";
+        v.path = "/我的视频/电影/" + v.name;
         v.provider = "189CloudPC";
       });
       movieTvData.value.movie.push(...movieResult.fileListAO.fileList);
@@ -386,7 +393,7 @@ const get189MovieTv = async (obj) => {
       let tvResult = await get189Folder({ folderId: item.id }, selectMedia.value);
 
       tvResult.fileListAO.folderList.forEach((v) => {
-        v.path = "/我的视频/电视剧";
+        v.path = "/我的视频/电视剧/" + v.name;
         v.provider = "189CloudPC";
       });
       movieTvData.value.tv.push(...tvResult.fileListAO.folderList);
@@ -409,8 +416,6 @@ const refreshQuarkVideo = async () => {
     refreshLoading.value = false;
     return;
   }
-  console.log(movieTvData.value, "movieTvData");
-
   let movie = groupBySource(movieTvData.value.movie);
   let tv = groupBySource(movieTvData.value.tv);
   compareMovieTv(movie, "movie");
@@ -446,7 +451,7 @@ const getQuarkMovieTv = async (obj) => {
     if (item.file_name == "电影") {
       let movieResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
       movieResult.data.list = movieResult.data.list.map((v) => {
-        return { id: v.fid, name: v.file_name, path: "/我的视频/电影", provider: "Quark", size: v.size };
+        return { id: v.fid, name: v.file_name, path: "/我的视频/电影/" + v.file_name, provider: "Quark", size: v.size };
       });
       movieTvData.value.movie.push(...movieResult.data.list);
       refreshData.value.found += movieResult.data.list.length;
@@ -455,7 +460,7 @@ const getQuarkMovieTv = async (obj) => {
       let tvResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
 
       tvResult.data.list = tvResult.data.list.map((v) => {
-        return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧", provider: "Quark", size: v.size };
+        return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧/" + v.file_name, provider: "Quark", size: v.size };
       });
       movieTvData.value.tv.push(...tvResult.data.list);
       refreshData.value.found += tvResult.data.list.length;
@@ -539,7 +544,9 @@ onShow(async () => {
   }
   judgeSelect();
   tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
-  historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  nextTick(() => {
+    historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  });
   webdavInfo.value = uni.getStorageSync("webdavInfo");
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   if (selectType.value.type == "WebDAV") {
