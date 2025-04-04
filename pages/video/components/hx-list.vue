@@ -60,7 +60,7 @@ const toVideoDetail = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=${props.title}&isConnected=${props.isConnected}`,
+    url: `/pages/video/video-all?title=${props.title}&isConnected1=${props.isConnected}`,
   });
 };
 

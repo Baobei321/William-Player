@@ -1,5 +1,5 @@
 <template>
-  <div class="recent-played">
+  <div class="recent-played" v-if="listData.length">
     <div class="recent-played-title">
       <div class="recent-played-title-left">最近观看</div>
       <div class="recent-played-title-right" @click="toVideoAll">
@@ -37,9 +37,10 @@ import emptyBg from "@/static/empty_bg.png";
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
+  listData: { type: Array, default: [] },
 });
 
-const listData = ref(uni.getStorageSync("historyPlay") || []);
+const scrollData = ref([]);
 
 const selectType = ref({});
 
@@ -76,17 +77,17 @@ const getMovieName = (val) => {
 const setItemFirst = (item) => {
   let index = null;
   if (item.type == "tv") {
-    index = listData.value.findIndex((i) => i.type == item.type && i.titlePlay == item.titlePlay);
+    index = scrollData.value.findIndex((i) => i.type == item.type && i.titlePlay == item.titlePlay);
   } else if (item.type == "movie") {
-    index = listData.value.findIndex((i) => i.type == item.type && getMovieName(i.name) == getMovieName(item.name));
+    index = scrollData.value.findIndex((i) => i.type == item.type && getMovieName(i.name) == getMovieName(item.name));
   }
   if (index > -1) {
-    listData.value.splice(index, 1);
-    listData.value.unshift(item);
+    scrollData.value.splice(index, 1);
+    scrollData.value.unshift(item);
   } else {
-    listData.value.unshift(item);
+    scrollData.value.unshift(item);
   }
-  uni.setStorageSync("historyPlay", listData.value);
+  uni.setStorageSync("historyPlay", scrollData.value);
 };
 
 const toVideoPlayer = (item) => {
@@ -124,7 +125,7 @@ const toVideoPlayer = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/video/video-all?title=最近观看&isConnected=${props.isConnected}`,
+    url: `/pages/video/video-all?title=最近观看&isConnected1=${props.isConnected}`,
   });
 };
 const imgError = (item) => {
@@ -137,8 +138,13 @@ const imgLoad = (item) => {
 };
 onShow(() => {
   judgeSelect();
-  listData.value = uni.getStorageSync("historyPlay") || [];
-  listData.value.forEach((item) => {
+  scrollData.value = [...props.listData];
+  // let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
+  // scrollData.value = scrollData.value.filter((item) => {
+  //   return localMovieTvData.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.tv.some((v) => v.name == item.titlePlay);
+  // });
+  // uni.setStorageSync("historyPlay", scrollData.value);
+  scrollData.value.forEach((item) => {
     item.loadImg = true;
   });
 });

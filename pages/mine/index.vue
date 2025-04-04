@@ -147,7 +147,7 @@ const openUrl = () => {
 
 //退出登录
 const toLogout = () => {
-  wil_modal.value.valueshowModal({
+  wil_modal.value.showModal({
     title: "温馨提示",
     content: "是否退出登录",
     confirmColor: "#ff6701",

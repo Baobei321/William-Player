@@ -212,7 +212,9 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
     "7": "七",
     "8": "八",
   };
-  let season = numberMapping[selectedValue[0]] == "一" ? "" : ` 第${numberMapping[selectedValue[0]]}季`;
+  // console.log(selectedValue[0],'选择');
+
+  let season = numberMapping[selectedValue[0]] == "一" || !numberMapping[selectedValue[0]] ? "" : ` 第${numberMapping[selectedValue[0]]}季`;
   console.log(selectItem.value.name + season);
 
   uni.setStorageSync("resetMovieTv", { type: type, movieTvId: selectItem.value.id, name: routerParams.value.type == "tv" ? selectItem.value.name + season : selectItem.value.title }); //设置到缓存，详情页去获取

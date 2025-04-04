@@ -6,7 +6,7 @@
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
         <scroll-view :scroll-y="true" class="video-container-scroll">
           <div class="scroll-list">
-            <recent-played v-if="historyPlay.length"></recent-played>
+            <recent-played v-if="historyPlay.length" :listData="historyPlay" :isConnected="isConnected"></recent-played>
             <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
             <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
             <Classify :isConnected="isConnected"></Classify>
@@ -254,50 +254,92 @@ const getMovieTv = async (arr1, path1 = "/") => {
 
 //将网盘中的电影等都设置详细信息
 const setMovieTvImg = async (arr, type) => {
-  for (let i = 0; i < arr.length; i++) {
-    let item = arr[i];
-    if (showDialog.value) return;
-    try {
-      let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
-      let data = {};
-      if (res.results.length == 1) {
-        data = res.results[0];
-      } else {
-        data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
-      }
-      if (data) {
-        item.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
-        if (type == "movie") {
-          item.releaseTime = data.release_date;
-          item.type = "2";
-        } else if (type == "tv") {
-          const numberMapping = {
-            "一": "1",
-            "二": "2",
-            "三": "3",
-            "四": "4",
-            "五": "5",
-            "六": "6",
-            "七": "7",
-          };
-          const match = item.name.match(/第(.*?)季/);
-          item.season = match ? numberMapping[match[1]] : "1";
-          item.releaseTime = data.first_air_date;
-          item.type = "1";
+  if (showDialog.value) return;
+  const processedItems = await Promise.all(
+    arr.map(async (item) => {
+      try {
+        let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
+        let data = {};
+        if (res.results.length == 1) {
+          data = res.results[0];
+        } else {
+          data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
         }
-        item.movieTvId = data.id;
-        item.genre_ids = data.genre_ids;
-      } else {
-        // item.poster = emptyBg;
-        // item.releaseTime = "暂无时间";
-        arr.splice(i, 1);
-        i--;
+        if (data) {
+          let newItem = { ...item };
+          newItem.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
+          if (type == "movie") {
+            newItem.releaseTime = data.release_date;
+            newItem.type = "2";
+          } else if (type == "tv") {
+            const numberMapping = {
+              "一": "1",
+              "二": "2",
+              "三": "3",
+              "四": "4",
+              "五": "5",
+              "六": "6",
+              "七": "7",
+            };
+            const match = newItem.name.match(/第(.*?)季/);
+            newItem.season = match ? numberMapping[match[1]] : "1";
+            newItem.releaseTime = data.first_air_date;
+            newItem.type = "1";
+          }
+          newItem.movieTvId = data.id;
+          newItem.genre_ids = data.genre_ids;
+          return newItem;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        return null;
       }
-    } catch (error) {
-      return Promise.reject();
-    }
-  }
-  return arr;
+    })
+  );
+  // for (let i = 0; i < arr.length; i++) {
+  //   let item = arr[i];
+  //   try {
+  //     let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
+  //     let data = {};
+  //     if (res.results.length == 1) {
+  //       data = res.results[0];
+  //     } else {
+  //       data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
+  //     }
+  //     if (data) {
+  //       item.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
+  //       if (type == "movie") {
+  //         item.releaseTime = data.release_date;
+  //         item.type = "2";
+  //       } else if (type == "tv") {
+  //         const numberMapping = {
+  //           "一": "1",
+  //           "二": "2",
+  //           "三": "3",
+  //           "四": "4",
+  //           "五": "5",
+  //           "六": "6",
+  //           "七": "7",
+  //         };
+  //         const match = item.name.match(/第(.*?)季/);
+  //         item.season = match ? numberMapping[match[1]] : "1";
+  //         item.releaseTime = data.first_air_date;
+  //         item.type = "1";
+  //       }
+  //       item.movieTvId = data.id;
+  //       item.genre_ids = data.genre_ids;
+  //     } else {
+  //       // item.poster = emptyBg;
+  //       // item.releaseTime = "暂无时间";
+  //       arr.splice(i, 1);
+  //       i--;
+  //     }
+  //   } catch (error) {
+  //     return Promise.reject();
+  //   }
+  // }
+  return processedItems.filter((item) => item !== null);
 };
 
 const toAddWebdav = () => {
@@ -543,12 +585,16 @@ onShow(async () => {
     uni.setStorageSync("sourceList", sourceList.value);
   }
   judgeSelect();
+  localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
   nextTick(() => {
     historyPlay.value = uni.getStorageSync("historyPlay") || [];
+    historyPlay.value = historyPlay.value.filter((item) => {
+      return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+    });
+    uni.setStorageSync("historyPlay", historyPlay.value);
   });
   webdavInfo.value = uni.getStorageSync("webdavInfo");
-  localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   if (selectType.value.type == "WebDAV") {
     handleGx();
   } else if (selectType.value.type == "天翼云盘") {

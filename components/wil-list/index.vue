@@ -254,7 +254,6 @@ const handleAdd = async (isA, sort = 'DESC') => {
 
 //手动删除一条数据
 const handleDelete = async (id) => {
-  console.log(id, 'id');
   if (!finished.value) { //如果还没滚动到底部
     const params = {
       ...props.requestParams,

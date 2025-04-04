@@ -279,10 +279,9 @@ const handleTv = async () => {
       "七": "7",
       "八": "8",
     };
-    const match = selectSource.value.name.match(/第(.*?)季/);
+    const match = imgData.value.title.match(/第(.*?)季/);
     season = match ? numberMapping[match[1]] : "1";
   }
-  console.log('asd',season);
   let res1 = await getTvSeason({
     movieTvId: routerParams.value.movieTvId,
     season: season,
@@ -424,11 +423,11 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
+    imgData.value.title = routerParams.value.name;
     handleTv();
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
-    imgData.value.title = imgData.value.title;
   }
   overview.value = res.overview;
   return res;
@@ -652,7 +651,7 @@ const reHandleTv = async () => {
 onBeforeMount(() => {
   judgeSelect();
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
-  getUntokenDict("online_storage_source").then((res) => {
+  getUntokenDict("online_storage_source").then(async (res) => {
     sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
       i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label;
       return i;
@@ -660,7 +659,7 @@ onBeforeMount(() => {
     selectSource.value = sourceList.value[0];
     activeTab.value = selectSource.value.provider;
     setButtonText();
-    getMovieTvDetail();
+    await getMovieTvDetail();
   });
   getActorList();
 });
@@ -680,6 +679,8 @@ onShow(async () => {
     setButtonText();
     historyPlay.value = historyPlay.value.filter((i) => i.titlePlay != imgData.value.title);
     uni.setStorageSync("historyPlay", historyPlay.value);
+    console.log("设置");
+    
     selectSource.value.name = resetMovieTv.name;
     localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
 
@@ -701,7 +702,8 @@ onShow(async () => {
       nowTv.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowTv.releaseTime = res.first_air_date;
       nowTv.type = "1";
-      nowTv.genre_ids = res.genre_ids;
+      nowTv.genre_ids = res.genres.map((i) => i.id);
+      
       nowTv.name = resetMovieTv.name;
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId && i.name == oldName);
@@ -710,7 +712,7 @@ onShow(async () => {
       nowMovie.releaseTime = res.release_date;
       nowMovie.type = "2";
       nowMovie.movieTvId = res.id;
-      nowMovie.genre_ids = res.genre_ids;
+      nowMovie.genre_ids = res.genres.map((i) => i.id);
       nowMovie.name = res.title;
     }
     imgData.value.title = resetMovieTv.name;
