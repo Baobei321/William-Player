@@ -109,9 +109,30 @@ const searchMovieTv = (data) => {
   });
 };
 
-//获取电视剧详情，包括有多季
+//获取电视剧详情，包括有多少季
 const getTvDetail = (id) => {
   let url = `https://api.tmdb.org/3/tv/${id}`;
+  return new Promise((resolve) => {
+    uni.request({
+      url: url,
+      data: {
+        language: "zh-CN",
+        api_key: uni.getStorageSync("tmdbKey"),
+      },
+      method: "GET",
+      header: {
+        "Content-Type": "application/json",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+};
+
+//获取电影详情，包括有多少季
+const getMovieDetail = (id) => {
+  let url = `https://api.tmdb.org/3/movie/${id}`;
   return new Promise((resolve) => {
     uni.request({
       url: url,
@@ -142,14 +163,20 @@ const toCancel = () => {
 const handleSelect = async (item, index) => {
   activeIndex.value = index;
   selectItem.value = item;
-  let res = await getTvDetail(item.id);
-  if (res.seasons.length >= 2) {
-    seasonColumns.value = res.seasons.map((v) => {
-      return { text: v.name, value: v.season_number };
-    });
-    showSeason.value = true;
-    return;
+  let res = {};
+  if (item.media_type == "tv") {
+    res = await getTvDetail(item.id);
+    if (res.seasons.length >= 2) {
+      seasonColumns.value = res.seasons.map((v) => {
+        return { text: v.name, value: v.season_number };
+      });
+      showSeason.value = true;
+      return;
+    }
+  } else {
+    res = await getMovieDetail(item.id);
   }
+
   wil_modal.value.showModal({
     title: "温馨提示",
     content: "是否确认匹配该影片？",

@@ -17,8 +17,8 @@
           <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{right:(popoverPosition.right-6)/16+'rem',top:popoverPosition.top/16+'rem',
             borderLeft:'0.375rem solid transparent',borderRight:'0.375rem solid transparent',borderBottom:'0.5rem solid #315ffd'}" v-show="showPopover">
           </div>
-          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{right:(popoverPosition.right-18)/16+'rem',top:(popoverPosition.top+8)/16+'rem'}"
-            v-if="showPopover">
+          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']"
+            :style="{right:(popoverPosition.right-18)/16+'rem',top:(popoverPosition.top+8)/16+'rem'}" v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">{{ popoverData.title }}</div>
               <div class="popover-title-right" @click="closePopover">
@@ -45,68 +45,77 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, watchEffect } from 'vue';
-import { setTmdbKey } from '../../../network/apis'
+import { onMounted, ref, watch, watchEffect } from "vue";
+import { setTmdbKey } from "../../../network/apis";
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
   loading: { type: Boolean, default: false },
-  tmdbKey1: { type: String, default: '' }
-})
+  tmdbKey1: { type: String, default: "" },
+});
 
-const navBarHeight = ref('')
-const contentHeight = ref('')
+const navBarHeight = ref("");
+const contentHeight = ref("");
 
-const video_navbar = ref(null)
+const video_navbar = ref(null);
 
-const showPopover = ref(false)
-const popoverPosition = ref({})
+const showPopover = ref(false);
+const popoverPosition = ref({});
 const popoverData = ref({
-  title: '正在扫描',
-  list: [{ label: '已找到', value: 0 }, { label: '待更新', value: 0 }, { label: '已更新', value: 0 }]
-})
-const tmdbKey = ref('')
+  title: "正在扫描",
+  list: [
+    { label: "已找到", value: 0 },
+    { label: "待更新", value: 0 },
+    { label: "已更新", value: 0 },
+  ],
+});
+const tmdbKey = ref("");
 
-const initTmdbKey = ref(uni.getStorageSync('tmdbKey') || '')
+const initTmdbKey = ref(uni.getStorageSync("tmdbKey") || "");
 
-const loading = ref(false)
+const loading = ref(false);
 
-const emits = defineEmits(['refresh'])
+const emits = defineEmits(["refresh"]);
 
 //计算微信navBar高度
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = (statusBarHeight + 54) / 16 + 'rem' //计算nav导航栏的高度
-  contentHeight.value = '3.375rem'
-}
+  navBarHeight.value = (statusBarHeight + 54) / 16 + "rem"; //计算nav导航栏的高度
+  contentHeight.value = "3.375rem";
+};
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
-  navBarHeight.value = '2.75rem'
-  contentHeight.value = '2.75rem'
-}
-
+  navBarHeight.value = "2.75rem";
+  contentHeight.value = "2.75rem";
+};
 
 // #ifdef  APP
-getNavHeight()
+getNavHeight();
 // #endif
 
 // #ifdef  H5
-getH5NavbarHeight()
+getH5NavbarHeight();
 // #endif
-
 
 const toVideoSearch = () => {
   uni.navigateTo({
-    url: '/pages/video/search'
-  })
-}
+    url: "/pages/video/search",
+  });
+};
 
 const toAddMedia = () => {
+  if (loading.value) {
+    uni.showToast({
+      title: "正在同步影片，请完成后再添加或管理资源",
+      icon: "none",
+    });
+    return
+  }
   uni.navigateTo({
-    url:'/pages/video/source-list'
-  })
+    url: "/pages/video/source-list",
+  });
   // let webdavInfo = uni.getStorageSync('webdavInfo')
   // if (!webdavInfo) {
   //   uni.navigateTo({
@@ -117,78 +126,83 @@ const toAddMedia = () => {
   //     url: '/pages/video/add-webdav?title=修改WebDAV'
   //   })
   // }
-}
+};
 
 const showProgress = () => {
-  if (!uni.getStorageSync('tmdbKey')) {
-    popoverData.value.title = 'api_key'
-    showPopover.value = true
-    return
+  if (!uni.getStorageSync("tmdbKey")) {
+    popoverData.value.title = "api_key";
+    showPopover.value = true;
+    return;
   }
   if (loading.value) {
-    showPopover.value = true
-    return
+    showPopover.value = true;
+    return;
   }
-  popoverData.value.title = '正在扫描'
-  showPopover.value = true
-  emits('refresh')
-}
+  popoverData.value.title = "正在扫描";
+  showPopover.value = true;
+  emits("refresh");
+};
 
 const closePopover = () => {
-  showPopover.value = false
-}
+  showPopover.value = false;
+};
 
 const getRefreshPosition = () => {
   let selectorQuery = uni.createSelectorQuery();
-  let sysinfo = uni.getSystemInfoSync()
-  selectorQuery.select('.video-navbar-popover').boundingClientRect((rect) => {
-    popoverPosition.value.top = rect.top + rect.height + 5
-    popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2
-  }).exec()
-}
+  let sysinfo = uni.getSystemInfoSync();
+  selectorQuery
+    .select(".video-navbar-popover")
+    .boundingClientRect((rect) => {
+      popoverPosition.value.top = rect.top + rect.height + 5;
+      popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2;
+    })
+    .exec();
+};
 
 const confirmApiKey = async () => {
-  initTmdbKey.value = tmdbKey.value
-  uni.setStorageSync('tmdbKey', tmdbKey.value)
-  showPopover.value = false
-  await setTmdbKey({ tmdbKey: tmdbKey.value })
-}
+  initTmdbKey.value = tmdbKey.value;
+  uni.setStorageSync("tmdbKey", tmdbKey.value);
+  showPopover.value = false;
+  await setTmdbKey({ tmdbKey: tmdbKey.value });
+};
 
 watch(
   () => props.refreshData,
   (val) => {
-    popoverData.value.list.find(i => i.label == '已找到').value = val.found || 0
-    popoverData.value.list.find(i => i.label == '待更新').value = val.toupdate || 0
-    popoverData.value.list.find(i => i.label == '已更新').value = val.updated || 0
-  }, { deep: true }
-)
+    popoverData.value.list.find((i) => i.label == "已找到").value = val.found || 0;
+    popoverData.value.list.find((i) => i.label == "待更新").value = val.toupdate || 0;
+    popoverData.value.list.find((i) => i.label == "已更新").value = val.updated || 0;
+  },
+  { deep: true }
+);
 
 watch(
   () => props.loading,
   (val) => {
-    loading.value = val
+    loading.value = val;
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.found}个影片`
+      popoverData.value.title = `已完成同步${props.refreshData.found}个影片`;
     }
-
-  }, { deep: true }
-)
+  },
+  { deep: true }
+);
 
 watch(
   () => props.tmdbKey1,
   (val) => {
-    initTmdbKey.value = val
-    tmdbKey.value = val
-  }, { immediate: true }
-)
+    initTmdbKey.value = val;
+    tmdbKey.value = val;
+  },
+  { immediate: true }
+);
 
 defineExpose({
-  showProgress
-})
+  showProgress,
+});
 
 onMounted(() => {
-  getRefreshPosition()
-})
+  getRefreshPosition();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -235,8 +249,7 @@ onMounted(() => {
         // border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;
-        background: url("../../../static/app-logo1.png")
-          center no-repeat;
+        background: url("../../../static/app-logo1.png") center no-repeat;
         background-size: 100% 100%;
       }
 

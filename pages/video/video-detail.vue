@@ -706,7 +706,7 @@ onShow(async () => {
       
       nowTv.name = resetMovieTv.name;
     } else if (resetMovieTv.type == "movie") {
-      let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId && i.name == oldName);
+      let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();
       nowMovie.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowMovie.releaseTime = res.release_date;

@@ -1,4 +1,5 @@
-![WilliamPlayer](https://gitee.com/CWLcwl0219/webdav-video-player/raw/master/static/app-logo1.png)
+![WilliamPlayer](https://socialify.git.ci/chenweiliang6/William-Player/image?custom_description=%E4%B8%80%E6%AC%BE%E9%80%82%E9%85%8D%F0%9F%93%B1%20Android%20Phone%20%E7%9A%84%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8%EF%BC%81&description=1&font=Source+Code+Pro&forks=1&issues=1&logo=https://gitee.com/CWLcwl0219/webdav-video-player/raw/master/static/app-logo1.png&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Auto)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/chenweiliang6/William-Player/total)
 # William Player
 一款适配📱 Android Phone 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
 
@@ -6,23 +7,29 @@
 
 喜欢或者对您有用的话就给颗🌟Star吧，您的支持是我维护的最大动力(′･ω･`)
 
+项目处于用爱发电阶段，请考虑[赞助](#赞助)支持项目持续维护。您的支持是我维护的最大动力(′･ω･`)
+
 ## Features
 
 - 支持**Android Phone**
 - 支持天翼云盘、夸克网盘和Webdav播放
 - 纯本地运行，无需后端服务支持 [^1]
-<!-- - 支持跳过片头/片尾 -->
-- 支持视频轨道选择
+- 支持音频轨道选择
 - 支持内嵌字幕播放[^2]
+- 内置IPTV源，不定时更新
+- IPTV线路选择、自动分组
+- 手势操作(双击播放/暂停，音量/亮度调节，画面缩放，拖动快进等)
+- 软件体积小 (≈ 19 MB)
+- 设备间的数据同步
+- 自动更新
+<!-- - 支持跳过片头/片尾 -->
 <!-- - 支持文件下载和边下边播
 - 支持多线程网络加速
 - 支持网盘文件的整理
 - 多账号登录
 - 浅色和深色模式
 - DLNA投屏 -->
-- 软件体积小 (≈ 19 MB)
-- 设备间的数据同步
-- 自动更新
+
 
 [^1]: 网盘由网盘供应商提供服务支持，与本项目无关
 
@@ -60,12 +67,30 @@ Android 8+
 
 按照以下顺序进行开发
 
-- [ ] 增加手动编辑修改刮削信息的功能
+- [x] 增加手动编辑修改刮削信息的功能
+- [x] 支持IPTV直播
 - [ ] 根据网络速度选择合适的夸克视频播放
 - [ ] 尝试解决夸克大文件下载链接的限速问题
 - [ ] 增加数据同步功能
 - [ ] 增加帮助页面
 - [ ] DLNA投屏
+
+## 赞助
+
+如果觉得此项目有用，可以考虑赞助我喝杯 ~~奶茶~~ 咖啡 ☕
+
+<img src="https://gitee.com/CWLcwl0219/William-Player/raw/master/static/zanshang.jpg" alt="Sponsor" width="240"/>
+
+
+## Star History
+
+<a href="https://star-history.com/#chenweiliang6/William-Player&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chenweiliang6/William-Player&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=chenweiliang6/William-Player&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=chenweiliang6/William-Player&type=Date" />
+ </picture>
+</a>
 
 ## 声明
 

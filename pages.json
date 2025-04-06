@@ -94,6 +94,13 @@
       }
     },
     {
+      "path": "pages/live/index",
+      "style": {
+        "navigationBarTitleText": "直播",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
       "path": "pages/mine/tmdb-key",
       "style": {
         "navigationBarTitleText": "设置",
@@ -164,6 +171,12 @@
         "text": "媒体库",
         "iconPath": "static/video.png",
         "selectedIconPath": "static/video-active.png"
+      },
+      {
+        "pagePath": "pages/live/index",
+        "text": "直播",
+        "iconPath": "static/live.png",
+        "selectedIconPath": "static/live-active.png"
       },
       {
         "pagePath": "pages/mine/index",

@@ -16,7 +16,7 @@
                 <image :src="item.img"></image>
               </div>
               <div class="list-item-name" :style="{color:vitem.active?'#ff6701':'#000'}">{{ vitem.name }}</div>
-              <image class="list-item-button" src="../../static/more-button.png" @click.stop="toShowMoreButton(item,vitem)"></image>
+              <image class="list-item-button" :src="vitem.active ? moreButtonActive : moreButton" @click.stop="toShowMoreButton(item,vitem)"></image>
             </div>
           </div>
         </template>
@@ -45,6 +45,8 @@ import { toParse, toStringfy } from "../mine/common";
 import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
 import showModal from "@/components/wil-modal/index.js";
 import wilModal from "@/components/wil-modal/modal.vue";
+import moreButton from "@/static/more-button.png";
+import moreButtonActive from "@/static/more-button-active.png";
 
 const sourceList = ref([]);
 const selectMedia = ref({});

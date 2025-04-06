@@ -133,7 +133,7 @@ export default {
               this.historyPlay.unshift(this.historyObj);
             }
           }
-          
+
           uni.setStorageSync("historyPlay", this.historyPlay);
         }
       } else if (this.plateForm == "android") {
@@ -157,6 +157,7 @@ export default {
     },
     //初始化进入的时候，设置从哪儿开始播放
     setInitialTime() {
+      if (!this.routerParams.path) return;
       const lastIndex = this.routerParams.path.lastIndexOf("/");
       let obj = {};
       if (this.routerParams.type == "movie") {
@@ -220,6 +221,11 @@ export default {
     this.historyPlay = uni.getStorageSync("historyPlay") || [];
     this.routerParams = options;
     this.setInitialTime();
+    if (options.videoUrl) {
+      this.config.url = options.videoUrl;
+      this.config.title = options.liveTitle
+      return;
+    }
     let res = await this.getVideoUrl();
     if (this.selectType.type == "WebDAV") {
       this.config.url = res.data.raw_url;
