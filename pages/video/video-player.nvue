@@ -6,7 +6,7 @@
         <video-view v-if="config.url" :initialTime="config.initialTime" :title="config.title" :src="config.url" @timeupdate="setHistory" @getpipstatus="getPipStatus"
           :style="{width:'750rpx',height:videoHeight}"></video-view>
       </view>
-      <template v-else>
+      <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
           :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory"
           v-if="config.url&&!showReload">
@@ -14,7 +14,7 @@
         <button class="video-button" v-if="showReload" @click="reloadVideo">
           <text style="color:#fff">重新加载</text>
         </button>
-      </template>
+      </view>
     </view>
   </view>
 </template>

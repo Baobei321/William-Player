@@ -36,7 +36,7 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.0/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.4/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
@@ -55,6 +55,7 @@ Android 8+
 <img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/05cfd863ab202929f64fd6d44e291f0.jpg" alt="Mobile Screenshot 2" width="24%"/>
 <img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/e1358cc49b75a1d8d570465eb009efe.jpg" alt="Mobile Screenshot 3" width="24%"/>
 <img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/a33afbdf6774f504d1990453d99b421.jpg" alt="Mobile Screenshot 4" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/0BD79FDBADA44731AFB327FC62E96883.jpg" alt="Mobile Screenshot 4" width="24%"/>
 </div>
 
 [^3]: 预览中的影视媒体仅作为展示用
@@ -69,6 +70,7 @@ Android 8+
 
 - [x] 增加手动编辑修改刮削信息的功能
 - [x] 支持IPTV直播
+- [ ] 支持跳过片头
 - [ ] 根据网络速度选择合适的夸克视频播放
 - [ ] 尝试解决夸克大文件下载链接的限速问题
 - [ ] 增加数据同步功能

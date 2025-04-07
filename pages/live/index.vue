@@ -1,6 +1,6 @@
 <template>
   <div class="live">
-    <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length">
+    <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length&&loading">
       <template #custom="scope">
         <div class="right-list">
           <div class="right-list-item" :style="{backgroundColor:item.active?'#dce1ff':'#f7f6fa'}" v-for="item in scope.row.childList" :key="item.name"
@@ -11,7 +11,8 @@
         </div>
       </template>
     </wil-category-list>
-    <nut-popup v-model:visible="showLine" position="bottom" safe-area-inset-bottom>
+    <wil-empty text="加载中..." v-if="loading"></wil-empty>
+    <nut-popup v-model:visible="showLine" position="bottom" round safe-area-inset-bottom>
       <nut-picker v-model="popupValue" :columns="lineColumns" title="选择线路" @confirm="confirmPicker" @cancel="showLine = false">
       </nut-picker>
     </nut-popup>
@@ -22,11 +23,12 @@
 import { onBeforeMount, ref } from "vue";
 import { parseM3UToArray, groupByGroupTitle } from "./common.js";
 import wilCategoryList from "@/components/wil-category-list/index.vue";
+import wilEmpty from "@/components/wil-empty/index.vue";
 
 const listProps = ref({
   children: "childList",
 });
-
+const loading = ref(false);
 const listData = ref([]);
 const staticData = ref([]);
 
@@ -39,18 +41,20 @@ const selectItem = ref({});
 //获取iptv
 const getIptv = () => {
   return new Promise((resolve, reject) => {
+    loading.value = true;
     uni.request({
       url: "https://gist.githubusercontent.com/GhostenEditor/fd637c07531a8610e24c2649c893082b/raw/76464b464f1c2d7f16a716697f2a3b7bf82f9603/iptv.m3u",
-      timeout: 5000,
       method: "GET",
       //   header: {
       //     Authorization: webdavInfo.token,
       //     "Content-Type": "application/json",
       //   },
       success: (res) => {
+        loading.value = false;
         resolve(parseM3UToArray(res.data));
       },
       fail: (error) => {
+        loading.value = false;
         reject(error);
       },
     });
@@ -58,7 +62,7 @@ const getIptv = () => {
 };
 
 const clickItem = (item, row) => {
-  popupValue.value = []
+  popupValue.value = [];
   row.forEach((v) => {
     v.active = false;
   });
@@ -98,6 +102,7 @@ page {
 .live {
   width: 100%;
   height: 100%;
+  background: #f6f7f8;
   ::v-deep .category-list {
     .category-list-wrap {
       .category-list-container {

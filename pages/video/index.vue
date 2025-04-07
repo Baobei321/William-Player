@@ -587,13 +587,14 @@ onShow(async () => {
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
-  nextTick(() => {
-    historyPlay.value = uni.getStorageSync("historyPlay") || [];
-    historyPlay.value = historyPlay.value.filter((item) => {
-      return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
-    });
-    uni.setStorageSync("historyPlay", historyPlay.value);
+  // nextTick(() => {
+  historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((item) => {
+    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
   });
+  uni.setStorageSync("historyPlay", historyPlay.value);
+  // });
+
   webdavInfo.value = uni.getStorageSync("webdavInfo");
   if (selectType.value.type == "WebDAV") {
     handleGx();

@@ -47,7 +47,7 @@
       <wil-empty v-else text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
-    <nut-popup v-model:visible="showSeason" position="bottom" safe-area-inset-bottom>
+    <nut-popup v-model:visible="showSeason" position="bottom" round safe-area-inset-bottom>
       <nut-picker v-model="popupValue" :columns="seasonColumns" title="选择季" @confirm="confirmPicker" @cancel="showSeason = false">
       </nut-picker>
     </nut-popup>

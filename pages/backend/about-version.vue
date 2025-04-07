@@ -21,7 +21,7 @@
             </nut-button>
             <nut-button disabled custom-color="#dedde3" v-else>当前已是最新版本</nut-button>
         </div>
-        <nut-popup v-model:visible="showPopover" position="bottom">
+        <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
             <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm"
                 @cancel="showPopover = false" />
         </nut-popup>

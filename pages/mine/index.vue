@@ -79,13 +79,13 @@ const cellOptions = ref([
       leftIcon: iconTb,
       // path: "/pages/backend/data-sync",
       path: null,
-      tip: "正在开发中...",
+      tip: "敬请期待...",
     },
     {
       title: "下载管理",
       leftIcon: iconDownload,
       path: null,
-      tip: "正在开发中...",
+      tip: "敬请期待...",
     },
     {
       title: "深度求索",
