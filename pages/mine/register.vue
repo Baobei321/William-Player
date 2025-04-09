@@ -65,7 +65,13 @@ const getUserByopenId = async () => {
   uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
   uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
   uni.setStorageSync("Authorization", res.data.token);
-  uni.setStorageSync("tmdbKey", res.data.wuser.tmdbKey);
+  let settingData = uni.getStorageSync("settingData");
+  if (settingData) {
+    settingData.tmdbKey = res.data.wuser.tmdbKey;
+    uni.setStorageSync("settingData", settingData);
+  } else {
+    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true });
+  }
 };
 const confirmCommit = async () => {
   base_form.value.confirmCommit().then(async (valid) => {

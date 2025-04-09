@@ -6,9 +6,9 @@
         <nut-transition :show="showPopover" name="fade" :duration="200">
           <div class="more-arrow"></div>
           <div class="more-popover">
-            <div class="more-popover-item" @click="toEdit">
-              <nut-icon name="edit" custom-color="#000"></nut-icon>
-              <span class="more-popover-item__text">手动编辑</span>
+            <div class="more-popover-item" @click="toSelect(item)" v-for="item in popoverArr" :key="item.text">
+              <image :src="item.icon"></image>
+              <span class="more-popover-item__text">{{ item.text }}</span>
             </div>
           </div>
         </nut-transition>
@@ -118,6 +118,9 @@
           </div>
         </div>
       </div>
+      <nut-popup v-model:visible="showTimePicker" round position="center">
+        <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
+      </nut-popup>
     </div>
   </div>
 </template>
@@ -126,11 +129,21 @@
 import { onBeforeMount, ref } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { useDict } from "../../utils/useDict";
-import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime } from "./components/common";
+import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, calTime } from "./components/common";
 import { onShow, onLoad } from "@dcloudio/uni-app";
+import editIcon from "@/static/edit_icon.png";
+import timeIcon from "@/static/time_icon.png";
+import { toStringfy } from "../mine/common";
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
+const popoverArr = ref([{ icon: editIcon, text: "手动编辑" }]);
+
+const showTimePicker = ref(false);
+const pickerTitle = ref("");
+const pickerVal = ref(["0", "0"]);
+const pickerColumns = ref([[], []]);
+
 const imgData = ref({}); //图片内的信息
 const overview = ref(""); //剧情简介
 
@@ -157,11 +170,73 @@ const historyTv = ref({});
 
 const localMovieTvData = ref({});
 
-const toEdit = () => {
-  showPopover.value = false;
-  uni.navigateTo({
-    url: `/pages/video/search-match?type=${routerParams.value.type}`,
-  });
+const toSelect = (item) => {
+  if (item.text == "手动编辑") {
+    showPopover.value = false;
+    uni.navigateTo({
+      url: `/pages/video/search-match?type=${routerParams.value.type}`,
+    });
+  } else if (item.text == "设置跳过片头时间") {
+    let localMovieTvData = uni.getStorageSync("localMovieTvData");
+    let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+    if (nowTv.openingTime) {
+      const minutes = String(Math.floor(nowTv.openingTime / 60)); // 取整分钟数
+      const remainingSeconds = String(nowTv.openingTime % 60); // 剩余秒数
+      pickerVal.value = [minutes, remainingSeconds];
+    } else {
+      pickerVal.value = ["0", "0"];
+    }
+    showPopover.value = false;
+    pickerTitle.value = item.text;
+    let arr1 = [];
+    let arr2 = [];
+    for (let i = 0; i <= 15; i++) {
+      arr1.push({ text: String(i) + "分", value: String(i) });
+    }
+    for (let i = 0; i <= 59; i++) {
+      arr2.push({ text: String(i) + "秒", value: String(i) });
+    }
+    pickerColumns.value[0] = arr1;
+    pickerColumns.value[1] = arr2;
+    showTimePicker.value = true;
+  } else if (item.text == "设置跳过片尾时间") {
+    let localMovieTvData = uni.getStorageSync("localMovieTvData");
+    let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+    if (nowTv.endTime) {
+      const minutes = String(Math.floor(nowTv.endTime / 60)); // 取整分钟数
+      const remainingSeconds = String(nowTv.endTime % 60); // 剩余秒数
+      pickerVal.value = [minutes, remainingSeconds];
+    } else {
+      pickerVal.value = ["15", "0"];
+    }
+    showPopover.value = false;
+    pickerTitle.value = item.text;
+    let arr1 = [];
+    let arr2 = [];
+    for (let i = 15; i <= 180; i++) {
+      arr1.push({ text: String(i) + "分", value: String(i) });
+    }
+    for (let i = 0; i <= 59; i++) {
+      arr2.push({ text: String(i) + "秒", value: String(i) });
+    }
+    pickerColumns.value[0] = arr1;
+    pickerColumns.value[1] = arr2;
+    showTimePicker.value = true;
+  }
+};
+
+const confirmPicker = ({ selectedValue, selectedOptions }) => {
+  let time = Number(selectedValue[0]) * 60 + Number(selectedValue[1]);
+  let localMovieTvData = uni.getStorageSync("localMovieTvData");
+  let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+  if (pickerTitle.value == "设置跳过片头时间") {
+    nowTv.openingTime = time;
+    console.log(selectedValue, "片头事件");
+  } else if (pickerTitle.value == "设置跳过片尾时间") {
+    nowTv.endTime = time;
+  }
+  uni.setStorageSync("localMovieTvData", localMovieTvData);
+  showTimePicker.value = false;
 };
 
 //通过tmdb接口获取更详细的信息
@@ -180,27 +255,7 @@ const getMovieTvById = (data, type) => {
       data: {
         ...obj,
         language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
-      },
-      method: "GET",
-      header: {
-        "Content-Type": "application/json",
-      },
-      success: (res) => {
-        resolve(res.data);
-      },
-    });
-  });
-};
-
-//获取第几季的详情
-const getTvSeason = (data) => {
-  return new Promise((resolve) => {
-    uni.request({
-      url: `https://api.tmdb.org/3/tv/${data.movieTvId}/season/${data.season}`,
-      data: {
-        language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: {
@@ -227,7 +282,7 @@ const getActorById = (data, type) => {
       url: url,
       data: {
         language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: {
@@ -238,28 +293,6 @@ const getActorById = (data, type) => {
       },
     });
   });
-};
-
-//计算时间
-const calTime = (val, type = "cn") => {
-  if (type == "cn") {
-    if (val > 60) {
-      let hours = Math.floor(val / 60);
-      let mins = val % 60;
-      return `${hours}小时${mins}分钟`;
-    } else {
-      return `${val}分钟`;
-    }
-  } else if (type == "en") {
-    if (val > 60) {
-      let hours = Math.floor(val / 60);
-      let mins = val % 60;
-      mins = mins >= 10 ? mins : "0" + mins;
-      return `${hours}:${mins}:00`;
-    } else {
-      return `${val}:00`;
-    }
-  }
 };
 
 //处理电视的详情和剧集等
@@ -514,15 +547,21 @@ const clickPlayButton = () => {
       });
       return;
     }
+    uni.setStorageSync("tvList", tvList.value);
+    let localMovieTvData = uni.getStorageSync("localMovieTvData");
+    let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
     let history = historyPlay.value?.find((i) => i.titlePlay == imgData.value.title);
     if (history) {
+      let openEndTime = {};
+      nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
+      nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&type=tv`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       } else {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&folderFileId=${history.folderFileId}&type=tv`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       }
     } else {
@@ -537,14 +576,17 @@ const clickPlayButton = () => {
         title: tvList.value[0].title,
         initialTime: "0",
       };
+      let openEndTime = {};
+      nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
+      nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&item=${JSON.stringify(historyItem)}&type=tv`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       } else {
         historyItem.folderFileId = tvList.value[0].id;
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       }
     }
@@ -553,15 +595,21 @@ const clickPlayButton = () => {
 
 //播放电视
 const toPlayVideo = (item, index) => {
+  uni.setStorageSync("tvList", tvList.value);
+  let localMovieTvData = uni.getStorageSync("localMovieTvData");
+  let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
   let history = historyPlay.value?.find((i) => i.titlePlay == selectSource.value.name && item.name == i.name);
   if (history) {
+    let openEndTime = {};
+    nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
+    nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&type=tv`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     } else {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&type=tv`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   } else {
@@ -576,14 +624,19 @@ const toPlayVideo = (item, index) => {
       title: item.title,
       initialTime: "0",
     };
+    let openEndTime = {};
+    nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
+    nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
+      console.log(toStringfy(openEndTime), "asd");
+
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&item=${JSON.stringify(historyItem)}&type=tv`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     } else {
       historyItem.folderFileId = item.id;
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   }
@@ -651,21 +704,38 @@ const reHandleTv = async () => {
 onBeforeMount(() => {
   judgeSelect();
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
-  getUntokenDict("online_storage_source").then(async (res) => {
-    sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
-      i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label;
-      return i;
+  getUntokenDict("online_storage_source")
+    .then(async (res) => {
+      sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
+        i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label;
+        return i;
+      });
+      selectSource.value = sourceList.value[0];
+      activeTab.value = selectSource.value.provider;
+      setButtonText();
+      await getMovieTvDetail();
+    })
+    .catch(async (error) => {
+      let dict = [
+        { value: "189CloudPC", label: "天翼云盘" },
+        { value: "Quark", label: "夸克网盘" },
+      ];
+      sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
+        i.sourceName = dict.find((v) => v.value == i.provider).label;
+        return i;
+      });
+      selectSource.value = sourceList.value[0];
+      activeTab.value = selectSource.value.provider;
+      setButtonText();
+      await getMovieTvDetail();
     });
-    selectSource.value = sourceList.value[0];
-    activeTab.value = selectSource.value.provider;
-    setButtonText();
-    await getMovieTvDetail();
-  });
   getActorList();
 });
 
 onShow(async () => {
-  setButtonText();
+  setTimeout(() => {
+    setButtonText();
+  }, 800);
   let resetMovieTv = uni.getStorageSync("resetMovieTv");
   if (resetMovieTv) {
     judgeSelect();
@@ -679,8 +749,6 @@ onShow(async () => {
     setButtonText();
     historyPlay.value = historyPlay.value.filter((i) => i.titlePlay != imgData.value.title);
     uni.setStorageSync("historyPlay", historyPlay.value);
-    console.log("设置");
-    
     selectSource.value.name = resetMovieTv.name;
     localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
 
@@ -703,7 +771,7 @@ onShow(async () => {
       nowTv.releaseTime = res.first_air_date;
       nowTv.type = "1";
       nowTv.genre_ids = res.genres.map((i) => i.id);
-      
+
       nowTv.name = resetMovieTv.name;
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
@@ -723,6 +791,15 @@ onShow(async () => {
 
 onLoad((options) => {
   routerParams.value = options;
+  if (routerParams.value.type == "movie") {
+    popoverArr.value = [{ icon: editIcon, text: "手动编辑" }];
+  } else if (routerParams.value.type == "tv") {
+    popoverArr.value = [
+      { icon: editIcon, text: "手动编辑" },
+      { icon: timeIcon, text: "设置跳过片头时间" },
+      { icon: timeIcon, text: "设置跳过片尾时间" },
+    ];
+  }
 });
 </script>
 
@@ -762,14 +839,19 @@ page {
             border-bottom: 16rpx solid #fff;
           }
           .more-popover {
-            width: 280rpx;
+            width: 360rpx;
             background: #fff;
             border-radius: 16rpx;
             .more-popover-item {
               display: flex;
               align-items: center;
               padding: 16rpx 24rpx;
+              image {
+                width: 40rpx;
+                height: 40rpx;
+              }
               .more-popover-item__text {
+                flex: 1;
                 padding-left: 15rpx;
                 color: #000;
               }

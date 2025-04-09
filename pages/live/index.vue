@@ -1,6 +1,6 @@
 <template>
   <div class="live">
-    <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length&&loading">
+    <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length&&!loading">
       <template #custom="scope">
         <div class="right-list">
           <div class="right-list-item" :style="{backgroundColor:item.active?'#dce1ff':'#f7f6fa'}" v-for="item in scope.row.childList" :key="item.name"
@@ -43,7 +43,7 @@ const getIptv = () => {
   return new Promise((resolve, reject) => {
     loading.value = true;
     uni.request({
-      url: "https://gist.githubusercontent.com/GhostenEditor/fd637c07531a8610e24c2649c893082b/raw/76464b464f1c2d7f16a716697f2a3b7bf82f9603/iptv.m3u",
+      url: "https://gist.githubusercontent.com/chenweiliang6/4b0a05651f1b83fb1b9d8e337381ec64/raw/796be8361915937cd36349ccbf6569f25519f24d/iptv.m3u",
       method: "GET",
       //   header: {
       //     Authorization: webdavInfo.token,

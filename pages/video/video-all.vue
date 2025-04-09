@@ -35,6 +35,8 @@ import { onLoad } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import wilModal from "@/components/wil-modal/modal.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
+import { toStringfy } from "../mine/common";
+// import { getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common.js";
 const requestParams = ref({});
 
 const mapping = {
@@ -50,6 +52,8 @@ const isClearAll = ref(false);
 const wil_list = ref(null);
 const wil_modal = ref(null);
 const selectType = ref({});
+const selectMedia = ref({});
+const tvList = ref([]);
 
 //判断选择的是webdav还是天翼云盘还是夸克
 const judgeSelect = () => {
@@ -57,6 +61,7 @@ const judgeSelect = () => {
   selectType.value = sourceList.find((item) => {
     let select = item.list.find((i) => i.active);
     if (select) {
+      selectMedia.value = select;
       return true;
     } else {
       return false;
@@ -152,7 +157,7 @@ const setItemFirst = (item) => {
   }
   uni.setStorageSync("historyPlay", historyPlay);
 };
-const toVideoDetail = (item) => {
+const toVideoDetail = async (item) => {
   //最近观看在选择状态下
   if (isSelect.value) {
     changeItemFn.value = (item) => {
@@ -189,16 +194,22 @@ const toVideoDetail = (item) => {
           });
         }
       } else if (item.type == "tv") {
+        let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
+        const lastIndex = item.path.lastIndexOf("/");
+        let nowTv = localMovieTvData.tv.find((i) => i.name == item.titlePlay && i.path == "/" + item.path.slice(0, lastIndex));
+        let openEndTime = {};
+        nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
+        nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
         if (selectType.value.type == "WebDAV") {
           uni.navigateTo({
-            url: `/pages/video/video-player?path=${item.path}&type=tv`,
+            url: `/pages/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&type=tv&${toStringfy(openEndTime)}`,
             success: () => {
               setItemFirst(item);
             },
           });
         } else {
           uni.navigateTo({
-            url: `/pages/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=tv`,
+            url: `/pages/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&titlePlay=${item.titlePlay}&type=tv&${toStringfy(openEndTime)}`,
           });
         }
       }
@@ -275,6 +286,7 @@ const imgLoad = (item) => {
     wil_list.value.handleEdit(item.path);
   });
 };
+
 onLoad((options) => {
   judgeSelect();
   routerParams.value = options;

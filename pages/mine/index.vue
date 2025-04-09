@@ -118,7 +118,7 @@ const cellOptions = ref([
     {
       title: "设置",
       leftIcon: iconSetting,
-      path: "/pages/mine/tmdb-key",
+      path: "/pages/mine/settings",
     },
     {
       title: "关于",

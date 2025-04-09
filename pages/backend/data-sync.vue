@@ -22,7 +22,7 @@ onMounted(async () => {
   wilQrcodeRef.value.getQRcode(qrObj);
 
   let webdavInfo = uni.getStorageSync("webdavInfo");
-  let tmdbKey = uni.getStorageSync("tmdbKey");
+  let tmdbKey = uni.getStorageSync("settingData").tmdbKey;
   let localMovieTvData = uni.getStorageSync("localMovieTvData");
   let obj = { webdavInfo, tmdbKey, localMovieTvData };
   obj = JSON.stringify(obj);
@@ -36,9 +36,10 @@ const scanCode = () => {
       if (result.type == "dataSync") {
         let res1 = await getShareData({ userId: result.userId });
         let data = JSON.parse(res1.data);
-
+        let settingData = uni.getStorageSync("settingData")
+        settingData.tmdbKey = data.tmdbKey
         uni.setStorageSync("webdavInfo", data.webdavInfo);
-        uni.setStorageSync("tmdbKey", data.tmdbKey);
+        uni.setStorageSync("settingData", settingData);
         uni.setStorageSync("localMovieTvData", data.localMovieTvData);
 
         uni.showToast({

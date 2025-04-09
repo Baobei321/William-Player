@@ -1,6 +1,7 @@
 <template>
   <div class="video">
-    <video-navbar @refresh="refreshVideo" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar" :tmdbKey1="tmdbKey"></video-navbar>
+    <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"
+      :tmdbKey1="tmdbKey"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
     <template v-else>
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
@@ -99,7 +100,7 @@ const searchMovieTv = (data, type) => {
         ...data,
         language: "zh-CN",
         page: 1,
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: { "Content-Type": "application/json" },
@@ -370,7 +371,7 @@ const handleGx = async () => {
         });
       }
     }
-    if (!uni.getStorageSync("tmdbKey")) {
+    if (!uni.getStorageSync("settingData").tmdbKey) {
       showDialog.value = true;
       return;
     } else {
@@ -526,6 +527,15 @@ const refreshVideo = () => {
   }
 };
 
+const pauseRefresh = () => {
+  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  movieTvData.value = { movie: [], tv: [] };
+  localMovieTvData.value.tv = [];
+  localMovieTvData.value.movie = [];
+  uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+  refreshLoading.value = false;
+};
+
 const onCancel = () => {
   showDialog.value = false;
   tmdbKey.value = "";
@@ -533,7 +543,13 @@ const onCancel = () => {
 
 const onOk = async () => {
   showDialog.value = false;
-  uni.setStorageSync("tmdbKey", tmdbKey.value);
+  let settingData = uni.getStorageSync("settingData");
+  if (settingData) {
+    settingData.tmdbKey = tmdbKey.value;
+    uni.setStorageSync("settingData", settingData);
+  } else {
+    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true });
+  }
   await setTmdbKey({ tmdbKey: tmdbKey.value });
   video_navbar.value.showProgress();
 };
@@ -586,15 +602,23 @@ onShow(async () => {
   }
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
-  tmdbKey.value = uni.getStorageSync("tmdbKey") || "";
-  // nextTick(() => {
-  historyPlay.value = uni.getStorageSync("historyPlay") || [];
-  historyPlay.value = historyPlay.value.filter((item) => {
-    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
-  });
-  uni.setStorageSync("historyPlay", historyPlay.value);
-  // });
-
+  tmdbKey.value = uni.getStorageSync("settingData").tmdbKey || "";
+  if (uni.getStorageSync("secondPage") == "videoPlayer") {
+    setTimeout(() => {
+      historyPlay.value = uni.getStorageSync("historyPlay") || [];
+      historyPlay.value = historyPlay.value.filter((item) => {
+        return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+      });
+      uni.setStorageSync("historyPlay", historyPlay.value);
+    }, 800);
+  } else {
+    historyPlay.value = uni.getStorageSync("historyPlay") || [];
+    historyPlay.value = historyPlay.value.filter((item) => {
+      return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+    });
+    uni.setStorageSync("historyPlay", historyPlay.value);
+  }
+  uni.removeStorageSync("secondPage");
   webdavInfo.value = uni.getStorageSync("webdavInfo");
   if (selectType.value.type == "WebDAV") {
     handleGx();
@@ -604,7 +628,7 @@ onShow(async () => {
       uni.removeStorageSync("isreload");
       let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
       listData.value = [res.fileListAO];
-      if (!uni.getStorageSync("tmdbKey")) {
+      if (!uni.getStorageSync("settingData").tmdbKey) {
         showDialog.value = true;
         return;
       } else {
@@ -617,7 +641,7 @@ onShow(async () => {
       uni.removeStorageSync("isreload");
       let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
       listData.value = [res.data];
-      if (!uni.getStorageSync("tmdbKey")) {
+      if (!uni.getStorageSync("settingData").tmdbKey) {
         showDialog.value = true;
         return;
       } else {
@@ -630,6 +654,12 @@ onShow(async () => {
 
 onBeforeMount(async () => {
   judgeSelect();
+  localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
+  historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((item) => {
+    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+  });
+  uni.setStorageSync("historyPlay", historyPlay.value);
   if (selectType.value.type == "WebDAV") {
     if (selectMedia.value.name) {
       let res1 = await loginUser(selectMedia.value);

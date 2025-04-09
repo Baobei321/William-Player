@@ -49,7 +49,7 @@ const clickItem = (item) => {
 
     //不需要判断token是否存在，是直接跳转页面
     uni.navigateTo({
-      url: item[props.defaultProps.path] + "?" + toStringfy(item[props.defaultProps.query]),
+      url: toStringfy(item[props.defaultProps.query]) ? item[props.defaultProps.path] + "?" + toStringfy(item[props.defaultProps.query]) : item[props.defaultProps.path],
     });
   } else {
     emits("clickItem", item);

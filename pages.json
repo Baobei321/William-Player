@@ -101,7 +101,7 @@
       }
     },
     {
-      "path": "pages/mine/tmdb-key",
+      "path": "pages/mine/settings",
       "style": {
         "navigationBarTitleText": "设置",
         "navigationBarBackgroundColor": "#fff"

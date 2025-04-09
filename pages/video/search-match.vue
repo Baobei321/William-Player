@@ -98,7 +98,7 @@ const searchMovieTv = (data) => {
       data: {
         ...data,
         language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: { "Content-Type": "application/json" },
@@ -117,7 +117,7 @@ const getTvDetail = (id) => {
       url: url,
       data: {
         language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: {
@@ -138,7 +138,7 @@ const getMovieDetail = (id) => {
       url: url,
       data: {
         language: "zh-CN",
-        api_key: uni.getStorageSync("tmdbKey"),
+        api_key: uni.getStorageSync("settingData").tmdbKey,
       },
       method: "GET",
       header: {

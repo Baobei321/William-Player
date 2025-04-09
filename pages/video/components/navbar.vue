@@ -20,7 +20,10 @@
           <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']"
             :style="{right:(popoverPosition.right-18)/16+'rem',top:(popoverPosition.top+8)/16+'rem'}" v-if="showPopover">
             <div class="popover-title">
-              <div class="popover-title-left">{{ popoverData.title }}</div>
+              <div class="popover-title-left">
+                <span>{{ popoverData.title }}</span>
+                <span class="popover-title-left__button" v-if="popoverData.title=='正在扫描'&&showPause" @click="toCancel">暂停</span>
+              </div>
               <div class="popover-title-right" @click="closePopover">
                 <nut-icon name="close" custom-color="#fff" size="12"></nut-icon>
               </div>
@@ -45,7 +48,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, watchEffect } from "vue";
+import { onMounted, ref, watch, watchEffect, nextTick } from "vue";
 import { setTmdbKey } from "../../../network/apis";
 
 const props = defineProps({
@@ -71,11 +74,13 @@ const popoverData = ref({
 });
 const tmdbKey = ref("");
 
-const initTmdbKey = ref(uni.getStorageSync("tmdbKey") || "");
+const initTmdbKey = ref(uni.getStorageSync("settingData").tmdbKey || "");
 
 const loading = ref(false);
 
-const emits = defineEmits(["refresh"]);
+const emits = defineEmits(["refresh", "pause"]);
+
+const showPause = ref(false);
 
 //计算微信navBar高度
 const getNavHeight = () => {
@@ -111,7 +116,7 @@ const toAddMedia = () => {
       title: "正在同步影片，请完成后再添加或管理资源",
       icon: "none",
     });
-    return
+    return;
   }
   uni.navigateTo({
     url: "/pages/video/source-list",
@@ -129,7 +134,7 @@ const toAddMedia = () => {
 };
 
 const showProgress = () => {
-  if (!uni.getStorageSync("tmdbKey")) {
+  if (!uni.getStorageSync("settingData").tmdbKey) {
     popoverData.value.title = "api_key";
     showPopover.value = true;
     return;
@@ -141,6 +146,16 @@ const showProgress = () => {
   popoverData.value.title = "正在扫描";
   showPopover.value = true;
   emits("refresh");
+  setTimeout(() => {
+    showPause.value = true;
+  }, 30000);
+};
+
+//暂停取消扫描
+const toCancel = () => {
+  popoverData.value.title == "已暂停";
+  showPopover.value = false;
+  emits("pause");
 };
 
 const closePopover = () => {
@@ -162,6 +177,13 @@ const getRefreshPosition = () => {
 const confirmApiKey = async () => {
   initTmdbKey.value = tmdbKey.value;
   uni.setStorageSync("tmdbKey", tmdbKey.value);
+  let settingData = uni.getStorageSync("settingData");
+  if (settingData) {
+    settingData.tmdbKey = tmdbKey.value;
+    uni.setStorageSync("settingData", settingData);
+  } else {
+    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true });
+  }
   showPopover.value = false;
   await setTmdbKey({ tmdbKey: tmdbKey.value });
 };
@@ -182,6 +204,7 @@ watch(
     loading.value = val;
     if (!val) {
       popoverData.value.title = `已完成同步${props.refreshData.found}个影片`;
+      showPause.value = false;
     }
   },
   { deep: true }
@@ -306,6 +329,12 @@ onMounted(() => {
             .popover-title-left {
               font-size: 30rpx;
               color: #fff;
+              .popover-title-left__button {
+                display: inline-block;
+                border: 2rpx solid #fff;
+                margin-left: 10rpx;
+                padding: 0 4rpx;
+              }
             }
             .popover-title-right {
               .nut-icon-close {

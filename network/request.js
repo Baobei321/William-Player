@@ -66,6 +66,7 @@ export default (params) => {
                 duration: 2000,
               })
             }
+            reject()
           }
         } else {
           uni.showToast({
@@ -101,6 +102,7 @@ export default (params) => {
               })
               break;
           }
+          reject()
         }
       },
       fail(err) {
@@ -119,7 +121,6 @@ export default (params) => {
           })
         }
         reject(err);
-
       },
       complete() {
         // 不管成功还是失败都会执行
@@ -127,5 +128,5 @@ export default (params) => {
         // uni.hideToast();
       }
     });
-  }).catch(() => { });
+  });
 };

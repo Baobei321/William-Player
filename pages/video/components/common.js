@@ -363,4 +363,44 @@ const parseTime = (timeStr) => {
   return 0;
 };
 
-export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime };
+//获取第几季的详情
+const getTvSeason = (data) => {
+  return new Promise((resolve) => {
+    uni.request({
+      url: `https://api.tmdb.org/3/tv/${data.movieTvId}/season/${data.season}`,
+      data: {
+        language: "zh-CN",
+        api_key: uni.getStorageSync("settingData").tmdbKey,
+      },
+      method: "GET",
+      header: {
+        "Content-Type": "application/json",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+};
+//计算时间
+const calTime = (val, type = "cn") => {
+  if (type == "cn") {
+    if (val > 60) {
+      let hours = Math.floor(val / 60);
+      let mins = val % 60;
+      return `${hours}小时${mins}分钟`;
+    } else {
+      return `${val}分钟`;
+    }
+  } else if (type == "en") {
+    if (val > 60) {
+      let hours = Math.floor(val / 60);
+      let mins = val % 60;
+      mins = mins >= 10 ? mins : "0" + mins;
+      return `${hours}:${mins}:00`;
+    } else {
+      return `${val}:00`;
+    }
+  }
+};
+export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, calTime };

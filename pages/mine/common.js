@@ -9,7 +9,7 @@ const toParse = (queryString) => {
 }
 
 const toStringfy = (params) => {
-  if (!params) return
+  if (!params || !Object.keys(params).length) return ''
   return Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     .join('&');
