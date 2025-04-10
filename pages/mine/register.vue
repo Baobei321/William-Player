@@ -70,7 +70,7 @@ const getUserByopenId = async () => {
     settingData.tmdbKey = res.data.wuser.tmdbKey;
     uni.setStorageSync("settingData", settingData);
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true });
+    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, showRecommend: true });
   }
 };
 const confirmCommit = async () => {

@@ -19,7 +19,7 @@ const getUserByopenId = async () => {
     settingData.tmdbKey = res.data.wuser.tmdbKey;
     uni.setStorageSync("settingData", settingData);
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true });
+    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, showRecommend: true });
   }
 };
 
@@ -46,7 +46,7 @@ onBeforeMount(async () => {
           settingData.tmdbKey = "9e0add7c02b66868ab0a368df820a335";
           uni.setStorageSync("settingData", settingData);
         } else {
-          uni.setStorageSync("settingData", { tmdbKey: "9e0add7c02b66868ab0a368df820a335", showProgress: true });
+          uni.setStorageSync("settingData", { tmdbKey: "9e0add7c02b66868ab0a368df820a335", showProgress: true, showRecommend: true });
         }
       });
     // uni.reLaunch({

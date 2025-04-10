@@ -1,11 +1,12 @@
 <template>
   <div class="video">
-    <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"
-      :tmdbKey1="tmdbKey"></video-navbar>
+    <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar" :tmdbKey1="tmdbKey"
+      class="navbar-transparent"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
     <template v-else>
       <div class="video-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
         <scroll-view :scroll-y="true" class="video-container-scroll">
+          <star-recommend v-if="settingData.showRecommend"></star-recommend>
           <div class="scroll-list">
             <recent-played v-if="historyPlay.length" :listData="historyPlay" :isConnected="isConnected"></recent-played>
             <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
@@ -40,13 +41,14 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, nextTick } from "vue";
+import { ref, onBeforeMount, nextTick, onMounted } from "vue";
 import Folder from "../../static/folder.png";
 import videoNavbar from "./components/navbar.vue";
 import Skeleton from "./components/skeleton.vue";
 import { onShow, onUnload } from "@dcloudio/uni-app";
-import hxList from "./components/hx-list.vue";
+import starRecommend from "./components/star-recommend.vue";
 import recentPlayed from "./components/recent-played.vue";
+import hxList from "./components/hx-list.vue";
 import Classify from "./components/classify.vue";
 import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
@@ -84,6 +86,7 @@ const selectMedia = ref({});
 const selectType = ref({});
 
 const isConnected = ref(false); //手机是否连接网络
+const settingData = ref({}); //设置的数据
 
 //通过tmdb接口获取更详细的信息
 const searchMovieTv = (data, type) => {
@@ -269,6 +272,7 @@ const setMovieTvImg = async (arr, type) => {
         if (data) {
           let newItem = { ...item };
           newItem.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + data.poster_path;
+          newItem.backdrop = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + data.backdrop_path;
           if (type == "movie") {
             newItem.releaseTime = data.release_date;
             newItem.type = "2";
@@ -289,6 +293,8 @@ const setMovieTvImg = async (arr, type) => {
           }
           newItem.movieTvId = data.id;
           newItem.genre_ids = data.genre_ids;
+          newItem.overview = data.overview;
+          newItem.voteAverage = data.vote_average; //评分
           return newItem;
         } else {
           return null;
@@ -517,14 +523,19 @@ const getQuarkMovieTv = async (obj) => {
   }
 };
 
-const refreshVideo = () => {
+const refreshVideo = async () => {
   if (selectType.value.type == "WebDAV") {
-    refreshWebDavVideo();
+    await refreshWebDavVideo();
   } else if (selectType.value.type == "天翼云盘") {
-    refresh189Video();
+    await refresh189Video();
   } else if (selectType.value.type == "夸克网盘") {
-    refreshQuarkVideo();
+    await refreshQuarkVideo();
   }
+  historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((item) => {
+    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+  });
+  uni.setStorageSync("historyPlay", historyPlay.value);
 };
 
 const pauseRefresh = () => {
@@ -578,6 +589,7 @@ const judgeSelect = () => {
 
 onShow(async () => {
   sourceList.value = uni.getStorageSync("sourceList");
+  settingData.value = uni.getStorageSync("settingData");
   if (!sourceList.value) {
     sourceList.value = [
       { type: "WebDAV", list: [], img: webdavFileIcon },
@@ -703,6 +715,16 @@ uni.onNetworkStatusChange(listenerNetwork);
 onUnload(() => {
   uni.offNetworkStatusChange(listenerNetwork);
 });
+
+// onMounted(()=>{
+//   let dom = document.querySelector('.video-container-scroll').childNodes[0].childNodes[0]
+//   console.log(document.querySelector('.video-container-scroll'),'阿萨');
+//   dom.addEventListener('scroll',()=>{
+//     let scrollTop = dom.scrollTop
+//     console.log(scrollTop,'sc');
+
+//   })
+// })
 </script>
 
 <style lang="scss" scoped>
@@ -719,7 +741,16 @@ page {
   align-items: center;
   background: #f6f7f8;
   box-sizing: border-box;
-
+  // .navbar-transparent {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   background: transparent;
+  //   border-bottom: 2rpx solid transparent;
+  //   ::v-deep .nut-navbar {
+  //     background: transparent;
+  //   }
+  // }
   .video-container {
     flex: 1;
     overflow: hidden;

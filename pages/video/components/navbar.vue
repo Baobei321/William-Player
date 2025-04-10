@@ -155,6 +155,7 @@ const showProgress = () => {
 const toCancel = () => {
   popoverData.value.title == "已暂停";
   showPopover.value = false;
+  showPause.value = false;
   emits("pause");
 };
 
@@ -182,7 +183,7 @@ const confirmApiKey = async () => {
     settingData.tmdbKey = tmdbKey.value;
     uni.setStorageSync("settingData", settingData);
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true });
+    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true, showRecommend: true });
   }
   showPopover.value = false;
   await setTmdbKey({ tmdbKey: tmdbKey.value });

@@ -771,7 +771,9 @@ onShow(async () => {
       nowTv.releaseTime = res.first_air_date;
       nowTv.type = "1";
       nowTv.genre_ids = res.genres.map((i) => i.id);
-
+      nowTv.overview = res.overview;
+      nowTv.backdrop = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;;
+      nowTv.voteAverage = res.vote_average; //评分
       nowTv.name = resetMovieTv.name;
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
