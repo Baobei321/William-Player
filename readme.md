@@ -37,7 +37,7 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.5/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.6/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
