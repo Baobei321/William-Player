@@ -3,7 +3,7 @@
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container">
       <view :style="{width:'750rpx',height:videoHeight,background:'#000'}" v-if="plateForm=='android'&&uniPlatform=='app'">
-        <video-view v-if="config.url" :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :src="config.url"
+        <video-view  :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
           :showProgress="settingData.showProgress" :showPre="this.historyObj.ji!='1'" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
           @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" :style="{width:'750rpx',height:videoHeight}" ref="video_view">
         </video-view>
