@@ -82,6 +82,8 @@ const emits = defineEmits(["refresh", "pause"]);
 
 const showPause = ref(false);
 
+const timer = ref(null);
+
 //计算微信navBar高度
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
@@ -146,7 +148,7 @@ const showProgress = () => {
   popoverData.value.title = "正在扫描";
   showPopover.value = true;
   emits("refresh");
-  setTimeout(() => {
+  timer.value = setTimeout(() => {
     showPause.value = true;
   }, 30000);
 };
@@ -156,6 +158,8 @@ const toCancel = () => {
   popoverData.value.title == "已暂停";
   showPopover.value = false;
   showPause.value = false;
+  clearTimeout(timer.value);
+  timer.value = null;
   emits("pause");
 };
 
@@ -205,6 +209,8 @@ watch(
     loading.value = val;
     if (!val) {
       popoverData.value.title = `已完成同步${props.refreshData.found}个影片`;
+      clearTimeout(timer.value);
+      timer.value = null;
       showPause.value = false;
     }
   },

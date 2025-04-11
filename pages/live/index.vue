@@ -43,7 +43,7 @@ const getIptv = () => {
   return new Promise((resolve, reject) => {
     loading.value = true;
     uni.request({
-      url: "https://gist.githubusercontent.com/chenweiliang6/4b0a05651f1b83fb1b9d8e337381ec64/raw/796be8361915937cd36349ccbf6569f25519f24d/iptv.m3u",
+      url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u",
       method: "GET",
       //   header: {
       //     Authorization: webdavInfo.token,
