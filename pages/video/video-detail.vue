@@ -66,23 +66,22 @@
             </nut-tabs>
             <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
           </div>
-          <scroll-view class="tv-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
-            <div class="tv-version-list" v-if="tvList.length">
-              <div class="tv-version-list__item" v-for="(item,index) in tvList" :key="item.name" @click="toPlayVideo(item,index)">
-                <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
-                  <image src="/static/playVideo-button.png" />
-                  <span class="item-img-runtime">{{ item.runtime }}</span>
-                  <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}" v-if="index+1==historyTv.ji">
-                  </div>
+          <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView" :scroll-x="true" style="width: 100%" :enhanced="true"
+            :showScrollbar="false" v-if="tvList.length">
+            <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+getMovieName(item.name)" :key="item.name" @click="toPlayVideo(item,index)">
+              <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
+                <image src="/static/playVideo-button.png" />
+                <span class="item-img-runtime">{{ item.runtime }}</span>
+                <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}" v-if="index+1==historyTv.ji">
                 </div>
-                <div class="item-title">{{ index+1+'.'+item.title }}</div>
               </div>
-            </div>
-            <div class="tv-version-empty" v-else>
-              <nut-button custom-color="#090909" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
-              <span v-else>加载中...</span>
+              <div class="item-title">{{ index+1+'.'+item.title }}</div>
             </div>
           </scroll-view>
+          <div class="tv-version-empty" v-else>
+            <nut-button custom-color="#090909" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
+            <span v-else>加载中...</span>
+          </div>
         </div>
         <div class="story-introduction">
           <div class="story-introduction-title">剧情简介</div>
@@ -126,10 +125,10 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, nextTick } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { useDict } from "../../utils/useDict";
-import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, calTime } from "./components/common";
+import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime } from "./components/common";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
@@ -159,6 +158,7 @@ const tvList = ref([]); //目前网盘所拥有的电视集数列表
 
 const historyPlay = ref(uni.getStorageSync("historyPlay") || []); //历史播放
 const buttonText = ref("播放");
+const firstEnter = ref(true);
 
 const routerParams = ref({});
 const selectMedia = ref({});
@@ -169,6 +169,7 @@ const showRehandleButton = ref(false);
 const historyTv = ref({});
 
 const localMovieTvData = ref({});
+const scrollIntoView = ref("");
 
 const toSelect = (item) => {
   if (item.text == "手动编辑") {
@@ -237,35 +238,6 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
   }
   uni.setStorageSync("localMovieTvData", localMovieTvData);
   showTimePicker.value = false;
-};
-
-//通过tmdb接口获取更详细的信息
-const getMovieTvById = (data, type) => {
-  let url = "";
-  let obj = JSON.parse(JSON.stringify(data));
-  if (type == "movie") {
-    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`;
-  } else if (type == "tv") {
-    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`;
-  }
-  delete obj.movieTvId;
-  return new Promise((resolve) => {
-    uni.request({
-      url: url,
-      data: {
-        ...obj,
-        language: "zh-CN",
-        api_key: uni.getStorageSync("settingData").tmdbKey,
-      },
-      method: "GET",
-      header: {
-        "Content-Type": "application/json",
-      },
-      success: (res) => {
-        resolve(res.data);
-      },
-    });
-  });
 };
 
 //获取演员表
@@ -436,6 +408,11 @@ const handleTv = async () => {
     v.poster = res1.episodes[vindex]?.still_path ? "https://media.themoviedb.org/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
     v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
   });
+  console.log("执行-1", scrollIntoView.value);
+  nextTick(() => {
+    historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+    console.log("执行0", scrollIntoView.value);
+  });
 };
 
 const getMovieTvDetail = async () => {
@@ -445,6 +422,7 @@ const getMovieTvDetail = async () => {
     },
     routerParams.value.type
   );
+  overview.value = res.overview;
   if (routerParams.value.type == "movie") {
     imgData.value = {
       img: "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
@@ -457,12 +435,11 @@ const getMovieTvDetail = async () => {
     };
   } else if (routerParams.value.type == "tv") {
     imgData.value.title = routerParams.value.name;
-    handleTv();
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
+    await handleTv();
   }
-  overview.value = res.overview;
   return res;
 };
 
@@ -527,6 +504,7 @@ const clickPlayButton = () => {
         runtime: imgData.value.runtimeEn,
         title: selectSource.value.name,
         initialTime: "0",
+        movieTvId: routerParams.value.movieTvId,
       };
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
@@ -575,6 +553,7 @@ const clickPlayButton = () => {
         runtime: tvList.value[0].runtime,
         title: tvList.value[0].title,
         initialTime: "0",
+        movieTvId: routerParams.value.movieTvId,
       };
       let openEndTime = {};
       nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
@@ -623,6 +602,7 @@ const toPlayVideo = (item, index) => {
       runtime: item.runtime,
       title: item.title,
       initialTime: "0",
+      movieTvId: routerParams.value.movieTvId,
     };
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
@@ -714,6 +694,11 @@ onBeforeMount(() => {
       activeTab.value = selectSource.value.provider;
       setButtonText();
       await getMovieTvDetail();
+      console.log("执行1", scrollIntoView.value);
+      nextTick(() => {
+        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+        console.log("执行2", scrollIntoView.value);
+      });
     })
     .catch(async (error) => {
       let dict = [
@@ -728,6 +713,9 @@ onBeforeMount(() => {
       activeTab.value = selectSource.value.provider;
       setButtonText();
       await getMovieTvDetail();
+      nextTick(() => {
+        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+      });
     });
   getActorList();
 });
@@ -735,6 +723,12 @@ onBeforeMount(() => {
 onShow(async () => {
   setTimeout(() => {
     setButtonText();
+    if (!firstEnter.value) {
+      nextTick(() => {
+        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+      });
+    }
+    firstEnter.value = false;
   }, 800);
   let resetMovieTv = uni.getStorageSync("resetMovieTv");
   if (resetMovieTv) {
@@ -747,6 +741,9 @@ onShow(async () => {
     selectSource.value = sourceList.value[0];
     activeTab.value = selectSource.value.provider;
     setButtonText();
+    nextTick(() => {
+      historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+    });
     historyPlay.value = historyPlay.value.filter((i) => i.titlePlay != imgData.value.title);
     uni.setStorageSync("historyPlay", historyPlay.value);
     selectSource.value.name = resetMovieTv.name;
@@ -772,7 +769,7 @@ onShow(async () => {
       nowTv.type = "1";
       nowTv.genre_ids = res.genres.map((i) => i.id);
       nowTv.overview = res.overview;
-      nowTv.backdrop = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;;
+      nowTv.backdrop = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
       nowTv.voteAverage = res.vote_average; //评分
       nowTv.name = resetMovieTv.name;
     } else if (resetMovieTv.type == "movie") {
@@ -1142,82 +1139,86 @@ page {
           }
         }
         .tv-version-scroll {
-          .tv-version-list {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          ::v-deep .uni-scroll-view-content {
             display: flex;
+            flex-direction: row;
             align-items: center;
             flex-wrap: nowrap;
             width: 100%;
             height: 230rpx;
-            .tv-version-list__item {
-              margin-left: 24rpx;
-              flex: 0 0 calc((100% - 24rpx) / 2);
+          }
+          .tv-version-list__item {
+            margin-left: 24rpx;
+            flex: 0 0 calc((100% - 24rpx) / 2);
+            overflow: hidden;
+
+            &:first-child {
+              margin-left: 0;
+            }
+
+            .item-img {
+              width: 100%;
+              height: 170rpx;
+              background: rgb(212, 212, 212);
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: cover;
+              border-radius: 16rpx;
+              position: relative;
               overflow: hidden;
 
-              &:first-child {
-                margin-left: 0;
+              image {
+                width: 60rpx;
+                height: 60rpx;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
               }
 
-              .item-img {
-                width: 100%;
-                height: 170rpx;
-                background: rgb(212, 212, 212);
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: cover;
-                border-radius: 16rpx;
-                position: relative;
-                overflow: hidden;
-
-                image {
-                  width: 60rpx;
-                  height: 60rpx;
-                  position: absolute;
-                  left: 50%;
-                  top: 50%;
-                  transform: translate(-50%, -50%);
-                }
-
-                .item-img-runtime {
-                  position: absolute;
-                  right: 10rpx;
-                  bottom: 10rpx;
-                  background: rgba(0, 0, 0, 0.5);
-                  color: #fff;
-                  font-size: 24rpx;
-                  border-radius: 8rpx;
-                  padding: 4rpx 8rpx;
-                }
-                .item-img-process {
-                  height: 7rpx;
-                  background: #ff6701;
-                  position: absolute;
-                  bottom: 0;
-                  left: 0;
-                }
+              .item-img-runtime {
+                position: absolute;
+                right: 10rpx;
+                bottom: 10rpx;
+                background: rgba(0, 0, 0, 0.5);
+                color: #fff;
+                font-size: 24rpx;
+                border-radius: 8rpx;
+                padding: 4rpx 8rpx;
               }
-
-              .item-title {
-                font-size: 28rpx;
-                color: #000;
-                font-weight: bold;
-                padding-top: 12rpx;
-                width: 100%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+              .item-img-process {
+                height: 7rpx;
+                background: #ff6701;
+                position: absolute;
+                bottom: 0;
+                left: 0;
               }
+            }
+
+            .item-title {
+              font-size: 28rpx;
+              color: #000;
+              font-weight: bold;
+              padding-top: 12rpx;
+              width: 100%;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
-          .tv-version-empty {
-            width: 100%;
-            height: 230rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            ::v-deep .nut-button {
-              height: initial;
-              width: initial;
-            }
+        }
+        .tv-version-empty {
+          width: 100%;
+          height: 230rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          ::v-deep .nut-button {
+            height: initial;
+            width: initial;
           }
         }
       }

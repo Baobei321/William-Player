@@ -382,6 +382,35 @@ const getTvSeason = (data) => {
     });
   });
 };
+//通过tmdb接口获取更详细的信息
+const getMovieTvById = (data, type) => {
+  let url = "";
+  let obj = JSON.parse(JSON.stringify(data));
+  if (type == "movie") {
+    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`;
+  } else if (type == "tv") {
+    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`;
+  }
+  delete obj.movieTvId;
+  return new Promise((resolve) => {
+    uni.request({
+      url: url,
+      data: {
+        ...obj,
+        language: "zh-CN",
+        api_key: uni.getStorageSync("settingData").tmdbKey,
+      },
+      method: "GET",
+      header: {
+        "Content-Type": "application/json",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+};
+
 //计算时间
 const calTime = (val, type = "cn") => {
   if (type == "cn") {
@@ -426,4 +455,4 @@ let classifyList = [
   { id: "16", label: "动画", img: "https://img1.baidu.com/it/u=3020374768,111332665&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=746", background: "linear-gradient(to bottom, #d73c23, #f46e5b)" },
   { id: "14", label: "奇幻", img: "https://wx1.sinaimg.cn/large/0079wuTAly1gx7yuc7wzyj30ty16ojx9.jpg", background: "linear-gradient(to bottom, #da243d, #dd626e)" },
 ]
-export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, calTime, classifyList };
+export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, classifyList };

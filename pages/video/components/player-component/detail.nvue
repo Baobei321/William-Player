@@ -1,0 +1,374 @@
+<template>
+  <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="player-detail">
+    <view class="swiper-content" @click="toVideoDetail(detailData)">
+      <view class="swiper-content-container">
+        <view class="swiper-content-left">
+          <image mode="aspectFill" :src="detailData.poster" style="width: 192.6rpx;height: 270rpx; border-radius: 12rpx;"></image>
+        </view>
+        <view class="swiper-content-right">
+          <text class="right-genres">{{ detailData.genres }}</text>
+          <text class="right-name">{{ detailData.name||detailData.title }}</text>
+          <view class="right-info">
+            <text class="right-info-date" style="font-size: 24rpx;">{{ detailData.first_air_date||detailData.release_date	 }}</text>
+            <view class="right-info-star">
+              <image src="@/static/star-fill.png" style="width: 30rpx;height: 30rpx;"></image>
+              <text style="font-size: 24rpx;">{{ detailData.vote_average?.toFixed(1) }}</text>
+            </view>
+          </view>
+          <text class="right-desc">{{ detailData.overview }}</text>
+        </view>
+      </view>
+    </view>
+    <view class="now-play" v-if="type=='tv'">
+      <text class="now-play-title">正在播放</text>
+      <view class="now-play-list">
+        <scroll-view class="tv-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :scroll-left="scrollLeft" :scroll-with-animation="true"
+          :showScrollbar="false" v-if="tvListData.length">
+          <view class="tv-version-list__item" :style="{marginLeft:index==0 ? 0 : '24rpx'}" v-for="(item,index) in tvListData" :key="item.name"
+            @click="changeVideo(item,index)">
+            <view class="item-img">
+              <image :src="item.poster || detailData.poster" class="item-bgc" mode="aspectFill"></image>
+              <image src="@/static/playVideo-button.png" v-if="name!=item.name" class="item-img-pause" />
+              <image src="https://y.qq.com/mediastyle/yqq/img/wave.gif?max_age=2592000" class="item-img-run" v-else></image>
+              <text class="item-img-runtime">{{ item.runtime }}</text>
+            </view>
+            <text class="item-title">{{ index+1+'.'+item.title }}</text>
+          </view>
+        </scroll-view>
+        <view class="tv-version-empty" v-else>
+          <button @click="reHandleTv" v-if="showRehandleButton" style="backgroundColor:#090909;borderColor:#090909;padding: 16rpx 24rpx;">
+            <text style="color: #ffffff;fontSize:32rpx">重新加载</text>
+          </button>
+          <text v-else>加载中...</text>
+        </view>
+      </view>
+
+    </view>
+    <view class="play-platform">
+      <text class="play-platform-title">播出平台</text>
+      <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
+        <view v-for="(item,index) in detailData.networks" :key="item.id" class="container-item" :style="{marginLeft:index==0 ? '0' : '24rpx'}">
+          <image :src="'https://media.themoviedb.org/t/p/h30'+item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix"></image>
+          <text v-else style="font-size: 32rpx;color: #000;">{{ item.name }}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </scroll-view>
+</template>
+    
+<script>
+import { getMovieTvById } from "../common.js";
+export default {
+  props: {
+    movieTvId: String,
+    type: String,
+    tvListData: { type: Array },
+    path: { type: String },
+    showRehandleButton: Boolean,
+  },
+  data() {
+    return {
+      detailData: {},
+      tvList: [],
+      name: "",
+      scrollLeft: "0",
+    };
+  },
+  methods: {
+    async getMovieTvDetail() {
+      let res = await getMovieTvById({ movieTvId: this.movieTvId }, this.type);
+      let genres = "";
+      res.genres.forEach((v, vindex) => {
+        if (vindex < res.genres.length - 1) {
+          genres += v.name + " ";
+        } else {
+          genres += v.name || "";
+        }
+      });
+      res.genres = genres;
+      res.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
+      if (this.type == "movie") {
+        res.networks = res.production_companies;
+      }
+      this.detailData = res;
+    },
+    changeVideo(item, index) {
+      if (item.name == this.name) return;
+      this.$emit("changeVideo", index);
+    },
+    //裁剪格式获取电影名
+    getMovieName(val) {
+      const lastDotIndex = val.lastIndexOf(".");
+      let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
+      return name;
+    },
+    reHandleTv() {
+      this.$emit("resetTv");
+    },
+  },
+  created() {
+    this.getMovieTvDetail();
+  },
+  watch: {
+    // 监听 message 的变化
+    path: {
+      handler(newVal, oldVal) {
+        if (newVal && this.tvListData?.length) {
+          const lastIndex = newVal.lastIndexOf("/");
+          this.name = newVal.substring(lastIndex + 1);
+          setTimeout(() => {
+            let nowIndex = this.tvListData.findIndex((v) => v.name == this.name);
+            this.scrollLeft = 363 * nowIndex + "rpx";
+          }, 0);
+        }
+      },
+      immediate: true, // 初始化时立即执行
+    },
+    tvListData: {
+      handler(newVal, oldVal) {
+        if (newVal && newVal.length && this.path) {
+          const lastIndex = this.path.lastIndexOf("/");
+          this.name = this.path.substring(lastIndex + 1);
+          setTimeout(() => {
+            let nowIndex = newVal.findIndex((v) => v.name == this.name);
+            this.scrollLeft = 363 * nowIndex + "rpx";
+          }, 0);
+        }
+      },
+      immediate: true,
+      deep: true, // 初始化时立即执行
+    },
+  },
+};
+</script>
+    
+<style lang="scss">
+.player-detail {
+  width: 750rpx;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+  .swiper-content {
+    width: 750rpx;
+    box-sizing: border-box;
+    padding: 60rpx 0 0 0;
+    .swiper-content-container {
+      padding: 0 24rpx;
+      box-sizing: border-box;
+      width: 750rpx;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .swiper-content-left {
+      width: 192.6rpx;
+      flex: 0 0 192.6rpx;
+      height: 270rpx;
+      border-radius: 12rpx;
+      image {
+        width: 192.6rpx;
+        height: 270rpx;
+        border-radius: 12rpx;
+      }
+    }
+    .swiper-content-right {
+      flex: 1;
+      overflow: hidden;
+      height: 270rpx;
+      margin-left: 24rpx;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .right-genres {
+        font-size: 26rpx;
+      }
+      .right-name {
+        font-size: 32rpx;
+      }
+      .right-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-weight: bold;
+        .right-info-star {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-left: 50rpx;
+        }
+      }
+      .right-desc {
+        font-size: 28rpx;
+        color: rgb(54, 54, 54);
+        lines: 3; /* 限制行数（可调整） */
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+  .now-play {
+    padding: 24rpx;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    width: 750rpx;
+    .now-play-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #000;
+      padding-bottom: 20rpx;
+    }
+    .now-play-list {
+      height: 230rpx;
+      width: 702rpx;
+      .tv-version-scroll {
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        height: 230rpx;
+        width: 702rpx;
+        ::v-deep .uni-scroll-view-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          flex-wrap: nowrap;
+          width: 100%;
+        }
+
+        .tv-version-list__item {
+          margin-left: 24rpx;
+          flex: 0 0 339rpx;
+          width: 339rpx;
+          // &:first-child {
+          //   margin-left: 0;
+          // }
+
+          .item-img {
+            width: 339rpx;
+            height: 170rpx;
+            background: rgb(212, 212, 212);
+            border-radius: 16rpx;
+            position: relative;
+            overflow: hidden;
+            .item-bgc {
+              width: 339rpx;
+              height: 170rpx;
+              border-radius: 16rpx;
+              object-fit: cover;
+              position: absolute;
+              right: 0;
+              bottom: 0;
+              z-index: 1;
+            }
+            .item-img-pause {
+              width: 60rpx;
+              height: 60rpx;
+              position: absolute;
+              left: 151.5rpx;
+              top: 55rpx;
+              z-index: 2;
+            }
+            .item-img-run {
+              width: 30rpx;
+              height: 30rpx;
+              position: absolute;
+              left: 166.5rpx;
+              top: 70rpx;
+              z-index: 2;
+            }
+            .item-img-runtime {
+              position: absolute;
+              right: 10rpx;
+              bottom: 10rpx;
+              background: rgba(0, 0, 0, 0.5);
+              color: #fff;
+              font-size: 24rpx;
+              border-radius: 8rpx;
+              padding: 4rpx 8rpx;
+            }
+            .item-img-process {
+              height: 7rpx;
+              background: #ff6701;
+              position: absolute;
+              bottom: 0;
+              left: 0;
+            }
+          }
+
+          .item-title {
+            width: 339rpx;
+            font-size: 28rpx;
+            color: #000;
+            font-weight: bold;
+            padding-top: 12rpx;
+            white-space: nowrap;
+            lines: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+      .tv-version-empty {
+        width: 750rpx;
+        height: 230rpx;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        .empty-button {
+          background-color: #090909;
+          width: 200px;
+          height: 80px;
+          background-color: #4caf50; /* 背景色 */
+          color: white; /* 文字颜色 */
+          border-radius: 10px; /* 圆角 */
+          font-size: 16px; /* 字体大小 */
+          border-width: 0;
+        }
+      }
+    }
+  }
+  .play-platform {
+    padding: 24rpx;
+    .play-platform-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #000;
+      padding-bottom: 20rpx;
+    }
+    .play-platform-container {
+      display: flex;
+      flex-direction: row;
+      width: 750rpx;
+      overflow: hidden;
+      ::v-deep .uni-scroll-view-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
+      }
+
+      .container-item {
+        background: rgb(240, 240, 240);
+        padding: 10rpx 16rpx;
+        box-sizing: border-box;
+        border-radius: 16rpx;
+        margin-left: 24rpx;
+        flex-direction: row;
+        width: auto;
+        // &:first-child {
+        //   margin-left: 0;
+        // }
+        .container-item-img {
+          height: 40rpx;
+          width: auto;
+        }
+      }
+    }
+  }
+}
+</style>

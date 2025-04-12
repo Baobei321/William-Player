@@ -1,16 +1,16 @@
 <template>
   <view class="video-player" style="width:750rpx">
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
-    <view class="video-player-container">
+    <view class="video-player-container" :style="{height:videoHeight,flex:`0 0 ${videoHeight}`}">
       <view :style="{width:'750rpx',height:videoHeight,background:'#000'}" v-if="plateForm=='android'&&uniPlatform=='app'">
-        <video-view  :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
+        <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
           :showProgress="settingData.showProgress" :showPre="this.historyObj.ji!='1'" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
           @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" :style="{width:'750rpx',height:videoHeight}" ref="video_view">
         </video-view>
       </view>
       <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
-          :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:650rpx" @timeupdate="setHistory" @pause="pauseVideo"
+          :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory" @pause="pauseVideo"
           v-if="config.url&&!showReload">
         </video>
         <button class="video-button" v-if="showReload" @click="reloadVideo">
@@ -18,16 +18,20 @@
         </button>
       </view>
     </view>
+    <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :type="routerParams.type" :tvListData="tvList" :path="historyObj.path"
+      @changeVideo="changeVideo" @resetTv="resetTv" v-if="!routerParams.liveTitle"></player-detail>
   </view>
 </template>
 
 <script>
 import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import playerDetail from "./components/player-component/detail.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common";
+import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common";
 export default {
   components: {
     wilNavbar,
+    playerDetail,
   },
   data() {
     return {
@@ -45,7 +49,7 @@ export default {
       plateForm: "",
       uniPlatform: "",
       pipStatus: false,
-      videoHeight: "650rpx",
+      videoHeight: "580rpx",
       settingData: {},
       emptyUrl:
         "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
@@ -66,12 +70,14 @@ export default {
         codec: "hardware",
         title: "",
         playStrategy: 0,
-        sourceList: [],
-        selectMedia: {},
-        selectType: {},
+
         cookieStr: "",
       },
+      sourceList: [],
+      selectMedia: {},
+      selectType: {},
       tvList: [],
+      showRehandleButton: false,
     };
   },
 
@@ -236,7 +242,7 @@ export default {
       if (this.pipStatus) {
         this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + "rpx";
       } else {
-        this.videoHeight = "650rpx";
+        this.videoHeight = "580rpx";
       }
     },
     pauseVideo() {
@@ -249,70 +255,69 @@ export default {
       this.tvList = uni.getStorageSync("tvList") || [];
       const lastIndex = this.routerParams.path.lastIndexOf("/");
       let nowIndex = this.tvList.findIndex((item) => item.name == this.routerParams.path.substring(lastIndex + 1)); //获取当前集在数组中的索引index
-      if (nowIndex > 0) {
-        this.$refs.video_view.release();
-        this.config.url = "";
-        this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
-        this.routerParams.path = this.routerParams.path.slice(0, lastIndex) + "/" + this.tvList[nowIndex - 1].name;
-        if (this.selectType.type != "WebDAV") {
-          this.routerParams.folderFileId = this.tvList[nowIndex - 1].id;
-        }
-        this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
-
-        //跳转下一集重新设置historyObj
-        this.historyObj.path = this.routerParams.path;
-        this.historyObj.ji = String(+this.historyObj.ji - 1);
-        this.historyObj.poster = this.tvList[nowIndex - 1].poster || this.historyObj.poster;
-        this.historyObj.name = this.tvList[nowIndex - 1].name;
-        this.historyObj.runtime = this.tvList[nowIndex - 1].runtime;
-        this.historyObj.title = this.tvList[nowIndex - 1].title;
-        this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
-        this.historyObj.initialTime = String(this.config.initialTime);
-
-        this.config.poster = this.historyObj.poster;
-      } else {
+      if (nowIndex <= 0) {
         uni.showToast({
           title: "已经是第一集啦",
           icon: "none",
         });
         return;
+      } else {
+        this.changeVideo(nowIndex - 1);
       }
-      this.setUrl();
     },
     nextVideo() {
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
       const lastIndex = this.routerParams.path.lastIndexOf("/");
       let nowIndex = this.tvList.findIndex((item) => item.name == this.routerParams.path.substring(lastIndex + 1)); //获取当前集在数组中的索引index
-      if (nowIndex < this.tvList.length - 1) {
-        this.$refs.video_view.release();
-        this.config.url = "";
-        this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
-        this.routerParams.path = this.routerParams.path.slice(0, lastIndex) + "/" + this.tvList[nowIndex + 1].name;
-        if (this.selectType.type != "WebDAV") {
-          this.routerParams.folderFileId = this.tvList[nowIndex + 1].id;
-        }
-        this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
-
-        //跳转下一集重新设置historyObj
-        this.historyObj.path = this.routerParams.path;
-        this.historyObj.ji = String(+this.historyObj.ji + 1);
-        this.historyObj.poster = this.tvList[nowIndex + 1].poster || this.historyObj.poster;
-        this.historyObj.name = this.tvList[nowIndex + 1].name;
-        this.historyObj.runtime = this.tvList[nowIndex + 1].runtime;
-        this.historyObj.title = this.tvList[nowIndex + 1].title;
-        this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
-        this.historyObj.initialTime = String(this.config.initialTime);
-
-        this.config.poster = this.historyObj.poster;
-      } else {
+      if (nowIndex >= this.tvList.length - 1) {
         uni.showToast({
           title: "已经是最后一集啦",
           icon: "none",
         });
         return;
+      } else {
+        this.changeVideo(nowIndex + 1);
       }
+    },
+    changeVideo(currentIndex) {
+      this.historyObj.initialTime = 0;
+      this.tvList = uni.getStorageSync("tvList") || [];
+      const lastIndex = this.routerParams.path.lastIndexOf("/");
+      // this.$refs.video_view.release();
+      this.config.url = "";
+      this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
+      this.routerParams.path = this.routerParams.path.slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
+      if (this.selectType.type != "WebDAV") {
+        this.routerParams.folderFileId = this.tvList[currentIndex].id;
+      }
+      this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
+
+      //跳转下一集重新设置historyObj
+      this.historyObj.path = this.routerParams.path;
+      this.historyObj.ji = String(currentIndex + 1);
+      this.historyObj.poster = this.tvList[currentIndex].poster || this.historyObj.poster;
+      this.historyObj.name = this.tvList[currentIndex].name;
+      this.historyObj.runtime = this.tvList[currentIndex].runtime;
+      this.historyObj.title = this.tvList[currentIndex].title;
+      this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+      this.historyObj.initialTime = String(this.config.initialTime);
+      this.config.poster = this.historyObj.poster;
       this.setUrl();
+    },
+    async resetTv() {
+      if (this.selectType.type == "WebDAV") {
+        let res1 = await loginUser(this.selectMedia);
+        this.selectMedia.token = res1.data.token;
+        uni.setStorageSync("sourceList", this.sourceList);
+        this.handleTv(this.routerParams);
+        this.setUrl();
+      } else {
+        uni.showToast({
+          title: "请重新登录网盘",
+          icon: "none",
+        });
+      }
     },
     //播放到片尾时间跳转下一集
     arriveTimeNext() {
@@ -321,6 +326,7 @@ export default {
       }
     },
     async handleTv(data) {
+      this.showRehandleButton = false;
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
       let nowTv = localMovieTvData.tv.find((i) => i.name == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
@@ -355,6 +361,7 @@ export default {
             this.selectMedia
           );
         } catch (error) {
+          this.showRehandleButton = true;
           return;
         }
         //对电视进行排序
@@ -384,6 +391,7 @@ export default {
             this.selectMedia
           );
         } catch (error) {
+          this.showRehandleButton = true;
           return;
         }
         //对电视进行排序
@@ -413,6 +421,7 @@ export default {
             this.selectMedia
           );
         } catch (error) {
+          this.showRehandleButton = true;
           return;
         }
         //对电视进行排序
@@ -453,7 +462,6 @@ export default {
     },
   },
   async onLoad(options) {
-    this.tvList = uni.getStorageSync("tvList") || [];
     let systemInfo = uni.getSystemInfoSync();
     this.plateForm = systemInfo.platform;
     this.uniPlatform = systemInfo.uniPlatform;
@@ -467,14 +475,14 @@ export default {
     }
     this.historyPlay = uni.getStorageSync("historyPlay") || [];
     this.routerParams = options;
-
+    this.setInitialTime();
+    this.tvList = uni.getStorageSync("tvList") || [];
     if (this.routerParams.titlePlay) {
       this.handleTv(this.routerParams);
     }
-    this.setInitialTime();
     // options.openingTime ? (this.config.initialTime = options.openingTime) : "";
     if (options.videoUrl) {
-      this.config.url = options.videoUrl;
+      this.config.url = decodeURIComponent(options.videoUrl);
       this.config.title = options.liveTitle;
       return;
     }
@@ -488,15 +496,22 @@ export default {
 </script>
 
 <style lang="scss">
+page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .video-player {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1;
+  overflow: hidden;
   .video-player-container {
-    flex: 1;
+    background: #000000;
+    width: 750rpx;
     .video-button {
       width: 200rpx;
       bordercolor: #00b2a0;

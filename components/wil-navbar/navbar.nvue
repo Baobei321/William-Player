@@ -1,5 +1,5 @@
 <template>
-  <view class="navbar-nvue" :style="{height:navBarHeight}">
+  <view class="navbar-nvue" :style="{height:navBarHeight,flex:`0 0 ${navBarHeight}`}">
     <view class="navbar-nvue-container" :style="{height:contentHeight}">
       <image src="@/static/rect-left.png" class="navbar-nvue-container__back" @click="toBack"></image>
       <span>{{ title }}</span>
@@ -69,10 +69,9 @@ export default {
       position: absolute;
       right: 24rpx;
     }
-    .navbar-nvue-container__empty{
+    .navbar-nvue-container__empty {
       width: 40rpx;
       height: 40rpx;
-   
     }
   }
 }

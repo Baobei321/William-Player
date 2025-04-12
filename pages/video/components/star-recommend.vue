@@ -20,7 +20,6 @@
               <div class="right-desc">{{ data.overview }}</div>
             </div>
           </div>
-
         </div>
       </template>
     </wil-swiper>

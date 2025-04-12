@@ -187,7 +187,7 @@ const confirmApiKey = async () => {
     settingData.tmdbKey = tmdbKey.value;
     uni.setStorageSync("settingData", settingData);
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true, showRecommend: true });
+    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true, playercodec: "exoplayer", showRecommend: true });
   }
   showPopover.value = false;
   await setTmdbKey({ tmdbKey: tmdbKey.value });

@@ -43,7 +43,7 @@ const getIptv = () => {
   return new Promise((resolve, reject) => {
     loading.value = true;
     uni.request({
-      url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u",
+      url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4B0FB64_427A_iptv_20250412160807756newMediaImage.m3u",
       method: "GET",
       //   header: {
       //     Authorization: webdavInfo.token,
@@ -81,7 +81,7 @@ const clickItem = (item, row) => {
 
 const confirmPicker = ({ selectedValue, selectedOptions }) => {
   uni.navigateTo({
-    url: `/pages/video/video-player?noSetHistory=0&videoUrl=${selectedValue[0]}&liveTitle=${selectItem.value.name}`,
+    url: `/pages/video/video-player?noSetHistory=0&videoUrl=${encodeURIComponent(selectedValue[0])}&liveTitle=${selectItem.value.name}`,
   });
   showLine.value = false;
 };
