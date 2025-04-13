@@ -129,7 +129,7 @@ const toVideoPlayer = async (item) => {
       });
     } else {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&folderFileId=${item.folderFileId}&type=tv&${toStringfy(openEndTime)}`,
+        url: `/pages/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&wjjId=${item.wjjId}&folderFileId=${item.folderFileId}&type=tv&${toStringfy(openEndTime)}`,
       });
     }
   }

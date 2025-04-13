@@ -539,7 +539,7 @@ const clickPlayButton = () => {
         });
       } else {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       }
     } else {
@@ -565,7 +565,7 @@ const clickPlayButton = () => {
       } else {
         historyItem.folderFileId = tvList.value[0].id;
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       }
     }
@@ -588,7 +588,7 @@ const toPlayVideo = (item, index) => {
       });
     } else {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   } else {
@@ -616,7 +616,7 @@ const toPlayVideo = (item, index) => {
     } else {
       historyItem.folderFileId = item.id;
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   }

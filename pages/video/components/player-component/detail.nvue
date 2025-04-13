@@ -1,7 +1,7 @@
 <template>
   <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="player-detail">
-    <view class="swiper-content" @click="toVideoDetail(detailData)">
-      <view class="swiper-content-container">
+    <view class="swiper-content">
+      <view class="swiper-content-container" v-if="detailData.name||detailData.title">
         <view class="swiper-content-left">
           <image mode="aspectFill" :src="detailData.poster" style="width: 192.6rpx;height: 270rpx; border-radius: 12rpx;"></image>
         </view>
@@ -48,9 +48,10 @@
       <text class="play-platform-title">播出平台</text>
       <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <view v-for="(item,index) in detailData.networks" :key="item.id" class="container-item" :style="{marginLeft:index==0 ? '0' : '24rpx'}">
-          <image :src="'https://media.themoviedb.org/t/p/h30'+item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix"></image>
+          <image :src="'https://media.themoviedb.org/t/p/h30'+item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix" @load="loadImage"></image>
           <text v-else style="font-size: 32rpx;color: #000;">{{ item.name }}</text>
         </view>
+        <view class="container-empty" v-if="!showPlatformImg"></view>
       </scroll-view>
     </view>
   </scroll-view>
@@ -72,6 +73,8 @@ export default {
       tvList: [],
       name: "",
       scrollLeft: "0",
+      loadimgNum: 0,
+      showPlatformImg: false,
     };
   },
   methods: {
@@ -104,6 +107,13 @@ export default {
     },
     reHandleTv() {
       this.$emit("resetTv");
+    },
+    loadImage() {
+      this.loadimgNum++;
+      let imgNum = this.detailData.networks.filter((i) => i.logo_path).length;
+      if (this.loadimgNum == imgNum) {
+        this.showPlatformImg = true;
+      }
     },
   },
   created() {
@@ -154,6 +164,7 @@ export default {
     width: 750rpx;
     box-sizing: border-box;
     padding: 60rpx 0 0 0;
+    height: 330rpx;
     .swiper-content-container {
       padding: 0 24rpx;
       box-sizing: border-box;
@@ -344,6 +355,7 @@ export default {
       flex-direction: row;
       width: 750rpx;
       overflow: hidden;
+      position: relative;
       ::v-deep .uni-scroll-view-content {
         display: flex;
         flex-direction: row;
@@ -365,8 +377,16 @@ export default {
         // }
         .container-item-img {
           height: 40rpx;
-          width: auto;
+          // width: auto;
         }
+      }
+      .container-empty {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 750rpx;
+        height: 60rpx;
+        background: #fff;
       }
     }
   }

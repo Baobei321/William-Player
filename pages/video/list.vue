@@ -29,7 +29,7 @@ import Folder from "../../static/folder.png";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { getFolder, get189Folder, getQuarkFolder } from "./components/common.js";
 import { onShow } from "@dcloudio/uni-app";
-import wilEmpty from "@/components/wil-empty/index.vue"
+import wilEmpty from "@/components/wil-empty/index.vue";
 
 const date = ref("暂未更新");
 
@@ -85,6 +85,7 @@ const refreshWebDAVModule = async () => {
       title: "请先开启Alist",
       icon: "none",
     });
+    isRefresh.value = false;
     return;
   }
   let num1 = 0;
@@ -446,9 +447,9 @@ page {
       margin-top: 24rpx;
       text-align: center;
       font-size: 28rpx;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       image {
         width: 400rpx;
         height: 400rpx;

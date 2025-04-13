@@ -19,7 +19,7 @@
       </view>
     </view>
     <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :type="routerParams.type" :tvListData="tvList" :path="historyObj.path"
-      @changeVideo="changeVideo" @resetTv="resetTv" v-if="!routerParams.liveTitle"></player-detail>
+      @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0"></player-detail>
   </view>
 </template>
 
@@ -146,6 +146,7 @@ export default {
         }
       } else if (this.plateForm == "android") {
         this.historyObj.initialTime = Math.round(event.detail.currentTime);
+        this.historyObj.wjjId = this.routerParams.wjjId;
         let index = null;
         if (this.routerParams.type == "tv") {
           index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
@@ -235,7 +236,7 @@ export default {
           });
         }
       }
-      addOperLog({ title: this.config.title, businessType: 10, operatorType: 2, operUrl: this.config.url });
+      // addOperLog({ title: this.config.title, businessType: 10, operatorType: 2, operUrl: this.config.url });
     },
     getPipStatus(event) {
       this.pipStatus = event.detail.isPip;
@@ -386,7 +387,7 @@ export default {
         try {
           result = await get189Folder(
             {
-              folderId: data.folderFileId,
+              folderId: data.wjjId,
             },
             this.selectMedia
           );
@@ -416,7 +417,7 @@ export default {
         try {
           result = await getQuarkFolder(
             {
-              fid: data.folderFileId,
+              fid: data.wjjId,
             },
             this.selectMedia
           );
