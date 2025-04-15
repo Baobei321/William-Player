@@ -408,10 +408,8 @@ const handleTv = async () => {
     v.poster = res1.episodes[vindex]?.still_path ? "https://media.themoviedb.org/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
     v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
   });
-  console.log("执行-1", scrollIntoView.value);
   nextTick(() => {
     historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
-    console.log("执行0", scrollIntoView.value);
   });
 };
 
@@ -438,7 +436,6 @@ const getMovieTvDetail = async () => {
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
-    await handleTv();
   }
   return res;
 };
@@ -565,7 +562,9 @@ const clickPlayButton = () => {
       } else {
         historyItem.folderFileId = tvList.value[0].id;
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${
+            toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
+          }`,
         });
       }
     }
@@ -616,7 +615,9 @@ const toPlayVideo = (item, index) => {
     } else {
       historyItem.folderFileId = item.id;
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${
+          toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
+        }`,
       });
     }
   }
@@ -694,10 +695,11 @@ onBeforeMount(() => {
       activeTab.value = selectSource.value.provider;
       setButtonText();
       await getMovieTvDetail();
-      console.log("执行1", scrollIntoView.value);
+      if (routerParams.value.type == "tv") {
+        await handleTv();
+      }
       nextTick(() => {
         historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
-        console.log("执行2", scrollIntoView.value);
       });
     })
     .catch(async (error) => {
@@ -713,6 +715,9 @@ onBeforeMount(() => {
       activeTab.value = selectSource.value.provider;
       setButtonText();
       await getMovieTvDetail();
+      if (routerParams.value.type == "tv") {
+        await handleTv();
+      }
       nextTick(() => {
         historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
       });
@@ -729,7 +734,7 @@ onShow(async () => {
       });
     }
     firstEnter.value = false;
-  }, 800);
+  }, 800); //为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
   let resetMovieTv = uni.getStorageSync("resetMovieTv");
   if (resetMovieTv) {
     judgeSelect();
@@ -764,6 +769,7 @@ onShow(async () => {
       nowTv.season = match ? numberMapping[match[1]] : "1";
       nowTv.movieTvId = routerParams.value.movieTvId;
       let res = await getMovieTvDetail();
+      handleTv();
       nowTv.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowTv.releaseTime = res.first_air_date;
       nowTv.type = "1";
@@ -775,6 +781,7 @@ onShow(async () => {
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();
+      handleTv();
       nowMovie.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowMovie.releaseTime = res.release_date;
       nowMovie.type = "2";

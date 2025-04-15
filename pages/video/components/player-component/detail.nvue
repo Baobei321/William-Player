@@ -129,7 +129,7 @@ export default {
           setTimeout(() => {
             let nowIndex = this.tvListData.findIndex((v) => v.name == this.name);
             this.scrollLeft = 363 * nowIndex + "rpx";
-          }, 0);
+          }, 20);
         }
       },
       immediate: true, // 初始化时立即执行
@@ -142,7 +142,7 @@ export default {
           setTimeout(() => {
             let nowIndex = newVal.findIndex((v) => v.name == this.name);
             this.scrollLeft = 363 * nowIndex + "rpx";
-          }, 0);
+          }, 20);
         }
       },
       immediate: true,

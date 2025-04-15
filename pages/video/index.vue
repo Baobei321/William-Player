@@ -622,7 +622,7 @@ onShow(async () => {
         return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
       });
       uni.setStorageSync("historyPlay", historyPlay.value);
-    }, 800);
+    }, 800);//为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
   } else {
     historyPlay.value = uni.getStorageSync("historyPlay") || [];
     historyPlay.value = historyPlay.value.filter((item) => {
