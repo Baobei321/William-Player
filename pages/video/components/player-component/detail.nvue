@@ -22,9 +22,9 @@
     <view class="now-play" v-if="type=='tv'">
       <text class="now-play-title">正在播放</text>
       <view class="now-play-list">
-        <scroll-view class="tv-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :scroll-left="scrollLeft" :scroll-with-animation="true"
+        <scroll-view class="tv-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :scroll-into-view="scrollIntoView" :scroll-with-animation="true"
           :showScrollbar="false" v-if="tvListData.length">
-          <view class="tv-version-list__item" :style="{marginLeft:index==0 ? 0 : '24rpx'}" v-for="(item,index) in tvListData" :key="item.name"
+          <view class="tv-version-list__item" :style="{marginLeft:index==0 ? 0 : '24rpx'}" v-for="(item,index) in tvListData" :key="item.name" :id="'name'+(index+1)"
             @click="changeVideo(item,index)">
             <view class="item-img">
               <image :src="item.poster || detailData.poster" class="item-bgc" mode="aspectFill"></image>
@@ -75,6 +75,7 @@ export default {
       scrollLeft: "0",
       loadimgNum: 0,
       showPlatformImg: false,
+      scrollIntoView: "name1",
     };
   },
   methods: {
@@ -128,8 +129,14 @@ export default {
           this.name = newVal.substring(lastIndex + 1);
           setTimeout(() => {
             let nowIndex = this.tvListData.findIndex((v) => v.name == this.name);
-            this.scrollLeft = 363 * nowIndex + "rpx";
-          }, 20);
+            // this.scrollLeft = 363 * nowIndex + "rpx";
+            this.scrollIntoView = "name" + (nowIndex + 1);
+            // uni.showToast({
+            //   title: this.scrollIntoView,
+            //   icon: "none",
+            //   duration: 7000,
+            // });
+          }, 100);
         }
       },
       immediate: true, // 初始化时立即执行
@@ -141,8 +148,14 @@ export default {
           this.name = this.path.substring(lastIndex + 1);
           setTimeout(() => {
             let nowIndex = newVal.findIndex((v) => v.name == this.name);
-            this.scrollLeft = 363 * nowIndex + "rpx";
-          }, 20);
+            // this.scrollLeft = 363 * nowIndex + "rpx";
+            this.scrollIntoView = "name" + (nowIndex + 1);
+            // uni.showToast({
+            //   title: this.scrollIntoView,
+            //   icon: "none",
+            //   duration: 7000,
+            // });
+          }, 100);
         }
       },
       immediate: true,

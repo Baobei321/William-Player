@@ -214,8 +214,6 @@ const openLoginPopup = (item) => {
   showLoginPopup.value = true;
 };
 
-const dada1 = ref("");
-
 onShow(() => {
   judgeLogin();
 });

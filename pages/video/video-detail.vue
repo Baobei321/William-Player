@@ -68,7 +68,7 @@
           </div>
           <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView" :scroll-x="true" style="width: 100%" :enhanced="true"
             :showScrollbar="false" v-if="tvList.length">
-            <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+getMovieName(item.name)" :key="item.name" @click="toPlayVideo(item,index)">
+            <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+(index+1)" :key="item.name" @click="toPlayVideo(item,index)">
               <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
                 <image src="/static/playVideo-button.png" />
                 <span class="item-img-runtime">{{ item.runtime }}</span>
@@ -232,7 +232,6 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
   let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
   if (pickerTitle.value == "设置跳过片头时间") {
     nowTv.openingTime = time;
-    console.log(selectedValue, "片头事件");
   } else if (pickerTitle.value == "设置跳过片尾时间") {
     nowTv.endTime = time;
   }
@@ -409,7 +408,7 @@ const handleTv = async () => {
     v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
   });
   nextTick(() => {
-    historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+    historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
   });
 };
 
@@ -607,8 +606,6 @@ const toPlayVideo = (item, index) => {
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
-      console.log(toStringfy(openEndTime), "asd");
-
       uni.navigateTo({
         url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
@@ -699,7 +696,7 @@ onBeforeMount(() => {
         await handleTv();
       }
       nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
       });
     })
     .catch(async (error) => {
@@ -719,7 +716,7 @@ onBeforeMount(() => {
         await handleTv();
       }
       nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
       });
     });
   getActorList();
@@ -730,7 +727,7 @@ onShow(async () => {
     setButtonText();
     if (!firstEnter.value) {
       nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
       });
     }
     firstEnter.value = false;
@@ -747,7 +744,7 @@ onShow(async () => {
     activeTab.value = selectSource.value.provider;
     setButtonText();
     nextTick(() => {
-      historyTv.value.name ? (scrollIntoView.value = "name" + getMovieName(historyTv.value.name)) : "";
+      historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
     });
     historyPlay.value = historyPlay.value.filter((i) => i.titlePlay != imgData.value.title);
     uni.setStorageSync("historyPlay", historyPlay.value);
