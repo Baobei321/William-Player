@@ -143,7 +143,7 @@ const clickCell = (item) => {
       type = "movie";
     }
     uni.navigateTo({
-      url: `/pages/video/video-player?path=${path}/${item.name}&type=${type}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
+      url: `/pages/video/video-player?path=${path}/${item.name}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
     });
   }
 };

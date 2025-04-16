@@ -67,6 +67,7 @@ export default {
           Object.keys(this.cookieObj).forEach((item) => {
             cloud189.list[0][item] = this.cookieObj[item];
           });
+          uni.setStorageSync("sourceList", this.sourceList);
           uni.showToast({
             title: "修改成功",
             icon: "none",
