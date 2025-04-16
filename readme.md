@@ -54,11 +54,12 @@ Android 8+
 ### Android Phone 截图
 
 <div style="display: flex;">
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/9d25a057431b3a0fa4b8ea748b98a4b.jpg" alt="Mobile Screenshot 1" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/05cfd863ab202929f64fd6d44e291f0.jpg" alt="Mobile Screenshot 2" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/e1358cc49b75a1d8d570465eb009efe.jpg" alt="Mobile Screenshot 3" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/a33afbdf6774f504d1990453d99b421.jpg" alt="Mobile Screenshot 4" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/0BD79FDBADA44731AFB327FC62E96883.jpg" alt="Mobile Screenshot 4" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143400_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 1" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143523_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 2" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143545_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 3" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143607_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 4" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143622_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 5" width="24%"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/bea9d2e3f9500a447821d40d230c59a1.png" alt="Mobile Screenshot 6" width="24%"/>
 </div>
 
 [^3]: 预览中的影视媒体仅作为展示用
@@ -76,10 +77,8 @@ Android 8+
 - [x] 支持跳过片头片尾
 - [x] 支持电视剧播放切换上下集
 - [x] 增加首页高分影视推荐
-- [ ] 根据网络速度选择合适的夸克视频播放
-- [ ] 尝试解决夸克大文件下载链接的限速问题
 - [ ] 增加数据同步功能
-- [ ] 增加帮助页面
+- [x] 增加帮助页面
 - [ ] DLNA投屏
 
 ## 赞助

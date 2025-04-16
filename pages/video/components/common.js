@@ -32,7 +32,7 @@ const getWebDAVUrl = (data, webdavInfo) => {
         path: "/" + data.path,
         password: "",
       }),
-      timeout: 5000,
+      timeout: 3000,
       method: "POST",
       header: {
         Authorization: webdavInfo.token,

@@ -115,7 +115,7 @@ const toVideoSearch = () => {
 const toAddMedia = () => {
   if (loading.value) {
     uni.showToast({
-      title: "正在同步影片，请完成后再添加或管理资源",
+      title: "正在同步影片，请完成后再管理资源",
       icon: "none",
     });
     return;

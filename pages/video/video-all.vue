@@ -53,7 +53,6 @@ const wil_list = ref(null);
 const wil_modal = ref(null);
 const selectType = ref({});
 const selectMedia = ref({});
-const tvList = ref([]);
 
 //判断选择的是webdav还是天翼云盘还是夸克
 const judgeSelect = () => {
@@ -278,7 +277,7 @@ const imgError = (item) => {
 };
 
 const imgLoad = (item) => {
-  if (routerParams.value.isConnected == "false" && !item.loadImg) return;
+  if (!routerParams.value.isConnected && !item.loadImg) return;
   changeItemFn.value = (item) => {
     item.loadImg = true;
   };

@@ -191,6 +191,7 @@ export default {
       flex: 0 0 192.6rpx;
       height: 270rpx;
       border-radius: 12rpx;
+      background: rgb(212, 212, 212);
       image {
         width: 192.6rpx;
         height: 270rpx;

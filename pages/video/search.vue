@@ -2,7 +2,7 @@
   <div class="video-search">
     <wil-navbar>
       <template #content>
-        <nut-searchbar v-model="searchValue" placeholder="输入影片名称搜索" @search="toSearch">
+        <nut-searchbar v-model="searchValue" placeholder="输入影片名称搜索" @search="toSearch" @clear="toCancel">
           <template #leftin>
             <nut-icon name="search" custom-color="#000"></nut-icon>
           </template>
@@ -12,7 +12,7 @@
         </nut-searchbar>
       </template>
     </wil-navbar>
-    <div class="video-search-list">
+    <div class="video-search-list" v-if="listData.length">
       <div class="video-search-list__item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)">
         <div class="item-left" :style="{backgroundImage:`url(${item.poster})`}">
           <div :class="['item-left-logo',item.type=='1'?'item-left-tv':'']">
@@ -41,51 +41,57 @@
         </div>
       </div>
     </div>
+    <wil-empty v-else text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import wilNavbar from '../../components/wil-navbar/index.vue'
-import movieLittle from '../../static/movie-little.png'
-import tvLittle from '../../static/tv-little.png'
+import wilNavbar from "../../components/wil-navbar/index.vue";
+import wilEmpty from "../../components/wil-empty/index.vue";
+import movieLittle from "../../static/movie-little.png";
+import tvLittle from "../../static/tv-little.png";
 
-const oldValue = ref('')
-const searchValue = ref('')
-const listData = ref([])
-
+const oldValue = ref("");
+const searchValue = ref("");
+const listData = ref([]);
 
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf('.');
+  const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  return name
+  return name;
 };
 
 const toSearch = () => {
-  if (oldValue.value == searchValue.value || !searchValue.value) return
-  let data = uni.getStorageSync('localMovieTvData')
-  let movieArr = data.movie.filter(item => item.name.indexOf(searchValue.value) > -1)
-  let tvArr = data.tv.filter(item => item.name.indexOf(searchValue.value) > -1)
-  listData.value = [...movieArr, ...tvArr]
-  oldValue.value = searchValue.value
-}
+  if (oldValue.value == searchValue.value || !searchValue.value) return;
+  let data = uni.getStorageSync("localMovieTvData");
+  let movieArr = data.movie.filter((item) => item.name.indexOf(searchValue.value) > -1);
+  let tvArr = data.tv.filter((item) => item.name.indexOf(searchValue.value) > -1);
+  listData.value = [...movieArr, ...tvArr];
+  oldValue.value = searchValue.value;
+};
+
+const toCancel = () => {
+  searchValue.value = "";
+  oldValue.value = "";
+  listData.value = [];
+};
 
 const handleName = (name) => {
-  let arr = []
-  name = removeExtension(name)
-  arr.push({ label: name.split(oldValue.value)[0] })
-  arr.push({ label: oldValue.value, color: '#315bfe' })
-  arr.push({ label: name.split(oldValue.value)[1] })
-  arr = arr.filter(i => i.label)
-  return arr
-}
+  let arr = [];
+  name = removeExtension(name);
+  arr.push({ label: name.split(oldValue.value)[0] });
+  arr.push({ label: oldValue.value, color: "#315bfe" });
+  arr.push({ label: name.split(oldValue.value)[1] });
+  arr = arr.filter((i) => i.label);
+  return arr;
+};
 
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${item.type == '1' ? 'tv' : 'movie'}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`
-  })
-}
-
+    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+  });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -96,6 +102,8 @@ page {
 .video-search {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   ::v-deep .wil-navbar {
     background: #fff;
     .nut-navbar {
@@ -131,6 +139,8 @@ page {
 }
 .video-search-list {
   padding: 24rpx 24rpx 68rpx 24rpx;
+  flex: 1;
+  overflow: auto;
   .video-search-list__item {
     display: flex;
     align-items: center;
