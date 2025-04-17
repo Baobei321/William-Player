@@ -39,7 +39,7 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.0.9/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.1.0/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
@@ -78,8 +78,9 @@ Android 8+
 - [x] 支持电视剧播放切换上下集
 - [x] 增加首页高分影视推荐
 - [ ] 增加数据同步功能
+- [ ] 支持视频下载管理
 - [x] 增加帮助页面
-- [ ] DLNA投屏
+- [x] DLNA投屏
 
 ## 赞助
 

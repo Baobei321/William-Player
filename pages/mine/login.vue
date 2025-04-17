@@ -31,9 +31,9 @@ import baseForm from "../../components/wil-form/index.vue";
 import checkIcon from "../../static/check.png";
 import checkActiveIcon from "../../static/check-active.png";
 import { loginByPhone, getWeUserByopenId } from "../../network/apis";
-// import { getUserByopenId } from '../../utils/user'
 import { encrypt } from "../../utils/jsencrypt.js";
 import * as CONFIG from "../../utils/config";
+import { getUserByopenId } from "./common.js";
 
 //手机号校验
 const validatorPhone = (val) => {
@@ -61,24 +61,11 @@ const checkAgree = () => {
   userAgree.value = !userAgree.value;
 };
 
-const getUserByopenId = async () => {
-  let res = await getWeUserByopenId({ openId: uni.getStorageSync(CONFIG.OPEN_ID) });
-  uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
-  uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
-  uni.setStorageSync("Authorization", res.data.token);
-  let settingData = uni.getStorageSync("settingData");
-  if (settingData) {
-    settingData.tmdbKey = res.data.wuser.tmdbKey;
-    uni.setStorageSync("settingData", settingData);
-  } else {
-    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
-  }
-};
-
 const confirmCommit = async () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
       let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) });
+      uni.setStorageSync("userPassword", { phone: formData.value.phone, password: formData.value.password });
       uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
       getUserByopenId();
       uni.reLaunch({
@@ -89,6 +76,7 @@ const confirmCommit = async () => {
 };
 
 const touristEnter = async () => {
+  uni.setStorageSync("userPassword", { phone: "19994658532", password: "123456789" });
   await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
     .then((res) => {
       uni.setStorageSync(CONFIG.OPEN_ID, res.openId);

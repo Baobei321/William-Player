@@ -2,12 +2,13 @@
   <view class="video-player" style="width:750rpx">
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container" :style="{height:videoHeight,flex:`0 0 ${videoHeight}`}">
-      <view :style="{width:'750rpx',height:videoHeight,background:'#000'}" v-if="plateForm=='android'&&uniPlatform=='app'">
+      <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
         <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
           :showProgress="settingData.showProgress" :showPre="this.historyObj.ji>1" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
-          @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" @getorientation="getOrientation"
+          @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" @getorientation="getOrientation" @ontv="castTv"
           :style="{width:'750rpx',height:videoHeight}" ref="video_view">
         </video-view>
+        <tv-button v-if="showTvButton" :style="{width:'750rpx',height:videoHeight}" @setTvButton="setTvButton" @changeTv="castTv"></tv-button>
       </view>
       <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
@@ -20,19 +21,25 @@
       </view>
     </view>
     <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :type="routerParams.type" :tvListData="tvList" :path="historyObj.path"
-      @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0"></player-detail>
+      @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0">
+    </player-detail>
+    <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton" @playOrPause="playOrPauseVideo"></tv-select>
   </view>
 </template>
 
 <script>
 import wilNavbar from "@/components/wil-navbar/navbar.nvue";
 import playerDetail from "./components/player-component/detail.nvue";
+import tvSelect from "./components/player-component/tv-select.nvue";
+import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common";
 export default {
   components: {
     wilNavbar,
     playerDetail,
+    tvSelect,
+    tvButton,
   },
   data() {
     return {
@@ -80,6 +87,7 @@ export default {
       tvList: [],
       showRehandleButton: false,
       direction: 0,
+      showTvButton: false,
     };
   },
 
@@ -268,6 +276,7 @@ export default {
       this.changeVideo(nowIndex + 1);
     },
     async changeVideo(currentIndex) {
+      this.showTvButton = false;
       let initObj = JSON.parse(JSON.stringify(this.historyObj));
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
@@ -298,6 +307,25 @@ export default {
     },
     getOrientation(event) {
       this.direction = event.detail.direction;
+    },
+    castTv() {
+      this.$refs.tv_select.showPopup();
+    },
+    setTvButton(val) {
+      if (val) {
+        this.$refs.video_view.onPause();
+      } else {
+        this.$refs.video_view.onPlay();
+        this.$refs.tv_select.stopVideo();
+      }
+      this.showTvButton = val;
+    },
+    playOrPauseVideo(val) {
+      if (val) {
+        this.$refs.video_view.onPlay();
+      } else {
+        this.$refs.video_view.onPause();
+      }
     },
     async resetTv() {
       if (this.selectType.type == "WebDAV") {
@@ -502,6 +530,7 @@ page {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 .video-player {
   position: relative;

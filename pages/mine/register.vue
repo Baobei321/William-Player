@@ -32,6 +32,7 @@ import checkActiveIcon from "../../static/check-active.png";
 import { registerUser, getWeUserByopenId, loginByPhone } from "../../network/apis";
 import * as CONFIG from "../../utils/config";
 import { encrypt } from "../../utils/jsencrypt.js";
+import { getUserByopenId } from "./common.js";
 
 //手机号校验
 const validatorPhone = (val) => {
@@ -60,25 +61,14 @@ const userAgree = ref(false);
 const checkAgree = () => {
   userAgree.value = !userAgree.value;
 };
-const getUserByopenId = async () => {
-  let res = await getWeUserByopenId({ openId: uni.getStorageSync(CONFIG.OPEN_ID) });
-  uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
-  uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
-  uni.setStorageSync("Authorization", res.data.token);
-  let settingData = uni.getStorageSync("settingData");
-  if (settingData) {
-    settingData.tmdbKey = res.data.wuser.tmdbKey;
-    uni.setStorageSync("settingData", settingData);
-  } else {
-    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
-  }
-};
+
 const confirmCommit = async () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
       try {
         let params = { nickName: formData.value.nickName, phonenumber: formData.value.phonenumber, userName: formData.value.userName, password: encrypt(formData.value.password) };
         let res = await registerUser(params);
+        uni.setStorageSync("userPassword", { phone: formData.value.phonenumber, password: formData.value.password });
         uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
         getUserByopenId();
         uni.reLaunch({

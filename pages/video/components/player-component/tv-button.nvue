@@ -1,0 +1,96 @@
+<template>
+  <view class="tv-button">
+    <view class="tv-button-status">
+      <view class="status-icon"></view><text class="status-text">已投屏</text>
+    </view>
+    <view class="tv-button-center">
+      <view class="tv-button-center__item" style="margin-right: 24rpx;" @click="changeTv">
+        <image src="@/static/change-icon.png" class="item-icon"></image>
+        <text class="item-text">切换</text>
+      </view>
+      <view class="tv-button-center__item" @click="exitTv">
+        <image src="@/static/exit-icon.png" class="item-icon"></image>
+        <text class="item-text">退出</text>
+      </view>
+    </view>
+  </view>
+</template>
+    
+<script>
+export default {
+  props: {
+    movieTvId: String,
+  },
+  data() {
+    return {
+      detailData: {},
+    };
+  },
+  methods: {
+    changeTv() {
+      this.$emit("changeTv");
+    },
+    exitTv() {
+      this.$emit("setTvButton", false);
+    },
+  },
+  created() {},
+};
+</script>
+    
+<style lang="scss" scoped>
+.tv-button {
+  width: 750rpx;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  .tv-button-status {
+    position: absolute;
+    width: 750rpx;
+    top: 50rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    .status-icon {
+      border-radius: 50%;
+      width: 20rpx;
+      height: 20rpx;
+      background: #00c550;
+    }
+    .status-text {
+      font-size: 28rpx;
+      color: #818181;
+      padding-left: 10rpx;
+    }
+  }
+  .tv-button-center {
+    width: 750rpx;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    .tv-button-center__item {
+      display: flex;
+      flex-direction: row;
+      padding: 16rpx 20rpx;
+      align-items: center;
+      background: rgba(91, 91, 91, 0.6);
+      border-radius: 10rpx;
+      .item-icon {
+        width: 26rpx;
+        height: 26rpx;
+      }
+      .item-text {
+        font-size: 28rpx;
+        color: #fff;
+        padding-left: 10rpx;
+      }
+    }
+  }
+}
+</style>

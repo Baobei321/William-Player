@@ -145,6 +145,13 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/backend/operation-guide",
+      "style": {
+        "navigationBarTitleText": "操作指引",
+        "navigationBarBackgroundColor": "#fff"
+      }
     }
   ],
   "easycom": {

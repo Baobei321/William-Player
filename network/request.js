@@ -1,4 +1,7 @@
 import * as CONFIG from '@/utils/config.js'
+import { loginByPhone } from './apis'
+import { encrypt } from "../utils/jsencrypt.js";
+import { getUserByopenId } from '../pages/mine/common.js'
 // 全局请求封装
 const base_url = CONFIG.BASE_URL
 // const base_url = 'http://10.106.18.108:4040/ruoyi'
@@ -32,7 +35,7 @@ export default (params) => {
       header: header,
       data: data,
       timeout: noToastUrl.indexOf(url) > -1 ? 1000 : timeout,
-      success(response) {
+      success: async (response) => {
         const res = response
         // 根据返回的状态码做出对应的操作
         //获取成功
@@ -44,16 +47,20 @@ export default (params) => {
             let code = res.data?.code
             // uni.clearStorageSync()
             if (code == 401) {
-              uni.showModal({
-                title: "提示",
-                content: "请登录",
-                showCancel: false,
-                success: () => {
-                  uni.navigateTo({
-                    url: "/pages/mine/login",
-                  })
-                },
-              });
+              // uni.showModal({
+              //   title: "提示",
+              //   content: "请登录",
+              //   showCancel: false,
+              //   success: () => {
+              //     uni.navigateTo({
+              //       url: "/pages/mine/login",
+              //     })
+              //   },
+              // });
+              let userPassword = uni.getStorageSync('userPassword')
+              let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
+              uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+              getUserByopenId();
             } else if (code == 404) {
               uni.showToast({
                 title: '请求地址不存在...',
@@ -66,7 +73,7 @@ export default (params) => {
                 duration: 2000,
               })
             }
-            reject()
+            reject("接口请求错误")
           }
         } else {
           uni.showToast({
@@ -76,18 +83,22 @@ export default (params) => {
           // uni.clearStorageSync()
           switch (res.statusCode) {
             case 401:
-              uni.showModal({
-                title: "提示",
-                content: "请登录",
-                showCancel: false,
-                success() {
-                  setTimeout(() => {
-                    uni.navigateTo({
-                      url: "/pages/mine/login",
-                    })
-                  }, 1000);
-                },
-              });
+              // uni.showModal({
+              //   title: "提示",
+              //   content: "请登录",
+              //   showCancel: false,
+              //   success() {
+              //     setTimeout(() => {
+              //       uni.navigateTo({
+              //         url: "/pages/mine/login",
+              //       })
+              //     }, 1000);
+              //   },
+              // });
+              let userPassword = uni.getStorageSync('userPassword')
+              let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
+              uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+              getUserByopenId();
               break;
             case 404:
               uni.showToast({
