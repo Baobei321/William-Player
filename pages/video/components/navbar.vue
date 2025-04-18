@@ -14,11 +14,12 @@
         <div class="video-navbar-popover">
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
-          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{right:(popoverPosition.right-6)/16+'rem',top:popoverPosition.top/16+'rem',
-            borderLeft:'0.375rem solid transparent',borderRight:'0.375rem solid transparent',borderBottom:'0.5rem solid #315ffd'}" v-show="showPopover">
+          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{top:popoverPosition.top/windowWidth*750+'rpx'}"
+            v-show="showPopover">
+            <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
           </div>
-          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']"
-            :style="{right:(popoverPosition.right-18)/16+'rem',top:(popoverPosition.top+8)/16+'rem'}" v-if="showPopover">
+          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{top:(popoverPosition.top)/windowWidth*750+24+'rpx'}"
+            v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">
                 <span>{{ popoverData.title }}</span>
@@ -84,16 +85,21 @@ const showPause = ref(false);
 
 const timer = ref(null);
 
+const windowWidth = ref(1);
+
 //计算微信navBar高度
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  windowWidth.value = sysinfo.windowWidth;
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = (statusBarHeight + 54) / 16 + "rem"; //计算nav导航栏的高度
-  contentHeight.value = "3.375rem";
+  navBarHeight.value = ((statusBarHeight + 54) / sysinfo.windowWidth) * 750 + "rpx"; //计算nav导航栏的高度
+  contentHeight.value = "108rpx";
 };
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  windowWidth.value = sysinfo.windowWidth;
   navBarHeight.value = "2.75rem";
   contentHeight.value = "2.75rem";
 };
@@ -174,6 +180,8 @@ const getRefreshPosition = () => {
     .select(".video-navbar-popover")
     .boundingClientRect((rect) => {
       popoverPosition.value.top = rect.top + rect.height + 5;
+      console.log(popoverPosition.value.top, "top");
+
       popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2;
     })
     .exec();
@@ -303,18 +311,22 @@ onMounted(() => {
     .nut-navbar__right {
       right: 0;
       position: absolute;
+      padding: 0 32rpx;
       .nut-icon-uploader {
         margin-left: 30rpx;
+      }
+      .nutui-iconfont {
+        font-size: 32rpx;
+        width: 40rpx;
+        height: 40rpx;
       }
       .video-navbar-popover {
         margin-left: 30rpx;
         .video-navbar-popover__arrow {
-          width: 0;
-          height: 0;
-          border-left: 12rpx solid transparent;
-          border-right: 12rpx solid transparent;
-          border-bottom: 16rpx solid #315ffd;
+          width: 32rpx;
+          height: 32rpx;
           position: fixed;
+          right: 36rpx;
         }
         .show-animation {
           animation: opacity1 0.2s ease;
@@ -329,6 +341,7 @@ onMounted(() => {
           z-index: 100;
           padding: 24rpx;
           border-radius: 20rpx;
+          right: 15rpx;
           .popover-title {
             display: flex;
             align-items: center;

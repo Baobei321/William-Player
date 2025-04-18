@@ -1149,7 +1149,6 @@ let QRCode = {};
 				ctx.draw(true, () => {
 					// 保存到临时区域
 					setTimeout(() => {
-						console.log(options)
 						uni.canvasToTempFilePath({
 							width: options.width,
 							height: options.height,

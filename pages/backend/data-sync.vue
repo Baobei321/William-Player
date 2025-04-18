@@ -1,47 +1,43 @@
 <template>
   <div class="data-sync">
     <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
-    <div class="scan-tip">请点击下方按钮，扫描其他设备的二维码进行数据同步</div>
-    <image src="../../static/scan-button.png" class="scan-button" @click="scanCode"></image>
+    <div class="scan-tip">请点击下方按钮，扫描其他设备的二维码将数据同步到被扫描的设备</div>
+    <image src="@/static/scan-button.png" class="scan-button" @click="scanCode"></image>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import wilQrcode from "../../components/wil-qrcode/index.vue";
-import appLogo from "../../static/app-logo1.png";
-import { setShareData, getShareData } from "../../network/apis";
-import * as CONFIG from "../../utils/config";
+import wilQrcode from "@/components/wil-qrcode/index.vue";
+import appLogo from "@/static/app-logo1.png";
+import { onUnload } from "@dcloudio/uni-app";
 
 const wilQrcodeRef = ref(null);
-onMounted(async () => {
-  let userId = uni.getStorageSync(CONFIG.USER_ID);
-  let qrObj = { type: "dataSync", userId };
-  qrObj = JSON.stringify(qrObj);
-  // 调用
-  wilQrcodeRef.value.getQRcode(qrObj);
+const udpClient = ref(null);
 
-  let webdavInfo = uni.getStorageSync("webdavInfo");
-  let tmdbKey = uni.getStorageSync("settingData").tmdbKey;
-  let localMovieTvData = uni.getStorageSync("localMovieTvData");
-  let obj = { webdavInfo, tmdbKey, localMovieTvData };
-  obj = JSON.stringify(obj);
-  await setShareData({ shareData: obj });
-});
+const onSocketMsg = (resData) => {
+  // resData 的数据结构：{ host, port, data, hex }
+  console.log("接收到消息: " + resData);
+  let data = JSON.parse(resData.data);
+  uni.setStorageSync("localMovieTvData", data.localMovieTvData);
+  uni.setStorageSync("sourceList", data.sourceList);
+};
+
+const onSocketError = (errMsg) => {
+  console.error("socket 异常：" + errMsg);
+};
 
 const scanCode = () => {
   uni.scanCode({
     success: async (res) => {
       let result = JSON.parse(res.result);
       if (result.type == "dataSync") {
-        let res1 = await getShareData({ userId: result.userId });
-        let data = JSON.parse(res1.data);
-        let settingData = uni.getStorageSync("settingData")
-        settingData.tmdbKey = data.tmdbKey
-        uni.setStorageSync("webdavInfo", data.webdavInfo);
-        uni.setStorageSync("settingData", settingData);
-        uni.setStorageSync("localMovieTvData", data.localMovieTvData);
-
+        // udpClient.value.send({
+        //   host: result.ipAddress,
+        //   port: result.port,
+        //   data: JSON.stringify({ localMovieTvData: uni.getStorageSync("localMovieTvData") || {}, sourceList: uni.getStorageSync("sourceList") || [] }),
+        //   useHex: true, // 使用 hexString ，默认为 false
+        // });
         uni.showToast({
           title: "同步成功",
           icon: "none",
@@ -55,6 +51,27 @@ const scanCode = () => {
     },
   });
 };
+
+// onMounted(async () => {
+//   let ipAddress = "";
+//   // #ifdef APP-PLUS
+//   udpClient.value = uni.requireNativePlugin("udp-client");
+//   udpClient.value.setByteSize(65507);
+//   udpClient.value.init(10005, onSocketMsg, onSocketError);
+//   let lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+//   lyzmlDLNA.getIpAddress((res) => {
+//     ipAddress = res;
+//     let qrObj = { type: "dataSync", ipAddress: ipAddress, port: 10005 };
+//     qrObj = JSON.stringify(qrObj);
+//     // 调用生成二维码
+//     wilQrcodeRef.value.getQRcode(qrObj);
+//   });
+//   // #endif
+// });
+
+// onUnload(() => {
+//   udpClient.value.release();
+// });
 </script>
 
 <style lang="scss" scoped>

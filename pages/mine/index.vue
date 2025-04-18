@@ -12,7 +12,7 @@
             src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
           <span>游客用户</span>
         </div>
-        <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button>
+        <!-- <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button> -->
       </div>
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
