@@ -1,5 +1,5 @@
 <template>
-  <view class="tv-select">
+  <view class="tv-select" :style="{zIndex:showOverlay?'2':'-1'}">
     <view :class="['tv-select-overlay',popupShow ? 'overlay-show' : 'overlay-hide']" @click="hidePopup" v-if="showOverlay"></view>
     <view :class="['tv-select-popup',popupShow ? 'popup-show' : 'popup-hide']" @click.stop="popupClick">
       <view class="popup-title">
@@ -172,6 +172,7 @@ export default {
   top: 0;
   left: 0;
   right: 0; /* 撑满父容器 */
+  z-index: -1;
   .tv-select-overlay {
     z-index: 99;
     position: absolute;

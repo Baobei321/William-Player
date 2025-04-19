@@ -32,7 +32,7 @@ const getWebDAVUrl = (data, webdavInfo) => {
         path: "/" + data.path,
         password: "",
       }),
-      timeout: 3000,
+      timeout: 10000,
       method: "POST",
       header: {
         Authorization: webdavInfo.token,
@@ -62,7 +62,7 @@ const loginUser = (webdavInfo) => {
         username: webdavInfo.username,
         password: webdavInfo.password,
       }),
-      timeout: 3000,
+      timeout: 10000,
       method: "POST",
       header: { "Content-Type": "application/json" },
       success: (res) => {
@@ -433,6 +433,19 @@ const calTime = (val, type = "cn") => {
   }
 };
 
+const handleSeasonName = (filename, reserve = false) => {
+  const lastDotIndex = filename.lastIndexOf(".");
+  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");
+  name = lasekhIndex === -1 ? name : name.substring(0, lasekhIndex);
+  if (!reserve) {
+    const lastKgIndex = name.lastIndexOf(" ");
+    name = lastKgIndex === -1 ? name : name.substring(0, lastKgIndex);
+  }
+  return name;
+};
+
+
 let classifyList = [
   { id: "18", label: "剧情", img: "https://n.sinaimg.cn/sinakd20230822s/429/w1000h1029/20230822/85c9-12a6845ed1089e9489c8510b78bfd6ef.jpg", background: "linear-gradient(to bottom, #e90c00, #fc633d)" },
   { id: "10749", label: "爱情", img: "http://mms2.baidu.com/it/u=2417138206,3826310341&fm=253&app=138&f=JPEG?w=500&h=711", background: "linear-gradient(to bottom, #152de0, #5c6bf8)" },
@@ -455,4 +468,7 @@ let classifyList = [
   { id: "16", label: "动画", img: "https://img1.baidu.com/it/u=3020374768,111332665&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=746", background: "linear-gradient(to bottom, #d73c23, #f46e5b)" },
   { id: "14", label: "奇幻", img: "https://wx1.sinaimg.cn/large/0079wuTAly1gx7yuc7wzyj30ty16ojx9.jpg", background: "linear-gradient(to bottom, #da243d, #dd626e)" },
 ]
-export { getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl, getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, classifyList };
+export {
+  getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl,
+  getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, classifyList
+};

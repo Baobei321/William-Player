@@ -31,7 +31,7 @@
 <script setup>
 import { ref } from "vue";
 import playVideoButton from "../../../static/playVideo-button.png";
-import { handleSecond, parseTime, } from "./common";
+import { handleSecond, parseTime, handleSeasonName } from "./common";
 import { onShow } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import { toStringfy } from "../../mine/common";
@@ -116,7 +116,7 @@ const toVideoPlayer = async (item) => {
   } else if (item.type == "tv") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
     const lastIndex = item.path.lastIndexOf("/");
-    let nowTv = localMovieTvData.tv.find((i) => i.name == item.titlePlay && i.path == "/" + item.path.slice(0, lastIndex));
+    let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == item.titlePlay && i.path == "/" + item.path.slice(0, lastIndex));
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";

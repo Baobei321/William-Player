@@ -290,6 +290,9 @@ const handleTv = async () => {
     movieTvId: routerParams.value.movieTvId,
     season: season,
   });
+  let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
+  uni.setStorageSync("seasonData", seasonData);
+  overview.value = res1.overview;
   let result = {};
   if (selectType.value.type == "WebDAV") {
     imgData.value.releaseTime = res1.air_date;

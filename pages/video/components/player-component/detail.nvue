@@ -67,6 +67,7 @@ export default {
     tvListData: { type: Array },
     path: { type: String },
     showRehandleButton: Boolean,
+    seasonData: { type: Object },
   },
   data() {
     return {
@@ -77,6 +78,7 @@ export default {
       loadimgNum: 0,
       showPlatformImg: false,
       scrollIntoView: "name1",
+      season: "1",
     };
   },
   methods: {
@@ -96,6 +98,13 @@ export default {
         res.networks = res.production_companies;
       }
       this.detailData = res;
+      if (this.seasonData.id) {
+        const numberMapping = { "1": "一", "2": "二", "3": "三", "4": "四", "5": "五", "6": "六", "7": "七", "8": "八" };
+        if (this.seasonData.season_number > 1) {
+          this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
+        }
+        this.detailData.overview = this.seasonData.overview;
+      }
     },
     changeVideo(item, index) {
       if (item.name == this.name) return;
@@ -159,8 +168,23 @@ export default {
           }, 100);
         }
       },
+      immediate: true, // 初始化时立即执行
+      deep: true,
+    },
+    seasonData: {
+      handler(newVal, oldVal) {
+        if (newVal?.id) {
+          const numberMapping = { "1": "一", "2": "二", "3": "三", "4": "四", "5": "五", "6": "六", "7": "七", "8": "八" };
+          if (this.detailData.id) {
+            if (newVal.season_number > 1) {
+              this.detailData.name = this.detailData.name + ` 第${numberMapping[String(newVal.season_number)]}季`;
+            }
+            this.detailData.overview = newVal.overview;
+          }
+        }
+      },
       immediate: true,
-      deep: true, // 初始化时立即执行
+      deep: true,
     },
   },
 };
@@ -293,7 +317,7 @@ export default {
               width: 60rpx;
               height: 60rpx;
               position: absolute;
-              left: 151.5rpx;
+              left: 139.5rpx;
               top: 55rpx;
               z-index: 2;
             }
@@ -301,7 +325,7 @@ export default {
               width: 30rpx;
               height: 30rpx;
               position: absolute;
-              left: 166.5rpx;
+              left: 154.5rpx;
               top: 70rpx;
               z-index: 2;
             }

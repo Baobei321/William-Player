@@ -26,6 +26,7 @@
 import { ref, nextTick } from "vue";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow } from "@dcloudio/uni-app";
+import { handleSeasonName } from "./common";
 
 const props = defineProps({
   title: { type: String, default: "电影" },
@@ -42,6 +43,9 @@ listData1.value.forEach((item) => {
 const removeExtension = (filename) => {
   const lastDotIndex = filename.lastIndexOf(".");
   let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");
+  name = lasekhIndex === -1 ? name : name.substring(0, lasekhIndex);
+
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }
@@ -54,7 +58,7 @@ const typeMapping = {
 };
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    url: `/pages/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
 

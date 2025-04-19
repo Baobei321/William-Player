@@ -20,8 +20,8 @@
         </button>
       </view>
     </view>
-    <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :type="routerParams.type" :tvListData="tvList" :path="historyObj.path"
-      @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0">
+    <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :seasonData="seasonData" :type="routerParams.type" :tvListData="tvList"
+      :path="historyObj.path" @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0">
     </player-detail>
     <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton" @playOrPause="playOrPauseVideo"></tv-select>
   </view>
@@ -33,7 +33,7 @@ import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common";
+import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName } from "./components/common";
 export default {
   components: {
     wilNavbar,
@@ -43,16 +43,12 @@ export default {
   },
   data() {
     return {
-      webdavInfo: {},
       historyPlay: [],
       historyObj: {
         initialTime: "0",
       },
       sum: 0,
       routerParams: {},
-      rawUrl: "",
-      timeout: null,
-      reloadTimeout: null,
       showReload: false,
       plateForm: "",
       uniPlatform: "",
@@ -88,6 +84,7 @@ export default {
       showRehandleButton: false,
       direction: 0,
       showTvButton: false,
+      seasonData: {},
     };
   },
 
@@ -185,7 +182,7 @@ export default {
       } else if (this.routerParams.type == "tv") {
         let name = this.routerParams.path.substring(lastIndex + 1);
         const secondLastSlashIndex = this.routerParams.path.lastIndexOf("/", lastIndex - 1);
-        let titlePlay = this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex);
+        let titlePlay = handleSeasonName(this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex), true);
         obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay) || {};
       }
       if (this.routerParams.item) {
@@ -196,7 +193,6 @@ export default {
         if (this.routerParams.type) {
           this.historyObj = obj;
           this.config.poster = this.historyObj.poster;
-          console.log(this.config.initialTime, "时间");
         } else {
           this.config.initialTime = 0;
           this.config.title = this.routerParams.path.substring(lastIndex + 1);
@@ -347,32 +343,29 @@ export default {
         this.nextVideo();
       }
     },
+
     async handleTv(data) {
       this.showRehandleButton = false;
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
-      let nowTv = localMovieTvData.tv.find((i) => i.name == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
-      let season = "";
-      if (localMovieTvData.tv) {
-        season = localMovieTvData.tv.find((i) => i.movieTvId == nowTv.movieTvId).season;
-      } else {
-        const numberMapping = {
-          "一": "1",
-          "二": "2",
-          "三": "3",
-          "四": "4",
-          "五": "5",
-          "六": "6",
-          "七": "7",
-          "八": "8",
-        };
-        const match = this.routerParams.titlePlay.match(/第(.*?)季/);
-        season = match ? numberMapping[match[1]] : "1";
-      }
+      let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
+      const numberMapping = {
+        "一": "1",
+        "二": "2",
+        "三": "3",
+        "四": "4",
+        "五": "5",
+        "六": "6",
+        "七": "7",
+        "八": "8",
+      };
+      const match = this.routerParams.titlePlay.match(/第(.*?)季/);
+      let season = match ? numberMapping[match[1]] : "1";
       let res1 = await getTvSeason({
         movieTvId: nowTv.movieTvId,
         season: season,
       });
+      this.seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
       let result = {};
       if (this.selectType.type == "WebDAV") {
         try {
@@ -498,6 +491,7 @@ export default {
     this.historyPlay = uni.getStorageSync("historyPlay") || [];
     this.routerParams = options;
     this.setInitialTime();
+    this.seasonData = uni.getStorageSync("seasonData") || {};
     this.tvList = uni.getStorageSync("tvList") || [];
     if (this.routerParams.titlePlay) {
       this.handleTv(this.routerParams);
@@ -513,6 +507,7 @@ export default {
   onUnload() {
     uni.setStorageSync("historyPlay", this.historyPlay);
     uni.removeStorageSync("tvList");
+    uni.removeStorageSync("seasonData");
   },
   onBackPress() {
     if (this.direction == 1) {

@@ -47,6 +47,7 @@ const getNavHeight = () => {
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   navBarHeight.value = '44px'
   contentHeight.value = '44px'
   emits('getHeight', navBarHeight.value)

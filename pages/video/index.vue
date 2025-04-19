@@ -54,7 +54,7 @@ import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
-import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder,handleSeasonName } from "./components/common";
 import emptyBg from "@/static/empty_bg.png";
 import * as CONFIG from "@/utils/config";
 const video_navbar = ref(null);
@@ -152,12 +152,13 @@ const removeExtension = (filename) => {
   return name;
 };
 
-const handleSeasonName = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  const lastKgIndex = name.lastIndexOf(" ");
-  name = lastKgIndex === -1 ? name : name.substring(0, lastKgIndex);
-  return name;
+const handleNameYear = (filename) => {
+  const lasekhIndex = filename.lastIndexOf("(") > -1 ? filename.lastIndexOf("(") : filename.lastIndexOf("（");
+  let year = "";
+  if (lasekhIndex > -1) {
+    year = filename.substring(lasekhIndex + 1, lasekhIndex + 5);
+  }
+  return year;
 };
 
 const refreshWebDavVideo = async () => {
@@ -262,7 +263,7 @@ const setMovieTvImg = async (arr, type) => {
   const processedItems = await Promise.all(
     arr.map(async (item) => {
       try {
-        let res = await searchMovieTv({ query: handleSeasonName(item.name) }, type);
+        let res = await searchMovieTv({ query: handleSeasonName(item.name), first_air_date_year: handleNameYear(item.name) }, type);
         let data = {};
         if (res.results.length == 1) {
           data = res.results[0];
@@ -533,7 +534,10 @@ const refreshVideo = async () => {
   }
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   historyPlay.value = historyPlay.value.filter((item) => {
-    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+    return (
+      localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == item.name && v.movieTvId == item.movieTvId) ||
+      localMovieTvData.value.tv.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+    );
   });
   uni.setStorageSync("historyPlay", historyPlay.value);
 };
@@ -600,13 +604,7 @@ onShow(async () => {
       },
       {
         type: "夸克网盘",
-        list: [
-          // {
-          //   name: "13396921269",
-          //   Cookie:
-          //     "b-user-id=fb9edea3-84d9-c5a7-2568-231d5d3bf606; tfstk=g2Hqfl6ElKp2Z91R-u2NafCMdnFvfRo2R-D_jlmtXG40nRwZ_zoNGnFslbzZzzBbonU0b5rTms4gIPXuQP48Cmab54zikVrsGAoOQlmiWnU6D3ixDReMRewwdmnY2scIHHNcrTm8fOx7iPi2xWyMRe9WdmnYBR0X-rvf40480oqiSs4k4lrUSR40safuxz4gIVVGEuqUmlX0IlXk4lUuSR2iS0chImmGUkNDbuNdITfArezimzWGIx2TiPS0PuEoUoP4-pUPIlDz0SzncxgvKDEoFYPQNGTaEDhSouyeFs2n4f0EtVdCw-oiiVFrkUCzPbcSjPVhmt2qsqHaMjS9v02myXULiQL84xMQ_yFPu9zsHqMzTvYlUunSAxF-Qe7uWjZLEkiv3TynmljPZNEl8eDtgNfgiOZzR3-PD-axRn3Anp1O672L4ytbc1fGJ9B1gAtf61FuwuzBcr1..; isg=BHt7v3jTmEJKo6SdslLjdmdICV_l0I_SkU1g320513qRzJiu9KCwIoFF5uyCd-fK; __sdid=AATbhJoRI0wC9Sytdqbj65miEu/G7tpLFZYDqyzktsV/TxJJWHgE26u078znMadenWI=; _UP_A4A_11_=wb9c61d27a5d456882b09f54dceed023; _UP_D_=pc; __pus=6ace96b097c34b0b9844df0432db09fdAATZtLec06C6CRqHhk6XyEeSx3Kb5WK71A5F9rQ4Y2ltXZdBCzTBCqStFnVzW+p4GrKPAbCgi0k08RlP64m8N42S; __kp=b517b620-f57a-11ef-bff3-49922a837aa1; __kps=AASzysrcrHGhp/zjlNK1Fny/; __ktd=5zoFeN+pioKJnIL5MjA2hA==; __uid=AASzysrcrHGhp/zjlNK1Fny/; __puus=1bf55253e736f7aa526417e1b8b523b9AATQRt0EI9lB70lR9UJhHmCNZywV3iwCg1AWFAyQ+0oDehlNle8oa/Qd4KVMS6MX92OuXn/BgTvwXopVLIeVdY+t2cM+PqG3QDp2Zr9e7pnirVOeH1MDAH/szXLLao96f7f5TCResPUjb2mOUIZuzLox3AI4ecyXxwzMnZFjOXNnORBNHp7/rK+UhqgP8N12EhbHJp7+E2gSCACm84KOMN7M; xlly_s=1",
-          // },
-        ],
+        list: [],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
       },
     ];
@@ -619,14 +617,20 @@ onShow(async () => {
     setTimeout(() => {
       historyPlay.value = uni.getStorageSync("historyPlay") || [];
       historyPlay.value = historyPlay.value.filter((item) => {
-        return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+        return (
+          localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == item.name && v.movieTvId == item.movieTvId) ||
+          localMovieTvData.value.tv.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+        );
       });
       uni.setStorageSync("historyPlay", historyPlay.value);
-    }, 800);//为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
+    }, 800); //为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
   } else {
     historyPlay.value = uni.getStorageSync("historyPlay") || [];
     historyPlay.value = historyPlay.value.filter((item) => {
-      return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+      return (
+        localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == item.name && v.movieTvId == item.movieTvId) ||
+        localMovieTvData.value.tv.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+      );
     });
     uni.setStorageSync("historyPlay", historyPlay.value);
   }
@@ -669,7 +673,10 @@ onBeforeMount(async () => {
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   historyPlay.value = historyPlay.value.filter((item) => {
-    return localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.value.tv.some((v) => v.name == item.titlePlay);
+    return (
+      localMovieTvData.value.movie.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == item.name && v.movieTvId == item.movieTvId) ||
+      localMovieTvData.value.tv.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+    );
   });
   uni.setStorageSync("historyPlay", historyPlay.value);
   if (selectType.value.type == "WebDAV") {

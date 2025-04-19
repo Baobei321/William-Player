@@ -179,7 +179,7 @@ const getRefreshPosition = () => {
   selectorQuery
     .select(".video-navbar-popover")
     .boundingClientRect((rect) => {
-      popoverPosition.value.top = rect.top + rect.height + 5;
+      popoverPosition.value.top = rect.top + rect.height;
       console.log(popoverPosition.value.top, "top");
 
       popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2;

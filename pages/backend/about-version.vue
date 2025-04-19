@@ -72,7 +72,6 @@ const confirm = ({ selectedValue, selectedOptions }) => {
 };
 const toLogin = () => {
   if (num == 5) {
-    num = 0;
     uni.removeStorageSync(CONFIG.USER_ID);
     uni.removeStorageSync(CONFIG.OPEN_ID);
     uni.removeStorageSync(CONFIG.USER_KEY);
