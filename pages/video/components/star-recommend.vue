@@ -9,7 +9,7 @@
             </div>
             <div class="swiper-content-right">
               <div class="right-genres">{{ data.genres }}</div>
-              <div class="right-name">{{ data.name }}</div>
+              <div class="right-name">{{ handleSeasonName(data.name,true) }}</div>
               <div class="right-info">
                 <div class="right-info-date">{{ data.releaseTime }}</div>
                 <div class="right-info-star">
@@ -29,7 +29,7 @@
 <script setup>
 import wilSwiper from "@/components/wil-swiper/index.vue";
 import { ref, onBeforeMount } from "vue";
-import { classifyList } from "./common";
+import { classifyList, handleSeasonName } from "./common";
 import { onShow } from "@dcloudio/uni-app";
 
 const listData = ref([]);
@@ -45,7 +45,7 @@ const removeExtension = (filename) => {
 
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    url: `/pages/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
 onShow(() => {

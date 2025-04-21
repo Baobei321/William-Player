@@ -92,15 +92,15 @@
           <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="related-actors-list">
               <div class="related-actors-list__item" v-if="director.name">
-                <image class="item-avatar"
-                  :src="director.profile_path ? 'https://media.themoviedb.org/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://szrcapi.mouldsdata.com/minio/tzgcs/2024/06/13/6aab190d557c47ddb18f89755a3a7732.png'"
+                <image class="item-avatar" backgroundColor='#efefef'
+                  :src="director.profile_path ? 'https://media.themoviedb.org/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
                   mode="aspectFill" />
                 <div class="item-name">{{director.name}}</div>
                 <div class="item-job">导演</div>
               </div>
               <div class="related-actors-list__item" v-for="item in actors" :key="item.name">
-                <image class="item-avatar"
-                  :src="item.profile_path?'https://media.themoviedb.org/t/p/w100_and_h100_bestv2'+item.profile_path :'https://szrcapi.mouldsdata.com/minio/tzgcs/2024/06/13/6aab190d557c47ddb18f89755a3a7732.png'"
+                <image class="item-avatar" backgroundColor='#efefef'
+                  :src="item.profile_path?'https://media.themoviedb.org/t/p/w100_and_h100_bestv2'+item.profile_path :'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
                   mode="aspectFill" />
                 <div class="item-name">{{item.name}}</div>
                 <div class="item-role">饰 {{ item.character }}</div>
@@ -128,12 +128,11 @@
 import { onBeforeMount, ref, nextTick } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { useDict } from "../../utils/useDict";
-import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime } from "./components/common";
+import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName } from "./components/common";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "../mine/common";
-
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
 const popoverArr = ref([{ icon: editIcon, text: "手动编辑" }]);
@@ -292,7 +291,7 @@ const handleTv = async () => {
   });
   let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
   uni.setStorageSync("seasonData", seasonData);
-  overview.value = res1.overview;
+  res1.overview ? (overview.value = res1.overview) : "";
   let result = {};
   if (selectType.value.type == "WebDAV") {
     imgData.value.releaseTime = res1.air_date;
@@ -642,7 +641,7 @@ const setButtonText = () => {
       buttonText.value = "播放";
     }
   } else if (routerParams.value.type == "tv") {
-    let history = historyPlay.value?.find((i) => i.titlePlay == selectSource.value.name);
+    let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true));
     historyTv.value = history || {};
     if (history) {
       let time = handleSecond(history.initialTime);
@@ -755,7 +754,7 @@ onShow(async () => {
     localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
 
     if (resetMovieTv.type == "tv") {
-      let nowTv = localMovieTvData.value.tv.find((i) => i.movieTvId == oldMovieTvId && i.name == oldName);
+      let nowTv = localMovieTvData.value.tv.find((i) => i.movieTvId == oldMovieTvId && handleSeasonName(i.name, true) == oldName);
       const numberMapping = {
         "一": "1",
         "二": "2",

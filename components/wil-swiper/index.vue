@@ -16,9 +16,8 @@
   </div>
 </template>
   
-  <script setup>
+<script setup>
 import { computed, onMounted, ref, nextTick, onBeforeMount } from "vue";
-
 const emits = defineEmits(["change"]);
 
 const props = defineProps({

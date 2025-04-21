@@ -60,8 +60,8 @@ import wilList from "@/components/wil-list/index";
 import wilEmpty from "@/components/wil-empty/index";
 import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
-import showModal from "@/components/wil-modal/index.js";
-import wilModal from "@/components/wil-modal/modal.vue";
+import showModal from "@/components/wil-modal/modal.js";
+import wilModal from "@/components/wil-modal/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 
 const searchValue = ref("");

@@ -54,15 +54,16 @@ import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
-import { loginUser, getFolder, get189Folder, getQuarkFolder,handleSeasonName } from "./components/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder, handleSeasonName } from "./components/common";
 import emptyBg from "@/static/empty_bg.png";
+
 import * as CONFIG from "@/utils/config";
 const video_navbar = ref(null);
 
 const listData = ref([]);
 const webdavInfo = ref({});
 const sourceList = ref([]);
-const refreshData = ref({ found: 0, toupdate: 0, updated: 0 });
+const refreshData = ref({ found: 0, toupdate: 0, updated: 0,success:0 });
 const refreshLoading = ref(false);
 const showDialog = ref(false);
 
@@ -96,7 +97,7 @@ const searchMovieTv = (data, type) => {
   } else if (type == "tv") {
     url = "https://api.tmdb.org/3/search/tv";
   }
-  return new Promise((resolve, rej) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: url,
       data: {
@@ -105,10 +106,14 @@ const searchMovieTv = (data, type) => {
         page: 1,
         api_key: uni.getStorageSync("settingData").tmdbKey,
       },
+      timeout: 10000,
       method: "GET",
       header: { "Content-Type": "application/json" },
       success: (res) => {
         resolve(res.data);
+      },
+      fail: (error) => {
+        reject(error);
       },
     });
   });
@@ -162,7 +167,7 @@ const handleNameYear = (filename) => {
 };
 
 const refreshWebDavVideo = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0 ,success:0};
   movieTvData.value = { movie: [], tv: [] };
   if (selectMedia.value.name) {
     let res1 = await loginUser(selectMedia.value);
@@ -202,6 +207,7 @@ const refreshWebDavVideo = async () => {
   localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
   refreshData.value.updated = refreshData.value.toupdate;
   refreshData.value.toupdate = 0;
+  refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
   addOperLog({ title: "WebDAV生成海报墙", businessType: 11, operatorType: 2 });
@@ -389,7 +395,7 @@ const handleGx = async () => {
 
 //天翼云盘refresh
 const refresh189Video = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0 };
   movieTvData.value = { movie: [], tv: [] };
   await get189MovieTv(listData.value[0]);
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
@@ -415,6 +421,7 @@ const refresh189Video = async () => {
   localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
   refreshData.value.updated = refreshData.value.toupdate;
   refreshData.value.toupdate = 0;
+  refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
   addOperLog({ title: "天翼云盘生成海报墙", businessType: 11, operatorType: 2 });
@@ -485,6 +492,7 @@ const refreshQuarkVideo = async () => {
   localMovieTvData.value.tv = await setMovieTvImg(tv, "tv");
   refreshData.value.updated = refreshData.value.toupdate;
   refreshData.value.toupdate = 0;
+  refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
   addOperLog({ title: "夸克网盘生成海报墙", businessType: 11, operatorType: 2 });
@@ -543,7 +551,7 @@ const refreshVideo = async () => {
 };
 
 const pauseRefresh = () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0,success:0 };
   movieTvData.value = { movie: [], tv: [] };
   localMovieTvData.value.tv = [];
   localMovieTvData.value.movie = [];
@@ -722,16 +730,6 @@ uni.onNetworkStatusChange(listenerNetwork);
 onUnload(() => {
   uni.offNetworkStatusChange(listenerNetwork);
 });
-
-// onMounted(()=>{
-//   let dom = document.querySelector('.video-container-scroll').childNodes[0].childNodes[0]
-//   console.log(document.querySelector('.video-container-scroll'),'阿萨');
-//   dom.addEventListener('scroll',()=>{
-//     let scrollTop = dom.scrollTop
-//     console.log(scrollTop,'sc');
-
-//   })
-// })
 </script>
 
 <style lang="scss" scoped>

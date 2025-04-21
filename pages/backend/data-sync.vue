@@ -32,12 +32,6 @@ const scanCode = () => {
     success: async (res) => {
       let result = JSON.parse(res.result);
       if (result.type == "dataSync") {
-        // udpClient.value.send({
-        //   host: result.ipAddress,
-        //   port: result.port,
-        //   data: JSON.stringify({ localMovieTvData: uni.getStorageSync("localMovieTvData") || {}, sourceList: uni.getStorageSync("sourceList") || [] }),
-        //   useHex: true, // 使用 hexString ，默认为 false
-        // });
         uni.showToast({
           title: "同步成功",
           icon: "none",
@@ -52,26 +46,6 @@ const scanCode = () => {
   });
 };
 
-// onMounted(async () => {
-//   let ipAddress = "";
-//   // #ifdef APP-PLUS
-//   udpClient.value = uni.requireNativePlugin("udp-client");
-//   udpClient.value.setByteSize(65507);
-//   udpClient.value.init(10005, onSocketMsg, onSocketError);
-//   let lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
-//   lyzmlDLNA.getIpAddress((res) => {
-//     ipAddress = res;
-//     let qrObj = { type: "dataSync", ipAddress: ipAddress, port: 10005 };
-//     qrObj = JSON.stringify(qrObj);
-//     // 调用生成二维码
-//     wilQrcodeRef.value.getQRcode(qrObj);
-//   });
-//   // #endif
-// });
-
-// onUnload(() => {
-//   udpClient.value.release();
-// });
 </script>
 
 <style lang="scss" scoped>

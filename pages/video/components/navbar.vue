@@ -180,8 +180,6 @@ const getRefreshPosition = () => {
     .select(".video-navbar-popover")
     .boundingClientRect((rect) => {
       popoverPosition.value.top = rect.top + rect.height;
-      console.log(popoverPosition.value.top, "top");
-
       popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2;
     })
     .exec();
@@ -216,7 +214,7 @@ watch(
   (val) => {
     loading.value = val;
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.found}个影片`;
+      popoverData.value.title = `已完成同步${props.refreshData.success}个影片`;
       clearTimeout(timer.value);
       timer.value = null;
       showPause.value = false;

@@ -4,7 +4,7 @@
       <image src="@/static/zanshang.jpg"></image>
     </div>
     <div class="appreciate-tip">
-      开发维护不易，如果您觉得此App有用，不妨使用微信扫描上方二维码，支持本软件！App完全免费！
+      开发维护不易，如果您觉得此App有用，不妨使用微信扫描上方二维码，也可以在github上⭐一下，支持本软件！App完全免费！
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@
     <div class="tmdb-key-title">请输入要修改的tmdbKey</div>
     <nut-input v-model="settingData.tmdbKey" placeholder="请输入tmdbKey" @blur="inputTmdb"></nut-input>
     <div class="tmdb-key-title">播放设置</div>
-    <wil-form :options="settings1" :show-button="true" ref="base_form" v-model="formData" :showButton="false">
+    <wil-form :options="settings1" :show-button="true" ref="base_form1" v-model="formData" :showButton="false">
       <template #showProgress>
         <nut-switch v-model="settingData.showProgress" active-color="#ff6701" @change="(val)=>changeSwitch(val,'进度条')" />
       </template>
@@ -15,12 +15,20 @@
       </template> -->
     </wil-form>
     <div class="tmdb-key-title">显示设置</div>
-    <wil-form :options="settings2" :show-button="true" ref="base_form" v-model="formData" :showButton="false">
+    <wil-form :options="settings2" :show-button="true" ref="base_form2" v-model="formData" :showButton="false">
       <template #showRecommend>
         <nut-switch v-model="settingData.showRecommend" active-color="#ff6701" @change="(val)=>changeSwitch(val,'推荐')" />
       </template>
+      <template #resetData>
+        <nut-cell title="重置数据" is-link @click="resetMtData">
+          <template #icon>
+            <nut-icon name="refresh2"></nut-icon>
+          </template>
+        </nut-cell>
+      </template>
     </wil-form>
     <!-- <nut-button custom-color="#090909" @click="confirmSet">确认设置</nut-button> -->
+    <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
@@ -28,17 +36,23 @@
 import { ref, onBeforeMount } from "vue";
 import { setTmdbKey } from "../../network/apis";
 import wilForm from "@/components/wil-form/index.vue";
+import wilModal from "@/components/wil-modal/index.vue";
 const settingData = ref({
   tmdbKey: "",
   showProgress: true,
   playercodec: "exoplayer",
   showRecommend: true,
 });
+
+const wil_modal = ref(null);
 const settings1 = ref([
   { label: "是否显示底部进度条", prop: "showProgress" },
   // { label: "视频解码器", prop: "playercodec" },
 ]);
-const settings2 = ref([{ label: "是否显示首页影视推荐", prop: "showRecommend" }]);
+const settings2 = ref([
+  { label: "是否显示首页影视推荐", prop: "showRecommend" },
+  { label: "", prop: "resetData" },
+]);
 
 const confirmSet = async () => {
   uni.setStorageSync("settingData", settingData.value);
@@ -62,6 +76,18 @@ const changeSwitch = (val, type) => {
     settingData.value.playercodec = val;
   }
   uni.setStorageSync("settingData", settingData.value);
+};
+
+const resetMtData = () => {
+  wil_modal.value.showModal({
+    title: "温馨提示",
+    content: "是否确认重置数据？",
+    confirmColor: "#ff6701",
+    confirm: async () => {
+      uni.removeStorageSync("localMovieTvData");
+      uni.removeStorageSync("historyPlay");
+    },
+  });
 };
 
 onBeforeMount(() => {
@@ -114,11 +140,35 @@ page {
             .nut-form-item__body {
               align-items: flex-end;
               .nut-form-item__body__slots {
-                .nut-radio-group{
+                display: flex;
+                width: 100%;
+                justify-content: flex-end;
+                .nut-radio-group {
                   .nut-radio {
-                    .nut-icon-check-checked{
+                    .nut-icon-check-checked {
                       color: #ff6701;
                     }
+                  }
+                }
+                .nut-cell {
+                  width: 100%;
+                  margin: 0;
+                  padding: 26rpx 0;
+                  box-shadow: none;
+                  .nut-cell__icon {
+                    .nutui-icon {
+                      width: 40rpx;
+                      height: 40rpx;
+                      line-height: 40rpx;
+                      font-size: 32rpx;
+                    }
+                  }
+                  .nut-cell__title {
+                    color: #353a45;
+                    font-size: 32rpx;
+                  }
+                  .nut-cell__link {
+                    display: none;
                   }
                 }
               }

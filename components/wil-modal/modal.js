@@ -1,4 +1,4 @@
-import Modal from './modal.vue';
+import Modal from './index.vue';
 import { createApp } from 'vue';
 function showModal({ title, confirmText, cancelColor, confirmColor, cancelText, content, cancel, confirm }) {
     const modalInstance = createApp(Modal, {

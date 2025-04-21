@@ -33,10 +33,11 @@ import wilList from "../../components/wil-list/index.vue";
 import { ref, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
-import wilModal from "@/components/wil-modal/modal.vue";
+import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
 import { toStringfy } from "../mine/common";
 // import { getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common.js";
+
 const requestParams = ref({});
 
 const mapping = {

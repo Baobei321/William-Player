@@ -60,6 +60,7 @@
     
 <script>
 import { getMovieTvById } from "../common.js";
+
 export default {
   props: {
     movieTvId: String,
@@ -103,7 +104,7 @@ export default {
         if (this.seasonData.season_number > 1) {
           this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
         }
-        this.detailData.overview = this.seasonData.overview;
+        this.seasonData.overview ? (this.detailData.overview = this.seasonData.overview) : "";
       }
     },
     changeVideo(item, index) {
@@ -179,7 +180,7 @@ export default {
             if (newVal.season_number > 1) {
               this.detailData.name = this.detailData.name + ` 第${numberMapping[String(newVal.season_number)]}季`;
             }
-            this.detailData.overview = newVal.overview;
+            newVal.overview ? (this.detailData.overview = newVal.overview) : "";
           }
         }
       },

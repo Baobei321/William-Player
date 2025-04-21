@@ -8,8 +8,9 @@
     <div class="mine-container">
       <div class="mine-notLog" v-if="!isLogin">
         <div class="mine-notLog__left">
-          <img
+          <wil-image backgroundColor="#efefef"
             src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
+          </wil-image>
           <span>游客用户</span>
         </div>
         <!-- <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button> -->
@@ -17,8 +18,9 @@
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
           <div class="left-img">
-            <img
+            <wil-image backgroundColor="#efefef"
               :src="userInfo.avatar||'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
+            </wil-image>
           </div>
           <div class="left-info">
             <div class="left-info-name">
@@ -54,8 +56,9 @@ import iconSetting from "../../static/icon-setting.png";
 import iconAbout from "../../static/icon-about.png";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "./common";
-import showModal from "@/components/wil-modal/index.js";
-import wilModal from "@/components/wil-modal/modal.vue";
+import showModal from "@/components/wil-modal/modal.js";
+import wilModal from "@/components/wil-modal/index.vue";
+import wilImage from "@/components/wil-image/index.vue";
 // const { getUntokenDict } = useDict()
 
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY));
@@ -254,7 +257,7 @@ page {
     overflow: auto;
   }
 
-  &-notLog {
+  .mine-notLog {
     padding: 24rpx 30rpx 24rpx 24rpx;
     background-color: #fff;
     border-radius: 16rpx;
@@ -264,13 +267,14 @@ page {
     // margin-top: 34rpx;
     margin-top: 0;
 
-    &__left {
+    .mine-notLog__left {
       display: flex;
       align-items: center;
 
-      img {
+      ::v-deep .wil-image {
         width: 136rpx;
         height: 136rpx;
+        border-radius: 50%;
       }
 
       span {
@@ -304,7 +308,7 @@ page {
         width: 136rpx;
         height: 136rpx;
 
-        img {
+        ::v-deep .wil-image {
           border-radius: 50%;
           width: 100%;
           height: 100%;
