@@ -1,6 +1,7 @@
 <template>
   <div class="data-sync">
     <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
+    <div class="scan-text">每隔10秒刷新一次同步状态</div>
     <div class="scan-tip">请点击下方按钮，扫描其他设备的二维码将数据同步到被扫描的设备</div>
     <image src="@/static/scan-button.png" class="scan-button" @click="scanCode"></image>
   </div>
@@ -10,28 +11,24 @@
 import { ref, onMounted } from "vue";
 import wilQrcode from "@/components/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
+import { setShareData, deleteShareData, getShareData } from "../../network/apis";
 import { onUnload } from "@dcloudio/uni-app";
 
 const wilQrcodeRef = ref(null);
-const udpClient = ref(null);
-
-const onSocketMsg = (resData) => {
-  // resData 的数据结构：{ host, port, data, hex }
-  console.log("接收到消息: " + resData);
-  let data = JSON.parse(resData.data);
-  uni.setStorageSync("localMovieTvData", data.localMovieTvData);
-  uni.setStorageSync("sourceList", data.sourceList);
-};
-
-const onSocketError = (errMsg) => {
-  console.error("socket 异常：" + errMsg);
-};
+let port = "";
+let timer = null;
 
 const scanCode = () => {
   uni.scanCode({
     success: async (res) => {
       let result = JSON.parse(res.result);
       if (result.type == "dataSync") {
+        let obj = {
+          localMovieTvData: uni.getStorageSync("localMovieTvData"),
+          sourceList: uni.getStorageSync("sourceList"),
+          historyPlay: uni.getStorageSync("historyPlay"),
+        };
+        await setShareData({ port: result.port, data: obj });
         uni.showToast({
           title: "同步成功",
           icon: "none",
@@ -46,6 +43,50 @@ const scanCode = () => {
   });
 };
 
+const setQrcode = () => {
+  port = String(Math.floor(Math.random() * 90000) + 10000);
+  let obj = { type: "dataSync", port: port };
+  wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
+};
+
+//10s刷新一次同步状态
+const refreshStatus = () => {
+  timer = setInterval(async () => {
+    await getShareData({ port: port })
+      .then((res) => {
+        if (res.data) {
+          uni.setStorageSync("localMovieTvData", res.data.localMovieTvData);
+          uni.setStorageSync("sourceList", res.data.sourceList);
+          uni.setStorageSync("historyPlay", res.data.historyPlay);
+          clearInterval(timer);
+          timer = null;
+          deleteShareData({ port: port });
+          uni.showToast({
+            title: "同步成功",
+            icon: "none",
+          });
+          setTimeout(() => {
+            uni.switchTab({
+              url: "/pages/video/index",
+            });
+          }, 1500);
+        }
+      })
+      .catch((error) => {
+        clearInterval(timer);
+        timer = null;
+      });
+  }, 10000);
+};
+refreshStatus();
+onMounted(() => {
+  setQrcode();
+});
+onUnload(() => {
+  clearInterval(timer);
+  timer = null;
+  deleteShareData({ port: port });
+});
 </script>
 
 <style lang="scss" scoped>
@@ -63,7 +104,10 @@ page {
   align-items: center;
   padding-top: 200rpx;
   box-sizing: border-box;
-
+  .scan-text {
+    font-size: 32rpx;
+    color: #000;
+  }
   .scan-tip {
     margin-top: 100rpx;
     padding: 0 100rpx;

@@ -134,6 +134,7 @@ page {
           background: transparent;
           .nut-form-item {
             background: transparent;
+            padding-top: 0;
             .nut-form-item__label {
               font-size: 32rpx;
             }
@@ -154,6 +155,8 @@ page {
                   width: 100%;
                   margin: 0;
                   padding: 26rpx 0;
+                  box-shadow: none;
+                  background: transparent;
                   box-shadow: none;
                   .nut-cell__icon {
                     .nutui-icon {

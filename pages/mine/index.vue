@@ -80,8 +80,8 @@ const cellOptions = ref([
     {
       title: "数据同步",
       leftIcon: iconTb,
-      // path: "/pages/backend/data-sync",
-      path: null,
+      path: "/pages/backend/data-sync",
+      // path: null,
       tip: "敬请期待...",
     },
     {

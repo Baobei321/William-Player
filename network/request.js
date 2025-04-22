@@ -4,7 +4,7 @@ import { encrypt } from "../utils/jsencrypt.js";
 import { getUserByopenId } from '../pages/mine/common.js'
 // 全局请求封装
 const base_url = CONFIG.BASE_URL
-// const base_url = 'http://10.106.18.108:4040/ruoyi'
+// const base_url = 'http://192.168.31.15:4040/ruoyi'
 // 请求超出时间
 const timeout = 3000
 

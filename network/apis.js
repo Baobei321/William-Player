@@ -96,6 +96,7 @@ export const deleteShareData = data => {
   return request({
     url: `/wechat/deleteShareData`,
     method: 'post',
+    data: data
   })
 }
 

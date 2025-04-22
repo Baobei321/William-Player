@@ -22,7 +22,8 @@
     <wil-empty v-else text="没有更多了"></wil-empty>
     <div class="video-all-bottom" v-if="isSelect">
       <div class="video-all-bottom__left" @click="clearAll">全部清空</div>
-      <div class="video-all-bottom__right" :style="{color:recentSelect.length?'rgb(255, 44, 44)':'rgb(188, 188, 188)'}" @click="clearPart">删除</div>
+      <div class="video-all-bottom__right" :style="{color:recentSelect.length?'rgb(255, 44, 44)':'rgb(188, 188, 188)'}" @click="clearPart">
+        {{recentSelect.length?'删除':'取消'}}</div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
   </div>
