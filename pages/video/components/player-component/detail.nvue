@@ -69,6 +69,7 @@ export default {
     path: { type: String },
     showRehandleButton: Boolean,
     seasonData: { type: Object },
+    direction: Number,
   },
   data() {
     return {
@@ -79,6 +80,7 @@ export default {
       loadimgNum: 0,
       showPlatformImg: false,
       scrollIntoView: "name1",
+      scrollIntoView_copy: "name1",
       season: "1",
     };
   },
@@ -141,11 +143,16 @@ export default {
           setTimeout(() => {
             let nowIndex = this.tvListData.findIndex((v) => v.name == this.name);
             // this.scrollLeft = 363 * nowIndex + "rpx";
-            this.scrollIntoView = "name" + (nowIndex + 1);
+            if (this.direction == 0) {
+              //竖屏的时候直接scroll到指定位置，横屏等竖屏之后再scroll
+              this.scrollIntoView_cop = this.scrollIntoView = "name" + (nowIndex + 1);
+            } else if (this.direction == 1) {
+              this.scrollIntoView_copy = "name" + (nowIndex + 1);
+            }
             // uni.showToast({
             //   title: this.scrollIntoView,
             //   icon: "none",
-            //   duration: 7000,
+            //   duration: 1500,
             // });
           }, 100);
         }
@@ -160,11 +167,16 @@ export default {
           setTimeout(() => {
             let nowIndex = newVal.findIndex((v) => v.name == this.name);
             // this.scrollLeft = 363 * nowIndex + "rpx";
-            this.scrollIntoView = "name" + (nowIndex + 1);
+            if (this.direction == 0) {
+              //竖屏的时候直接scroll到指定位置，横屏等竖屏之后再scroll
+              this.scrollIntoView_cop = this.scrollIntoView = "name" + (nowIndex + 1);
+            } else if (this.direction == 1) {
+              this.scrollIntoView_copy = "name" + (nowIndex + 1);
+            }
             // uni.showToast({
             //   title: this.scrollIntoView,
             //   icon: "none",
-            //   duration: 7000,
+            //   duration: 1500,
             // });
           }, 100);
         }
@@ -186,6 +198,15 @@ export default {
       },
       immediate: true,
       deep: true,
+    },
+    direction: {
+      handler(newVal, oldVal) {
+        if (newVal == 0) {
+          setTimeout(() => {
+            this.scrollIntoView = this.scrollIntoView_copy;
+          }, 1000);
+        }
+      },
     },
   },
 };

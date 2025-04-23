@@ -1,4 +1,7 @@
 ![WilliamPlayer](https://socialify.git.ci/chenweiliang6/William-Player/image?custom_description=%E4%B8%80%E6%AC%BE%E9%80%82%E9%85%8D%F0%9F%93%B1%20Android%20Phone%20%E7%9A%84%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8%EF%BC%81&description=1&font=Source+Code+Pro&forks=1&issues=1&logo=https://gitee.com/CWLcwl0219/webdav-video-player/raw/master/static/app-logo1.png&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Auto)
+![android 8.0 or above](https://img.shields.io/badge/android-8.0_or_above-purple?logo=android)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/chenweiliang6/William-Player/release.yml?logo=github&label=android%20build)](https://github.com/chenweiliang6/William-Player/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/chenweiliang6/William-Player)](https://github.com/chenweiliang6/William-Player/releases/latest)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/chenweiliang6/William-Player/total)
 # William Player
 一款适配📱 Android Phone 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
@@ -13,7 +16,7 @@
 
 ## Features
 
-- 支持**Android Phone**
+- 支持**Android Phone**和**Android Pad**
 - 支持天翼云盘、夸克网盘和Webdav播放
 - 纯本地运行，无需后端服务支持 [^1]
 - 支持音频轨道选择
@@ -77,7 +80,7 @@ Android 8+
 - [x] 支持跳过片头片尾
 - [x] 支持电视剧播放切换上下集
 - [x] 增加首页高分影视推荐
-- [ ] 增加数据同步功能
+- [x] 增加数据同步功能
 - [ ] 支持视频下载管理
 - [x] 增加帮助页面
 - [x] DLNA投屏
@@ -91,7 +94,7 @@ Android 8+
 
 ## Star History
 
-<a href="https://star-history.com/#chenweiliang6/William-Player&Date">
+<a href="https://github.com/chenweiliang6/William-Player">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chenweiliang6/William-Player&type=Date&theme=dark" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=chenweiliang6/William-Player&type=Date" />

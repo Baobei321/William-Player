@@ -20,8 +20,8 @@
         </button>
       </view>
     </view>
-    <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :seasonData="seasonData" :type="routerParams.type" :tvListData="tvList"
-      :path="historyObj.path" @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0">
+    <player-detail :movieTvId="historyObj.movieTvId" :showRehandleButton="showRehandleButton" :seasonData="seasonData" :direction="direction" :type="routerParams.type"
+      :tvListData="tvList" :path="historyObj.path" @changeVideo="changeVideo" @resetTv="resetTv" v-if="routerParams.noSetHistory!=0">
     </player-detail>
     <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton" @playOrPause="playOrPauseVideo"></tv-select>
   </view>
