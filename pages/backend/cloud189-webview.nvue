@@ -8,6 +8,8 @@
 <script>
 import wilNavbar from "@/components/wil-navbar/navbar.nvue";
 import { get189Folder, get189User } from "../video/components/common";
+import { addOperLog } from "@/network/apis";
+
 export default {
   components: {
     wilNavbar,
@@ -106,6 +108,7 @@ export default {
             title: "添加成功",
             icon: "none",
           });
+          addOperLog({ title: "登录天翼云盘", businessType: 12, operatorType: 2, operUrl: "" });
         }
         uni.setStorageSync("sourceList", this.sourceList);
         setTimeout(() => {

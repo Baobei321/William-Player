@@ -107,7 +107,7 @@ export default {
       this.judgeSelect();
       if (this.selectType.type == "WebDAV") {
         if (this.selectMedia.name) {
-          let res = await getWebDAVUrl({ path: this.routerParams.path }, this.selectMedia);
+          let res = await getWebDAVUrl({ path: decodeURIComponent(this.routerParams.path) }, this.selectMedia);
           return res;
         }
       } else if (this.selectType.type == "天翼云盘") {
@@ -173,16 +173,16 @@ export default {
     },
     //初始化进入的时候，设置从哪儿开始播放
     setInitialTime() {
-      if (!this.routerParams.path) return;
-      const lastIndex = this.routerParams.path.lastIndexOf("/");
+      if (!decodeURIComponent(this.routerParams.path)) return;
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
       let obj = {};
       if (this.routerParams.type == "movie") {
-        let name = this.routerParams.path.substring(lastIndex + 1);
+        let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
         obj = this.historyPlay?.find((i) => i.name == name) || {};
       } else if (this.routerParams.type == "tv") {
-        let name = this.routerParams.path.substring(lastIndex + 1);
-        const secondLastSlashIndex = this.routerParams.path.lastIndexOf("/", lastIndex - 1);
-        let titlePlay = handleSeasonName(this.routerParams.path.substring(secondLastSlashIndex + 1, lastIndex), true);
+        let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
+        const secondLastSlashIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/", lastIndex - 1);
+        let titlePlay = handleSeasonName(decodeURIComponent(this.routerParams.path).substring(secondLastSlashIndex + 1, lastIndex), true);
         obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay) || {};
       }
       if (this.routerParams.item) {
@@ -195,7 +195,7 @@ export default {
           this.config.poster = this.historyObj.poster;
         } else {
           this.config.initialTime = 0;
-          this.config.title = this.routerParams.path.substring(lastIndex + 1);
+          this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
           this.historyObj = {};
           return;
         }
@@ -208,7 +208,7 @@ export default {
         if (this.historyObj.titlePlay) {
           this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
         } else {
-          this.config.title = this.routerParams.path.substring(lastIndex + 1);
+          this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
         }
       }
     },
@@ -242,7 +242,7 @@ export default {
           });
         }
       }
-      addOperLog({ title: this.config.title, businessType: 10, operatorType: 2, operUrl: this.config.url });
+      addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: this.config.url });
     },
     getPipStatus(event) {
       this.pipStatus = event.detail.isPip;
@@ -260,15 +260,15 @@ export default {
     prevVideo() {
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
-      const lastIndex = this.routerParams.path.lastIndexOf("/");
-      let nowIndex = this.tvList.findIndex((item) => item.name == this.routerParams.path.substring(lastIndex + 1)); //获取当前集在数组中的索引index
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      let nowIndex = this.tvList.findIndex((item) => item.name == decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)); //获取当前集在数组中的索引index
       this.changeVideo(nowIndex - 1);
     },
     nextVideo() {
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
-      const lastIndex = this.routerParams.path.lastIndexOf("/");
-      let nowIndex = this.tvList.findIndex((item) => item.name == this.routerParams.path.substring(lastIndex + 1)); //获取当前集在数组中的索引index
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      let nowIndex = this.tvList.findIndex((item) => item.name == decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)); //获取当前集在数组中的索引index
       this.changeVideo(nowIndex + 1);
     },
     async changeVideo(currentIndex) {
@@ -276,17 +276,17 @@ export default {
       let initObj = JSON.parse(JSON.stringify(this.historyObj));
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
-      const lastIndex = this.routerParams.path.lastIndexOf("/");
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
       // this.$refs.video_view.release();
       this.config.url = "";
       this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
-      this.routerParams.path = this.routerParams.path.slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
+      this.routerParams.path = decodeURIComponent(this.routerParams.path).slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
       if (this.selectType.type != "WebDAV") {
         this.routerParams.folderFileId = this.tvList[currentIndex].id;
       }
       this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
       //跳转下一集重新设置historyObj
-      this.historyObj.path = this.routerParams.path;
+      this.historyObj.path = decodeURIComponent(this.routerParams.path);
       this.historyObj.ji = String(currentIndex + 1);
       this.historyObj.poster = this.tvList[currentIndex].poster || this.historyObj.poster;
       this.historyObj.name = this.tvList[currentIndex].name;

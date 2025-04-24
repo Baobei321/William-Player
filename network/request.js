@@ -76,10 +76,6 @@ export default (params) => {
             reject("接口请求错误")
           }
         } else {
-          uni.showToast({
-            title: res.statusCode,
-            duration: 2000,
-          })
           // uni.clearStorageSync()
           switch (res.statusCode) {
             case 401:
@@ -109,6 +105,7 @@ export default (params) => {
             default:
               uni.showToast({
                 title: '请重试...',
+                icon:'none',
                 duration: 2000,
               })
               break;

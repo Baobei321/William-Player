@@ -68,7 +68,7 @@ const getFileList = async (data) => {
   if (selectType.value.type == "WebDAV") {
     webdavInfo.value = uni.getStorageSync("webdavInfo");
     let path = "";
-    path = routerParams.value.path;
+    path = decodeURIComponent(routerParams.value.path);
     return new Promise((resolve) => {
       uni.request({
         url: "http://" + webdavInfo.value.address + ":" + webdavInfo.value.port + "/api/fs/list",
@@ -120,19 +120,19 @@ const handleData = (val) => {
 
 const clickCell = (item) => {
   let path = "";
-  path = routerParams.value.path;
+  path = decodeURIComponent(routerParams.value.path);
   if (item.type == "1") {
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${path}/${item.name}`,
+        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}`,
       });
     } else if (selectType.value.type == "天翼云盘") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${path}/${item.name}&folderFileId=${item.folderFileId}`,
+        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
       });
     } else if (selectType.value.type == "夸克网盘") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${path}/${item.name}&folderFileId=${item.folderFileId}`,
+        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
       });
     }
   } else {
@@ -143,14 +143,14 @@ const clickCell = (item) => {
       type = "movie";
     }
     uni.navigateTo({
-      url: `/pages/video/video-player?path=${path}/${item.name}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
+      url: `/pages/video/video-player?path=${encodeURIComponent(path + "/" + item.name)}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
     });
   }
 };
 
 onLoad((options) => {
   routerParams.value = options;
-  let arr = routerParams.value.path.split("/");
+  let arr = decodeURIComponent(routerParams.value.path).split("/");
   setTimeout(() => {
     uni.setNavigationBarTitle({
       title: arr[arr.length - 1],
