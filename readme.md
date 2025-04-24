@@ -12,7 +12,9 @@
 
 项目处于用爱发电阶段，完全免费，请考虑[赞助](#赞助)支持项目持续维护。您的支持是我维护的最大动力(′･ω･`)
 
-需要运行项目的同学可以将/pages/video/video-player.nvue中的video-view删掉，使用video组件。
+对于App使用有问题或者建议的，大家可以进交流群一起交流。
+
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 
 ## Features
 
