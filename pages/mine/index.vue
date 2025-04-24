@@ -109,7 +109,7 @@ const cellOptions = ref([
       // outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
       path: "/pages/backend/index",
       query: {
-        url: "https://chenweiliang6.github.io/app-webview",
+        url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview",
         title: "问题与反馈",
       },
     },
