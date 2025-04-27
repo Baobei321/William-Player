@@ -22,6 +22,7 @@ export default {
       timeout: null,
       sourceList: [],
       quarkCookie: "",
+      routerParams: {},
     };
   },
   methods: {
@@ -112,6 +113,7 @@ export default {
     },
   },
   onLoad(options) {
+    this.routerParams = options;
     this.url = decodeURIComponent(options.url);
   },
 };
