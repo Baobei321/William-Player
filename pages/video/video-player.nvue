@@ -122,12 +122,6 @@ export default {
         }
       }
     },
-    //裁剪格式获取电影名
-    getMovieName(val) {
-      const lastDotIndex = val.lastIndexOf(".");
-      let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
-      return name;
-    },
     setHistory(event) {
       if (this.routerParams.noSetHistory == 0) return;
       if (!this.routerParams.type) return;
@@ -140,7 +134,7 @@ export default {
           if (this.routerParams.type == "tv") {
             index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
           } else if (this.routerParams.type == "movie") {
-            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && this.getMovieName(i.name) == this.getMovieName(this.historyObj.name));
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name, true) == handleSeasonName(this.historyObj.name, true));
           }
           if (index > -1) {
             this.historyPlay.splice(index, 1);
@@ -158,7 +152,7 @@ export default {
         if (this.routerParams.type == "tv") {
           index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
         } else if (this.routerParams.type == "movie") {
-          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && this.getMovieName(i.name) == this.getMovieName(this.historyObj.name));
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name) == handleSeasonName(this.historyObj.name));
         }
         if (index > -1) {
           this.historyPlay.splice(index, 1);
@@ -203,7 +197,7 @@ export default {
       }
 
       if (this.routerParams.type == "movie") {
-        this.config.title = this.getMovieName(this.historyObj.title);
+        this.config.title = handleSeasonName(this.historyObj.title, true);
       } else {
         if (this.historyObj.titlePlay) {
           this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
@@ -313,6 +307,7 @@ export default {
       } else {
         this.$refs.video_view.onPlay();
         this.$refs.tv_select.stopVideo();
+        this.$refs.selectUdn = "";
       }
       this.showTvButton = val;
     },

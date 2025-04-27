@@ -442,7 +442,7 @@ const handleSeasonName = (filename, reserve = false) => {
     const lastKgIndex = name.lastIndexOf(" ");
     name = lastKgIndex === -1 ? name : name.substring(0, lastKgIndex);
   }
-  return name;
+  return name.trim();
 };
 
 

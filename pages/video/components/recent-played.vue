@@ -19,7 +19,7 @@
               <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
               <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>
             </div>
-            <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ removeExtension(item.name) }}</span>
+            <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ handleSeasonName(removeExtension(item.name)) }}</span>
             <span class="recent-played-list-movie__item-name" v-if="item.type=='tv'">{{ removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
           </div>
         </div>

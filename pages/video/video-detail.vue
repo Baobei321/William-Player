@@ -577,7 +577,7 @@ const toPlayVideo = (item, index) => {
   uni.setStorageSync("tvList", tvList.value);
   let localMovieTvData = uni.getStorageSync("localMovieTvData");
   let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
-  let history = historyPlay.value?.find((i) => i.titlePlay == selectSource.value.name && item.name == i.name);
+  let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true) && item.name == i.name);
   if (history) {
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
@@ -634,7 +634,7 @@ const handleSize = (size) => {
 const setButtonText = () => {
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   if (routerParams.value.type == "movie") {
-    let history = historyPlay.value?.find((i) => i.name == selectSource.value.name);
+    let history = historyPlay.value?.find((i) => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true));
     if (history) {
       buttonText.value = "播放 " + handleSecond(history.initialTime);
     } else {
