@@ -44,7 +44,7 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.1.6/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.1.7/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
@@ -84,6 +84,10 @@ Android 8+
 - [x] 增加首页高分影视推荐
 - [x] 增加数据同步功能
 - [ ] 支持视频下载管理
+- [ ] 支持视频播放倍速设置
+- [ ] 增加命名格式支持
+- [ ] 增加emby支持
+- [ ] 将多季电视剧合并到一个库中
 - [x] 增加帮助页面
 - [x] DLNA投屏
 

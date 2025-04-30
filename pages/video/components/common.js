@@ -4,7 +4,7 @@ import * as CONFIG from '@/utils/config.js'
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
+      url: webdavInfo.protocol+"://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
       data: JSON.stringify({ ...data, page: 1, per_page: 100, refresh: false }),
       timeout: 10000,
       method: "POST",
@@ -24,7 +24,7 @@ const getFolder = (data, webdavInfo) => {
 
 //webdav获取视频链接
 const getWebDAVUrl = (data, webdavInfo) => {
-  let requestUrl = "http://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
+  let requestUrl = webdavInfo.protocol+"://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
   return new Promise((resolve, reject) => {
     uni.request({
       url: requestUrl,
@@ -52,8 +52,8 @@ const getWebDAVUrl = (data, webdavInfo) => {
 const loginUser = (webdavInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url:
-        "http://" +
+      url: webdavInfo.protocol +
+        "://" +
         webdavInfo.address +
         ":" +
         webdavInfo.port +

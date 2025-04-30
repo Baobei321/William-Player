@@ -71,7 +71,7 @@ const getFileList = async (data) => {
     path = decodeURIComponent(routerParams.value.path);
     return new Promise((resolve) => {
       uni.request({
-        url: "http://" + webdavInfo.value.address + ":" + webdavInfo.value.port + "/api/fs/list",
+        url: webdavInfo.value.protocol + "://" + webdavInfo.value.address + ":" + webdavInfo.value.port + "/api/fs/list",
         data: JSON.stringify({ path: "/" + path, page: data.pageNum, per_page: data.pageSize, refresh: false }),
         method: "POST",
         header: { Authorization: webdavInfo.value.token, "Content-Type": "application/json" },

@@ -56,7 +56,7 @@ export default {
       });
       if (!this.cookieObj.JSESSIONID || !this.cookieObj.COOKIE_LOGIN_USER) {
         uni.showToast({
-          title: "权限校验失败，请稍后再试",
+          title: "正在加载，请稍后再试",
           icon: "none",
         });
         return;
@@ -118,7 +118,7 @@ export default {
         }, 1500);
       } else {
         uni.showToast({
-          title: "权限校验失败，请稍后再试",
+          title: "正在加载，请稍后再试",
           icon: "none",
         });
       }

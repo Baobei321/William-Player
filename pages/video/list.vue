@@ -50,7 +50,7 @@ const selectMedia = ref({});
 const loginUser = () => {
   return new Promise((resolve) => {
     uni.request({
-      url: "http://" + selectMedia.value.address + ":" + selectMedia.value.port + "/api/auth/login",
+      url: selectMedia.value.protocol + "://" + selectMedia.value.address + ":" + selectMedia.value.port + "/api/auth/login",
       data: JSON.stringify({ username: selectMedia.value.username, password: selectMedia.value.password }),
       timeout: 3000,
       method: "POST",
