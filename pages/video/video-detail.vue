@@ -128,7 +128,7 @@
 import { onBeforeMount, ref, nextTick } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { useDict } from "../../utils/useDict";
-import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName } from "./components/common";
+import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, generateChineseNumberMapping } from "./components/common";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
@@ -272,17 +272,8 @@ const handleTv = async () => {
   if (localMovieTvData.value.tv) {
     season = localMovieTvData.value.tv.find((i) => i.movieTvId == routerParams.value.movieTvId).season;
   } else {
-    const numberMapping = {
-      "一": "1",
-      "二": "2",
-      "三": "3",
-      "四": "4",
-      "五": "5",
-      "六": "6",
-      "七": "7",
-      "八": "8",
-    };
-    const match = imgData.value.title.match(/第(.*?)季/);
+    const numberMapping = generateChineseNumberMapping(40, "string");
+    const match = imgData.value.title.match(/第([一二三四五六七八九十\d]+)季/);
     season = match ? numberMapping[match[1]] : "1";
   }
   let res1 = await getTvSeason({
@@ -536,6 +527,8 @@ const clickPlayButton = () => {
           url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       } else {
+        console.log("path", history.folderFileId);
+
         uni.navigateTo({
           url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
@@ -755,16 +748,8 @@ onShow(async () => {
 
     if (resetMovieTv.type == "tv") {
       let nowTv = localMovieTvData.value.tv.find((i) => i.movieTvId == oldMovieTvId && handleSeasonName(i.name, true) == oldName);
-      const numberMapping = {
-        "一": "1",
-        "二": "2",
-        "三": "3",
-        "四": "4",
-        "五": "5",
-        "六": "6",
-        "七": "7",
-      };
-      const match = selectSource.value.name.match(/第(.*?)季/);
+      const numberMapping = generateChineseNumberMapping(40, "string");
+      const match = selectSource.value.name.match(/第([一二三四五六七八九十\d]+)季/);
       nowTv.season = match ? numberMapping[match[1]] : "1";
       nowTv.movieTvId = routerParams.value.movieTvId;
       let res = await getMovieTvDetail();

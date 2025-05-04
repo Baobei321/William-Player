@@ -9,10 +9,8 @@
       </base-form>
       <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title=='添加WebDAV'?'添加':'修改' }}</nut-button>
       <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
-
       <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
         <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker" @cancel="showProtocol = false">
-
         </nut-picker>
       </nut-popup>
     </div>

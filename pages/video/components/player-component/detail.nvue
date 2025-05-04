@@ -114,16 +114,7 @@ export default {
       }
       this.detailData = res;
       if (this.seasonData.id) {
-        const numberMapping = {
-          "1": "一",
-          "2": "二",
-          "3": "三",
-          "4": "四",
-          "5": "五",
-          "6": "六",
-          "7": "七",
-          "8": "八",
-        };
+        const numberMapping = generateChineseNumberMapping(40,'number')
         if (this.seasonData.season_number > 1) {
           this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
         }
@@ -208,16 +199,7 @@ export default {
     seasonData: {
       handler(newVal, oldVal) {
         if (newVal?.id) {
-          const numberMapping = {
-            "1": "一",
-            "2": "二",
-            "3": "三",
-            "4": "四",
-            "5": "五",
-            "6": "六",
-            "7": "七",
-            "8": "八",
-          };
+          const numberMapping = generateChineseNumberMapping(40,'number')
           if (this.detailData.id) {
             if (newVal.season_number > 1) {
               this.detailData.name = this.detailData.name + ` 第${numberMapping[String(newVal.season_number)]}季`;

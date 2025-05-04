@@ -4,8 +4,8 @@ import * as CONFIG from '@/utils/config.js'
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: webdavInfo.protocol+"://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
-      data: JSON.stringify({ ...data, page: 1, per_page: 100, refresh: false }),
+      url: webdavInfo.protocol + "://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
+      data: JSON.stringify({ ...data, page: 1, per_page: 1000, refresh: false }),
       timeout: 10000,
       method: "POST",
       header: {
@@ -24,7 +24,7 @@ const getFolder = (data, webdavInfo) => {
 
 //webdav获取视频链接
 const getWebDAVUrl = (data, webdavInfo) => {
-  let requestUrl = webdavInfo.protocol+"://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
+  let requestUrl = webdavInfo.protocol + "://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
   return new Promise((resolve, reject) => {
     uni.request({
       url: requestUrl,
@@ -433,9 +433,18 @@ const calTime = (val, type = "cn") => {
   }
 };
 
-const handleSeasonName = (filename, reserve = false) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+const isSeasonString = (str) => {
+  return /^第(?:[一二三四五六七八九十]|十[一二三四五六七八九]?)+季$/.test(str);
+}
+
+const handleSeasonName = (filename, reserve = false) => {  //reserve为true,就是保留第几季，false就是不保留
+  const firstDotIndex = filename.indexOf("."); //获取第一个.的位置索引
+  const secondDotIndex = filename.indexOf(".", firstDotIndex + 1);//获取第二个.的位置索引
+  let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
+  let twoName = secondDotIndex === -1 ? name : name.substring(firstDotIndex + 1, secondDotIndex) //获取第二个小数点前的内容，如果是第几季，给拼接上
+  if (isSeasonString(twoName)) {
+    name = name + ' ' + twoName
+  }
   const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");
   name = lasekhIndex === -1 ? name : name.substring(0, lasekhIndex);
   if (!reserve) {
@@ -444,6 +453,76 @@ const handleSeasonName = (filename, reserve = false) => {
   }
   return name.trim();
 };
+
+const handleNameYear = (filename) => {
+  const firstDotIndex = filename.indexOf("."); //获取第一个.的位置索引
+  const secondDotIndex = filename.indexOf(".", firstDotIndex + 1);//获取第二个.的位置索引
+  if (secondDotIndex > -1) {
+    let contentYear = filename.substring(firstDotIndex + 1, secondDotIndex)
+    if (/^\d{4}$/.test(contentYear)) {
+      return contentYear
+    } else {
+      const thirdDotIndex = filename.indexOf(".", secondDotIndex + 1)
+      if (thirdDotIndex > -1) {
+        contentYear = filename.substring(secondDotIndex + 1, thirdDotIndex)
+        if (/^\d{4}$/.test(contentYear)) {
+          return contentYear
+        }
+      }
+    }
+  }
+  const lasekhIndex = filename.lastIndexOf("(") > -1 ? filename.lastIndexOf("(") : filename.lastIndexOf("（");
+  let year = "";
+  if (lasekhIndex > -1) {
+    year = filename.substring(lasekhIndex + 1, lasekhIndex + 5);
+  }
+  return year;
+};
+
+//生成数字映射对象
+const generateChineseNumberMapping = (maxNumber = 99, type = 'string') => {
+  const chineseDigits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+  const mapping = {};
+  if (maxNumber >= 1) {
+    // 生成 1-9
+    for (let i = 1; i <= 9; i++) {
+      if (type == 'string') {
+        mapping[chineseDigits[i]] = i.toString();
+      } else if (type == 'number') {
+        mapping[i.toString()] = chineseDigits[i];
+      }
+    }
+  }
+
+  if (maxNumber >= 10) {
+    // 生成 10-19 ("十", "十一", ..., "十九")
+    type == 'string' ? mapping["十"] = "10" : mapping["10"] = "十"
+    for (let i = 1; i <= 9; i++) {
+      if (type == 'string') {
+        mapping["十" + chineseDigits[i]] = `1${i}`; // "十一" -> "11"
+      } else if (type == 'number') {
+        mapping[`1${i}`] = "十" + chineseDigits[i]
+      }
+    }
+  }
+  if (maxNumber >= 20 && maxNumber <= 99) {
+    // 生成 20-99 ("二十", "二十一", ..., "九十九")
+    for (let tens = 2; tens <= 9; tens++) {
+      if (type == 'string') {
+        mapping[chineseDigits[tens] + "十"] = `${tens}0`; // "二十" -> "20"
+        for (let ones = 1; ones <= 9; ones++) {
+          mapping[chineseDigits[tens] + "十" + chineseDigits[ones]] = `${tens}${ones}`; // "二十一" -> "21"
+        }
+      } else if (type == 'number') {
+        mapping[`${tens}0`] = chineseDigits[tens] + "十"; // "二十" -> "20"
+        for (let ones = 1; ones <= 9; ones++) {
+          mapping[`${tens}${ones}`] = chineseDigits[tens] + "十" + chineseDigits[ones]; // "二十一" -> "21"
+        }
+      }
+    }
+  }
+  return mapping;
+}
 
 
 let classifyList = [
@@ -470,5 +549,6 @@ let classifyList = [
 ]
 export {
   getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl,
-  getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, classifyList
+  getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, handleNameYear,
+  generateChineseNumberMapping, classifyList
 };

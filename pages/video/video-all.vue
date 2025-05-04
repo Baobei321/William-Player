@@ -73,23 +73,23 @@ const removeExtension = (item) => {
   if (routerParams.value.title == "最近观看") {
     if (item.type == "tv") {
       item.name1 = `${item.titlePlay} 第${item.ji}集 ${item.title}`;
-      const lastDotIndex = item.name1.lastIndexOf(".");
-      let name = lastDotIndex === -1 ? item.name1 : item.name1.substring(0, lastDotIndex);
+      const firstDotIndex = item.name1.indexOf(".");
+      let name = firstDotIndex === -1 ? item.name1 : item.name1.substring(0, firstDotIndex);
       if (name.length > 12) {
         name = name.slice(0, 11) + "...";
       }
       return name;
     } else if (item.type == "movie") {
-      const lastDotIndex = item.name.lastIndexOf(".");
-      let name = lastDotIndex === -1 ? item.name : item.name.substring(0, lastDotIndex);
+      const firstDotIndex = item.name.indexOf(".");
+      let name = firstDotIndex === -1 ? item.name : item.name.substring(0, firstDotIndex);
       if (name.length > 7) {
         name = name.slice(0, 6) + "...";
       }
       return name;
     }
   }
-  const lastDotIndex = item.name.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? item.name : item.name.substring(0, lastDotIndex);
+  const firstDotIndex = item.name.indexOf(".");
+  let name = firstDotIndex === -1 ? item.name : item.name.substring(0, firstDotIndex);
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }

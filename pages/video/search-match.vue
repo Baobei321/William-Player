@@ -62,6 +62,7 @@ import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
+import { generateChineseNumberMapping } from "./components/common";
 import { onLoad } from "@dcloudio/uni-app";
 
 const searchValue = ref("");
@@ -229,16 +230,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
     });
     return;
   }
-  const numberMapping = {
-    "1": "一",
-    "2": "二",
-    "3": "三",
-    "4": "四",
-    "5": "五",
-    "6": "六",
-    "7": "七",
-    "8": "八",
-  };
+  const numberMapping = generateChineseNumberMapping(40, "number");
   // console.log(selectedValue[0],'选择');
 
   let season = numberMapping[selectedValue[0]] == "一" || !numberMapping[selectedValue[0]] ? "" : ` 第${numberMapping[selectedValue[0]]}季`;

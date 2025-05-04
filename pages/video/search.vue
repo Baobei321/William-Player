@@ -51,16 +51,11 @@ import wilNavbar from "../../components/wil-navbar/index.vue";
 import wilEmpty from "../../components/wil-empty/index.vue";
 import movieLittle from "../../static/movie-little.png";
 import tvLittle from "../../static/tv-little.png";
+import { handleSeasonName } from "./components/common.js";
 
 const oldValue = ref("");
 const searchValue = ref("");
 const listData = ref([]);
-
-const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  return name;
-};
 
 const toSearch = () => {
   if (oldValue.value == searchValue.value || !searchValue.value) return;
@@ -79,7 +74,7 @@ const toCancel = () => {
 
 const handleName = (name) => {
   let arr = [];
-  name = removeExtension(name);
+  name = handleSeasonName(name);
   arr.push({ label: name.split(oldValue.value)[0] });
   arr.push({ label: oldValue.value, color: "#315bfe" });
   arr.push({ label: name.split(oldValue.value)[1] });

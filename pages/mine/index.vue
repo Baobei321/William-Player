@@ -11,9 +11,12 @@
           <wil-image backgroundColor="#efefef"
             src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
           </wil-image>
-          <span>游客用户</span>
+          <div class="mine-notLog__left-info">
+            <span>游客用户</span>
+            <span>即使不登录，也能正常使用，这个模块主要是为了UI好看</span>
+          </div>
         </div>
-        <!-- <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button> -->
+        <nut-button custom-color="#ff6701" class="mine-notLog__right" @click="toLogin">去登录</nut-button>
       </div>
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
@@ -274,14 +277,23 @@ page {
       ::v-deep .wil-image {
         width: 136rpx;
         height: 136rpx;
+        flex: 0 0 136rpx;
         border-radius: 50%;
       }
-
-      span {
+      .mine-notLog__left-info {
         padding-left: 24rpx;
-        font-size: 32rpx;
-        color: #353a45;
-        font-weight: bold;
+        span:first-child {
+          display: block;
+          font-size: 32rpx;
+          color: #353a45;
+          font-weight: bold;
+        }
+        span:last-child {
+          display: block;
+          font-size: 24rpx;
+          color: gray;
+          padding-top: 10rpx;
+        }
       }
     }
 

@@ -35,8 +35,7 @@ import { onShow } from "@dcloudio/uni-app";
 const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  let name = handleSeasonName(filename,true);
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }

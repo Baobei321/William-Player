@@ -7,7 +7,7 @@
           <span>William Player</span>
           <span>{{ appVersion }}</span>
         </div>
-        <div class="main-time">2025-04-18</div>
+        <div class="main-time">2025-05-04</div>
       </div>
       <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true"></nut-cell>
     </div>
@@ -71,17 +71,17 @@ const confirm = ({ selectedValue, selectedOptions }) => {
   showPopover.value = false;
 };
 const toLogin = () => {
-  if (num == 5) {
-    uni.removeStorageSync(CONFIG.USER_ID);
-    uni.removeStorageSync(CONFIG.OPEN_ID);
-    uni.removeStorageSync(CONFIG.USER_KEY);
-    uni.removeStorageSync("Authorization");
-    uni.reLaunch({
-      url: "/pages/mine/login",
-    });
-  } else {
-    num++;
-  }
+  // if (num == 5) {
+  //   uni.removeStorageSync(CONFIG.USER_ID);
+  //   uni.removeStorageSync(CONFIG.OPEN_ID);
+  //   uni.removeStorageSync(CONFIG.USER_KEY);
+  //   uni.removeStorageSync("Authorization");
+  //   uni.reLaunch({
+  //     url: "/pages/mine/login",
+  //   });
+  // } else {
+  //   num++;
+  // }
 };
 
 const compareVersions = (newBb, oldBb) => {

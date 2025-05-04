@@ -33,7 +33,7 @@ import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName } from "./components/common";
+import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName, generateChineseNumberMapping } from "./components/common";
 export default {
   components: {
     wilNavbar,
@@ -276,7 +276,7 @@ export default {
       this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
       this.routerParams.path = decodeURIComponent(this.routerParams.path).slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
       if (this.selectType.type != "WebDAV") {
-        this.routerParams.folderFileId = this.tvList[currentIndex].id;
+        this.historyObj.folderFileId = this.routerParams.folderFileId = this.tvList[currentIndex].id;
       }
       this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
       //跳转下一集重新设置historyObj
@@ -344,17 +344,8 @@ export default {
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
       let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
-      const numberMapping = {
-        "一": "1",
-        "二": "2",
-        "三": "3",
-        "四": "4",
-        "五": "5",
-        "六": "6",
-        "七": "7",
-        "八": "8",
-      };
-      const match = this.routerParams.titlePlay.match(/第(.*?)季/);
+      const numberMapping = generateChineseNumberMapping(40, "string");
+      const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
       let season = match ? numberMapping[match[1]] : "1";
       let res1 = await getTvSeason({
         movieTvId: nowTv.movieTvId,

@@ -41,11 +41,7 @@ listData1.value.forEach((item) => {
 });
 
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");
-  name = lasekhIndex === -1 ? name : name.substring(0, lasekhIndex);
-
+  let name = handleSeasonName(filename,true)
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }

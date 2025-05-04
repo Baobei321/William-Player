@@ -54,7 +54,7 @@ import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
-import { loginUser, getFolder, get189Folder, getQuarkFolder, handleSeasonName } from "./components/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping } from "./components/common";
 import emptyBg from "@/static/empty_bg.png";
 
 import * as CONFIG from "@/utils/config";
@@ -94,6 +94,8 @@ const searchMovieTv = (data, type) => {
   let url = "";
   if (type == "movie") {
     url = "https://api.tmdb.org/3/search/movie";
+    data.primary_release_year = data.first_air_date_year;
+    delete data.first_air_date_year;
   } else if (type == "tv") {
     url = "https://api.tmdb.org/3/search/tv";
   }
@@ -132,14 +134,14 @@ const handleSize = (size) => {
 const groupBySource = (arr) => {
   const map = new Map();
   arr.forEach((item) => {
-    if (!map.has(removeExtension(item.name))) {
-      map.set(removeExtension(item.name), {
+    if (!map.has(handleSeasonName(item.name, true))) {
+      map.set(handleSeasonName(item.name, true), {
         ...item,
         provider: null,
         source: [],
       });
     }
-    map.get(removeExtension(item.name)).source.push({
+    map.get(handleSeasonName(item.name, true)).source.push({
       provider: item.provider,
       size: handleSize(item.size) || 0,
       path: item.path,
@@ -149,21 +151,6 @@ const groupBySource = (arr) => {
   });
   const result = Array.from(map.values());
   return result;
-};
-
-const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
-  return name;
-};
-
-const handleNameYear = (filename) => {
-  const lasekhIndex = filename.lastIndexOf("(") > -1 ? filename.lastIndexOf("(") : filename.lastIndexOf("（");
-  let year = "";
-  if (lasekhIndex > -1) {
-    year = filename.substring(lasekhIndex + 1, lasekhIndex + 5);
-  }
-  return year;
 };
 
 const refreshWebDavVideo = async () => {
@@ -284,16 +271,8 @@ const setMovieTvImg = async (arr, type) => {
             newItem.releaseTime = data.release_date;
             newItem.type = "2";
           } else if (type == "tv") {
-            const numberMapping = {
-              "一": "1",
-              "二": "2",
-              "三": "3",
-              "四": "4",
-              "五": "5",
-              "六": "6",
-              "七": "7",
-            };
-            const match = newItem.name.match(/第(.*?)季/);
+            const numberMapping = generateChineseNumberMapping(40, "string");
+            const match = newItem.name.match(/第([一二三四五六七八九十\d]+)季/);
             newItem.season = match ? numberMapping[match[1]] : "1";
             newItem.releaseTime = data.first_air_date;
             newItem.type = "1";
@@ -336,7 +315,7 @@ const setMovieTvImg = async (arr, type) => {
   //           "六": "6",
   //           "七": "7",
   //         };
-  //         const match = item.name.match(/第(.*?)季/);
+  //         const match = item.name.match(/第([一二三四五六七八九十\d]+)季/);
   //         item.season = match ? numberMapping[match[1]] : "1";
   //         item.releaseTime = data.first_air_date;
   //         item.type = "1";
@@ -612,7 +591,13 @@ onShow(async () => {
       },
       {
         type: "夸克网盘",
-        list: [],
+        list: [
+          {
+            name: "夸克1",
+            Cookie:
+              ";ctoken=CgvOfFIM8hhSqfviY0T1fAIy;b-user-id=d07f6ced-0d7b-b68a-6134-d26c4082e168;grey-id=fb371296-de94-b202-7885-93d242bd6156;grey-id.sig=ViN7tN26o1QV-zPEpLwAnAtBiipAc7myNw571kaBT0s;isQuark=true;isQuark.sig=hUgqObykqFom5Y09bll94T1sS9abT1X-4Df_lzgl8nM;__wpkreporterwid_=f68f7506-04fa-4b0a-9df0-1187a915f429;_UP_A4A_11_=wb9c815b241b406c89d9878d16323a8a;_UP_D_=pc;_UP_30C_6A_=st9c8620117cptolf15yp11wfpf6043z;_UP_TS_=sg10846d4799a905d5099da7066e9098292;_UP_E37_B7_=sg10846d4799a905d5099da7066e9098292;_UP_TG_=st9c8620117cptolf15yp11wfpf6043z;_UP_335_2B_=1;__pus=4e5b396fb61ea761749c315764d5ed76AAR717aMfqxockeVyN1KMakoKhCI7wZRJN2gGejJkVKNPc602qBj2sm7/q9ofjZ36bml3Eq1+gfLQVt+rnXndBxd;__kp=7f009c90-249c-11f0-862e-bb516aec0598;__kps=AATc9iwGX/ljvMFuRWfxn+MU;__ktd=WXoBAMZ6fERHHy7u3YbOdg==;__uid=AATc9iwGX/ljvMFuRWfxn+MU;web-grey-id=6c90f7a3-4450-61fd-fb92-f2cf182225b0;web-grey-id.sig=_fEH5fxAnQyBiVEUAlvTzZhi13VcAM6tLVXpx_XozvQ;tfstk=gjfodf9UiNnuW8jt2iR7IZwz07WHP4OBjMhpvBKU3n-je3dd8BlFvwdJLu_dmHjdR35Jy3LFxiKX93CRe905iGcKwuw58XApTlET65QSPBOUX_LKqUkWWePp8BJeNIWhaUu765Q5ztoyteVO9aQ4chteTLJy0m-XzBly4M-23F8t4BRFYrY2RUkrae-Puj8B0HReTM74oeOl_DxWAHf4cGpo1pp-Es8kEh7yqZS5gEi94a-mT2d2rL0czncETs6HZdoWYSoMAsSH_Lf4JvxMGnYHr_4KCH69-w8M_VGCogSVsd5YcXKF4kMqQZvSOhFcJvMBUETDXAA6bA80pQauorDZyL8Xu140ovMBUETDXr4mICpylE5G.;Video-Auth=6fMPMLio5tkd8moQoEaHEWRxfIjsm8eBtuWAjFc8YTxDM2VrCFqLJq/HtacI5mPqDbqdcNaBhsq4tyF/lIhJmbhkDAYy/GQirxDzMKOyxCcULt6qIrMluvuIzgi9qhkeHK9GDmo7w6KUKetDq64abQ==;__puus=52cb535defc64f5ca29f86166cdc99ebAARagkVg7TLDp2StuL2RjNnXjRyVKTwGkJOlEFdgkyYxkEgESosuaY+uAUmr88ehMgIw3/o0OFWZO5EsBBxhNnGGEu3gMhaTHjAb0mxrMNF/KEZ36osjnxKZK3+ncJ3Xe7dQKcnvSekezvLuWEXEaaZp2iSiy7dITxW4SmVrRlCcvsex3Ppu7EcdavdQWTb5hTDgsVEQz91gcuC+MQgKM3c3",
+          },
+        ],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
       },
     ];

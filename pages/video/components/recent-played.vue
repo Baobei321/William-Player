@@ -63,8 +63,8 @@ const judgeSelect = () => {
 };
 
 const removeExtension = (filename) => {
-  const lastDotIndex = filename.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  const firstDotIndex  = filename.indexOf(".");
+  let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
   if (name.length > 17) {
     name = name.slice(0, 16) + "...";
   }
@@ -73,8 +73,8 @@ const removeExtension = (filename) => {
 
 //裁剪格式获取电影名
 const getMovieName = (val) => {
-  const lastDotIndex = val.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
+  const firstDotIndex = val.indexOf(".");
+  let name = firstDotIndex === -1 ? val : val.substring(0, firstDotIndex);
   return name;
 };
 
