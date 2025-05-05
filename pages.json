@@ -7,107 +7,6 @@
       }
     },
     {
-      "path": "pages/video/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/list",
-      "style": {
-        "navigationBarTitleText": "媒体库"
-      }
-    },
-    {
-      "path": "pages/video/source-list",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/file-source",
-      "style": {
-        "navigationBarTitleText": "添加新文件源",
-        "navigationBarBackgroundColor": "#fff"
-      }
-    },
-    {
-      "path": "pages/video/catelog-list",
-      "style": {
-        "navigationBarTitleText": ""
-      }
-    },
-    {
-      "path": "pages/video/search",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/search-match",
-      "style": {
-        "navigationBarTitleText": "编辑信息",
-        "navigationBarBackgroundColor": "#f7f7f7"
-      }
-    },
-    {
-      "path": "pages/mine/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/mine/login",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/mine/register",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/add-webdav",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/video-detail",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/video/video-all",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationBarBackgroundColor": "#fff"
-      }
-    },
-    {
-      "path": "pages/video/video-player",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/live/index",
-      "style": {
-        "navigationBarTitleText": "直播",
-        "navigationBarBackgroundColor": "#fff"
-      }
-    },
-    {
-      "path": "pages/mine/settings",
-      "style": {
-        "navigationBarTitleText": "设置",
-        "navigationBarBackgroundColor": "#fff"
-      }
-    },
-    {
       "path": "pages/backend/index",
       "style": {
         "navigationBarBackgroundColor": "#fff"
@@ -151,6 +50,107 @@
       "style": {
         "navigationBarTitleText": "操作指引",
         "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/live/index",
+      "style": {
+        "navigationBarTitleText": "直播",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/media/list",
+      "style": {
+        "navigationBarTitleText": "媒体库"
+      }
+    },
+    {
+      "path": "pages/media/catelog-list",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/source/source-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/source/file-source",
+      "style": {
+        "navigationBarTitleText": "添加新文件源",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/source/add-webdav",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/search",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/search-match",
+      "style": {
+        "navigationBarTitleText": "编辑信息",
+        "navigationBarBackgroundColor": "#f7f7f7"
+      }
+    },
+    {
+      "path": "pages/video/video-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/video/video-all",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/video/video-player",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/settings",
+      "style": {
+        "navigationBarTitleText": "设置",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/register",
+      "style": {
+        "navigationStyle": "custom"
       }
     }
   ],

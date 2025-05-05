@@ -27,7 +27,7 @@ import { onBeforeMount, onMounted, ref, nextTick } from "vue";
 import baseCell from "../../components/wil-cell/index.vue";
 import Folder from "../../static/folder.png";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
-import { getFolder, get189Folder, getQuarkFolder } from "./components/common.js";
+import { getFolder, get189Folder, getQuarkFolder } from "../../utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
 import wilEmpty from "@/components/wil-empty/index.vue";
 
@@ -66,15 +66,15 @@ const loginUser = () => {
 const clickCell = (item) => {
   if (selectType.value.type == "WebDAV") {
     uni.navigateTo({
-      url: "/pages/video/catelog-list?path=" + item.name,
+      url: "/pages/media/catelog-list?path=" + item.name,
     });
   } else if (selectType.value.type == "天翼云盘") {
     uni.navigateTo({
-      url: `/pages/video/catelog-list?path=${item.name}&folderFileId=${item.id}`,
+      url: `/pages/media/catelog-list?path=${item.name}&folderFileId=${item.id}`,
     });
   } else if (selectType.value.type == "夸克网盘") {
     uni.navigateTo({
-      url: `/pages/video/catelog-list?path=${item.name}&folderFileId=${item.fid}`,
+      url: `/pages/media/catelog-list?path=${item.name}&folderFileId=${item.fid}`,
     });
   }
 };

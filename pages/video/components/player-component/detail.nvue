@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getMovieTvById, generateChineseNumberMapping } from "../common.js";
+import { getMovieTvById, generateChineseNumberMapping } from "@/utils/common.js";
 
 export default {
   props: {

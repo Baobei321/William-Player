@@ -12,8 +12,8 @@
       <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="hxList-list-movie">
           <div class="hxList-list-movie__item" v-for="item in listData1" :key="item.name" @click="toVideoDetail(item)">
-            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.poster" style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)"
-              mode="aspectFill"></image>
+            <image :src="!props.isConnected && !item.loadImg? emptyBg : 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' + item.poster" style="object-fit: cover;"
+              @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill"></image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
             <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
           </div>
@@ -26,7 +26,7 @@
 import { ref, nextTick } from "vue";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow } from "@dcloudio/uni-app";
-import { handleSeasonName } from "./common";
+import { handleSeasonName } from "../../../../utils/common";
 
 const props = defineProps({
   title: { type: String, default: "电影" },
@@ -41,7 +41,7 @@ listData1.value.forEach((item) => {
 });
 
 const removeExtension = (filename) => {
-  let name = handleSeasonName(filename,true)
+  let name = handleSeasonName(filename, true);
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }

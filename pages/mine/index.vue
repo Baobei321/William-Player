@@ -78,7 +78,7 @@ const cellOptions = ref([
     {
       title: "媒体库列表",
       leftIcon: iconMedia,
-      path: "/pages/video/list",
+      path: "/pages/media/list",
     },
     {
       title: "数据同步",

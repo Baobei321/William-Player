@@ -62,7 +62,7 @@ import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
-import { generateChineseNumberMapping } from "./components/common";
+import { generateChineseNumberMapping } from "../../utils/common";
 import { onLoad } from "@dcloudio/uni-app";
 
 const searchValue = ref("");
@@ -232,8 +232,8 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
   }
   const numberMapping = generateChineseNumberMapping(40, "number");
   // console.log(selectedValue[0],'选择');
-
   let season = numberMapping[selectedValue[0]] == "一" || !numberMapping[selectedValue[0]] ? "" : ` 第${numberMapping[selectedValue[0]]}季`;
+  if (selectedValue[0] == "0") season = " 特别篇";
   console.log(selectItem.value.name + season);
 
   uni.setStorageSync("resetMovieTv", { type: type, movieTvId: selectItem.value.id, name: routerParams.value.type == "tv" ? selectItem.value.name + season : selectItem.value.title }); //设置到缓存，详情页去获取

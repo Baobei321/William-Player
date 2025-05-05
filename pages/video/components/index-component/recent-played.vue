@@ -30,11 +30,11 @@
 
 <script setup>
 import { ref } from "vue";
-import playVideoButton from "../../../static/playVideo-button.png";
-import { handleSecond, parseTime, handleSeasonName } from "./common";
+import playVideoButton from "../../../../static/playVideo-button.png";
+import { handleSecond, parseTime, handleSeasonName } from "../../../../utils/common";
 import { onShow } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
-import { toStringfy } from "../../mine/common";
+import { toStringfy } from "../../../mine/common";
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -63,7 +63,7 @@ const judgeSelect = () => {
 };
 
 const removeExtension = (filename) => {
-  const firstDotIndex = filename.indexOf(".");
+  const firstDotIndex  = filename.indexOf(".");
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
   if (name.length > 17) {
     name = name.slice(0, 16) + "...";
@@ -116,13 +116,7 @@ const toVideoPlayer = async (item) => {
   } else if (item.type == "tv") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
     const lastIndex = item.path.lastIndexOf("/");
-    let nowTv = localMovieTvData.tv.find((i) => {
-      if (i.isMultiSeason) {
-        return i.name == handleSeasonName(item.titlePlay, false) && i.movieTvId == item.movieTvId;
-      } else {
-        return handleSeasonName(i.name, true) == item.titlePlay && i.movieTvId == item.movieTvId;
-      }
-    });
+    let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == item.titlePlay && i.path == "/" + item.path.slice(0, lastIndex));
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";

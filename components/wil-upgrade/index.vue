@@ -1,6 +1,7 @@
 <template>
   <div class="wil-upgrade">
-    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom" :custom-style="{ height: '45%' }" @closed="closedPopup" @open="open" @close="close">
+    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom" :custom-style="{ height: '45%' }" @closed="closedPopup" @open="open"
+      @close="close">
       <div class="wil-upgrade-container">
         <div class="wil-upgrade-title">
           <div class="wil-upgrade-title__logo">
@@ -15,8 +16,7 @@
           <div class="wil-upgrade-list__title">
             <span>发现新版本</span><span>{{ newVersion[props.defaultProps.version] }}</span>
           </div>
-          <div class="wil-upgrade-list__container">
-            {{ newVersion[props.defaultProps.remark] }}
+          <div class="wil-upgrade-list__container" v-html="newVersion[props.defaultProps.remark]">
           </div>
         </div>
         <div class="wil-upgrade-button">
@@ -39,6 +39,7 @@
 <script setup>
 import { ref, onBeforeMount, watch } from "vue";
 import { onHide } from "@dcloudio/uni-app";
+import { addOperLog } from "@/network/apis";
 
 const props = defineProps({
   type: { type: String, default: "outApp" }, //inApp是在应用内更新，outApp是跳转到外部浏览器下载安装包更新
@@ -149,6 +150,7 @@ const toDownLoad = (apkUrl) => {
   if (props.type == "inApp") {
     downloadInstallApp(apkUrl);
   } else if (props.type == "outApp") {
+    addOperLog({ title: "更新app", businessType: 13, operatorType: 2 });
     plus.runtime.openURL(apkUrl, (error) => {
       if (error) {
         uni.showToast({ title: "打开浏览器失败", icon: "none" });
@@ -375,6 +377,11 @@ onHide(() => {
         flex: 1;
         width: 100%;
         box-sizing: border-box;
+        ::v-deep p {
+          img {
+            width: 100%;
+          }
+        }
       }
     }
 

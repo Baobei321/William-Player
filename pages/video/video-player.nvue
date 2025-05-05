@@ -2,15 +2,15 @@
   <view class="video-player" style="width:750rpx">
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container" :style="{height:videoHeight,flex:`0 0 ${videoHeight}`}">
-      <!-- <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
+      <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
         <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
           :showProgress="settingData.showProgress" :showPre="this.historyObj.ji>1" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
           @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" @getorientation="getOrientation" @ontv="castTv"
           :style="{width:'750rpx',height:videoHeight}" ref="video_view">
         </video-view>
         <tv-button v-if="showTvButton" :style="{width:'750rpx',height:videoHeight}" @setTvButton="setTvButton" @changeTv="castTv"></tv-button>
-      </view> -->
-      <view>
+      </view>
+      <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
           :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory" @pause="pauseVideo"
           v-if="config.url&&!showReload">
@@ -33,7 +33,7 @@ import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName, generateChineseNumberMapping } from "./components/common";
+import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/common";
 export default {
   components: {
     wilNavbar,
@@ -142,7 +142,6 @@ export default {
           } else {
             if (this.historyObj.type) {
               this.historyPlay.unshift(this.historyObj);
-              console.log(this.historyPlay);
             }
           }
         }
@@ -178,13 +177,6 @@ export default {
         let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
         const secondLastSlashIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/", lastIndex - 1);
         let titlePlay = handleSeasonName(decodeURIComponent(this.routerParams.path).substring(secondLastSlashIndex + 1, lastIndex), true);
-        const numberMapping = generateChineseNumberMapping(40, "number");
-        const match = titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
-        if (match && !isNaN(Number(match[1])) && match[1].trim() !== "") {
-          titlePlay = titlePlay.replace(match[1], numberMapping[match[1]]);
-        }
-        titlePlay.indexOf("第一季") > -1 ? (titlePlay = titlePlay.split("第一季")[0].trim()) : "";
-        console.log(titlePlay, "title");
         obj = this.historyPlay?.find((i) => i.name == name && i.titlePlay == titlePlay) || {};
       }
       if (this.routerParams.item) {
@@ -194,8 +186,6 @@ export default {
       } else {
         if (this.routerParams.type) {
           this.historyObj = obj;
-          console.log(this.historyObj, "this.historyObj");
-
           this.config.poster = this.historyObj.poster;
         } else {
           this.config.initialTime = 0;
@@ -353,14 +343,7 @@ export default {
       this.showRehandleButton = false;
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
-      const secondLastIndex = data.path.slice(0, lastIndex).lastIndexOf("/");
-      let nowTv = localMovieTvData.tv.find((i) => {
-        if (i.isMultiSeason) {
-          return i.name == handleSeasonName(this.routerParams.titlePlay, false) && i.path == "/" + data.path.slice(0, secondLastIndex);
-        } else {
-          return handleSeasonName(i.name, true) == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex);
-        }
-      });
+      let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
       const numberMapping = generateChineseNumberMapping(40, "string");
       const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
       let season = match ? numberMapping[match[1]] : "1";

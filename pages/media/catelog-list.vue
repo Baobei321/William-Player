@@ -26,7 +26,7 @@ import { ref } from "vue";
 import loadList from "../../components/wil-list/index.vue";
 import Folder from "../../static/folder.png";
 import videoPlayer from "../../static/video-player.png";
-import { get189Folder, getQuarkFolder } from "./components/common.js";
+import { get189Folder, getQuarkFolder } from "../../utils/common.js";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 
 const webdavInfo = ref({});
@@ -124,15 +124,15 @@ const clickCell = (item) => {
   if (item.type == "1") {
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}`,
+        url: `/pages/media/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}`,
       });
     } else if (selectType.value.type == "天翼云盘") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
+        url: `/pages/media/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
       });
     } else if (selectType.value.type == "夸克网盘") {
       uni.navigateTo({
-        url: `/pages/video/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
+        url: `/pages/media/catelog-list?path=${encodeURIComponent(path + "/" + item.name)}&folderFileId=${item.folderFileId}`,
       });
     }
   } else {

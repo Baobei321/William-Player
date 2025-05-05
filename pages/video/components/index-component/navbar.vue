@@ -50,7 +50,7 @@
 
 <script setup>
 import { onMounted, ref, watch, watchEffect, nextTick } from "vue";
-import { setTmdbKey } from "../../../network/apis";
+import { setTmdbKey } from "../../../../network/apis";
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
@@ -127,7 +127,7 @@ const toAddMedia = () => {
     return;
   }
   uni.navigateTo({
-    url: "/pages/video/source-list",
+    url: "/pages/source/source-list",
   });
   // let webdavInfo = uni.getStorageSync('webdavInfo')
   // if (!webdavInfo) {

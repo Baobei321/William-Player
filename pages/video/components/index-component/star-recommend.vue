@@ -5,7 +5,7 @@
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
             <div class="swiper-content-left">
-              <image mode="aspectFill" :src="data.poster"></image>
+              <image mode="aspectFill" :src="'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' + data.poster"></image>
             </div>
             <div class="swiper-content-right">
               <div class="right-genres">{{ data.genres }}</div>
@@ -29,13 +29,13 @@
 <script setup>
 import wilSwiper from "@/components/wil-swiper/index.vue";
 import { ref, onBeforeMount } from "vue";
-import { classifyList, handleSeasonName } from "./common";
+import { classifyList, handleSeasonName } from "../../../../utils/common";
 import { onShow } from "@dcloudio/uni-app";
 
 const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 const removeExtension = (filename) => {
-  let name = handleSeasonName(filename,true);
+  let name = handleSeasonName(filename, true);
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }
@@ -62,7 +62,7 @@ onShow(() => {
       }
     });
     item.genres = genres;
-    item.underImg = item.backdrop;
+    item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
     return item;
   });
   let movie = localMovieTvData.movie.sort((a, b) => b.voteAverage - a.voteAverage);
@@ -78,7 +78,7 @@ onShow(() => {
       }
     });
     item.genres = genres;
-    item.underImg = item.backdrop;
+    item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
     return item;
   });
   listData.value = [...tv, ...movie];

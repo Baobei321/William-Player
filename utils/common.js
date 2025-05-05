@@ -441,8 +441,8 @@ const handleSeasonName = (filename, reserve = false) => {  //reserve为true,就�
   const firstDotIndex = filename.indexOf("."); //获取第一个.的位置索引
   const secondDotIndex = filename.indexOf(".", firstDotIndex + 1);//获取第二个.的位置索引
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
-  let twoName = secondDotIndex === -1 ? name : name.substring(firstDotIndex + 1, secondDotIndex) //获取第二个小数点前的内容，如果是第几季，给拼接上
-  if (isSeasonString(twoName)) {
+  let twoName = secondDotIndex === -1 ? name : filename.substring(firstDotIndex + 1, secondDotIndex) //获取第二个小数点前的内容，如果是第几季，给拼接上
+  if (isSeasonString(twoName)) {    
     name = name + ' ' + twoName
   }
   const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");

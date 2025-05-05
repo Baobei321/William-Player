@@ -51,7 +51,7 @@ import wilNavbar from "../../components/wil-navbar/index.vue";
 import wilEmpty from "../../components/wil-empty/index.vue";
 import movieLittle from "../../static/movie-little.png";
 import tvLittle from "../../static/tv-little.png";
-import { handleSeasonName } from "./components/common.js";
+import { handleSeasonName } from "../../utils/common.js";
 
 const oldValue = ref("");
 const searchValue = ref("");

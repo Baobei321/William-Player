@@ -37,7 +37,7 @@ import emptyBg from "@/static/empty_bg.png";
 import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
 import { toStringfy } from "../mine/common";
-// import { getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime } from "./components/common.js";
+import { handleSeasonName } from "@/utils/common.js";
 
 const requestParams = ref({});
 
@@ -90,6 +90,7 @@ const removeExtension = (item) => {
   }
   const firstDotIndex = item.name.indexOf(".");
   let name = firstDotIndex === -1 ? item.name : item.name.substring(0, firstDotIndex);
+  name = handleSeasonName(name, true);
   if (name.length > 7) {
     name = name.slice(0, 6) + "...";
   }

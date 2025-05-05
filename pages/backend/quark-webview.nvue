@@ -7,7 +7,7 @@
 
 <script>
 import wilNavbar from "@/components/wil-navbar/navbar.nvue";
-import { getQuarkFolder, getQuarkUser } from "../video/components/common";
+import { getQuarkFolder, getQuarkUser } from "@/utils/common";
 import { addOperLog } from "@/network/apis";
 
 export default {

@@ -42,7 +42,7 @@ import { ref } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "../mine/common";
-import { loginUser, getFolder, get189Folder, getQuarkFolder } from "./components/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder } from "../../utils/common";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
 import moreButton from "@/static/more-button.png";
@@ -61,7 +61,7 @@ let selectType = {};
 
 const mapping = {
   "WebDAV": {
-    path: "/pages/video/add-webdav",
+    path: "/pages/source/add-webdav",
     query: { title: "修改WebDAV" },
   },
   "天翼云盘": {
@@ -82,7 +82,7 @@ const mapping = {
 
 const toAddFile = () => {
   uni.navigateTo({
-    url: "/pages/video/file-source",
+    url: "/pages/source/file-source",
   });
 };
 

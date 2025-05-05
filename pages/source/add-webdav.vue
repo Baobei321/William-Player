@@ -22,7 +22,7 @@ import { onBeforeMount, reactive, ref } from "vue";
 import baseForm from "../../components/wil-form/index.vue";
 import wilNavbar from "../../components/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { loginUser } from "./components/common";
+import { loginUser } from "../../utils/common";
 
 const state = reactive({
   formData: {
