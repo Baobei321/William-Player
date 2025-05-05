@@ -52,7 +52,7 @@ const options = ref([
     rule: [{ required: true, message: "请输入用户名" }],
   },
   { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "alist密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
-  { label: "路径", prop: "path", type: "input", formItemProps: { placeholder: "选填,例如:/dav", type: "text" }, rule: [{ required: true, message: "请输入路径" }] },
+  // { label: "路径", prop: "path", type: "input", formItemProps: { placeholder: "选填,例如:/dav", type: "text" }, rule: [{ required: true, message: "请输入路径" }] },
 ]);
 
 const showProtocol = ref(false);
