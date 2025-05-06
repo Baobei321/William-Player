@@ -62,7 +62,7 @@
         <div class="tv-version" v-if="routerParams.type=='tv'">
           <div class="tv-version-tabs">
             <nut-tabs v-model="activeTab" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSource">
-              <nut-tab-pane :title="item.sourceName" :pane-key="item.provider" v-for="item in sourceList" :key="item.provider"></nut-tab-pane>
+              <nut-tab-pane :title="item.sourceName" :pane-key="item.provider+item.name" v-for="item in sourceList" :key="item.provider+item.name"></nut-tab-pane>
             </nut-tabs>
             <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
           </div>
@@ -72,7 +72,8 @@
               <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
                 <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime">{{ item.runtime }}</span>
-                <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}" v-if="index+1==historyTv.ji">
+                <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"
+                  v-if="index+1==historyTv.ji&& selectSource.path + '/' + historyTv.name == '/' + historyTv.path">
                 </div>
               </div>
               <div class="item-title">{{ index+1+'.'+item.title }}</div>
@@ -468,7 +469,8 @@ const changeSource = (item) => {
 
 //切换电视视频源
 const changeTvSource = (obj) => {
-  selectSource.value = sourceList.value.find((i) => i.provider == obj.paneKey);
+  selectSource.value = sourceList.value.find((i) => i.provider + i.name == obj.paneKey);
+  setButtonText();
   handleTv();
 };
 
@@ -491,7 +493,7 @@ const getMovieName = (val) => {
 const clickPlayButton = () => {
   if (routerParams.value.type == "movie") {
     let history = historyPlay.value?.find((i) => getMovieName(i.name) == getMovieName(imgData.value.title));
-    if (history) {
+    if (history && selectSource.value.path == "/" + history.path) {
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
           url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}&type=movie`,
@@ -535,7 +537,7 @@ const clickPlayButton = () => {
     let localMovieTvData = uni.getStorageSync("localMovieTvData");
     let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
     let history = historyPlay.value?.find((i) => i.titlePlay == imgData.value.title);
-    if (history) {
+    if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
       let openEndTime = {};
       nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
       nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
@@ -588,7 +590,7 @@ const toPlayVideo = (item, index) => {
   let localMovieTvData = uni.getStorageSync("localMovieTvData");
   let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
   let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true) && item.name == i.name);
-  if (history) {
+  if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
@@ -645,7 +647,7 @@ const setButtonText = () => {
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   if (routerParams.value.type == "movie") {
     let history = historyPlay.value?.find((i) => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true));
-    if (history) {
+    if (history && selectSource.value.path == "/" + history.path) {
       buttonText.value = "播放 " + handleSecond(history.initialTime);
     } else {
       buttonText.value = "播放";
@@ -653,7 +655,7 @@ const setButtonText = () => {
   } else if (routerParams.value.type == "tv") {
     let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true));
     historyTv.value = history || {};
-    if (history) {
+    if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
       let time = handleSecond(history.initialTime);
       buttonText.value = `第${history.ji}集 ${time}`;
     } else {
@@ -702,7 +704,7 @@ const resetMovieTvData = async () => {
     routerParams.value.movieTvId = resetMovieTv.movieTvId;
     uni.removeStorageSync("resetMovieTv");
     selectSource.value = sourceList.value[0];
-    activeTab.value = selectSource.value.provider;
+    activeTab.value = selectSource.value.provider + selectSource.value.name;
     setButtonText();
     nextTick(() => {
       historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
@@ -763,12 +765,18 @@ onBeforeMount(() => {
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
   getUntokenDict("online_storage_source")
     .then(async (res) => {
-      sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
-        i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label;
+      let source = JSON.parse(routerParams.value.source);
+      sourceList.value = source.map((i) => {
+        if (source.filter((v) => v.provider == i.provider).length > 1) {
+          let label = res.online_storage_source.find((v) => v.value == i.provider).label;
+          i.sourceName = label ? label + `(${i.name})` : i.provider;
+        } else {
+          i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label || i.provider;
+        }
         return i;
       });
       selectSource.value = sourceList.value[0];
-      activeTab.value = selectSource.value.provider;
+      activeTab.value = selectSource.value.provider + selectSource.value.name;
       setButtonText();
       await getMovieTvDetail();
       if (routerParams.value.type == "tv") {
@@ -784,11 +792,16 @@ onBeforeMount(() => {
         { value: "Quark", label: "夸克网盘" },
       ];
       sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
-        i.sourceName = dict.find((v) => v.value == i.provider).label;
+        if (source.filter((v) => v.provider == i.provider).length > 1) {
+          let label = dict.find((v) => v.value == i.provider).label;
+          i.sourceName = label ? label + `(${i.name})` : i.provider;
+        } else {
+          i.sourceName = dict.find((v) => v.value == i.provider).label || i.provider;
+        }
         return i;
       });
       selectSource.value = sourceList.value[0];
-      activeTab.value = selectSource.value.provider;
+      activeTab.value = selectSource.value.provider + selectSource.value.name;
       setButtonText();
       await getMovieTvDetail();
       if (routerParams.value.type == "tv") {

@@ -568,7 +568,7 @@ const refreshVideo = async () => {
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
-      localMovieTvData.value.movie?.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
+      localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
       localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
     );
   });
@@ -651,7 +651,7 @@ onShow(async () => {
       historyPlay.value = uni.getStorageSync("historyPlay") || [];
       historyPlay.value = historyPlay.value.filter((item) => {
         return (
-          localMovieTvData.value.movie?.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
+          localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
           localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
         );
       });
@@ -661,7 +661,7 @@ onShow(async () => {
     historyPlay.value = uni.getStorageSync("historyPlay") || [];
     historyPlay.value = historyPlay.value.filter((item) => {
       return (
-        localMovieTvData.value.movie?.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == handleSeasonName(item.name) && v.movieTvId == item.movieTvId) ||
+        localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name) && v.movieTvId == item.movieTvId) ||
         localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
       );
     });
@@ -707,7 +707,7 @@ onBeforeMount(async () => {
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
-      localMovieTvData.value.movie?.some((v) => v.path == "/" + item.path && handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
+      localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
       localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
     );
   });

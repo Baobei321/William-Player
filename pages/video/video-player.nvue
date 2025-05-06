@@ -2,15 +2,15 @@
   <view class="video-player" style="width:750rpx">
     <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
     <view class="video-player-container" :style="{height:videoHeight,flex:`0 0 ${videoHeight}`}">
-      <!-- <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
+      <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
         <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
           :showProgress="settingData.showProgress" :showPre="this.historyObj.ji>1" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
           @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" @getorientation="getOrientation" @ontv="castTv"
           :style="{width:'750rpx',height:videoHeight}" ref="video_view">
         </video-view>
         <tv-button v-if="showTvButton" :style="{width:'750rpx',height:videoHeight}" @setTvButton="setTvButton" @changeTv="castTv"></tv-button>
-      </view> -->
-      <view >
+      </view>
+      <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
           :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory" @pause="pauseVideo"
           v-if="config.url&&!showReload">
@@ -344,7 +344,7 @@ export default {
       this.showRehandleButton = false;
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
-      let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == this.routerParams.titlePlay && i.path == "/" + data.path.slice(0, lastIndex));
+      let nowTv = localMovieTvData.tv.find((i) => (handleSeasonName(i.name, true) == this.routerParams.titlePlay && data.movieTvId ? data.movieTvId == i.movieTvId : i.path == "/" + data.path.slice(0, lastIndex)));
       const numberMapping = generateChineseNumberMapping(40, "string");
       const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
       let season = "";

@@ -438,6 +438,7 @@ const isSeasonString = (str) => {
 }
 
 const handleSeasonName = (filename, reserve = false) => {  //reserve为true,就是保留第几季，false就是不保留
+  if (!filename) return
   const firstDotIndex = filename.indexOf("."); //获取第一个.的位置索引
   const secondDotIndex = filename.indexOf(".", firstDotIndex + 1);//获取第二个.的位置索引
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);

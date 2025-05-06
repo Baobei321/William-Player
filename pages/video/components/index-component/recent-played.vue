@@ -63,7 +63,7 @@ const judgeSelect = () => {
 };
 
 const removeExtension = (filename) => {
-  const firstDotIndex  = filename.indexOf(".");
+  const firstDotIndex = filename.indexOf(".");
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
   if (name.length > 17) {
     name = name.slice(0, 16) + "...";
@@ -116,13 +116,13 @@ const toVideoPlayer = async (item) => {
   } else if (item.type == "tv") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
     const lastIndex = item.path.lastIndexOf("/");
-    let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == item.titlePlay && i.path == "/" + item.path.slice(0, lastIndex));
+    let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == item.titlePlay && i.movieTvId == item.movieTvId);
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&type=tv&${toStringfy(openEndTime)}`,
+        url: `/pages/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&type=tv&movieTvId=${item.movieTvId}&${toStringfy(openEndTime)}`,
         success: () => {
           setItemFirst(item);
         },
