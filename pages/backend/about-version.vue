@@ -14,6 +14,7 @@
     <div class="about-version-protocol">
       <image src="@/static/tmdb-xy.png"></image>
       <div class="about-version-protocol__button" @click="toQQpage">联系我们</div>
+      <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
     </div>
     <div class="about-version-button">
       <nut-button :disabled="isLoading" custom-color="#ff6701" @click="checkUpdate" v-if="showButton">
@@ -243,9 +244,16 @@ page {
     .about-version-protocol__button {
       margin-top: 50rpx;
       font-weight: bold;
-      font-size: 32rpx;
+      font-size: 28rpx;
       color: #68c6b3;
     }
+    // .about-version-protocol__tip{
+    //   padding: 0 100rpx;
+    //   margin-top: 24px;
+    //   text-align: center;
+    //   font-size: 24rpx;
+    //   line-height: 35rpx;
+    // }
   }
   .about-version-button {
     position: absolute;

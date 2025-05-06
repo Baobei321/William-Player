@@ -275,7 +275,6 @@ const setMovieTvImg = async (arr, type) => {
   const processedItems = await Promise.all(
     arr.map(async (item) => {
       try {
-        let res = await searchMovieTv({ query: handleSeasonName(item.name), first_air_date_year: handleNameYear(item.name) }, type);
         const numberMapping = generateChineseNumberMapping(40, "string");
         const match = item.name.match(/第([一二三四五六七八九十\d]+)季/);
         let season = "";
@@ -292,17 +291,37 @@ const setMovieTvImg = async (arr, type) => {
             season = "1";
           }
         }
+        //刮削的时候查询这个影片名是不是在本地已经有了，本地有了的话，就不用去tmdb查了
+        let exitMovieTv = null;
+        let localMovieTvData = uni.getStorageSync("localMovieTvData");
+        if (type == "movie") {
+          exitMovieTv = localMovieTvData.movie.find((i) => i.name == item.name) || null;
+        } else if (type == "tv") {
+          exitMovieTv = localMovieTvData.tv.find((i) => i.name == item.name) || null;
+        }
+        let res = {};
         let data = {};
-        if (res.results.length == 1) {
-          data = res.results[0];
+        if (!exitMovieTv) {
+          //本地不存在已有的影片，就去查tmdb
+          res = await searchMovieTv({ query: handleSeasonName(item.name), first_air_date_year: handleNameYear(item.name) }, type);
+          if (res.results.length == 1) {
+            data = res.results[0];
+          } else {
+            data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
+          }
         } else {
-          data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
+          data = exitMovieTv;
+          type == "movie" ? (data.release_date = data.releaseTime) : (data.first_air_date = data.releaseTime);
+          data.id = data.movieTvId;
+          data.poster_path = data.poster;
+          data.backdrop_path = data.backdrop;
+          data.vote_average = data.voteAverage || 0;
         }
         if (data) {
           let newItem = { ...item };
           newItem.poster = data.poster_path;
           newItem.backdrop = data.backdrop_path;
-          if (season != "1") {
+          if (season != "1" && !exitMovieTv) {
             let seasonRes = await getTvSeason({
               movieTvId: data.id,
               season: season,
@@ -321,6 +340,8 @@ const setMovieTvImg = async (arr, type) => {
           newItem.genre_ids = data.genre_ids;
           newItem.overview = data.overview;
           newItem.voteAverage = data.vote_average; //评分
+          data.openingTime ? (newItem.openingTime = data.openingTime) : ""; //本地刮削的重新设置片头时间
+          data.endTime ? (newItem.endTime = data.endTime) : ""; //本地刮削的重新设置片头时间
           return newItem;
         } else {
           return null;

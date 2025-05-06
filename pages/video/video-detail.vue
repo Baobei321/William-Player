@@ -109,7 +109,7 @@
           </scroll-view>
         </div>
         <div class="tip-footer">
-          <span class="tip-footer-name">{{ selectSource.name+' ' }}</span>
+          <span class="tip-footer-name">{{ handleSeasonName(selectSource.name,true)+'-' }}</span>
           <span class="tip-footer-webdav">路径：{{ selectSource.path }}</span>
           <div class="tip-footer-timesize">
             <span v-if="imgData.runtime">{{ imgData.runtime }}</span><span>{{ selectSource.sourceName }}</span><span
