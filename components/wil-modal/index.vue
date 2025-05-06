@@ -1,5 +1,5 @@
 <template>
-  <nut-transition :show="show" name="fade" :duration="200">
+  <nut-transition :show="show" name="fade" :duration="200" style="position: fixed;z-index: 9999;">
     <div :class="['wil-modal']">
       <div class="wil-modal-top">
         <div class="wil-modal-title">{{data.title}}</div>
@@ -112,7 +112,7 @@ defineExpose({
   border-radius: 30rpx;
   background: #fff;
   position: fixed;
-  z-index: 2;
+  z-index: 9999;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -177,7 +177,7 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index: 9998;
   background: var(--nut-overlay-bg-color, rgba(0, 0, 0, 0.5));
 }
 .modal-show {

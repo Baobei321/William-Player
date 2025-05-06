@@ -117,8 +117,12 @@ export default {
         const numberMapping = generateChineseNumberMapping(40, "number");
         if (this.seasonData.season_number > 1) {
           this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
+          this.detailData.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
+        } else if (this.seasonData.season_number == 0) {
+          this.detailData.name = this.detailData.name + " 特别篇";
+          this.detailData.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
         }
-        this.seasonData.season_number > 1 && this.seasonData.overview ? (this.detailData.overview = this.seasonData.overview) : "";
+        this.seasonData.season_number != 1 && this.seasonData.overview ? (this.detailData.overview = this.seasonData.overview) : "";
       }
     },
     changeVideo(item, index) {

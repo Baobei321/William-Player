@@ -266,7 +266,7 @@ const getActorById = (data, type) => {
 };
 
 //处理电视的详情和剧集等
-const handleTv = async () => {
+const handleTv = async (seasonData1 = null) => {
   showRehandleButton.value = false;
   let season = "";
   if (localMovieTvData.value.tv) {
@@ -288,10 +288,12 @@ const handleTv = async () => {
       }
     }
   }
-  let res1 = await getTvSeason({
-    movieTvId: routerParams.value.movieTvId,
-    season: season,
-  });
+  let res1 = {};
+  if (!seasonData1) {
+    res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+  } else {
+    res1 = seasonData1;
+  }
   if (season != "1") {
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
   }
@@ -729,15 +731,16 @@ const resetMovieTvData = async () => {
       }
       nowTv.movieTvId = routerParams.value.movieTvId;
       let res = await getMovieTvDetail();
-      handleTv();
-      nowTv.poster = res.poster_path;
-      nowTv.releaseTime = res.first_air_date;
       nowTv.type = "1";
       nowTv.genre_ids = res.genres.map((i) => i.id);
-      nowTv.overview = res.overview;
       nowTv.backdrop = res.backdrop_path;
       nowTv.voteAverage = res.vote_average; //评分
       nowTv.name = resetMovieTv.name;
+      let res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: nowTv.season });
+      handleTv(res1);
+      nowTv.poster = res1.poster_path;
+      nowTv.releaseTime = res1.air_date;
+      nowTv.overview = res1.overview;
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();

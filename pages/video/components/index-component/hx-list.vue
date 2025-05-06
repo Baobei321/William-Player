@@ -35,7 +35,7 @@ const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
 });
 
-const listData1 = ref(JSON.parse(JSON.stringify(props.listData)));
+const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30));
 listData1.value.forEach((item) => {
   item.loadImg = true;
 });
@@ -75,7 +75,7 @@ const imgLoad = (item) => {
 
 onShow(() => {
   nextTick(() => {
-    listData1.value = JSON.parse(JSON.stringify(props.listData));
+    listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30)
     listData1.value.forEach((item) => {
       item.loadImg = true;
     });

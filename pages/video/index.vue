@@ -37,25 +37,28 @@
     </template>
     <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :enableControl="true" :appVersion="CONFIG.VERSIOIN">
     </wil-upgrade>
+    <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
 <script setup>
 import { ref, onBeforeMount, nextTick, onMounted } from "vue";
-import Folder from "../../static/folder.png";
 import videoNavbar from "./components/index-component/navbar.vue";
 import Skeleton from "./components/index-component/skeleton.vue";
-import { onShow, onUnload } from "@dcloudio/uni-app";
 import starRecommend from "./components/index-component/star-recommend.vue";
 import recentPlayed from "./components/index-component/recent-played.vue";
 import hxList from "./components/index-component/hx-list.vue";
 import Classify from "./components/index-component/classify.vue";
-import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
+import wilModal from "../../components/wil-modal/index.vue";
+import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
-import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping } from "../../utils/common";
+import Folder from "../../static/folder.png";
 import emptyBg from "@/static/empty_bg.png";
+import { onShow, onUnload } from "@dcloudio/uni-app";
+import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping } from "../../utils/common";
+import { toParse, toStringfy } from "../mine/common";
 
 import * as CONFIG from "@/utils/config";
 const video_navbar = ref(null);
@@ -88,6 +91,7 @@ const selectType = ref({});
 
 const isConnected = ref(false); //手机是否连接网络
 const settingData = ref({}); //设置的数据
+const wil_modal = ref(null);
 
 //通过tmdb接口获取更详细的信息
 const searchMovieTv = (data, type) => {
@@ -173,6 +177,20 @@ const refreshWebDavVideo = async () => {
   await getMovieTv(listData.value, "/");
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
     refreshLoading.value = false;
+    wil_modal.value.showModal({
+      title: "温馨提示",
+      content: "未刮削出海报墙，是否要查看教程？",
+      confirmColor: "#ff6701",
+      confirm: async () => {
+        let query = {
+          url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview",
+          title: "问题与反馈",
+        };
+        uni.navigateTo({
+          url: "/pages/backend/index" + "?" + toStringfy(query),
+        });
+      },
+    });
     return;
   }
   let movie = groupBySource(movieTvData.value.movie);
@@ -359,6 +377,20 @@ const refresh189Video = async () => {
   await get189MovieTv(listData.value[0]);
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
     refreshLoading.value = false;
+    wil_modal.value.showModal({
+      title: "温馨提示",
+      content: "未刮削出海报墙，是否要查看教程？",
+      confirmColor: "#ff6701",
+      confirm: async () => {
+        let query = {
+          url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview",
+          title: "问题与反馈",
+        };
+        uni.navigateTo({
+          url: "/pages/backend/index" + "?" + toStringfy(query),
+        });
+      },
+    });
     return;
   }
   let movie = groupBySource(movieTvData.value.movie);
@@ -429,6 +461,20 @@ const refreshQuarkVideo = async () => {
   await getQuarkMovieTv(listData.value[0]);
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
     refreshLoading.value = false;
+    wil_modal.value.showModal({
+      title: "温馨提示",
+      content: "未刮削出海报墙，是否要查看教程？",
+      confirmColor: "#ff6701",
+      confirm: async () => {
+        let query = {
+          url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview",
+          title: "问题与反馈",
+        };
+        uni.navigateTo({
+          url: "/pages/backend/index" + "?" + toStringfy(query),
+        });
+      },
+    });
     return;
   }
   let movie = groupBySource(movieTvData.value.movie);
@@ -570,13 +616,7 @@ onShow(async () => {
       },
       {
         type: "夸克网盘",
-        list: [
-          {
-            name: "夸克1",
-            Cookie:
-              ";ctoken=CgvOfFIM8hhSqfviY0T1fAIy;b-user-id=d07f6ced-0d7b-b68a-6134-d26c4082e168;grey-id=fb371296-de94-b202-7885-93d242bd6156;grey-id.sig=ViN7tN26o1QV-zPEpLwAnAtBiipAc7myNw571kaBT0s;isQuark=true;isQuark.sig=hUgqObykqFom5Y09bll94T1sS9abT1X-4Df_lzgl8nM;__wpkreporterwid_=f68f7506-04fa-4b0a-9df0-1187a915f429;_UP_A4A_11_=wb9c815b241b406c89d9878d16323a8a;_UP_D_=pc;_UP_30C_6A_=st9c8620117cptolf15yp11wfpf6043z;_UP_TS_=sg10846d4799a905d5099da7066e9098292;_UP_E37_B7_=sg10846d4799a905d5099da7066e9098292;_UP_TG_=st9c8620117cptolf15yp11wfpf6043z;_UP_335_2B_=1;__pus=4e5b396fb61ea761749c315764d5ed76AAR717aMfqxockeVyN1KMakoKhCI7wZRJN2gGejJkVKNPc602qBj2sm7/q9ofjZ36bml3Eq1+gfLQVt+rnXndBxd;__kp=7f009c90-249c-11f0-862e-bb516aec0598;__kps=AATc9iwGX/ljvMFuRWfxn+MU;__ktd=WXoBAMZ6fERHHy7u3YbOdg==;__uid=AATc9iwGX/ljvMFuRWfxn+MU;web-grey-id=6c90f7a3-4450-61fd-fb92-f2cf182225b0;web-grey-id.sig=_fEH5fxAnQyBiVEUAlvTzZhi13VcAM6tLVXpx_XozvQ;tfstk=gjfodf9UiNnuW8jt2iR7IZwz07WHP4OBjMhpvBKU3n-je3dd8BlFvwdJLu_dmHjdR35Jy3LFxiKX93CRe905iGcKwuw58XApTlET65QSPBOUX_LKqUkWWePp8BJeNIWhaUu765Q5ztoyteVO9aQ4chteTLJy0m-XzBly4M-23F8t4BRFYrY2RUkrae-Puj8B0HReTM74oeOl_DxWAHf4cGpo1pp-Es8kEh7yqZS5gEi94a-mT2d2rL0czncETs6HZdoWYSoMAsSH_Lf4JvxMGnYHr_4KCH69-w8M_VGCogSVsd5YcXKF4kMqQZvSOhFcJvMBUETDXAA6bA80pQauorDZyL8Xu140ovMBUETDXr4mICpylE5G.;Video-Auth=6fMPMLio5tkd8moQoEaHEWRxfIjsm8eBtuWAjFc8YTxDM2VrCFqLJq/HtacI5mPqDbqdcNaBhsq4tyF/lIhJmbhkDAYy/GQirxDzMKOyxCcULt6qIrMluvuIzgi9qhkeHK9GDmo7w6KUKetDq64abQ==;__puus=52cb535defc64f5ca29f86166cdc99ebAARagkVg7TLDp2StuL2RjNnXjRyVKTwGkJOlEFdgkyYxkEgESosuaY+uAUmr88ehMgIw3/o0OFWZO5EsBBxhNnGGEu3gMhaTHjAb0mxrMNF/KEZ36osjnxKZK3+ncJ3Xe7dQKcnvSekezvLuWEXEaaZp2iSiy7dITxW4SmVrRlCcvsex3Ppu7EcdavdQWTb5hTDgsVEQz91gcuC+MQgKM3c3",
-          },
-        ],
+        list: [],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
       },
     ];

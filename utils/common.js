@@ -442,7 +442,7 @@ const handleSeasonName = (filename, reserve = false) => {  //reserve为true,就�
   const secondDotIndex = filename.indexOf(".", firstDotIndex + 1);//获取第二个.的位置索引
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
   let twoName = secondDotIndex === -1 ? name : filename.substring(firstDotIndex + 1, secondDotIndex) //获取第二个小数点前的内容，如果是第几季，给拼接上
-  if (isSeasonString(twoName)) {    
+  if (isSeasonString(twoName)) {
     name = name + ' ' + twoName
   }
   const lasekhIndex = name.lastIndexOf("(") > -1 ? name.lastIndexOf("(") : name.lastIndexOf("（");
@@ -483,6 +483,11 @@ const handleNameYear = (filename) => {
 const generateChineseNumberMapping = (maxNumber = 99, type = 'string') => {
   const chineseDigits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
   const mapping = {};
+  if (type == 'string') {
+    mapping['特别篇'] = '0'
+  } else if (type == 'number') {
+    mapping['0'] = '特别篇'
+  }
   if (maxNumber >= 1) {
     // 生成 1-9
     for (let i = 1; i <= 9; i++) {

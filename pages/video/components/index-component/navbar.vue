@@ -285,7 +285,7 @@ onMounted(() => {
         // border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;
-        background: url("../../../static/app-logo1.png") center no-repeat;
+        background: url("../../../../static/app-logo1.png") center no-repeat;
         background-size: 100% 100%;
       }
 

@@ -201,6 +201,7 @@ page {
                     padding: 0;
                     height: 100%;
                     box-shadow: none;
+                    color: #353a45;
                   }
                 }
               }

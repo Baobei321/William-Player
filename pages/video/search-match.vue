@@ -289,10 +289,10 @@ page {
     // align-items: center;
     justify-content: center;
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     ::v-deep .load-list {
       .search-match-list__item {
-        margin-top: 24rpx;
+        margin-bottom: 24rpx;
         border-radius: 16rpx;
         border: 2rpx solid rgb(235, 235, 235);
         display: flex;

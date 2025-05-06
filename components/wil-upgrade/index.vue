@@ -1,6 +1,6 @@
 <template>
   <div class="wil-upgrade">
-    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom" :custom-style="{ height: '45%' }" @closed="closedPopup" @open="open"
+    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom" :custom-style="{ height: '60%' }" @closed="closedPopup" @open="open"
       @close="close">
       <div class="wil-upgrade-container">
         <div class="wil-upgrade-title">

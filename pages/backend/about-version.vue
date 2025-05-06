@@ -7,9 +7,13 @@
           <span>William Player</span>
           <span>{{ appVersion }}</span>
         </div>
-        <div class="main-time">2025-05-04</div>
+        <div class="main-time">{{ CONFIG.updateTime }}</div>
       </div>
       <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true"></nut-cell>
+    </div>
+    <div class="about-version-protocol">
+      <image src="@/static/tmdb-xy.png"></image>
+      <div class="about-version-protocol__button" @click="toQQpage">联系我们</div>
     </div>
     <div class="about-version-button">
       <nut-button :disabled="isLoading" custom-color="#ff6701" @click="checkUpdate" v-if="showButton">
@@ -36,6 +40,7 @@ import wilUpgrade from "@/components/wil-upgrade/index.vue";
 import { getUntokenDicts } from "../../network/apis";
 import appLogo from "../../static/app-logo1.png";
 import * as CONFIG from "@/utils/config";
+import { toParse, toStringfy } from "../mine/common";
 
 const url = ref("");
 
@@ -70,6 +75,17 @@ const confirm = ({ selectedValue, selectedOptions }) => {
   uni.setStorageSync("remindTime", { type: selectedValue[0] });
   showPopover.value = false;
 };
+
+const toQQpage = () => {
+  let query = {
+    url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview/#/qqTalk",
+    title: "问题与反馈",
+  };
+  uni.navigateTo({
+    url: "/pages/backend/index" + "?" + toStringfy(query),
+  });
+};
+
 const toLogin = () => {
   // if (num == 5) {
   //   uni.removeStorageSync(CONFIG.USER_ID);
@@ -143,7 +159,7 @@ page {
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
-  padding-top: 350rpx;
+  padding-top: 250rpx;
   position: relative;
 
   .about-version-container {
@@ -214,7 +230,23 @@ page {
       }
     }
   }
+  .about-version-protocol {
+    margin-top: 24rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
+    image {
+      width: 526.5rpx;
+      height: 178.5rpx;
+    }
+    .about-version-protocol__button {
+      margin-top: 50rpx;
+      font-weight: bold;
+      font-size: 32rpx;
+      color: #68c6b3;
+    }
+  }
   .about-version-button {
     position: absolute;
     bottom: 50rpx;
