@@ -30,18 +30,17 @@ const listData = ref([]);
 
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 
-
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
   let idArr = [];
   listData.value = [];
-  let movieTvData = uni.getStorageSync("localMovieTvData");
-  movieTvData.movie.forEach((item) => {
+  let movieTvData = uni.getStorageSync("localMovieTvData") || {};
+  movieTvData.movie?.forEach((item) => {
     if (item.genre_ids) {
       idArr.push(...item.genre_ids);
     }
   });
-  movieTvData.tv.forEach((item) => {
+  movieTvData.tv?.forEach((item) => {
     if (item.genre_ids) {
       idArr.push(...item.genre_ids);
     }

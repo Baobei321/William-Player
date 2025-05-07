@@ -293,11 +293,11 @@ const setMovieTvImg = async (arr, type) => {
         }
         //刮削的时候查询这个影片名是不是在本地已经有了，本地有了的话，就不用去tmdb查了
         let exitMovieTv = null;
-        let localMovieTvData = uni.getStorageSync("localMovieTvData");
+        let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
         if (type == "movie") {
-          exitMovieTv = localMovieTvData.movie.find((i) => i.name == item.name) || null;
+          exitMovieTv = localMovieTvData.movie?.find((i) => i.name == item.name) || null;
         } else if (type == "tv") {
-          exitMovieTv = localMovieTvData.tv.find((i) => i.name == item.name) || null;
+          exitMovieTv = localMovieTvData.tv?.find((i) => i.name == item.name) || null;
         }
         let res = {};
         let data = {};

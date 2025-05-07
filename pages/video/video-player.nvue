@@ -344,7 +344,9 @@ export default {
       this.showRehandleButton = false;
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
-      let nowTv = localMovieTvData.tv.find((i) => (handleSeasonName(i.name, true) == this.routerParams.titlePlay && data.movieTvId ? data.movieTvId == i.movieTvId : i.path == "/" + data.path.slice(0, lastIndex)));
+      let nowTv = localMovieTvData.tv.find((i) => {
+        return handleSeasonName(i.name, true) == this.routerParams.titlePlay && (data.movieTvId ? data.movieTvId == i.movieTvId : i.path == "/" + data.path.slice(0, lastIndex));
+      });
       const numberMapping = generateChineseNumberMapping(40, "string");
       const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
       let season = "";

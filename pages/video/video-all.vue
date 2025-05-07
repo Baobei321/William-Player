@@ -6,8 +6,9 @@
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
             <div class="item-poster">
-              <image :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg : item.poster" class="item-poster-image" mode="aspectFill" @error="imgError(item)"
-                @load="imgLoad(item)">
+              <image
+                :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg :(routerParams.title=='最近观看' ? item.poster : 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' +item.poster)"
+                class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
               </image>
               <div :class="[item.select?'item-poster-check':'item-poster-nocheck']" v-if="isSelect">
                 <image src="@/static/check-active.png" v-if="item.select"></image>

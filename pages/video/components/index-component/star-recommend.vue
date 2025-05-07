@@ -50,37 +50,43 @@ const toVideoDetail = (item) => {
 onShow(() => {
   classifyList1.value = JSON.parse(JSON.stringify(classifyList));
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
-  let tv = localMovieTvData.tv.sort((a, b) => b.voteAverage - a.voteAverage);
-  tv = tv.slice(0, 3).map((item) => {
-    let genres = "";
-    item.type = "tv";
-    item.genre_ids.forEach((v, vindex) => {
-      if (vindex < item.genre_ids.length - 1) {
-        genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
-      } else {
-        genres += classifyList1.value.find((h) => h.id == v)?.label || "";
-      }
+  let tv = [];
+  if (localMovieTvData?.tv) {
+    tv = localMovieTvData.tv.sort((a, b) => b.voteAverage - a.voteAverage);
+    tv = tv.slice(0, 3).map((item) => {
+      let genres = "";
+      item.type = "tv";
+      item.genre_ids.forEach((v, vindex) => {
+        if (vindex < item.genre_ids.length - 1) {
+          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+        } else {
+          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+        }
+      });
+      item.genres = genres;
+      item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      return item;
     });
-    item.genres = genres;
-    item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
-    return item;
-  });
-  let movie = localMovieTvData.movie.sort((a, b) => b.voteAverage - a.voteAverage);
-  movie = movie.slice(0, 3).map((item) => {
-    item.name = removeExtension(item.name);
-    item.type = "movie";
-    let genres = "";
-    item.genre_ids.forEach((v, vindex) => {
-      if (vindex < item.genre_ids.length - 1) {
-        genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
-      } else {
-        genres += classifyList1.value.find((h) => h.id == v)?.label || "";
-      }
+  }
+  let movie = [];
+  if (localMovieTvData?.movie) {
+    movie = localMovieTvData.movie.sort((a, b) => b.voteAverage - a.voteAverage);
+    movie = movie.slice(0, 3).map((item) => {
+      item.name = removeExtension(item.name);
+      item.type = "movie";
+      let genres = "";
+      item.genre_ids.forEach((v, vindex) => {
+        if (vindex < item.genre_ids.length - 1) {
+          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+        } else {
+          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+        }
+      });
+      item.genres = genres;
+      item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      return item;
     });
-    item.genres = genres;
-    item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
-    return item;
-  });
+  }
   listData.value = [...tv, ...movie];
 });
 </script>

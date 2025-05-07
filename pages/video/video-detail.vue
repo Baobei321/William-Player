@@ -51,8 +51,8 @@
           <div class="movie-version-title">影片版本</div>
           <scroll-view class="movie-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="movie-version-list">
-              <div :class="['movie-version-list__item',item.provider==selectSource.provider ? 'movie-version-list__active' : '']" v-for="item in sourceList"
-                :key="item.provider" @click="changeSource(item)">
+              <div :class="['movie-version-list__item',item.provider+item.name==selectSource.provider+selectSource.name ? 'movie-version-list__active' : '']"
+                v-for="item in sourceList" :key="item.provider+item.name" @click="changeSource(item)">
                 {{ item.sourceName }}
               </div>
             </div>
