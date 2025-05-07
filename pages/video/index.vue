@@ -57,7 +57,7 @@ import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import Folder from "../../static/folder.png";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow, onUnload } from "@dcloudio/uni-app";
-import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping } from "../../utils/common";
+import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie } from "../../utils/common";
 import { toParse, toStringfy } from "../mine/common";
 
 import * as CONFIG from "@/utils/config";
@@ -236,21 +236,26 @@ const getMovieTv = async (arr1, path1 = "/") => {
   const handleMovieTv = async (arr, path) => {
     if (!arr?.length) return;
     refreshLoading.value = true;
+    let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8"];
     for (let item of arr) {
       if (item.type != "1") continue;
       if (item.name == "电影") {
-        uni.hideLoading();
         let movieResult = await getFolder({ path: path + "电影" }, selectMedia.value);
         movieResult.data.content ? "" : (movieResult.data.content = []);
-        movieResult.data.content.forEach((v) => {
+        for (let v of movieResult.data.content) {
           v.path = path + "电影/" + v.name;
           v.provider = movieResult.data.provider;
-        });
-        movieTvData.value.movie.push(...movieResult.data.content);
-        refreshData.value.found += movieResult.data.content.length;
+          if (v.type == "1") {
+            await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+          } else {
+            if (videoFormat.some((i) => v.name.includes(i))) {
+              movieTvData.value.movie.push(v);
+              refreshData.value.found ++;
+            }
+          }
+        }
       }
       if (item.name == "电视剧") {
-        uni.hideLoading();
         let tvResult = await getFolder({ path: path + "电视剧" }, selectMedia.value);
         tvResult.data.content.forEach((v) => {
           v.path = path + "电视剧/" + v.name;
@@ -260,7 +265,6 @@ const getMovieTv = async (arr1, path1 = "/") => {
         refreshData.value.found += tvResult.data.content.length;
       }
       if (item.name != "电影" && item.name != "电视剧") {
-        uni.hideLoading();
         let otherResult = await getFolder({ path: path + item.name }, selectMedia.value);
         await handleMovieTv(otherResult.data?.content, path + item.name + "/");
       }
@@ -443,23 +447,27 @@ const refresh189Video = async () => {
 const get189MovieTv = async (obj) => {
   if (!obj?.count) return;
   refreshLoading.value = true;
-
   let myVideo = obj.folderList.find((i) => i.name == "我的视频");
   let res1 = await get189Folder({ folderId: myVideo.id }, selectMedia.value);
-
   for (let item of res1.fileListAO.folderList) {
     if (item.name == "电影") {
       let movieResult = await get189Folder({ folderId: item.id }, selectMedia.value);
-      movieResult.fileListAO.fileList.forEach((v) => {
+      let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+      let movieArr = movieResult.fileListAO.fileList.filter((v) => {
         v.path = "/我的视频/电影/" + v.name;
         v.provider = "189CloudPC";
+        return videoFormat.some((i) => v.name.includes(i));
       });
-      movieTvData.value.movie.push(...movieResult.fileListAO.fileList);
-      refreshData.value.found += movieResult.fileListAO.fileList.length;
+      refreshData.value.found += movieArr.length;
+      movieTvData.value.movie.push(...movieArr);
+      for (let v of movieResult.fileListAO.folderList) {
+        v.path = "/我的视频/电影/" + v.name;
+        v.provider = "189CloudPC";
+        await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+      }
     }
     if (item.name == "电视剧") {
       let tvResult = await get189Folder({ folderId: item.id }, selectMedia.value);
-
       tvResult.fileListAO.folderList.forEach((v) => {
         v.path = "/我的视频/电视剧/" + v.name;
         v.provider = "189CloudPC";
@@ -533,15 +541,24 @@ const getQuarkMovieTv = async (obj) => {
   for (let item of res1.data.list) {
     if (item.file_name == "电影") {
       let movieResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
-      movieResult.data.list = movieResult.data.list.map((v) => {
-        return { id: v.fid, name: v.file_name, path: "/我的视频/电影/" + v.file_name, provider: "Quark", size: v.size };
-      });
-      movieTvData.value.movie.push(...movieResult.data.list);
-      refreshData.value.found += movieResult.data.list.length;
+      for (let v of movieResult.data.list) {
+        v.id = v.fid;
+        v.name = v.file_name;
+        v.path = "/我的视频/电影/" + v.file_name;
+        v.provider = "Quark";
+        if (v.file_type == "0") {
+          await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+        } else {
+          let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+          if (videoFormat.some((i) => v.name.includes(i))) {
+            movieTvData.value.movie.push(v);
+            refreshData.value.found++;
+          }
+        }
+      }
     }
     if (item.file_name == "电视剧") {
       let tvResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
-
       tvResult.data.list = tvResult.data.list.map((v) => {
         return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧/" + v.file_name, provider: "Quark", size: v.size };
       });

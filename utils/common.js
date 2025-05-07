@@ -530,6 +530,64 @@ const generateChineseNumberMapping = (maxNumber = 99, type = 'string') => {
   return mapping;
 }
 
+//递归查询电影文件夹里的深层电影
+const recursionMovie = async (data, movieArr, selectType, selectMedia, refreshData) => {
+  let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8"];
+  if (selectType.type == "WebDAV") {
+    let result = await getFolder({ path: data.path }, selectMedia);
+    if (result.data.content) {
+      for (let item of result.data.content) {
+        item.provider = result.data.provider;
+        item.path = data.path + "/" + item.name;
+        if (item.type == "1") {
+          await recursionMovie(item, movieArr, selectType, selectMedia, refreshData);
+        } else {
+          if (videoFormat.some((v) => item.name.includes(v))) {
+            refreshData.found++;
+            movieArr.push(item);
+          }
+        }
+      }
+    }
+  } else if (selectType.type == "天翼云盘") {
+    let result = await get189Folder({ folderId: data.id }, selectMedia);
+    if (result.fileListAO.folderList) {
+      for (let item of result.fileListAO.folderList) {
+        item.provider = "189CloudPC";
+        item.path = data.path + "/" + item.name;
+        await recursionMovie(item, movieArr, selectType, selectMedia, refreshData);
+      }
+    }
+    if (result.fileListAO.fileList) {
+      result.fileListAO.fileList.forEach((item) => {
+        item.path = data.path + "/" + item.name;
+        item.provider = "189CloudPC";
+        if (videoFormat.some((v) => item.name.includes(v))) {
+          refreshData.found++;
+          movieArr.push(item);
+        }
+      });
+    }
+  } else if (selectType.type == "夸克网盘") {
+    let result = await getQuarkFolder({ fid: data.id }, selectMedia);
+    if (result.data.list) {
+      for (let item of result.data.list) {
+        item.id = item.fid
+        item.name = item.file_name
+        item.provider = "Quark";
+        item.path = data.path + "/" + item.file_name;
+        if (item.file_type == "0") {
+          await recursionMovie(item, movieArr, selectType, selectMedia, refreshData);
+        } else {
+          if (videoFormat.some((v) => item.file_name.includes(v))) {
+            refreshData.found++;
+            movieArr.push(item);
+          }
+        }
+      }
+    }
+  }
+};
 
 let classifyList = [
   { id: "18", label: "剧情", img: "https://n.sinaimg.cn/sinakd20230822s/429/w1000h1029/20230822/85c9-12a6845ed1089e9489c8510b78bfd6ef.jpg", background: "linear-gradient(to bottom, #e90c00, #fc633d)" },
@@ -556,5 +614,5 @@ let classifyList = [
 export {
   getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl,
   getQuarkResolutionUrl, getQuarkUser, handleSecond, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, handleNameYear,
-  generateChineseNumberMapping, classifyList
+  generateChineseNumberMapping, recursionMovie, classifyList
 };
