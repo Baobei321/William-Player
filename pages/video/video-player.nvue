@@ -33,7 +33,8 @@ import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, getQuarkVideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder, calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/common";
+import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
+import { calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/scrape";
 export default {
   components: {
     wilNavbar,

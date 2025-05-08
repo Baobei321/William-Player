@@ -59,8 +59,8 @@
 </template>
 
 <script>
-import { getMovieTvById, generateChineseNumberMapping } from "@/utils/common.js";
-
+import { getMovieTvById } from "@/utils/common.js";
+import { generateChineseNumberMapping } from "@/utils/scrape.js";
 export default {
   props: {
     movieTvId: String,

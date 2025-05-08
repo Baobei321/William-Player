@@ -29,7 +29,7 @@
 <script setup>
 import wilSwiper from "@/components/wil-swiper/index.vue";
 import { ref, onBeforeMount } from "vue";
-import { classifyList, handleSeasonName } from "../../../../utils/common";
+import { classifyList, handleSeasonName } from "../../../../utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 
 const listData = ref([]);

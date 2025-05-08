@@ -26,7 +26,7 @@
 import { ref, nextTick } from "vue";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow } from "@dcloudio/uni-app";
-import { handleSeasonName } from "../../../../utils/common";
+import { handleSeasonName } from "../../../../utils/scrape";
 
 const props = defineProps({
   title: { type: String, default: "电影" },

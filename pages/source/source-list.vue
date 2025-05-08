@@ -42,7 +42,7 @@ import { ref } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "../mine/common";
-import { loginUser, getFolder, get189Folder, getQuarkFolder } from "../../utils/common";
+import { loginUser, get189Folder, getQuarkFolder } from "../../utils/common";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
 import moreButton from "@/static/more-button.png";

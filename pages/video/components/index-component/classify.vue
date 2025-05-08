@@ -19,7 +19,7 @@
 <script setup>
 import { ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import { classifyList } from "../../../../utils/common.js";
+import { classifyList } from "../../../../utils/scrape.js";
 import emptyBg from "@/static/empty_bg.png";
 
 const props = defineProps({

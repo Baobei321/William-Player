@@ -57,7 +57,8 @@ import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import Folder from "../../static/folder.png";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow, onUnload } from "@dcloudio/uni-app";
-import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie } from "../../utils/common";
+import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
+import { handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie } from "../../utils/scrape";
 import { toParse, toStringfy } from "../mine/common";
 
 import * as CONFIG from "@/utils/config";
@@ -236,7 +237,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
   const handleMovieTv = async (arr, path) => {
     if (!arr?.length) return;
     refreshLoading.value = true;
-    let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8"];
+    let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
     for (let item of arr) {
       if (item.type != "1") continue;
       if (item.name == "电影") {
@@ -250,7 +251,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
           } else {
             if (videoFormat.some((i) => v.name.includes(i))) {
               movieTvData.value.movie.push(v);
-              refreshData.value.found ++;
+              refreshData.value.found++;
             }
           }
         }

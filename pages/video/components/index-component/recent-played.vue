@@ -31,7 +31,7 @@
 <script setup>
 import { ref } from "vue";
 import playVideoButton from "../../../../static/playVideo-button.png";
-import { handleSecond, parseTime, handleSeasonName } from "../../../../utils/common";
+import { handleSecond, parseTime, handleSeasonName } from "../../../../utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import { toStringfy } from "../../../mine/common";

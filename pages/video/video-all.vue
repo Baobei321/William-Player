@@ -38,7 +38,7 @@ import emptyBg from "@/static/empty_bg.png";
 import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
 import { toStringfy } from "../mine/common";
-import { handleSeasonName } from "@/utils/common.js";
+import { handleSeasonName } from "@/utils/scrape.js";
 
 const requestParams = ref({});
 

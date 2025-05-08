@@ -129,7 +129,8 @@
 import { onBeforeMount, ref, nextTick } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import { useDict } from "../../utils/useDict";
-import { loginUser, getFolder, handleSecond, get189Folder, getQuarkFolder, parseTime, getTvSeason, getMovieTvById, calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/common";
+import { loginUser, getFolder, get189Folder, getQuarkFolder, getTvSeason, getMovieTvById } from "../../utils/common";
+import { parseTime, calTime, handleSecond, handleSeasonName, generateChineseNumberMapping } from "../../utils/scrape";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
