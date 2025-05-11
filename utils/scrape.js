@@ -177,7 +177,7 @@ const recursionMovie = async (data, movieArr, selectType, selectMedia, refreshDa
     if (selectType.type == "WebDAV") {
         let result = await getFolder({ path: data.path }, selectMedia);
         if (result.data.content) {
-            for (let item of result.data.content) {
+            await Promise.allSettled(result.data.content.map(async item => {
                 item.provider = result.data.provider;
                 item.path = data.path + "/" + item.name;
                 if (item.type == "1") {
@@ -188,16 +188,16 @@ const recursionMovie = async (data, movieArr, selectType, selectMedia, refreshDa
                         movieArr.push(item);
                     }
                 }
-            }
+            }))
         }
     } else if (selectType.type == "天翼云盘") {
         let result = await get189Folder({ folderId: data.id }, selectMedia);
         if (result.fileListAO.folderList) {
-            for (let item of result.fileListAO.folderList) {
+            await Promise.allSettled(result.fileListAO.folderList.map(async item => {
                 item.provider = "189CloudPC";
                 item.path = data.path + "/" + item.name;
                 await recursionMovie(item, movieArr, selectType, selectMedia, refreshData);
-            }
+            }))
         }
         if (result.fileListAO.fileList) {
             result.fileListAO.fileList.forEach((item) => {
@@ -212,7 +212,7 @@ const recursionMovie = async (data, movieArr, selectType, selectMedia, refreshDa
     } else if (selectType.type == "夸克网盘") {
         let result = await getQuarkFolder({ fid: data.id }, selectMedia);
         if (result.data.list) {
-            for (let item of result.data.list) {
+            await Promise.allSettled(result.data.list.map(async item => {
                 item.id = item.fid
                 item.name = item.file_name
                 item.provider = "Quark";
@@ -225,29 +225,125 @@ const recursionMovie = async (data, movieArr, selectType, selectMedia, refreshDa
                         movieArr.push(item);
                     }
                 }
-            }
+            }))
         }
     }
 };
 
+const startsWithSeasonFormat = (str) => {
+    // 正则表达式匹配以多种季数格式开头的字符串
+    const seasonRegex = /^(第[一二三四五六七八九十百千万\d]+季|Season\s?\d+|S\d{1,2})/i;
+    return seasonRegex.test(str);
+}
+
+//提取出第几季
+function extractSeasonNumber(str) {
+    // 优先检查"特别篇"
+    if (/特别篇/i.test(str)) {
+        return '0';
+    }
+    const seasonRegex = /(?:^| )(?:第([一二三四五六七八九十百千万\d]+)季|Season\s?(\d+)|S(\d{1,2}))(?!\d)/i;
+    const match = str.match(seasonRegex);
+
+    if (!match) return '1';
+
+    if (match[1]) {
+        const chineseNumbers = generateChineseNumberMapping(40, "string");
+        return chineseNumbers[match[1]] || parseInt(match[1], 10);
+    } else {
+        return parseInt(match[2] || match[3], 10);
+    }
+}
+
+
 //递归查询电视剧文件夹里的深层电视剧
-const recursionTv = async (data, movieArr, selectType, selectMedia, refreshData) => {
+const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refreshData) => {
     let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
     if (selectType.type == "WebDAV") {
         let result = await getFolder({ path: data.path }, selectMedia);
         if (result.data.content) {
-            for (let item of result.data.content) {
-                item.provider = result.data.provider;
-                item.path = data.path + "/" + item.name;
-                if (item.type == "1") {
-                    await recursionMovie(item, movieArr, selectType, selectMedia, refreshData);
+            let shouldSkip = false; // 全局标记跳过继续循环
+            await Promise.allSettled(result.data.content.map(async child => {
+                if (shouldSkip) return;
+                child.provider = result.data.provider;
+                child.path = data.path + "/" + child.name;
+                if (child.type == "1") {
+                    await recursionTv(child, data, tvArr, selectType, selectMedia, refreshData);
                 } else {
-                    if (videoFormat.some((v) => item.name.includes(v))) {
+                    if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
+                        shouldSkip = true
                         refreshData.found++;
-                        movieArr.push(item);
+                        if (startsWithSeasonFormat(data.name)) {
+                            tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                        } else {
+                            if (data.name.includes(handleSeasonName(parent.name))) {
+                                tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            } else {
+                                tvArr.push({ ...data, season: '1', seasonPath: data.path })
+                            }
+                        }
                     }
                 }
-            }
+            }))
+        }
+    } else if (selectType.type == '天翼云盘') {
+        let result = await get189Folder({ folderId: data.id }, selectMedia);
+        if (result.fileListAO.folderList) {
+            await Promise.allSettled(result.fileListAO.folderList.map(async child => {
+                child.provider = "189CloudPC";
+                child.path = data.path + "/" + child.name;
+                await recursionTv(child, data, tvArr, selectType, selectMedia, refreshData);
+            }))
+        }
+        if (result.fileListAO.fileList) {
+            let shouldSkip = false; // 全局标记跳过继续循环
+            await Promise.allSettled(result.fileListAO.fileList.map(async child => {
+                if (shouldSkip) return;
+                child.path = data.path + "/" + child.name;
+                child.provider = "189CloudPC";
+                if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
+                    shouldSkip = true
+                    refreshData.found++;
+                    if (startsWithSeasonFormat(data.name)) {
+                        tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                    } else {
+                        if (data.name.includes(handleSeasonName(parent.name))) {
+                            tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                        } else {
+                            tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
+                        }
+                    }
+                }
+            }))
+        }
+    } else if (selectType.type == '夸克网盘') {
+        let result = await getQuarkFolder({ fid: data.id }, selectMedia);
+        if (result.data.list) {
+            result.data.list = result.data.list.map((v) => {
+                return { id: v.fid, name: v.file_name, path: data.path + "/" + v.file_name, provider: "Quark", size: v.size, file_type: v.file_type };
+            });
+            let shouldSkip = false; // 全局标记跳过继续循环
+            await Promise.allSettled(result.data.list.map(async child => {
+                if (shouldSkip) return;
+                if (child.file_type == "0") {
+                    await recursionTv(child, data, tvArr, selectType, selectMedia, refreshData);
+                } else {
+                    if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
+                        shouldSkip = true;
+                        refreshData.found++;
+                        if (startsWithSeasonFormat(data.name)) {
+                            tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                        } else {
+                            if (data.name.includes(handleSeasonName(parent.name))) {
+                                tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            } else {
+                                tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
+                            }
+                        }
+                        return
+                    }
+                }
+            }))
         }
     }
 }

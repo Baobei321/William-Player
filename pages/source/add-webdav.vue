@@ -2,11 +2,11 @@
   <div class="add-webdav-form">
     <wil-navbar :title="title"></wil-navbar>
     <div class="add-webdav-form__container">
-      <base-form v-model="state.formData" :options="options" ref="base_form">
+      <wil-form v-model="state.formData" :options="options" ref="base_form">
         <template #protocol>
           <nut-cell :title="protoColumns.find(i=>i.value==state.formData.protocol)?.text" is-link @click="openPopup"></nut-cell>
         </template>
-      </base-form>
+      </wil-form>
       <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title=='添加WebDAV'?'添加':'修改' }}</nut-button>
       <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
       <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
@@ -19,7 +19,7 @@
   
   <script setup>
 import { onBeforeMount, reactive, ref } from "vue";
-import baseForm from "../../components/wil-form/index.vue";
+import wilForm from "../../components/wil-form/index.vue";
 import wilNavbar from "../../components/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { loginUser } from "../../utils/common";

@@ -167,12 +167,20 @@ const handleSelect = async (item, index) => {
   let res = {};
   if (item.media_type == "tv") {
     res = await getTvDetail(item.id);
-    if (res.seasons.length >= 2) {
-      seasonColumns.value = res.seasons.map((v) => {
-        return { text: v.name, value: v.season_number };
+    if (routerParams.value.maxSeasonLength > res.seasons.length) {
+      uni.showToast({
+        title: "库内影片的季数大于当前影片",
+        icon: "none",
       });
-      showSeason.value = true;
-      return;
+      return
+    } else {
+      if (res.seasons.length >= 2 && routerParams.value.maxSeasonLength == 1) {
+        seasonColumns.value = res.seasons.map((v) => {
+          return { text: v.name, value: v.season_number };
+        });
+        showSeason.value = true;
+        return;
+      }
     }
   } else {
     res = await getMovieDetail(item.id);

@@ -1,5 +1,6 @@
 <template>
   <div class="video">
+    <!-- <div style="background: #efefef;width: 375px;height: 812px;"></div> -->
     <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar" :tmdbKey1="tmdbKey"
       class="navbar-transparent"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
@@ -52,14 +53,14 @@ import Classify from "./components/index-component/classify.vue";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import wilModal from "../../components/wil-modal/index.vue";
 import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
+import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
+import { handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie, recursionTv } from "../../utils/scrape";
+import { toParse, toStringfy } from "../mine/common";
 import appLogo from "../../static/app-logo1.png";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
 import Folder from "../../static/folder.png";
 import emptyBg from "@/static/empty_bg.png";
 import { onShow, onUnload } from "@dcloudio/uni-app";
-import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
-import { handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie } from "../../utils/scrape";
-import { toParse, toStringfy } from "../mine/common";
 
 import * as CONFIG from "@/utils/config";
 const video_navbar = ref(null);
@@ -137,22 +138,51 @@ const handleSize = (size) => {
 
 //groupBy视频来源，将多个网盘来的视频合成一个
 const groupBySource = (arr) => {
+  const chineseNumber = generateChineseNumberMapping(40, "number");
   const map = new Map();
-  arr.forEach((item) => {
+  let arr1 = arr.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
+  arr1.forEach((item) => {
     if (!map.has(handleSeasonName(item.name, true))) {
+      let deleteProp = ["created", "hash_info", "hashinfo", "is_dir", "modified", "sign"];
+      deleteProp.forEach((v) => {
+        delete item[v];
+      });
       map.set(handleSeasonName(item.name, true), {
         ...item,
         provider: null,
         source: [],
       });
     }
-    map.get(handleSeasonName(item.name, true)).source.push({
-      provider: item.provider,
-      size: handleSize(item.size) || 0,
-      path: item.path,
-      folderFileId: item.id,
-      name: item.name,
-    });
+    let source = map.get(handleSeasonName(item.name, true)).source;
+    if (!source.length) {
+      source.push({
+        provider: item.provider,
+        size: handleSize(item.size) || 0,
+        path: item.path,
+        folderFileId: item.id, //电影的folderFileId放在这个层级
+        name: item.name,
+        seasonArr: [{ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId }], //电视剧的folderFileId放在这个层级
+      });
+    } else {
+      let nowSource = source.find((v) => v.name == item.name && v.path == item.path);
+      if (nowSource) {
+        nowSource.seasonArr.push({ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId });
+        nowSource.seasonArr = nowSource.seasonArr.sort((a, b) => {
+          return Number(a.season) - Number(b.season);
+        });
+      } else {
+        source.push({
+          provider: item.provider,
+          size: handleSize(item.size) || 0,
+          path: item.path,
+          folderFileId: item.id,
+          name: item.name,
+          seasonArr: [{ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: item.season }],
+        });
+      }
+    }
   });
   const result = Array.from(map.values());
   return result;
@@ -214,6 +244,10 @@ const refreshWebDavVideo = async () => {
   refreshData.value.updated = refreshData.value.toupdate;
   refreshData.value.toupdate = 0;
   refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
+  // localMovieTvData.value.tv[23].source[0].seasonArr = [
+  //   { name: "第一季", path: "/天翼云盘/电视剧/重启之极海听雷/第一季", season: "1" },
+  //   { name: "第二季", path: "/天翼云盘/电视剧/重启之极海听雷/第二季", season: "2" },
+  // ];
   uni.setStorageSync("localMovieTvData", localMovieTvData.value);
   refreshLoading.value = false;
   addOperLog({ title: "WebDAV生成海报墙", businessType: 11, operatorType: 2 });
@@ -243,27 +277,33 @@ const getMovieTv = async (arr1, path1 = "/") => {
       if (item.name == "电影") {
         let movieResult = await getFolder({ path: path + "电影" }, selectMedia.value);
         movieResult.data.content ? "" : (movieResult.data.content = []);
-        for (let v of movieResult.data.content) {
-          v.path = path + "电影/" + v.name;
-          v.provider = movieResult.data.provider;
-          if (v.type == "1") {
-            await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
-          } else {
-            if (videoFormat.some((i) => v.name.includes(i))) {
-              movieTvData.value.movie.push(v);
-              refreshData.value.found++;
+        await Promise.allSettled(
+          movieResult.data.content.map(async (v) => {
+            v.path = path + "电影/" + v.name;
+            v.provider = movieResult.data.provider;
+            if (v.type == "1") {
+              await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+            } else {
+              if (videoFormat.some((i) => v.name.includes(i))) {
+                movieTvData.value.movie.push(v);
+                refreshData.value.found++;
+              }
             }
-          }
-        }
+          })
+        );
       }
       if (item.name == "电视剧") {
         let tvResult = await getFolder({ path: path + "电视剧" }, selectMedia.value);
-        tvResult.data.content.forEach((v) => {
-          v.path = path + "电视剧/" + v.name;
-          v.provider = tvResult.data.provider;
-        });
-        movieTvData.value.tv.push(...tvResult.data.content);
-        refreshData.value.found += tvResult.data.content.length;
+        tvResult.data.content ? "" : (tvResult.data.content = []);
+        await Promise.allSettled(
+          tvResult.data.content.map(async (v) => {
+            v.path = path + "电视剧/" + v.name;
+            v.provider = tvResult.data.provider;
+            if (v.type == "1") {
+              await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+            }
+          })
+        );
       }
       if (item.name != "电影" && item.name != "电视剧") {
         let otherResult = await getFolder({ path: path + item.name }, selectMedia.value);
@@ -300,9 +340,9 @@ const setMovieTvImg = async (arr, type) => {
         let exitMovieTv = null;
         let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
         if (type == "movie") {
-          exitMovieTv = localMovieTvData.movie?.find((i) => i.name == item.name) || null;
+          exitMovieTv = localMovieTvData.movie?.find((i) => i.path == item.path) || null;
         } else if (type == "tv") {
-          exitMovieTv = localMovieTvData.tv?.find((i) => i.name == item.name) || null;
+          exitMovieTv = localMovieTvData.tv?.find((i) => i.path == item.path) || null;
         }
         let res = {};
         let data = {};
@@ -311,11 +351,14 @@ const setMovieTvImg = async (arr, type) => {
           res = await searchMovieTv({ query: handleSeasonName(item.name), first_air_date_year: handleNameYear(item.name) }, type);
           if (res.results.length == 1) {
             data = res.results[0];
-          } else {
+          } else if (res.results.length > 1) {
             data = res.results.find((vitem) => vitem.name?.includes(handleSeasonName(item.name)) || vitem.title?.includes(handleSeasonName(item.name)));
+          } else {
+            data = { name: handleSeasonName(item.name) };
           }
         } else {
           data = exitMovieTv;
+          item.name = data.name;
           type == "movie" ? (data.release_date = data.releaseTime) : (data.first_air_date = data.releaseTime);
           data.id = data.movieTvId;
           data.poster_path = data.poster;
@@ -326,8 +369,9 @@ const setMovieTvImg = async (arr, type) => {
           let newItem = { ...item };
           newItem.poster = data.poster_path;
           newItem.backdrop = data.backdrop_path;
+          let seasonRes = null;
           if (season != "1" && !exitMovieTv) {
-            let seasonRes = await getTvSeason({
+            seasonRes = await getTvSeason({
               movieTvId: data.id,
               season: season,
             });
@@ -338,7 +382,7 @@ const setMovieTvImg = async (arr, type) => {
             newItem.type = "2";
           } else if (type == "tv") {
             newItem.season = season;
-            newItem.releaseTime = data.first_air_date;
+            newItem.releaseTime = seasonRes ? seasonRes.air_date : data.first_air_date;
             newItem.type = "1";
           }
           newItem.movieTvId = data.id;
@@ -461,20 +505,24 @@ const get189MovieTv = async (obj) => {
       });
       refreshData.value.found += movieArr.length;
       movieTvData.value.movie.push(...movieArr);
-      for (let v of movieResult.fileListAO.folderList) {
-        v.path = "/我的视频/电影/" + v.name;
-        v.provider = "189CloudPC";
-        await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
-      }
+      await Promise.allSettled(
+        movieResult.fileListAO.folderList.map(async (v) => {
+          v.path = "/我的视频/电影/" + v.name;
+          v.provider = "189CloudPC";
+          await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+        })
+      );
     }
     if (item.name == "电视剧") {
       let tvResult = await get189Folder({ folderId: item.id }, selectMedia.value);
-      tvResult.fileListAO.folderList.forEach((v) => {
-        v.path = "/我的视频/电视剧/" + v.name;
-        v.provider = "189CloudPC";
-      });
-      movieTvData.value.tv.push(...tvResult.fileListAO.folderList);
-      refreshData.value.found += tvResult.fileListAO.folderList.length;
+      tvResult.fileListAO.folderList ? "" : (tvResult.fileListAO.folderList = []);
+      await Promise.allSettled(
+        tvResult.fileListAO.folderList.map(async (v) => {
+          v.path = "/我的视频/电视剧/" + v.name;
+          v.provider = "189CloudPC";
+          await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+        })
+      );
     }
   }
   if (res1.fileListAO.folderList.every((i) => i.name != "电影" && i.name != "电视剧")) {
@@ -538,33 +586,40 @@ const getQuarkMovieTv = async (obj) => {
   refreshLoading.value = true;
   let myVideo = obj.list.find((i) => i.file_name == "我的视频");
   let res1 = await getQuarkFolder({ fid: myVideo.fid }, selectMedia.value);
-
   for (let item of res1.data.list) {
     if (item.file_name == "电影") {
       let movieResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
-      for (let v of movieResult.data.list) {
-        v.id = v.fid;
-        v.name = v.file_name;
-        v.path = "/我的视频/电影/" + v.file_name;
-        v.provider = "Quark";
-        if (v.file_type == "0") {
-          await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
-        } else {
-          let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-          if (videoFormat.some((i) => v.name.includes(i))) {
-            movieTvData.value.movie.push(v);
-            refreshData.value.found++;
+      await Promise.allSettled(
+        movieResult.data.list.map(async (v) => {
+          v.id = v.fid;
+          v.name = v.file_name;
+          v.path = "/我的视频/电影/" + v.file_name;
+          v.provider = "Quark";
+          if (v.file_type == "0") {
+            await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+          } else {
+            let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+            if (videoFormat.some((i) => v.name.includes(i))) {
+              movieTvData.value.movie.push(v);
+              refreshData.value.found++;
+            }
           }
-        }
-      }
+        })
+      );
     }
     if (item.file_name == "电视剧") {
       let tvResult = await getQuarkFolder({ fid: item.fid }, selectMedia.value);
+      tvResult.data.list ? "" : (tvResult.data.list = []);
       tvResult.data.list = tvResult.data.list.map((v) => {
-        return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧/" + v.file_name, provider: "Quark", size: v.size };
+        return { id: v.fid, name: v.file_name, path: "/我的视频/电视剧/" + v.file_name, provider: "Quark", size: v.size, file_type: v.file_type };
       });
-      movieTvData.value.tv.push(...tvResult.data.list);
-      refreshData.value.found += tvResult.data.list.length;
+      await Promise.allSettled(
+        tvResult.data.list.map(async (v) => {
+          if (v.file_type == "0") {
+            await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+          }
+        })
+      );
     }
   }
   if (res1.data.list.every((i) => i.file_name != "电影" && i.file_name != "电视剧")) {
@@ -587,7 +642,13 @@ const refreshVideo = async () => {
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
       localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
-      localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+      localMovieTvData.value.tv?.some((v) => {
+        if (item.season != "1") {
+          return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
+        } else {
+          return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
+        }
+      })
     );
   });
   uni.setStorageSync("historyPlay", historyPlay.value);
@@ -650,12 +711,18 @@ onShow(async () => {
       { type: "WebDAV", list: [], img: webdavFileIcon },
       {
         type: "天翼云盘",
-        list: [],
+        list: [{ name: "天翼1", JSESSIONID: "C58D84CC935A033812607ECFE9FD22ED", COOKIE_LOGIN_USER: "33B57676BB871A7B4087885F88C25AA06168D6B26178CB63A20657E0241DCA9962DD9B2FD4310151EE41F0B405B8A38E07FBE9DA9F45DB99BDDD99EC" }],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
       },
       {
         type: "夸克网盘",
-        list: [],
+        list: [
+          {
+            name: "测试",
+            Cookie:
+              ";ctoken=CgvOfFIM8hhSqfviY0T1fAIy;b-user-id=d07f6ced-0d7b-b68a-6134-d26c4082e168;grey-id=fb371296-de94-b202-7885-93d242bd6156;grey-id.sig=ViN7tN26o1QV-zPEpLwAnAtBiipAc7myNw571kaBT0s;isQuark=true;isQuark.sig=hUgqObykqFom5Y09bll94T1sS9abT1X-4Df_lzgl8nM;__wpkreporterwid_=f68f7506-04fa-4b0a-9df0-1187a915f429;_UP_A4A_11_=wb9c815b241b406c89d9878d16323a8a;_UP_D_=pc;_UP_30C_6A_=st9c8620117cptolf15yp11wfpf6043z;_UP_TS_=sg10846d4799a905d5099da7066e9098292;_UP_E37_B7_=sg10846d4799a905d5099da7066e9098292;_UP_TG_=st9c8620117cptolf15yp11wfpf6043z;_UP_335_2B_=1;__pus=4e5b396fb61ea761749c315764d5ed76AAR717aMfqxockeVyN1KMakoKhCI7wZRJN2gGejJkVKNPc602qBj2sm7/q9ofjZ36bml3Eq1+gfLQVt+rnXndBxd;__kp=7f009c90-249c-11f0-862e-bb516aec0598;__kps=AATc9iwGX/ljvMFuRWfxn+MU;__ktd=WXoBAMZ6fERHHy7u3YbOdg==;__uid=AATc9iwGX/ljvMFuRWfxn+MU;web-grey-id=6c90f7a3-4450-61fd-fb92-f2cf182225b0;web-grey-id.sig=_fEH5fxAnQyBiVEUAlvTzZhi13VcAM6tLVXpx_XozvQ;tfstk=gjfodf9UiNnuW8jt2iR7IZwz07WHP4OBjMhpvBKU3n-je3dd8BlFvwdJLu_dmHjdR35Jy3LFxiKX93CRe905iGcKwuw58XApTlET65QSPBOUX_LKqUkWWePp8BJeNIWhaUu765Q5ztoyteVO9aQ4chteTLJy0m-XzBly4M-23F8t4BRFYrY2RUkrae-Puj8B0HReTM74oeOl_DxWAHf4cGpo1pp-Es8kEh7yqZS5gEi94a-mT2d2rL0czncETs6HZdoWYSoMAsSH_Lf4JvxMGnYHr_4KCH69-w8M_VGCogSVsd5YcXKF4kMqQZvSOhFcJvMBUETDXAA6bA80pQauorDZyL8Xu140ovMBUETDXr4mICpylE5G.;Video-Auth=6fMPMLio5tkd8moQoEaHEWRxfIjsm8eBtuWAjFc8YTxDM2VrCFqLJq/HtacI5mPqDbqdcNaBhsq4tyF/lIhJmbhkDAYy/GQirxDzMKOyxCcULt6qIrMluvuIzgi9qhkeHK9GDmo7w6KUKetDq64abQ==;__puus=52cb535defc64f5ca29f86166cdc99ebAARagkVg7TLDp2StuL2RjNnXjRyVKTwGkJOlEFdgkyYxkEgESosuaY+uAUmr88ehMgIw3/o0OFWZO5EsBBxhNnGGEu3gMhaTHjAb0mxrMNF/KEZ36osjnxKZK3+ncJ3Xe7dQKcnvSekezvLuWEXEaaZp2iSiy7dITxW4SmVrRlCcvsex3Ppu7EcdavdQWTb5hTDgsVEQz91gcuC+MQgKM3c3",
+          },
+        ],
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
       },
     ];
@@ -670,7 +737,13 @@ onShow(async () => {
       historyPlay.value = historyPlay.value.filter((item) => {
         return (
           localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
-          localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+          localMovieTvData.value.tv?.some((v) => {
+            if (item.season != "1") {
+              return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
+            } else {
+              return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
+            }
+          })
         );
       });
       uni.setStorageSync("historyPlay", historyPlay.value);
@@ -680,7 +753,13 @@ onShow(async () => {
     historyPlay.value = historyPlay.value.filter((item) => {
       return (
         localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name) && v.movieTvId == item.movieTvId) ||
-        localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+        localMovieTvData.value.tv?.some((v) => {
+          if (item.season != "1") {
+            return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
+          } else {
+            return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
+          }
+        })
       );
     });
     uni.setStorageSync("historyPlay", historyPlay.value);
@@ -726,7 +805,13 @@ onBeforeMount(async () => {
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
       localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
-      localMovieTvData.value.tv?.some((v) => handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId)
+      localMovieTvData.value.tv?.some((v) => {
+        if (item.season != "1") {
+          return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
+        } else {
+          return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
+        }
+      })
     );
   });
   uni.setStorageSync("historyPlay", historyPlay.value);

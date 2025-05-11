@@ -308,7 +308,7 @@ export default {
     transform: translateY(0);
   }
   .popup-hide {
-    transform: translateY(700rpx);
+    transform: translateY(800rpx);
   }
 }
 </style>

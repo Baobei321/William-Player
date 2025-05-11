@@ -1,9 +1,10 @@
 <template>
   <nut-transition :show="show" name="fade" :duration="200" style="position: fixed;z-index: 9999;">
     <div :class="['wil-modal']">
-      <div class="wil-modal-top">
+      <div :class="['wil-modal-top',$slots.default?'':'wil-modal-height']">
         <div class="wil-modal-title">{{data.title}}</div>
-        <div class="wil-modal-content">{{data.content}}</div>
+        <slot v-if="$slots.default"></slot>
+        <div class="wil-modal-content" v-else>{{data.content}}</div>
       </div>
       <div class="wil-modal-button">
         <div class="wil-modal-button__cancel" :style="{color:data.cancelColor}" @click="cancel">{{ data.cancelText }}</div>
@@ -118,7 +119,7 @@ defineExpose({
   transform: translate(-50%, -50%);
   width: calc(100% - 60rpx);
   .wil-modal-top {
-    height: 250rpx;
+    // height: 250rpx;
     padding: 56rpx 0;
     box-sizing: border-box;
     display: flex;
@@ -136,6 +137,9 @@ defineExpose({
       padding: 0 30rpx;
       text-align: center;
     }
+  }
+  .wil-modal-height{
+    height: 250rpx;
   }
   .wil-modal-button {
     border-top: 2rpx solid #e9e9e9;

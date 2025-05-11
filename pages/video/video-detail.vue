@@ -19,7 +19,7 @@
       <div class="video-detail-container__img" :style="{backgroundImage:`url(${imgData.img})`}">
         <div class="img-container">
           <div class="img-title">{{ imgData.title }}</div>
-          <div class="img-mid">
+          <div class="img-mid" v-if="imgData.releaseTime">
             <div class="img-mid-score">
               <image src="@/static/star-fill.png"></image>
               <span>{{ imgData.score }}</span>
@@ -61,8 +61,15 @@
         <!-- 电视专用 -->
         <div class="tv-version" v-if="routerParams.type=='tv'">
           <div class="tv-version-tabs">
-            <nut-tabs v-model="activeTab" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSource">
-              <nut-tab-pane :title="item.sourceName" :pane-key="item.provider+item.name" v-for="item in sourceList" :key="item.provider+item.name"></nut-tab-pane>
+            <div class="tv-version-tabs__cloud">
+              <div :class="['tv-version-tabs__cloud-item',item.provider+item.name==selectSource.provider+selectSource.name ? 'tv-version-tabs__cloud-active' : '']"
+                v-for="item in sourceList" :key="item.provider+item.name" @click="changeTvSource(item)">
+                {{ item.sourceName }}
+              </div>
+            </div>
+            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSeason">
+              <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr" :key="item.season">
+              </nut-tab-pane>
             </nut-tabs>
             <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
           </div>
@@ -71,7 +78,7 @@
             <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+(index+1)" :key="item.name" @click="toPlayVideo(item,index)">
               <div class="item-img" :style="{backgroundImage:`url(${item.poster || imgData.img})`}">
                 <image src="@/static/playVideo-button.png" />
-                <span class="item-img-runtime">{{ item.runtime }}</span>
+                <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"
                   v-if="index+1==historyTv.ji&& selectSource.path + '/' + historyTv.name == '/' + historyTv.path">
                 </div>
@@ -84,11 +91,11 @@
             <span v-else>加载中...</span>
           </div>
         </div>
-        <div class="story-introduction">
+        <div class="story-introduction" v-if="overview">
           <div class="story-introduction-title">剧情简介</div>
           <div class="story-introduction-text">{{ overview }}</div>
         </div>
-        <div class="related-actors">
+        <div class="related-actors" v-if="actors.length">
           <div class="related-actors-title">相关演员</div>
           <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="related-actors-list">
@@ -153,7 +160,8 @@ const selectSource = ref({}); //切换选中的来源
 const director = ref({});
 const actors = ref([]);
 
-const activeTab = ref("");
+const activeSeason = ref("");
+const seasonFirst = ref({});
 
 const tvList = ref([]); //目前网盘所拥有的电视集数列表
 
@@ -175,8 +183,10 @@ const scrollIntoView = ref("");
 const toSelect = (item) => {
   if (item.text == "手动编辑") {
     showPopover.value = false;
+    //获取当前源里面的最大季数
+    const maxSeasonArrLength = Math.max(...sourceList.value.map((v) => v.seasonArr.length));
     uni.navigateTo({
-      url: `/pages/video/search-match?type=${routerParams.value.type}`,
+      url: `/pages/video/search-match?type=${routerParams.value.type}&maxSeasonLength=${maxSeasonArrLength}`,
     });
   } else if (item.text == "设置跳过片头时间") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData");
@@ -244,6 +254,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
 const getActorById = (data, type) => {
   let url = "";
   let obj = JSON.parse(JSON.stringify(data));
+  if (!data.movieTvId || !obj.movieTvId) return Promise.reject();
   if (type == "movie") {
     url = `https://api.tmdb.org/3/movie/${obj.movieTvId}/credits`;
   } else if (type == "tv") {
@@ -271,8 +282,10 @@ const getActorById = (data, type) => {
 const handleTv = async (seasonData1 = null) => {
   showRehandleButton.value = false;
   let season = "";
+  season = activeSeason.value.season;
   if (localMovieTvData.value.tv) {
     season = localMovieTvData.value.tv.find((i) => i.movieTvId == routerParams.value.movieTvId).season;
+    season = season != "1" ? season : activeSeason.value.season;
   } else {
     const numberMapping = generateChineseNumberMapping(40, "string");
     const match = imgData.value.title.match(/第([一二三四五六七八九十\d]+)季/);
@@ -289,27 +302,36 @@ const handleTv = async (seasonData1 = null) => {
         season = "1";
       }
     }
+    season = season != "1" ? season : activeSeason.value.season;
   }
+
   let res1 = {};
   if (!seasonData1) {
-    res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+    if (routerParams.value.movieTvId) {
+      res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+    }
   } else {
     res1 = seasonData1;
   }
   if (season != "1") {
     imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
+    overview.value = res1.overview;
+  } else {
+    imgData.value.img = seasonFirst.value.img;
+    overview.value = seasonFirst.value.overview;
   }
   let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
   uni.setStorageSync("seasonData", seasonData);
   season != "1" && res1.overview ? (overview.value = res1.overview) : "";
   let result = {};
+  let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
   if (selectType.value.type == "WebDAV") {
     imgData.value.releaseTime = res1.air_date;
-    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
+    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
     try {
       result = await getFolder(
         {
-          path: selectSource.value.path,
+          path: activeSeason.value.path,
         },
         selectMedia.value
       );
@@ -317,6 +339,9 @@ const handleTv = async (seasonData1 = null) => {
       showRehandleButton.value = true;
       return;
     }
+    result.data.content = result.data.content.filter((h) => {
+      return videoFormat.some((v) => h.name.includes(v));
+    });
     //对电视进行排序
     tvList.value = result.data.content.sort((a, b) => {
       const regex = /S\d{2}E\d{2}/;
@@ -335,14 +360,14 @@ const handleTv = async (seasonData1 = null) => {
         return numA - numB;
       }
     });
-    imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.total || 0}集）`;
+    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result?.data?.total || 0}集）`;
   } else if (selectType.value.type == "天翼云盘") {
     imgData.value.releaseTime = res1.air_date;
-    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
+    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
     try {
       result = await get189Folder(
         {
-          folderId: selectSource.value.folderFileId,
+          folderId: activeSeason.value.folderFileId,
         },
         selectMedia.value
       );
@@ -350,6 +375,9 @@ const handleTv = async (seasonData1 = null) => {
       showRehandleButton.value = true;
       return;
     }
+    result.fileListAO.fileList = result.fileListAO.fileList.filter((h) => {
+      return videoFormat.some((v) => h.name.includes(v));
+    });
     //对电视进行排序
     tvList.value = result.fileListAO.fileList.sort((a, b) => {
       const regex = /S\d{2}E\d{2}/;
@@ -368,14 +396,14 @@ const handleTv = async (seasonData1 = null) => {
         return numA - numB;
       }
     });
-    imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.fileListAO.count || 0}集）`;
+    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result.fileListAO.count || 0}集）`;
   } else if (selectType.value.type == "夸克网盘") {
     imgData.value.releaseTime = res1.air_date;
     imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
     try {
       result = await getQuarkFolder(
         {
-          fid: selectSource.value.folderFileId,
+          fid: activeSeason.value.folderFileId,
         },
         selectMedia.value
       );
@@ -383,6 +411,9 @@ const handleTv = async (seasonData1 = null) => {
       showRehandleButton.value = true;
       return;
     }
+    result.data.list = result.data.list.filter((h) => {
+      return videoFormat.some((v) => h.file_name.includes(v));
+    });
     //对电视进行排序
     tvList.value = result.data.list
       .sort((a, b) => {
@@ -415,9 +446,13 @@ const handleTv = async (seasonData1 = null) => {
   }
   //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
   tvList.value.forEach((v, vindex) => {
-    v.title = res1.episodes[vindex]?.name || "暂无标题";
-    v.poster = res1.episodes[vindex]?.still_path ? "https://media.themoviedb.org/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
-    v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
+    if (res1.episodes) {
+      v.title = res1.episodes[vindex]?.name || "暂无标题";
+      v.poster = res1.episodes[vindex]?.still_path ? "https://media.themoviedb.org/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
+      v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
+    } else {
+      v.title = `第${vindex + 1}集`;
+    }
   });
   nextTick(() => {
     historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
@@ -425,6 +460,10 @@ const handleTv = async (seasonData1 = null) => {
 };
 
 const getMovieTvDetail = async () => {
+  if (!routerParams.value.movieTvId) {
+    imgData.value.title = routerParams.value.name;
+    return false;
+  }
   let res = await getMovieTvById(
     {
       movieTvId: routerParams.value.movieTvId,
@@ -443,8 +482,13 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
-    imgData.value.title = routerParams.value.name;
-    imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
+    if (activeSeason.value.season != "1") {
+      imgData.value.title = routerParams.value.name + " " + activeSeason.value.name;
+    } else {
+      imgData.value.title = routerParams.value.name;
+    }
+    seasonFirst.value.img = imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
+    seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
   }
@@ -469,10 +513,34 @@ const changeSource = (item) => {
 };
 
 //切换电视视频源
-const changeTvSource = (obj) => {
-  selectSource.value = sourceList.value.find((i) => i.provider + i.name == obj.paneKey);
+const changeTvSource = async (obj) => {
+  selectSource.value = sourceList.value.find((i) => i.provider + i.name == obj.provider + obj.name);
+  let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
+  if (obj1) {
+    activeSeason.value = { ...obj1 };
+  } else {
+    activeSeason.value = { ...selectSource.value.seasonArr[0] };
+  }
   setButtonText();
-  handleTv();
+  await handleTv();
+  nextTick(() => {
+    historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : (scrollIntoView.value = "name1");
+  });
+};
+
+//切换不同季
+const changeTvSeason = async (obj) => {
+  activeSeason.value = { ...selectSource.value.seasonArr.find((i) => i.season == obj.paneKey) };
+  if (activeSeason.value.season != "1") {
+    imgData.value.title = routerParams.value.name + " " + activeSeason.value.name;
+  } else {
+    imgData.value.title = routerParams.value.name;
+  }
+  setButtonText();
+  await handleTv();
+  nextTick(() => {
+    historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : (scrollIntoView.value = "name1");
+  });
 };
 
 //电视集数还在加载中，点击提示
@@ -483,17 +551,12 @@ const disabledTip = () => {
   });
 };
 
-//裁剪格式获取电影名
-const getMovieName = (val) => {
-  const lastDotIndex = val.lastIndexOf(".");
-  let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
-  return name;
-};
-
 //点击播放按钮
 const clickPlayButton = () => {
   if (routerParams.value.type == "movie") {
-    let history = historyPlay.value?.find((i) => getMovieName(i.name) == getMovieName(imgData.value.title));
+    const lastIndex = routerParams.value.path.lastIndexOf("/");
+    let name = routerParams.value.path.substring(lastIndex + 1);
+    let history = historyPlay.value?.find((i) => i.name == name);
     if (history && selectSource.value.path == "/" + history.path) {
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
@@ -536,26 +599,30 @@ const clickPlayButton = () => {
     }
     uni.setStorageSync("tvList", tvList.value);
     let localMovieTvData = uni.getStorageSync("localMovieTvData");
-    let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+    let nowTv = {};
+    if (routerParams.value.movieTvId) {
+      nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+    } else {
+      nowTv = localMovieTvData.tv.find((i) => i.path == routerParams.value.path);
+    }
     let history = historyPlay.value?.find((i) => i.titlePlay == imgData.value.title);
-    if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
+    if (history && activeSeason.value.path + "/" + history.name == "/" + history.path) {
       let openEndTime = {};
+      routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
       nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
       nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       } else {
-        console.log("path", history.folderFileId);
-
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${history.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       }
     } else {
       let historyItem = {
-        path: `${selectSource.value.path.slice(1)}/${tvList.value[0].name}`,
+        path: `${activeSeason.value.path.slice(1)}/${tvList.value[0].name}`,
         titlePlay: imgData.value.title,
         ji: "1",
         poster: tvList.value[0].poster || imgData.value.img,
@@ -567,16 +634,17 @@ const clickPlayButton = () => {
         movieTvId: routerParams.value.movieTvId,
       };
       let openEndTime = {};
+      routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
       nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
       nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+          url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
         });
       } else {
         historyItem.folderFileId = tvList.value[0].id;
         uni.navigateTo({
-          url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${
+          url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${
             toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
           }`,
         });
@@ -589,10 +657,17 @@ const clickPlayButton = () => {
 const toPlayVideo = (item, index) => {
   uni.setStorageSync("tvList", tvList.value);
   let localMovieTvData = uni.getStorageSync("localMovieTvData");
-  let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+  let nowTv = {};
+  if (routerParams.value.movieTvId) {
+    nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+  } else {
+    nowTv = localMovieTvData.tv.find((i) => i.path == routerParams.value.path);
+  }
   let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true) && item.name == i.name);
-  if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
+  if (history && activeSeason.value.path + "/" + history.name == "/" + history.path && activeSeason.value.season == history.season) {
+    //存在历史记录，同一路径的片源，同一季
     let openEndTime = {};
+    routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
@@ -601,12 +676,12 @@ const toPlayVideo = (item, index) => {
       });
     } else {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   } else {
     let historyItem = {
-      path: `${selectSource.value.path.slice(1)}/${item.name}`,
+      path: `${activeSeason.value.path.slice(1)}/${item.name}`,
       titlePlay: imgData.value.title,
       ji: String(index + 1),
       poster: item.poster || imgData.value.img,
@@ -616,18 +691,21 @@ const toPlayVideo = (item, index) => {
       title: item.title,
       initialTime: "0",
       movieTvId: routerParams.value.movieTvId,
+      season: activeSeason.value.season,
     };
+
     let openEndTime = {};
+    routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     } else {
       historyItem.folderFileId = item.id;
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${selectSource.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${
+        url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${
           toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
         }`,
       });
@@ -654,9 +732,15 @@ const setButtonText = () => {
       buttonText.value = "播放";
     }
   } else if (routerParams.value.type == "tv") {
-    let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true));
+    let history = historyPlay.value?.find((i) => {
+      if (activeSeason.value.season == "1") {
+        return i.titlePlay == handleSeasonName(selectSource.value.name, true);
+      } else {
+        return i.titlePlay == handleSeasonName(selectSource.value.name, true) + " " + activeSeason.value.name;
+      }
+    });
     historyTv.value = history || {};
-    if (history && selectSource.value.path + "/" + history.name == "/" + history.path) {
+    if (history && activeSeason.value.path + "/" + history.name == "/" + history.path && history.season == activeSeason.value.season) {
       let time = handleSecond(history.initialTime);
       buttonText.value = `第${history.ji}集 ${time}`;
     } else {
@@ -700,12 +784,14 @@ const resetMovieTvData = async () => {
   if (resetMovieTv) {
     judgeSelect();
     let oldMovieTvId = routerParams.value.movieTvId;
-    let oldName = imgData.value.title;
+    // let oldName = imgData.value.title;
+    let oldPath = routerParams.value.path;
     routerParams.value.type = resetMovieTv.type;
     routerParams.value.movieTvId = resetMovieTv.movieTvId;
+    routerParams.value.name = resetMovieTv.name;
     uni.removeStorageSync("resetMovieTv");
     selectSource.value = sourceList.value[0];
-    activeTab.value = selectSource.value.provider + selectSource.value.name;
+    activeSeason.value = { ...selectSource.value.seasonArr[0] };
     setButtonText();
     nextTick(() => {
       historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
@@ -716,7 +802,9 @@ const resetMovieTvData = async () => {
     localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
 
     if (resetMovieTv.type == "tv") {
-      let nowTv = localMovieTvData.value.tv.find((i) => i.movieTvId == oldMovieTvId && handleSeasonName(i.name, true) == oldName);
+      let nowTv = localMovieTvData.value.tv.find((i) => i.movieTvId == oldMovieTvId && i.path == oldPath);
+      let selectSource1 = nowTv.source.find((i) => i.path == selectSource.value.path);
+      selectSource1.name = resetMovieTv.name;
       const numberMapping = generateChineseNumberMapping(40, "string");
       const match = selectSource.value.name.match(/第([一二三四五六七八九十\d]+)季/);
       if (match) {
@@ -747,7 +835,6 @@ const resetMovieTvData = async () => {
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();
-      handleTv();
       nowMovie.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowMovie.releaseTime = res.release_date;
       nowMovie.type = "2";
@@ -777,7 +864,35 @@ onBeforeMount(() => {
         return i;
       });
       selectSource.value = sourceList.value[0];
-      activeTab.value = selectSource.value.provider + selectSource.value.name;
+      historyTv.value =
+        historyPlay.value?.find((i) => {
+          if (i.season == "1") {
+            let sameSource = sourceList.value.find((v) => handleSeasonName(v.name, true) == i.titlePlay);
+            if (sameSource) {
+              selectSource.value = sameSource;
+              return true;
+            } else {
+              selectSource.value = sourceList.value[0];
+              return false;
+            }
+          } else {
+            const chineseNumber = generateChineseNumberMapping(40, "number");
+            let sameSource = sourceList.value.find((v) => i.titlePlay == handleSeasonName(v.name, true) + " " + `第${chineseNumber[i.season]}季`);
+            if (sameSource) {
+              selectSource.value = sameSource;
+              return true;
+            } else {
+              selectSource.value = sourceList.value[0];
+              return false;
+            }
+          }
+        }) || {};
+      let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
+      if (obj1) {
+        activeSeason.value = { ...obj1 };
+      } else {
+        activeSeason.value = { ...selectSource.value.seasonArr[0] };
+      }
       setButtonText();
       await getMovieTvDetail();
       if (routerParams.value.type == "tv") {
@@ -792,7 +907,8 @@ onBeforeMount(() => {
         { value: "189CloudPC", label: "天翼云盘" },
         { value: "Quark", label: "夸克网盘" },
       ];
-      sourceList.value = JSON.parse(routerParams.value.source).map((i) => {
+      let source = JSON.parse(routerParams.value.source);
+      sourceList.value = source.map((i) => {
         if (source.filter((v) => v.provider == i.provider).length > 1) {
           let label = dict.find((v) => v.value == i.provider).label;
           i.sourceName = label ? label + `(${i.name})` : i.provider;
@@ -802,7 +918,36 @@ onBeforeMount(() => {
         return i;
       });
       selectSource.value = sourceList.value[0];
-      activeTab.value = selectSource.value.provider + selectSource.value.name;
+      historyTv.value =
+        historyPlay.value?.find((i) => {
+          if (i.season == "1") {
+            let sameSource = sourceList.value.find((v) => handleSeasonName(v.name, true) == i.titlePlay);
+            if (sameSource) {
+              selectSource.value = sameSource;
+              return true;
+            } else {
+              selectSource.value = sourceList.value[0];
+              return false;
+            }
+          } else {
+            const chineseNumber = generateChineseNumberMapping(40, "number");
+            let sameSource = sourceList.value.find((v) => i.titlePlay == handleSeasonName(v.name, true) + " " + `第${chineseNumber[i.season]}季`);
+            if (sameSource) {
+              selectSource.value = sameSource;
+              return true;
+            } else {
+              selectSource.value = sourceList.value[0];
+              return false;
+            }
+          }
+        }) || {};
+
+      let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
+      if (obj1) {
+        activeSeason.value = { ...obj1 };
+      } else {
+        activeSeason.value = { ...selectSource.value.seasonArr[0] };
+      }
       setButtonText();
       await getMovieTvDetail();
       if (routerParams.value.type == "tv") {
@@ -831,6 +976,9 @@ onShow(() => {
 
 onLoad((options) => {
   routerParams.value = options;
+  if (options.movieTvId == "undefined") {
+    routerParams.value.movieTvId = undefined;
+  }
   if (routerParams.value.type == "movie") {
     popoverArr.value = [{ icon: editIcon, text: "手动编辑" }];
   } else if (routerParams.value.type == "tv") {
@@ -1135,7 +1283,31 @@ page {
 
       .tv-version {
         margin-top: 20rpx;
+        .tv-version-tabs__cloud {
+          display: flex;
+          align-items: center;
+          flex-wrap: nowrap;
+          width: 100%;
+          overflow: auto;
+          .tv-version-tabs__cloud-item {
+            font-size: 28rpx;
+            color: #000;
+            font-weight: bold;
+            padding: 12rpx 24rpx;
+            border-radius: 8rpx;
+            border: 2rpx solid #c2c5c6;
+            margin-left: 12rpx;
+            white-space: nowrap;
 
+            &:first-child {
+              margin-left: 0;
+            }
+          }
+          .tv-version-tabs__cloud-active {
+            color: #315ffd;
+            border: 2rpx solid #315ffd;
+          }
+        }
         ::v-deep .nut-tabs {
           &__titles {
             .nut-tabs__list {

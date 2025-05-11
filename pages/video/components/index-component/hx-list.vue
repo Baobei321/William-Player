@@ -12,10 +12,11 @@
       <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="hxList-list-movie">
           <div class="hxList-list-movie__item" v-for="item in listData1" :key="item.name" @click="toVideoDetail(item)">
-            <image :src="!props.isConnected && !item.loadImg? emptyBg : 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' + item.poster" style="object-fit: cover;"
-              @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill"></image>
+            <image :src="!props.isConnected && !item.loadImg? emptyBg :setEmptyImg(item.poster) " style="object-fit: cover;" @error="imgError(item)" @load="imgLoad(item)"
+              mode="aspectFill">
+            </image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-            <span class="hxList-list-movie__item-time">{{ item.releaseTime }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime||'暂无' }}</span>
           </div>
         </div>
       </scroll-view>
@@ -25,6 +26,7 @@
 <script setup>
 import { ref, nextTick } from "vue";
 import emptyBg from "@/static/empty_bg.png";
+import posterEmpty from "@/static/poster-empty.png";
 import { onShow } from "@dcloudio/uni-app";
 import { handleSeasonName } from "../../../../utils/scrape";
 
@@ -73,9 +75,17 @@ const imgLoad = (item) => {
   item.loadImg = true;
 };
 
+const setEmptyImg = (poster) => {
+  if (poster) {
+    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+  } else {
+    return posterEmpty;
+  }
+};
+
 onShow(() => {
   nextTick(() => {
-    listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30)
+    listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30);
     listData1.value.forEach((item) => {
       item.loadImg = true;
     });

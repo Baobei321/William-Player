@@ -133,7 +133,7 @@ export default {
           this.historyObj.initialTime = Math.round(event.detail.currentTime);
           let index = null;
           if (this.routerParams.type == "tv") {
-            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay));
           } else if (this.routerParams.type == "movie") {
             index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name, true) == handleSeasonName(this.historyObj.name, true));
           }
@@ -151,7 +151,7 @@ export default {
         this.historyObj.wjjId = this.routerParams.wjjId;
         let index = null;
         if (this.routerParams.type == "tv") {
-          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.titlePlay == this.historyObj.titlePlay);
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay));
         } else if (this.routerParams.type == "movie") {
           index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name) == handleSeasonName(this.historyObj.name));
         }
@@ -216,6 +216,7 @@ export default {
       if (this.selectType.type == "WebDAV") {
         this.config.url = res.data.raw_url;
       } else if (this.selectType.type == "天翼云盘") {
+        // this.config.url = res.normal.url;
         const NetworkModule = uni.requireNativePlugin("NetworkModule");
         NetworkModule.request(
           {
@@ -346,7 +347,11 @@ export default {
       let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
       const lastIndex = data.path.lastIndexOf("/");
       let nowTv = localMovieTvData.tv.find((i) => {
-        return handleSeasonName(i.name, true) == this.routerParams.titlePlay && (data.movieTvId ? data.movieTvId == i.movieTvId : i.path == "/" + data.path.slice(0, lastIndex));
+        return (
+          i.source.some((v) => {
+            return v.seasonArr.some((h) => h.path == "/" + data.path.slice(0, lastIndex));
+          }) && i.movieTvId == data.movieTvId
+        );
       });
       const numberMapping = generateChineseNumberMapping(40, "string");
       const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);

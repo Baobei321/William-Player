@@ -59,6 +59,13 @@
         "navigationBarBackgroundColor": "#fff"
       }
     },
+       {
+      "path": "pages/live/list",
+      "style": {
+        "navigationBarTitleText": "直播列表",
+        "navigationBarBackgroundColor": "#fff"
+      }
+    },
     {
       "path": "pages/media/list",
       "style": {

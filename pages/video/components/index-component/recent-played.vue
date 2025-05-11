@@ -115,8 +115,11 @@ const toVideoPlayer = async (item) => {
     }
   } else if (item.type == "tv") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
-    const lastIndex = item.path.lastIndexOf("/");
-    let nowTv = localMovieTvData.tv.find((i) => handleSeasonName(i.name, true) == item.titlePlay && i.movieTvId == item.movieTvId);
+    let nowTv = localMovieTvData.tv.find((i) => {
+      return i.source.some((v) => {
+        return v.seasonArr.some((h) => h.path + "/" + item.name == "/" + item.path);
+      })&& i.movieTvId == item.movieTvId;
+    });
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";

@@ -1,96 +1,118 @@
 <template>
   <div class="live">
-    <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length&&!loading">
-      <template #custom="scope">
-        <div class="right-list">
-          <div class="right-list-item" :style="{backgroundColor:item.active?'#dce1ff':'#f7f6fa'}" v-for="item in scope.row.childList" :key="item.name"
-            @click="clickItem(item,scope.row.childList)">
-            <image :src="item.logo"></image>
-            <span>{{ item.name }}</span>
-          </div>
-        </div>
-      </template>
-    </wil-category-list>
-    <wil-empty text="加载中..." v-if="loading"></wil-empty>
-    <nut-popup v-model:visible="showLine" position="bottom" round safe-area-inset-bottom>
-      <nut-picker v-model="popupValue" :columns="lineColumns" title="选择线路" @confirm="confirmPicker" @cancel="showLine = false">
-      </nut-picker>
-    </nut-popup>
+    <nut-cell-group>
+      <nut-cell :title="item.name" is-link v-for="item in liveList" :key="item.name" @click="toLiveList(item)"></nut-cell>
+    </nut-cell-group>
+    <wil-modal ref="wil_modal">
+      <wil-form v-model="state.formData" :options="options" ref="base_form">
+      </wil-form>
+    </wil-modal>
+    <!-- <nut-popup v-model:visible="showForm" position="center" round safe-area-inset-bottom>
+
+    </nut-popup> -->
+    <div class="live-add" @click="openForm">
+      <image src="@/static/jia-hao.png"></image>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, reactive } from "vue";
+import wilForm from "@/components/wil-form/index.vue";
+import wilModal from "@/components/wil-modal/index.vue";
 import { parseM3UToArray, groupByGroupTitle } from "./common.js";
-import wilCategoryList from "@/components/wil-category-list/index.vue";
-import wilEmpty from "@/components/wil-empty/index.vue";
 
-const listProps = ref({
-  children: "childList",
+const liveList = ref([]);
+const wil_modal = ref(null);
+const base_form = ref(null);
+
+const state = reactive({
+  formData: {},
 });
-const loading = ref(false);
-const listData = ref([]);
-const staticData = ref([]);
 
-const showLine = ref(false);
-const popupValue = ref([]);
-const lineColumns = ref([]);
-
-const selectItem = ref({});
+//手机号校验
+const validatorUrl = (val) => {
+  if (!val) {
+    return false;
+  } else {
+    const reg = /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+    if (!reg.test(val)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+};
+const options = [
+  { label: "直播源名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入直播源名称" }] },
+  { label: "直播源地址", prop: "url", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ validator: validatorUrl, message: "请输入正确的直播源地址" }] },
+];
 
 //获取iptv
-const getIptv = () => {
+const getIptv = (url) => {
   return new Promise((resolve, reject) => {
-    loading.value = true;
     uni.request({
-      url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u",
+      url: url,
       method: "GET",
-      //   header: {
-      //     Authorization: webdavInfo.token,
-      //     "Content-Type": "application/json",
-      //   },
       success: (res) => {
-        loading.value = false;
         resolve(parseM3UToArray(res.data));
       },
       fail: (error) => {
-        loading.value = false;
         reject(error);
       },
     });
   });
 };
 
-const clickItem = (item, row) => {
-  popupValue.value = [];
-  row.forEach((v) => {
-    v.active = false;
+const openForm = () => {
+  wil_modal.value.showModal({
+    title: "添加",
+    confirmColor: "#ff6701",
+    confirm: async () => {
+      if (liveList.value.some((v) => v.name == state.formData.name)) {
+        uni.showToast({
+          title: "存在同名直播源",
+          icon: "none",
+        });
+        return;
+      }
+      if (liveList.value.some((v) => v.url == state.formData.url)) {
+        uni.showToast({
+          title: "存在相同url直播源",
+          icon: "none",
+        });
+        return;
+      }
+      let res = await getIptv(state.formData.url);
+      if (!res[0].groupTitle) {
+        uni.showToast({
+          title: "请检查文件的格式是否正确",
+          icon: "error",
+        });
+      } else {
+        liveList.value.push(state.formData);
+        uni.setStorageSync("liveList", liveList.value);
+      }
+      state.formData = {};
+    },
+    cancel: () => {
+      state.formData = {};
+    },
   });
-  item.active = true;
-  staticData.value.forEach((v) => {
-    let obj = v.childList.find((i) => i.name == item.name);
-    if (obj) {
-      lineColumns.value = obj.childList.map((h, hindex) => {
-        return { value: h.url, text: `线路${hindex + 1}` };
-      });
-      showLine.value = true;
-    }
-  });
-  selectItem.value = item;
 };
 
-const confirmPicker = ({ selectedValue, selectedOptions }) => {
+const toLiveList = (item) => {
   uni.navigateTo({
-    url: `/pages/video/video-player?noSetHistory=0&videoUrl=${encodeURIComponent(selectedValue[0])}&liveTitle=${selectItem.value.name}`,
+    url: "/pages/live/list?name=" + item.name,
   });
-  showLine.value = false;
 };
 
-onBeforeMount(async () => {
-  let res = await getIptv();
-  listData.value = groupByGroupTitle(res);
-  staticData.value = groupByGroupTitle(res, "3");
-  console.log(staticData.value, "res");
+onBeforeMount(() => {
+  liveList.value = uni.getStorageSync("liveList");
+  if (!liveList.value) {
+    liveList.value = [{ name: "默认直播源", url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u" }];
+    uni.setStorageSync("liveList", liveList.value);
+  }
 });
 </script>
 
@@ -103,29 +125,64 @@ page {
   width: 100%;
   height: 100%;
   background: #f6f7f8;
-  ::v-deep .category-list {
-    .category-list-wrap {
-      .category-list-container {
-        background-color: #f7f6fa;
-        .category-list-container-item {
-          background-color: #f7f6fa;
-          .right-list {
-            .right-list-item {
-              display: flex;
-              align-items: center;
-              height: 110rpx;
-              image {
-                width: 100rpx;
-                height: 50rpx;
-              }
-              span {
-                font-size: 32rpx;
-                padding-left: 10rpx;
+  box-sizing: border-box;
+  border-top: 2rpx solid #f6f7f8;
+  ::v-deep .nut-cell-group {
+    .nut-cell-group__wrap {
+      background-color: transparent;
+      box-shadow: none;
+      .nut-cell {
+        margin: 0;
+        background-color: #fff;
+        box-shadow: none;
+        .nut-cell__title {
+          color: #000;
+        }
+        .nut-icon {
+          color: #000;
+        }
+        &::after {
+          border-bottom: 2rpx solid #eaeaea;
+        }
+      }
+    }
+  }
+  ::v-deep .nut-transition {
+    .wil-modal {
+      .wil-modal-top {
+        padding-bottom: 0;
+        .base-form {
+          .base-form-content {
+            .nut-form {
+              .nut-cell-group {
+                .nut-cell-group__wrap {
+                  .nut-form-item {
+                    .nut-form-item__label {
+                      min-width: 170rpx;
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
+    }
+  }
+  .live-add {
+    width: 120rpx;
+    height: 120rpx;
+    background: #ff6701;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 90rpx;
+    right: 24rpx;
+    image {
+      width: 50rpx;
+      height: 50rpx;
     }
   }
 }
