@@ -8,11 +8,10 @@
             {{ item.name.length>12 ? item.name.slice(0,12)+'...' : item.name}}
           </template>
           <template #icon>
-            <image :src="Folder" v-if="item.type=='1'" />
-            <image :src="item.thumb || videoPlayer" v-else />
+            <image :src="setImg(item)" />
           </template>
           <template #link>
-            <span v-if="item.type!='1'">{{ handleSize(item.size) }}</span>
+            <span v-if="item.type != '1'">{{ handleSize(item.size) }}</span>
             <span v-else></span>
           </template>
         </nut-cell>
@@ -26,7 +25,8 @@ import { ref } from "vue";
 import loadList from "../../components/wil-list/index.vue";
 import Folder from "../../static/folder.png";
 import videoPlayer from "../../static/video-player.png";
-import { get189Folder, getQuarkFolder } from "../../utils/common.js";
+import photoIcon from "../../static/photo-icon.png";
+import { get189Folder, getQuarkFolder, getWebDAVUrl, get189DownloadUrl, getQuarkVideoUrl } from "../../utils/common.js";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 
 const webdavInfo = ref({});
@@ -49,7 +49,19 @@ const responseAdapter = (result) => {
     listTotal: +result.data.total,
   };
 };
-
+const setImg = (item) => {
+  if (item.type == "1") {
+    return Folder;
+  } else {
+    let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+    let imgFormat = ["jpg", "png", "jpeg", "raw", "webp", "gif"];
+    if (videoFormat.some((i) => item.name.includes(i))) {
+      return videoPlayer;
+    } else if (imgFormat.some((i) => item.name.includes(i))) {
+      return photoIcon;
+    }
+  }
+};
 const judgeSelect = () => {
   sourceList.value = uni.getStorageSync("sourceList");
   selectType.value =
@@ -118,7 +130,7 @@ const handleData = (val) => {
   data.value = val;
 };
 
-const clickCell = (item) => {
+const clickCell = async (item) => {
   let path = "";
   path = decodeURIComponent(routerParams.value.path);
   if (item.type == "1") {
@@ -136,15 +148,44 @@ const clickCell = (item) => {
       });
     }
   } else {
-    let type = "";
-    if (path.indexOf("电视剧") > -1) {
-      type = "tv";
-    } else if (path.indexOf("电影") > -1) {
-      type = "movie";
+    let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+    let imgFormat = ["jpg", "png", "jpeg", "raw", "webp", "gif"];
+    if (videoFormat.some((i) => item.name.includes(i))) {
+      let type = "";
+      if (path.indexOf("电视剧") > -1) {
+        type = "tv";
+      } else if (path.indexOf("电影") > -1) {
+        type = "movie";
+      }
+      uni.navigateTo({
+        url: `/pages/video/video-player?path=${encodeURIComponent(path + "/" + item.name)}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
+      });
+    } else if (imgFormat.some((i) => item.name.includes(i))) {
+      if (selectType.value.type == "WebDAV") {
+        let res = await getWebDAVUrl({ path: decodeURIComponent(routerParams.value.path) + "/" + item.name }, selectMedia.value);
+        uni.previewImage({
+          urls: [res.data.raw_url],
+          indicator: "none",
+        });
+      } else if (selectType.value.type == "天翼云盘") {
+        let res = await get189DownloadUrl({ folderFileId: item.folderFileId }, selectMedia.value);
+        uni.previewImage({
+          urls: [res.fileDownloadUrl],
+          indicator: "none",
+        });
+      } else if (selectType.value.type == "夸克网盘") {
+        let res = await getQuarkVideoUrl({ folderFileId: item.folderFileId }, selectMedia.value);
+        uni.previewImage({
+          urls: [res.data[0].download_url],
+          indicator: "none",
+        });
+      }
+    } else {
+      uni.showToast({
+        title: "无法打开此类型文件",
+        icon: "none",
+      });
     }
-    uni.navigateTo({
-      url: `/pages/video/video-player?path=${encodeURIComponent(path + "/" + item.name)}&noSetHistory=0&folderFileId=${item.folderFileId}`, //noSetHistory为0表示不缓存历史播放记录
-    });
   }
 };
 

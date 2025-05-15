@@ -203,6 +203,54 @@ const get189User = (obj) => {
   })
 }
 
+//天翼云盘获取文件下载链接
+const get189DownloadUrl = (data, cookieInfo) => {
+  let cookie = { JSESSIONID: cookieInfo.JSESSIONID, COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER }
+  let randomDigits = "";
+  for (let i = 0; i < 16; i++) {
+    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
+  }
+  let cookieStr = ''
+  let arr = Object.keys(cookie)
+  arr.forEach((item, index) => {
+    let str = ''
+    if (index == arr.length - 1) {
+      str = `${item}=${cookie[item]}`
+      cookieStr = cookieStr + str
+    } else {
+      str = `${item}=${cookie[item]};`
+      cookieStr = cookieStr + str
+    }
+  })
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: `${CONFIG.Download189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}`,
+      timeout: 5000,
+      method: "GET",
+      header: {
+        Accept: "application/json;charset=UTF-8",
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        Connection: "keep-alive",
+        Cookie: cookieStr,
+        Host: "cloud.189.cn",
+        Priority: "u=0",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Sign-Type": "1",
+        TE: "trailers",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+      },
+      success: (res) => {
+        resolve(res.data);
+      },
+      fail: (error) => {
+        reject(error);
+      },
+    });
+  });
+}
+
 //夸克网盘
 const getQuarkFolder = (data, cookieInfo) => {
   let cookieStr = cookieInfo.Cookie;
@@ -229,7 +277,7 @@ const getQuarkFolder = (data, cookieInfo) => {
   });
 }
 
-//夸克网盘获取视频链接
+//夸克网盘获取视频或者文件下载链接
 const getQuarkVideoUrl = (data, cookieInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
@@ -357,6 +405,6 @@ const getMovieTvById = (data, type) => {
 };
 
 export {
-  getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, getQuarkFolder, getQuarkVideoUrl,
+  getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, get189DownloadUrl, getQuarkFolder, getQuarkVideoUrl,
   getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById,
 };

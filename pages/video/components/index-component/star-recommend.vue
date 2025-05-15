@@ -52,11 +52,11 @@ onShow(() => {
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
   let tv = [];
   if (localMovieTvData?.tv) {
-    tv = localMovieTvData.tv.sort((a, b) => b.voteAverage - a.voteAverage);
+    tv = localMovieTvData.tv.filter(v=>v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
     tv = tv.slice(0, 3).map((item) => {
       let genres = "";
       item.type = "tv";
-      item.genre_ids.forEach((v, vindex) => {
+      item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
           genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
         } else {
@@ -70,12 +70,12 @@ onShow(() => {
   }
   let movie = [];
   if (localMovieTvData?.movie) {
-    movie = localMovieTvData.movie.sort((a, b) => b.voteAverage - a.voteAverage);
+    movie = localMovieTvData.movie.filter(v=>v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
     movie = movie.slice(0, 3).map((item) => {
       item.name = removeExtension(item.name);
       item.type = "movie";
       let genres = "";
-      item.genre_ids.forEach((v, vindex) => {
+      item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
           genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
         } else {

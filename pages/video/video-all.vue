@@ -6,8 +6,7 @@
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
             <div class="item-poster">
-              <image
-                :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg :(routerParams.title=='最近观看' ? item.poster : 'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' +item.poster)"
+              <image :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg :(routerParams.title=='最近观看' ? item.poster : setEmptyImg(item.poster))"
                 class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
               </image>
               <div :class="[item.select?'item-poster-check':'item-poster-nocheck']" v-if="isSelect">
@@ -15,7 +14,7 @@
               </div>
             </div>
             <span class="item-name">{{ removeExtension(item) }}</span>
-            <span class="item-time" v-if="routerParams.title!='最近观看'">{{ item.releaseTime }}</span>
+            <span class="item-time" v-if="routerParams.title!='最近观看'">{{ item.releaseTime||'暂无' }}</span>
           </div>
         </template>
       </wil-list>
@@ -39,6 +38,7 @@ import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
 import { toStringfy } from "../mine/common";
 import { handleSeasonName } from "@/utils/scrape.js";
+import posterEmpty from "@/static/poster-empty.png";
 
 const requestParams = ref({});
 
@@ -219,7 +219,13 @@ const toVideoDetail = async (item) => {
     }
   }
 };
-
+const setEmptyImg = (poster) => {
+  if (poster) {
+    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+  } else {
+    return posterEmpty;
+  }
+};
 const longPress = (item) => {
   if (routerParams.value.title != "最近观看" || isSelect.value) return;
   isSelect.value = true;

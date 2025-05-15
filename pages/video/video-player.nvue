@@ -33,7 +33,7 @@ import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
+import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
 import { calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/scrape";
 export default {
   components: {
@@ -119,6 +119,7 @@ export default {
       } else if (this.selectType.type == "夸克网盘") {
         if (this.selectMedia.name) {
           let res = await getQuarkResolutionUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
+          // let res = await getQuarkVideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
           return res;
         }
       }
@@ -232,6 +233,8 @@ export default {
       } else if (this.selectType.type == "夸克网盘") {
         if (res.data.video_list[0].video_info?.url) {
           this.config.url = res.data.video_list[0].video_info.url;
+          // addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: res.data[0].download_url });
+          // this.config.url = res.data[0].download_url;
         } else {
           uni.showToast({
             title: "请使用88vip以上的夸克网盘",
@@ -369,12 +372,8 @@ export default {
           season = "1";
         }
       }
-      let res1 = await getTvSeason({
-        movieTvId: nowTv.movieTvId,
-        season: season,
-      });
-      this.seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
       let result = {};
+      let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
       if (this.selectType.type == "WebDAV") {
         try {
           result = await getFolder(
@@ -387,6 +386,9 @@ export default {
           this.showRehandleButton = true;
           return;
         }
+        result.data.content = result.data.content.filter((h) => {
+          return videoFormat.some((v) => h.name.includes(v));
+        });
         //对电视进行排序
         this.tvList = result.data.content.sort((a, b) => {
           const regex = /S\d{2}E\d{2}/;
@@ -417,6 +419,9 @@ export default {
           this.showRehandleButton = true;
           return;
         }
+        result.fileListAO.fileList = result.fileListAO.fileList.filter((h) => {
+          return videoFormat.some((v) => h.name.includes(v));
+        });
         //对电视进行排序
         this.tvList = result.fileListAO.fileList.sort((a, b) => {
           const regex = /S\d{2}E\d{2}/;
@@ -447,6 +452,9 @@ export default {
           this.showRehandleButton = true;
           return;
         }
+        result.data.list = result.data.list.filter((h) => {
+          return videoFormat.some((v) => h.file_name.includes(v));
+        });
         //对电视进行排序
         this.tvList = result.data.list
           .sort((a, b) => {
@@ -475,6 +483,12 @@ export default {
             };
           });
       }
+      let res1 = {};
+      res1 = await getTvSeason({
+        movieTvId: nowTv.movieTvId,
+        season: season,
+      });
+      this.seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
       //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
       this.tvList.forEach((v, vindex) => {
         v.title = res1.episodes[vindex]?.name || "暂无标题";
@@ -485,6 +499,7 @@ export default {
     },
   },
   async onLoad(options) {
+    this.judgeSelect();
     let systemInfo = uni.getSystemInfoSync();
     this.plateForm = systemInfo.platform;
     this.uniPlatform = systemInfo.uniPlatform;

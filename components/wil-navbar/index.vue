@@ -53,11 +53,11 @@ const getH5NavbarHeight = () => {
   emits('getHeight', navBarHeight.value)
 }
 
-// #ifdef  APP
+// #ifdef APP-PLUS
 getNavHeight()
 // #endif
 
-// #ifdef  H5
+// #ifdef H5
 getH5NavbarHeight()
 // #endif
 

@@ -1,15 +1,17 @@
 <template>
   <div class="live">
     <nut-cell-group>
-      <nut-cell :title="item.name" is-link v-for="item in liveList" :key="item.name" @click="toLiveList(item)"></nut-cell>
+      <nut-swipe v-for="(item,index) in liveList" :key="item.name" :disabled="item.name=='默认直播源' ? true : false">
+        <nut-cell :title="item.name" is-link @click="toLiveList(item)"></nut-cell>
+        <template #right>
+          <nut-button style="height: 100%" type="danger" shape="square" @click="deleteLive(index)">删除</nut-button>
+        </template>
+      </nut-swipe>
     </nut-cell-group>
     <wil-modal ref="wil_modal">
       <wil-form v-model="state.formData" :options="options" ref="base_form">
       </wil-form>
     </wil-modal>
-    <!-- <nut-popup v-model:visible="showForm" position="center" round safe-area-inset-bottom>
-
-    </nut-popup> -->
     <div class="live-add" @click="openForm">
       <image src="@/static/jia-hao.png"></image>
     </div>
@@ -69,6 +71,13 @@ const openForm = () => {
     title: "添加",
     confirmColor: "#ff6701",
     confirm: async () => {
+      if (!state.formData.name || !state.formData.url) {
+        uni.showToast({
+          title: "请输入完整的直播源",
+          icon: "none",
+        });
+        return;
+      }
       if (liveList.value.some((v) => v.name == state.formData.name)) {
         uni.showToast({
           title: "存在同名直播源",
@@ -101,6 +110,11 @@ const openForm = () => {
   });
 };
 
+const deleteLive = (index) => {
+  liveList.value.splice(index, 1);
+  uni.setStorageSync("liveList", liveList.value);
+};
+
 const toLiveList = (item) => {
   uni.navigateTo({
     url: "/pages/live/list?name=" + item.name,
@@ -131,18 +145,23 @@ page {
     .nut-cell-group__wrap {
       background-color: transparent;
       box-shadow: none;
-      .nut-cell {
-        margin: 0;
-        background-color: #fff;
-        box-shadow: none;
-        .nut-cell__title {
-          color: #000;
-        }
-        .nut-icon {
-          color: #000;
-        }
-        &::after {
-          border-bottom: 2rpx solid #eaeaea;
+      .nut-swipe {
+        .nut-swipe__content {
+          .nut-cell {
+            margin: 0;
+            background-color: #fff;
+            box-shadow: none;
+            border-radius: 0;
+            .nut-cell__title {
+              color: #000;
+            }
+            .nut-icon {
+              color: #000;
+            }
+            &::after {
+              border-bottom: 2rpx solid #eaeaea;
+            }
+          }
         }
       }
     }

@@ -87,7 +87,7 @@ const timer = ref(null);
 
 const windowWidth = ref(1);
 
-//计算微信navBar高度
+//计算设备navBar高度
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   windowWidth.value = sysinfo.windowWidth;
@@ -104,11 +104,11 @@ const getH5NavbarHeight = () => {
   contentHeight.value = "2.75rem";
 };
 
-// #ifdef  APP
+// #ifdef APP-PLUS
 getNavHeight();
 // #endif
 
-// #ifdef  H5
+// #ifdef H5
 getH5NavbarHeight();
 // #endif
 

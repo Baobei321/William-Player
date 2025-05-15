@@ -27,13 +27,13 @@
           <view class="tv-version-list__item" :style="{marginLeft:index==0 ? 0 : '24rpx'}" v-for="(item,index) in tvListData" :key="item.name" :id="'name'+(index+1)"
             @click="changeVideo(item,index)">
             <view class="item-img">
-              <image :src="item.poster || detailData.poster" class="item-bgc" mode="aspectFill"></image>
+              <image :src="item.poster || posterEmpty" class="item-bgc" mode="aspectFill"></image>
               <image src="@/static/playVideo-button.png" v-if="name!=item.name" class="item-img-pause" />
               <!-- <image src="https://y.qq.com/mediastyle/yqq/img/wave.gif?max_age=2592000" class="item-img-run" v-else></image> -->
               <image src="https://img.alicdn.com/imgextra/i2/O1CN01PjwhOL1FfuzmXWggp_!!6000000000515-1-tps-72-72.gif" class="item-img-run" v-else></image>
               <text class="item-img-runtime">{{ item.runtime }}</text>
             </view>
-            <text class="item-title">{{ index+1+'.'+item.title }}</text>
+            <text class="item-title">{{ index+1+'.'+(item.title||`第${index+1}集`) }}</text>
           </view>
         </scroll-view>
         <view class="tv-version-empty" v-else>
@@ -61,6 +61,8 @@
 <script>
 import { getMovieTvById } from "@/utils/common.js";
 import { generateChineseNumberMapping } from "@/utils/scrape.js";
+import posterEmpty from "@/static/poster-empty.png";
+
 export default {
   props: {
     movieTvId: String,

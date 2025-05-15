@@ -80,10 +80,10 @@
                 <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div class="item-img-process" :style="{width:Number(historyTv.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"
-                  v-if="index+1==historyTv.ji&& selectSource.path + '/' + historyTv.name == '/' + historyTv.path">
+                  v-if="index+1==historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path">
                 </div>
               </div>
-              <div class="item-title">{{ index+1+'.'+item.title }}</div>
+              <div class="item-title">{{ index+1+'.'+(item.title||`第${index+1}集`) }}</div>
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
@@ -120,7 +120,8 @@
           <span class="tip-footer-name">{{ handleSeasonName(selectSource.name,true)+'-' }}</span>
           <span class="tip-footer-webdav">路径：{{ selectSource.path }}</span>
           <div class="tip-footer-timesize">
-            <span v-if="imgData.runtime">{{ imgData.runtime }}</span><span>{{ selectSource.sourceName }}</span><span
+            <span v-if="imgData.runtime">{{ imgData.runtime }}</span><span>{{ selectSource.sourceName }}</span>
+            <span
               v-if="routerParams.type=='movie' ? selectSource.size : tvList[0]?.size">{{ routerParams.type=='movie' ? selectSource.size : handleSize(tvList[0]?.size) }}</span>
           </div>
         </div>
@@ -304,30 +305,11 @@ const handleTv = async (seasonData1 = null) => {
     }
     season = season != "1" ? season : activeSeason.value.season;
   }
-
-  let res1 = {};
-  if (!seasonData1) {
-    if (routerParams.value.movieTvId) {
-      res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
-    }
-  } else {
-    res1 = seasonData1;
-  }
-  if (season != "1") {
-    imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
-    overview.value = res1.overview;
-  } else {
-    imgData.value.img = seasonFirst.value.img;
-    overview.value = seasonFirst.value.overview;
-  }
-  let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
-  uni.setStorageSync("seasonData", seasonData);
-  season != "1" && res1.overview ? (overview.value = res1.overview) : "";
   let result = {};
   let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
   if (selectType.value.type == "WebDAV") {
-    imgData.value.releaseTime = res1.air_date;
-    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
+    // imgData.value.releaseTime = res1.air_date;
+    // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
     try {
       result = await getFolder(
         {
@@ -360,10 +342,10 @@ const handleTv = async (seasonData1 = null) => {
         return numA - numB;
       }
     });
-    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result?.data?.total || 0}集）`;
+    // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
   } else if (selectType.value.type == "天翼云盘") {
-    imgData.value.releaseTime = res1.air_date;
-    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
+    // imgData.value.releaseTime = res1.air_date;
+    // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
     try {
       result = await get189Folder(
         {
@@ -396,10 +378,10 @@ const handleTv = async (seasonData1 = null) => {
         return numA - numB;
       }
     });
-    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result.fileListAO.count || 0}集）`;
+    // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
   } else if (selectType.value.type == "夸克网盘") {
-    imgData.value.releaseTime = res1.air_date;
-    imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
+    // imgData.value.releaseTime = res1.air_date;
+    // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
     try {
       result = await getQuarkFolder(
         {
@@ -442,8 +424,29 @@ const handleTv = async (seasonData1 = null) => {
         };
       });
 
-    imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
+    // imgData.value.runtime = `共${res1.episodes.length}集（库中有${tvList.value?.length || 0}集）`;
   }
+  let res1 = {};
+  if (!seasonData1) {
+    if (routerParams.value.movieTvId) {
+      res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+    }
+  } else {
+    res1 = seasonData1;
+  }
+  imgData.value.releaseTime = res1.air_date;
+  imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
+  if (season != "1") {
+    imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
+    overview.value = res1.overview;
+  } else {
+    imgData.value.img = seasonFirst.value.img;
+    overview.value = seasonFirst.value.overview;
+  }
+  let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
+  uni.setStorageSync("seasonData", seasonData);
+  season != "1" && res1.overview ? (overview.value = res1.overview) : "";
+
   //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
   tvList.value.forEach((v, vindex) => {
     if (res1.episodes) {
@@ -632,6 +635,7 @@ const clickPlayButton = () => {
         title: tvList.value[0].title,
         initialTime: "0",
         movieTvId: routerParams.value.movieTvId,
+        season: activeSeason.value.season,
       };
       let openEndTime = {};
       routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
@@ -663,7 +667,7 @@ const toPlayVideo = (item, index) => {
   } else {
     nowTv = localMovieTvData.tv.find((i) => i.path == routerParams.value.path);
   }
-  let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name, true) && item.name == i.name);
+  let history = historyPlay.value?.find((i) => i.titlePlay == handleSeasonName(selectSource.value.name + (activeSeason.value.name == "第一季" ? "" : " " + activeSeason.value.name), true) && item.name == i.name);
   if (history && activeSeason.value.path + "/" + history.name == "/" + history.path && activeSeason.value.season == history.season) {
     //存在历史记录，同一路径的片源，同一季
     let openEndTime = {};
@@ -672,11 +676,11 @@ const toPlayVideo = (item, index) => {
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     } else {
       uni.navigateTo({
-        url: `/pages/video/video-player?path=${selectSource.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+        url: `/pages/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
       });
     }
   } else {
@@ -848,115 +852,61 @@ const resetMovieTvData = async () => {
   }
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   judgeSelect();
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
-  getUntokenDict("online_storage_source")
-    .then(async (res) => {
-      let source = JSON.parse(routerParams.value.source);
-      sourceList.value = source.map((i) => {
-        if (source.filter((v) => v.provider == i.provider).length > 1) {
-          let label = res.online_storage_source.find((v) => v.value == i.provider).label;
-          i.sourceName = label ? label + `(${i.name})` : i.provider;
+  let dict = [
+    { value: "189CloudPC", label: "天翼云盘" },
+    { value: "Quark", label: "夸克网盘" },
+  ];
+  let source = JSON.parse(routerParams.value.source);
+  sourceList.value = source.map((i) => {
+    if (source.filter((v) => v.provider == i.provider).length > 1) {
+      let label = dict.find((v) => v.value == i.provider).label;
+      i.sourceName = label ? label + `(${i.name})` : i.provider;
+    } else {
+      i.sourceName = dict.find((v) => v.value == i.provider).label || i.provider;
+    }
+    return i;
+  });
+  selectSource.value = sourceList.value[0];
+  historyTv.value =
+    historyPlay.value?.find((i) => {
+      if (i.season == "1") {
+        let sameSource = sourceList.value.find((v) => handleSeasonName(v.name, true) == i.titlePlay && v.seasonArr.find((h) => h.path + "/" + i.name == "/" + i.path));
+        if (sameSource) {
+          selectSource.value = sameSource;
+          return true;
         } else {
-          i.sourceName = res.online_storage_source.find((v) => v.value == i.provider).label || i.provider;
+          selectSource.value = sourceList.value[0];
+          return false;
         }
-        return i;
-      });
-      selectSource.value = sourceList.value[0];
-      historyTv.value =
-        historyPlay.value?.find((i) => {
-          if (i.season == "1") {
-            let sameSource = sourceList.value.find((v) => handleSeasonName(v.name, true) == i.titlePlay);
-            if (sameSource) {
-              selectSource.value = sameSource;
-              return true;
-            } else {
-              selectSource.value = sourceList.value[0];
-              return false;
-            }
-          } else {
-            const chineseNumber = generateChineseNumberMapping(40, "number");
-            let sameSource = sourceList.value.find((v) => i.titlePlay == handleSeasonName(v.name, true) + " " + `第${chineseNumber[i.season]}季`);
-            if (sameSource) {
-              selectSource.value = sameSource;
-              return true;
-            } else {
-              selectSource.value = sourceList.value[0];
-              return false;
-            }
-          }
-        }) || {};
-      let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
-      if (obj1) {
-        activeSeason.value = { ...obj1 };
       } else {
-        activeSeason.value = { ...selectSource.value.seasonArr[0] };
-      }
-      setButtonText();
-      await getMovieTvDetail();
-      if (routerParams.value.type == "tv") {
-        await handleTv();
-      }
-      nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
-      });
-    })
-    .catch(async (error) => {
-      let dict = [
-        { value: "189CloudPC", label: "天翼云盘" },
-        { value: "Quark", label: "夸克网盘" },
-      ];
-      let source = JSON.parse(routerParams.value.source);
-      sourceList.value = source.map((i) => {
-        if (source.filter((v) => v.provider == i.provider).length > 1) {
-          let label = dict.find((v) => v.value == i.provider).label;
-          i.sourceName = label ? label + `(${i.name})` : i.provider;
+        const chineseNumber = generateChineseNumberMapping(40, "number");
+        let sameSource = sourceList.value.find((v) => i.titlePlay == handleSeasonName(v.name, true) + ` 第${chineseNumber[i.season]}季` && v.seasonArr.find((h) => h.path + "/" + i.name == "/" + i.path));
+        if (sameSource) {
+          selectSource.value = sameSource;
+          return true;
         } else {
-          i.sourceName = dict.find((v) => v.value == i.provider).label || i.provider;
+          selectSource.value = sourceList.value[0];
+          return false;
         }
-        return i;
-      });
-      selectSource.value = sourceList.value[0];
-      historyTv.value =
-        historyPlay.value?.find((i) => {
-          if (i.season == "1") {
-            let sameSource = sourceList.value.find((v) => handleSeasonName(v.name, true) == i.titlePlay);
-            if (sameSource) {
-              selectSource.value = sameSource;
-              return true;
-            } else {
-              selectSource.value = sourceList.value[0];
-              return false;
-            }
-          } else {
-            const chineseNumber = generateChineseNumberMapping(40, "number");
-            let sameSource = sourceList.value.find((v) => i.titlePlay == handleSeasonName(v.name, true) + " " + `第${chineseNumber[i.season]}季`);
-            if (sameSource) {
-              selectSource.value = sameSource;
-              return true;
-            } else {
-              selectSource.value = sourceList.value[0];
-              return false;
-            }
-          }
-        }) || {};
-
-      let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
-      if (obj1) {
-        activeSeason.value = { ...obj1 };
-      } else {
-        activeSeason.value = { ...selectSource.value.seasonArr[0] };
       }
-      setButtonText();
-      await getMovieTvDetail();
-      if (routerParams.value.type == "tv") {
-        await handleTv();
-      }
-      nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
-      });
-    });
+    }) || {};
+  let obj1 = selectSource.value.seasonArr.find((i) => i.season == historyTv.value.season);
+  if (obj1) {
+    activeSeason.value = { ...obj1 };
+  } else {
+    activeSeason.value = { ...selectSource.value.seasonArr[0] };
+  }
+  setButtonText();
+  await getMovieTvDetail();
+  if (routerParams.value.type == "tv") {
+    await handleTv();
+  }
+  nextTick(() => {
+    historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
+  });
   getActorList();
 });
 
