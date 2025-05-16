@@ -171,7 +171,7 @@ page {
                     font-size: 32rpx;
                   }
                   .nut-cell__link {
-                    display: none;
+                    // display: none;
                   }
                 }
               }

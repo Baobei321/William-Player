@@ -242,14 +242,13 @@ function extractSeasonNumber(str) {
     if (/特别篇/i.test(str)) {
         return '0';
     }
-    const seasonRegex = /(?:^| )(?:第([一二三四五六七八九十百千万\d]+)季|Season\s?(\d+)|S(\d{1,2}))(?!\d)/i;
+    const seasonRegex =  /(?:第([一二三四五六七八九十百千万\d]+)季|Season[\s\u3000]*(\d+)|S(\d{1,2}))/i;
     const match = str.match(seasonRegex);
-
     if (!match) return '1';
 
     if (match[1]) {
         const chineseNumbers = generateChineseNumberMapping(40, "string");
-        return chineseNumbers[match[1]] || parseInt(match[1], 10);
+        return chineseNumbers[match[1]] || String(parseInt(match[1], 10));
     } else {
         return parseInt(match[2] || match[3], 10);
     }
@@ -277,6 +276,8 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                             tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
+                                console.log(extractSeasonNumber(data.name));
+
                                 tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
                                 tvArr.push({ ...data, season: '1', seasonPath: data.path })
