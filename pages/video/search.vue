@@ -14,7 +14,7 @@
     </wil-navbar>
     <div class="video-search-list" v-if="listData.length">
       <div class="video-search-list__item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)">
-        <div class="item-left" :style="{backgroundImage:`url(${item.poster})`}">
+        <div class="item-left" :style="{backgroundImage:`url(${setEmptyImg(item.poster)})`}">
           <div :class="['item-left-logo',item.type=='1'?'item-left-tv':'']">
             <template v-if="item.type=='1'">
               <image :src="tvLittle" />
@@ -52,6 +52,7 @@ import wilEmpty from "../../components/wil-empty/index.vue";
 import movieLittle from "../../static/movie-little.png";
 import tvLittle from "../../static/tv-little.png";
 import { handleSeasonName } from "../../utils/scrape.js";
+import posterEmpty from "@/static/poster-empty.png";
 
 const oldValue = ref("");
 const searchValue = ref("");
@@ -80,6 +81,14 @@ const handleName = (name) => {
   arr.push({ label: name.split(oldValue.value)[1] });
   arr = arr.filter((i) => i.label);
   return arr;
+};
+
+const setEmptyImg = (poster) => {
+  if (poster) {
+    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+  } else {
+    return posterEmpty;
+  }
 };
 
 const toVideoDetail = (item) => {

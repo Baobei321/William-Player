@@ -216,6 +216,7 @@ export default {
       let res = await this.getVideoUrl();
       if (this.selectType.type == "WebDAV") {
         this.config.url = res.data.raw_url;
+        addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: this.config.url });
       } else if (this.selectType.type == "天翼云盘") {
         // this.config.url = res.normal.url;
         const NetworkModule = uni.requireNativePlugin("NetworkModule");
@@ -227,12 +228,14 @@ export default {
           },
           (res1) => {
             this.config.url = res1.location;
+            addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: this.config.url });
           },
           (error) => {}
         );
       } else if (this.selectType.type == "夸克网盘") {
         if (res.data.video_list[0].video_info?.url) {
           this.config.url = res.data.video_list[0].video_info.url;
+          addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: this.config.url });
           // addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: res.data[0].download_url });
           // this.config.url = res.data[0].download_url;
         } else {
@@ -242,7 +245,6 @@ export default {
           });
         }
       }
-      addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: this.config.url });
     },
     getPipStatus(event) {
       this.pipStatus = event.detail.isPip;

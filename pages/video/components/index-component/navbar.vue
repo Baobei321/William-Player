@@ -152,6 +152,11 @@ const showProgress = () => {
     return;
   }
   popoverData.value.title = "正在扫描";
+  popoverData.value.list = [
+    { label: "已找到", value: 0 },
+    { label: "待更新", value: 0 },
+    { label: "已更新", value: 0 },
+  ];
   showPopover.value = true;
   emits("refresh");
   timer.value = setTimeout(() => {
@@ -202,8 +207,22 @@ const confirmApiKey = async () => {
 watch(
   () => props.refreshData,
   (val) => {
+    if (props.loading) {
+      popoverData.value.list = [
+        { label: "已找到", value: 0 },
+        { label: "待更新", value: 0 },
+        { label: "已更新", value: 0 },
+      ];
+      popoverData.value.list.find((i) => i.label == "待更新").value = val.toupdate || 0;
+    } else {
+      popoverData.value.list = [
+        { label: "已找到", value: 0 },
+        { label: "已失败", value: 0 },
+        { label: "已更新", value: 0 },
+      ];
+      popoverData.value.list.find((i) => i.label == "已失败").value = val.fail || 0;
+    }
     popoverData.value.list.find((i) => i.label == "已找到").value = val.found || 0;
-    popoverData.value.list.find((i) => i.label == "待更新").value = val.toupdate || 0;
     popoverData.value.list.find((i) => i.label == "已更新").value = val.updated || 0;
   },
   { deep: true }
@@ -214,7 +233,7 @@ watch(
   (val) => {
     loading.value = val;
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.success}个影片`;
+      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`;
       clearTimeout(timer.value);
       timer.value = null;
       showPause.value = false;

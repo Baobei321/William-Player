@@ -15,6 +15,7 @@
     <div class="live-add" @click="openForm">
       <image src="@/static/jia-hao.png"></image>
     </div>
+    <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
   </div>
 </template>
 
@@ -22,17 +23,22 @@
 import { onBeforeMount, ref, reactive } from "vue";
 import wilForm from "@/components/wil-form/index.vue";
 import wilModal from "@/components/wil-modal/index.vue";
+import shareDialog from "../video/components/index-component/share-dialog.vue";
 import { parseM3UToArray, groupByGroupTitle } from "./common.js";
+import { getCutContent } from "@/utils/common";
+import { onShow } from "@dcloudio/uni-app";
 
 const liveList = ref([]);
 const wil_modal = ref(null);
 const base_form = ref(null);
+const showShareModal = ref(false);
+const shareUrl = ref("");
 
 const state = reactive({
   formData: {},
 });
 
-//手机号校验
+//m3u校验
 const validatorUrl = (val) => {
   if (!val) {
     return false;
@@ -45,6 +51,7 @@ const validatorUrl = (val) => {
     }
   }
 };
+
 const options = [
   { label: "直播源名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入直播源名称" }] },
   { label: "直播源地址", prop: "url", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ validator: validatorUrl, message: "请输入正确的直播源地址" }] },
@@ -126,6 +133,14 @@ onBeforeMount(() => {
   if (!liveList.value) {
     liveList.value = [{ name: "默认直播源", url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u" }];
     uni.setStorageSync("liveList", liveList.value);
+  }
+});
+
+onShow(async () => {
+  let shareUrl1 = await getCutContent();
+  if (shareUrl1) {
+    shareUrl.value = shareUrl1;
+    showShareModal.value = true;
   }
 });
 </script>

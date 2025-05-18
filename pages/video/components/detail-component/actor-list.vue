@@ -101,6 +101,7 @@ onBeforeMount(() => {
 
 <style lang="scss" scoped>
 .actor-list {
+  width: 100%;
   .story-introduction {
     margin-top: 50rpx;
 
@@ -195,7 +196,7 @@ onBeforeMount(() => {
     margin-top: 50rpx;
     padding-top: 20rpx;
     border-top: 2rpx solid #c2c5c6;
-
+    width: 100%;
     .tip-footer-name {
       font-size: 24rpx;
       color: #c2c5c6;
@@ -205,6 +206,7 @@ onBeforeMount(() => {
       font-size: 24rpx;
       color: #c2c5c6;
       padding-top: 20rpx;
+      word-break: break-all;  /* 允许在任意字符间断行 */
     }
 
     .tip-footer-timesize {

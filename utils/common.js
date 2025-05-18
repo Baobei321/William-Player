@@ -404,7 +404,47 @@ const getMovieTvById = (data, type) => {
   });
 };
 
+// //设置tmdb图片的域名
+// const setTmdbImgDomain = () => {
+//   uni.requireNativePlugin(NetworkModule);
+//   NetworkModule.request(
+//     {
+//       url: 'https://media.themoviedb.org',
+//       timeout: 5000,
+//       method: "GET",
+//     },
+//     (res) => {
+//       uni.setStorageSync('imgDomain', res.location);
+//     },
+//     (error) => { }
+//   );
+// }
+
+//获取剪切板的内容，是否是分享链接，是的话弹窗弹窗，看看是不是要跳到资源保存页面
+const getCutContent = () => {
+  return new Promise((resolve, reject) => {
+    uni.getClipboardData({
+      success: (res) => {
+        const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fa5，。；！？、]+)/g;
+        const urls = res.data.match(urlRegex); // ["https://cloud.189.cn/t/uMfaErJFFrm2"]
+        if (urls[0].startsWith("https://cloud.189.cn/") || urls[0].startsWith("https://pan.quark.cn/")) {
+          if (uni.getStorageSync('shareUrl') == urls[0]) {
+            resolve(null)
+          } else {
+            uni.setStorageSync('shareUrl', urls[0])
+            resolve(urls[0])
+          }
+        } else {
+          resolve(null)
+        }
+      }
+    })
+  })
+
+  const text = '刑警的日子.Into.txhe.Heat.2025.4K-2160p.WEB-DL.H265.AAC-DeePTV-刑警的日子链接：https://cloud.189.cn/t/uMfaErJFFrm2阿松大';
+}
+
 export {
   getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, get189DownloadUrl, getQuarkFolder, getQuarkVideoUrl,
-  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById,
+  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent
 };

@@ -19,17 +19,26 @@
       </div>
       <wil-empty v-else text="暂无文件，请查看资源是否开启" class="video-list1-tip"></wil-empty>
     </div>
+    <div class="video-link" @click="openModal">
+      <image src="@/static/link-icon.png"></image>
+    </div>
+    <wil-modal ref="wil_modal">
+      <wil-form v-model="state.formData" :options="options" ref="base_form">
+      </wil-form>
+    </wil-modal>
   </div>
 </template>
   
   <script setup>
-import { onBeforeMount, onMounted, ref, nextTick } from "vue";
+import { onBeforeMount, reactive, ref, nextTick } from "vue";
 import baseCell from "../../components/wil-cell/index.vue";
 import Folder from "../../static/folder.png";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { getFolder, get189Folder, getQuarkFolder } from "../../utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
 import wilEmpty from "@/components/wil-empty/index.vue";
+import wilModal from "@/components/wil-modal/index.vue";
+import wilForm from "@/components/wil-form/index.vue";
 
 const date = ref("暂未更新");
 
@@ -46,6 +55,14 @@ const refreshWidth = ref(0);
 const sourceList = ref([]);
 const selectType = ref({});
 const selectMedia = ref({});
+
+const wil_modal = ref(null);
+
+const state = reactive({
+  formData: {},
+});
+
+const options = [{ label: "", prop: "url", type: "input", formItemProps: { placeholder: "请输入地址", type: "text", maxlength: -1 } }];
 
 const loginUser = () => {
   return new Promise((resolve) => {
@@ -272,6 +289,36 @@ const judgeSelect = () => {
     }) || {};
 };
 
+const openModal = () => {
+  wil_modal.value.showModal({
+    title: "播放",
+    confirmColor: "#ff6701",
+    confirm: async () => {
+      if (!state.formData.url) {
+        uni.showToast({
+          title: "请输入链接",
+          icon: "none",
+        });
+      } else {
+        if (!state.formData.url.startsWith("http://") && !state.formData.url.startsWith("https://")) {
+          uni.showToast({
+            title: "链接格式不正确",
+            icon: "none",
+          });
+        } else {
+          uni.navigateTo({
+            url: `/pages/video/video-player?noSetHistory=0&videoUrl=${encodeURIComponent(state.formData.url)}&liveTitle=自定义链接`,
+          });
+        }
+      }
+      state.formData = {};
+    },
+    cancel: () => {
+      state.formData = {};
+    },
+  });
+};
+
 onShow(async () => {
   judgeSelect();
   if (selectType.value.type == "WebDAV") {
@@ -477,6 +524,22 @@ page {
       color: #ffffff;
     }
   }
+  .video-link {
+    border-radius: 25rpx;
+    background: #315ffd;
+    width: 100rpx;
+    height: 100rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 90rpx;
+    right: 30rpx;
+    image {
+      width: 60rpx;
+      height: 60rpx;
+    }
+  }
   ::v-deep .nut-popup {
     background: #f3f2f7;
     .video-popup-title {
@@ -544,6 +607,37 @@ page {
             padding-left: 30rpx;
             font-size: 28rpx;
             color: #000;
+          }
+        }
+      }
+    }
+  }
+  ::v-deep .nut-transition {
+    .wil-modal {
+      .wil-modal-top {
+        padding-bottom: 14rpx;
+        .base-form {
+          .base-form-content {
+            .nut-form {
+              .nut-cell-group {
+                .nut-cell-group__wrap {
+                  margin-bottom: 0;
+                  .nut-form-item {
+                    padding-bottom: 0;
+                    .nut-form-item__body {
+                      .nut-form-item__body__slots {
+                        input {
+                          height: 90rpx;
+                          border: 2rpx solid rgb(186, 186, 186);
+                          border-radius: 10rpx;
+                          padding: 0 24rpx;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

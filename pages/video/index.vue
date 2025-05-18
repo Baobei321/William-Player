@@ -39,6 +39,7 @@
     <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :enableControl="true" :appVersion="CONFIG.VERSIOIN">
     </wil-upgrade>
     <wil-modal ref="wil_modal"></wil-modal>
+    <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
   </div>
 </template>
 
@@ -52,8 +53,9 @@ import hxList from "./components/index-component/hx-list.vue";
 import Classify from "./components/index-component/classify.vue";
 import wilUpgrade from "../../components/wil-upgrade/index.vue";
 import wilModal from "../../components/wil-modal/index.vue";
+import shareDialog from "./components/index-component/share-dialog.vue";
 import { setTmdbKey, getUntokenDicts, addOperLog } from "../../network/apis";
-import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
+import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, getCutContent } from "../../utils/common";
 import { handleSeasonName, handleNameYear, generateChineseNumberMapping, recursionMovie, recursionTv } from "../../utils/scrape";
 import { toParse, toStringfy } from "../mine/common";
 import appLogo from "../../static/app-logo1.png";
@@ -68,9 +70,11 @@ const video_navbar = ref(null);
 const listData = ref([]);
 const webdavInfo = ref({});
 const sourceList = ref([]);
-const refreshData = ref({ found: 0, toupdate: 0, updated: 0, success: 0 });
+const refreshData = ref({ found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 });
 const refreshLoading = ref(false);
 const showDialog = ref(false);
+const showShareModal = ref(false);
+const shareUrl = ref("");
 
 const upgradeInfo = ref({
   logo: appLogo,
@@ -193,7 +197,7 @@ const groupBySource = (arr) => {
 };
 
 const refreshWebDavVideo = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
   movieTvData.value = { movie: [], tv: [] };
   if (selectMedia.value.name) {
     let res1 = await loginUser(selectMedia.value);
@@ -400,6 +404,7 @@ const setMovieTvImg = async (arr, type) => {
           return null;
         }
       } catch (error) {
+        refreshData.value.fail++;
         return null;
       }
     })
@@ -729,6 +734,11 @@ onShow(async () => {
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   tmdbKey.value = uni.getStorageSync("settingData").tmdbKey || "";
+  let shareUrl1 = await getCutContent();
+  if (shareUrl1) {
+    shareUrl.value = shareUrl1;
+    showShareModal.value = true;
+  }
   if (uni.getStorageSync("secondPage") == "videoPlayer") {
     setTimeout(() => {
       historyPlay.value = uni.getStorageSync("historyPlay") || [];
@@ -797,6 +807,7 @@ onShow(async () => {
 });
 
 onBeforeMount(async () => {
+  // setTmdbImgDomain();
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   historyPlay.value = uni.getStorageSync("historyPlay") || [];

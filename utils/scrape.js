@@ -276,8 +276,6 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                             tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
-                                console.log(extractSeasonNumber(data.name));
-
                                 tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
                                 tvArr.push({ ...data, season: '1', seasonPath: data.path })

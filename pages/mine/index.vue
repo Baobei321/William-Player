@@ -39,13 +39,15 @@
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
+    <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import baseCell from "../../components/wil-cell/index.vue";
-import wilNavbar from "../../components/wil-navbar";
+import shareDialog from "../video/components/index-component/share-dialog.vue";
+import wilNavbar from "../../components/wil-navbar/index.vue";
 import userImg from "../../static/user-img.png";
 import * as CONFIG from "../../utils/config";
 import logOut from "../../static/log-out.png";
@@ -59,6 +61,7 @@ import iconSetting from "../../static/icon-setting.png";
 import iconAbout from "../../static/icon-about.png";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "./common";
+import { getCutContent } from "@/utils/common";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
 import wilImage from "@/components/wil-image/index.vue";
@@ -70,6 +73,8 @@ const isLogin = ref(false);
 
 const showLoginPopup = ref(false);
 const wil_modal = ref(null);
+const showShareModal = ref(false);
+const shareUrl = ref("");
 
 const cellOptions = ref([
   [
@@ -220,8 +225,13 @@ const openLoginPopup = (item) => {
   showLoginPopup.value = true;
 };
 
-onShow(() => {
+onShow(async () => {
   judgeLogin();
+  let shareUrl1 = await getCutContent();
+  if (shareUrl1) {
+    shareUrl.value = shareUrl1;
+    showShareModal.value = true;
+  }
 });
 </script>
 
