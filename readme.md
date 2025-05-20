@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/chenweiliang6/William-Player)](https://github.com/chenweiliang6/William-Player/releases/latest)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/chenweiliang6/William-Player/total)
 # William Player
-一款适配📱 Android Phone 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
+一款适配📱 Android Phone和Android Pad 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
 
 ---
 
@@ -44,11 +44,11 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.3.1/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.3.2/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
-| arm64-v8a   | app-release.apk   | 适合大部分设备，手机多数为此架构     |
+| arm64-v8a   | app-release.apk   | 适合大部分设备，手机和平板多数为此架构     |
 
 ## 版本适配
 

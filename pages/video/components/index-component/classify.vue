@@ -31,8 +31,8 @@ const listData = ref([]);
 
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 
-const itemWidth = ref("");
-const lineNumber = ref(0);
+const itemWidth = ref("341rpx");
+const lineNumber = ref(2);
 
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
