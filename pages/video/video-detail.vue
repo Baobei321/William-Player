@@ -112,6 +112,8 @@ import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "../mine/common";
+import * as CONFIG from "@/utils/config";
+
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
 const popoverArr = ref([{ icon: editIcon, text: "手动编辑" }]);
@@ -377,7 +379,7 @@ const handleTv = async (seasonData1 = null) => {
   imgData.value.releaseTime = res1.air_date;
   imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
   if (season != "1") {
-    imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
+    imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
     overview.value = res1.overview;
   } else {
     imgData.value.img = seasonFirst.value.img;
@@ -390,7 +392,7 @@ const handleTv = async (seasonData1 = null) => {
   tvList.value.forEach((v, vindex) => {
     if (res1.episodes) {
       v.title = res1.episodes[vindex]?.name || "暂无标题";
-      v.poster = res1.episodes[vindex]?.still_path ? "https://media.themoviedb.org/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
+      v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN +"/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
       v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
     } else {
       v.title = `第${vindex + 1}集`;
@@ -422,7 +424,7 @@ const getMovieTvDetail = async () => {
   overview.value = res.overview;
   if (routerParams.value.type == "movie") {
     imgData.value = {
-      img: "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
+      img: CONFIG.IMG_DOMAIN +"/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
       score: res.vote_average.toFixed(1),
       releaseTime: res.release_date,
       runtime: calTime(res.runtime),
@@ -431,7 +433,7 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = imgData.value.img = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
+    seasonFirst.value.img = imgData.value.img = CONFIG.IMG_DOMAIN +"/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
@@ -761,7 +763,7 @@ const resetMovieTvData = async () => {
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();
-      nowMovie.poster = "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + res.poster_path;
+      nowMovie.poster =CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowMovie.releaseTime = res.release_date;
       nowMovie.type = "2";
       nowMovie.movieTvId = res.id;

@@ -427,7 +427,7 @@ const getCutContent = () => {
       success: (res) => {
         const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fa5，。；！？、]+)/g;
         const urls = res.data.match(urlRegex); // ["https://cloud.189.cn/t/uMfaErJFFrm2"]
-        if (urls[0].startsWith("https://cloud.189.cn/") || urls[0].startsWith("https://pan.quark.cn/")) {
+        if (urls && (urls[0].startsWith("https://cloud.189.cn/") || urls[0].startsWith("https://pan.quark.cn/"))) {
           if (uni.getStorageSync('shareUrl') == urls[0]) {
             resolve(null)
           } else {
@@ -440,8 +440,6 @@ const getCutContent = () => {
       }
     })
   })
-
-  const text = '刑警的日子.Into.txhe.Heat.2025.4K-2160p.WEB-DL.H265.AAC-DeePTV-刑警的日子链接：https://cloud.189.cn/t/uMfaErJFFrm2阿松大';
 }
 
 export {

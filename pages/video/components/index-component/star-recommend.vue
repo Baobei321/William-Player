@@ -5,7 +5,7 @@
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
             <div class="swiper-content-left">
-              <image mode="aspectFill" :src="'https://media.themoviedb.org/t/p/w300_and_h450_bestv2' + data.poster"></image>
+              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN+'/t/p/w300_and_h450_bestv2' + data.poster"></image>
             </div>
             <div class="swiper-content-right">
               <div class="right-genres">{{ data.genres }}</div>
@@ -31,6 +31,7 @@ import wilSwiper from "@/components/wil-swiper/index.vue";
 import { ref, onBeforeMount } from "vue";
 import { classifyList, handleSeasonName } from "../../../../utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
+import * as CONFIG from "@/utils/config";
 
 const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
@@ -52,7 +53,7 @@ onShow(() => {
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
   let tv = [];
   if (localMovieTvData?.tv) {
-    tv = localMovieTvData.tv.filter(v=>v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
+    tv = localMovieTvData.tv.filter((v) => v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
     tv = tv.slice(0, 3).map((item) => {
       let genres = "";
       item.type = "tv";
@@ -64,13 +65,13 @@ onShow(() => {
         }
       });
       item.genres = genres;
-      item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
       return item;
     });
   }
   let movie = [];
   if (localMovieTvData?.movie) {
-    movie = localMovieTvData.movie.filter(v=>v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
+    movie = localMovieTvData.movie.filter((v) => v.voteAverage).sort((a, b) => b.voteAverage - a.voteAverage);
     movie = movie.slice(0, 3).map((item) => {
       item.name = removeExtension(item.name);
       item.type = "movie";
@@ -83,7 +84,7 @@ onShow(() => {
         }
       });
       item.genres = genres;
-      item.underImg = "https://media.themoviedb.org/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
       return item;
     });
   }

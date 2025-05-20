@@ -2,7 +2,8 @@
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
     <div class="video-classify-list">
-      <div class="list-item" v-for="item in listData" :key="item.id" :style="{ background: item.background }" @click="toVideoAll(item)">
+      <div class="list-item" v-for="(item,index) in listData" :key="item.id"
+        :style="{ background: item.background,flex:`0 0 ${itemWidth}`,marginLeft:index%lineNumber===0?0:'20rpx' }" @click="toVideoAll(item)">
         <div class="list-item-title">{{ item.label }}</div>
         <div class="list-item-img">
           <div class="img-one"></div>
@@ -30,6 +31,9 @@ const listData = ref([]);
 
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 
+const itemWidth = ref("");
+const lineNumber = ref(0);
+
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
   let idArr = [];
@@ -55,6 +59,23 @@ const getGenre = () => {
     }
   });
 };
+
+const setItemWidth = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth;
+  if (windowWidth > 800) {
+    lineNumber.value = Math.floor((windowWidth - 24) / 170.5);
+    let remain = lineNumber.value * 170.5;
+    if (remain >= (lineNumber.value - 1) * 10) {
+      itemWidth.value = (windowWidth - 24 - (lineNumber.value - 1) * 10) / lineNumber.value + "px";
+      // return `0 0 ${itemWidth}px`;
+    } else {
+      lineNumber.value--;
+      itemWidth.value = (windowWidth - 24 - (lineNumber.value - 1) * 10) / lineNumber.value + "px";
+    }
+  }
+};
+setItemWidth();
 
 //跳转到videoAll
 const toVideoAll = (item) => {
@@ -89,12 +110,12 @@ onShow(() => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
+    // justify-content: space-between;
     box-sizing: border-box;
     width: 100%;
 
     .list-item {
-      flex: 0 0 calc(50% - 10rpx);
+      flex: 0 0 341rpx;
       height: 170rpx;
       border-radius: 20rpx;
       margin-top: 20rpx;

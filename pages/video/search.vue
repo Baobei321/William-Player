@@ -53,6 +53,7 @@ import movieLittle from "../../static/movie-little.png";
 import tvLittle from "../../static/tv-little.png";
 import { handleSeasonName } from "../../utils/scrape.js";
 import posterEmpty from "@/static/poster-empty.png";
+import * as CONFIG from "@/utils/config";
 
 const oldValue = ref("");
 const searchValue = ref("");
@@ -85,7 +86,7 @@ const handleName = (name) => {
 
 const setEmptyImg = (poster) => {
   if (poster) {
-    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+    return CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + poster;
   } else {
     return posterEmpty;
   }

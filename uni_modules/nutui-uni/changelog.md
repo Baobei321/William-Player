@@ -522,13 +522,13 @@ pagination , progress , sku , trendarrow , uploader
 
 * **price:** 支持customClass与 customStyle ([43516f4](https://github.com/yang1206/uniapp-nutui/commit/43516f43f33540684ed98a4878b4fbd4925116dd))
 
-## [1.3.1](https://github.com/yang1206/uniapp-nutui/compare/v1.3.1...v1.3.1) (2023-11-01)
+## [1.3.1](https://github.com/yang1206/uniapp-nutui/compare/v1.3.0...v1.3.1) (2023-11-01)
 
 ### Bug Fixes
 
 * **sku:** 小程序真机调试错误 ([1bb8380](https://github.com/yang1206/uniapp-nutui/commit/1bb8380f4c1cabb443938f31dd6e0d1aa84ea104))
 
-# [1.3.1](https://github.com/yang1206/uniapp-nutui/compare/v1.2.4...v1.3.1) (2023-10-31)
+# [1.3.1](https://github.com/yang1206/uniapp-nutui/compare/v1.2.4...v1.3.0) (2023-10-31)
 
 ### Bug Fixes
 

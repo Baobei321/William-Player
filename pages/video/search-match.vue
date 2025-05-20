@@ -15,7 +15,7 @@
         :pageSize="20" pageNumKey="page" v-if="requestParams.query">
         <template #default="item">
           <div class="search-match-list__item" @click="handleSelect(item,item.$index)" :style="{borderColor:activeIndex==item.$index?'#ff6701':'rgb(235, 235, 235)'}">
-            <div class="item-left" :style="{backgroundImage:`url(https://media.themoviedb.org/t/p/w300_and_h450_bestv2${item.poster_path })`}">
+            <div class="item-left" :style="{backgroundImage:`url(${CONFIG.IMG_DOMAIN}/t/p/w300_and_h450_bestv2${item.poster_path })`}">
               <div :class="['item-left-logo',item.media_type=='tv'?'item-left-tv':'']">
                 <template v-if="item.media_type=='tv'">
                   <image :src="tvLittle" />
@@ -64,6 +64,7 @@ import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
 import { generateChineseNumberMapping } from "../../utils/scrape";
 import { onLoad } from "@dcloudio/uni-app";
+import * as CONFIG from '@/utils/config'
 
 const searchValue = ref("");
 const requestParams = ref({});

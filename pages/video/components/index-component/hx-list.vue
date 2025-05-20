@@ -29,6 +29,7 @@ import emptyBg from "@/static/empty_bg.png";
 import posterEmpty from "@/static/poster-empty.png";
 import { onShow } from "@dcloudio/uni-app";
 import { handleSeasonName } from "../../../../utils/scrape";
+import * as CONFIG from "@/utils/config";
 
 const props = defineProps({
   title: { type: String, default: "电影" },
@@ -77,7 +78,7 @@ const imgLoad = (item) => {
 
 const setEmptyImg = (poster) => {
   if (poster) {
-    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+    return CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + poster;
   } else {
     return posterEmpty;
   }

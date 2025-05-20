@@ -39,6 +39,7 @@ import wilEmpty from "@/components/wil-empty/index.vue";
 import { toStringfy } from "../mine/common";
 import { handleSeasonName } from "@/utils/scrape.js";
 import posterEmpty from "@/static/poster-empty.png";
+import * as CONFIG from "@/utils/config";
 
 const requestParams = ref({});
 
@@ -221,7 +222,7 @@ const toVideoDetail = async (item) => {
 };
 const setEmptyImg = (poster) => {
   if (poster) {
-    return "https://media.themoviedb.org/t/p/w300_and_h450_bestv2" + poster;
+    return CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + poster;
   } else {
     return posterEmpty;
   }

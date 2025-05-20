@@ -10,14 +10,14 @@
         <div class="related-actors-list">
           <div class="related-actors-list__item" v-if="director.name">
             <image class="item-avatar" backgroundColor='#efefef'
-              :src="director.profile_path ? 'https://media.themoviedb.org/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
+              :src="director.profile_path ? CONFIG.IMG_DOMAIN+'/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
               mode="aspectFill" />
             <div class="item-name">{{director.name}}</div>
             <div class="item-job">导演</div>
           </div>
           <div class="related-actors-list__item" v-for="item in actors" :key="item.name">
             <image class="item-avatar" backgroundColor='#efefef'
-              :src="item.profile_path?'https://media.themoviedb.org/t/p/w100_and_h100_bestv2'+item.profile_path :'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
+              :src="item.profile_path ? CONFIG.IMG_DOMAIN+'/t/p/w100_and_h100_bestv2'+item.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
               mode="aspectFill" />
             <div class="item-name">{{item.name}}</div>
             <div class="item-role">饰 {{ item.character }}</div>
@@ -39,6 +39,8 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
 import { handleSeasonName } from "@/utils/scrape";
+import * as CONFIG from "@/utils/config";
+
 const props = defineProps({
   routerParams: { type: Object, default: {} },
   selectSource: { type: Object, default: {} },

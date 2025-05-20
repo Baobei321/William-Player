@@ -242,7 +242,7 @@ function extractSeasonNumber(str) {
     if (/特别篇/i.test(str)) {
         return '0';
     }
-    const seasonRegex =  /(?:第([一二三四五六七八九十百千万\d]+)季|Season[\s\u3000]*(\d+)|S(\d{1,2}))/i;
+    const seasonRegex = /(?:第([一二三四五六七八九十百千万\d]+)季|Season[\s\u3000]*(\d+)|S(\d{1,2}))/i;
     const match = str.match(seasonRegex);
     if (!match) return '1';
 
@@ -271,13 +271,19 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                 } else {
                     if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
                         shouldSkip = true
-                        refreshData.found++;
                         if (startsWithSeasonFormat(data.name)) {
+                            if (!tvArr.find(j => j.path == parent.path)) {
+                                refreshData.found++;
+                            }
                             tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
+                                if (!tvArr.find(j => j.path == parent.path)) {
+                                    refreshData.found++;
+                                }
                                 tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
+                                refreshData.found++;
                                 tvArr.push({ ...data, season: '1', seasonPath: data.path })
                             }
                         }
@@ -302,13 +308,19 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                 child.provider = "189CloudPC";
                 if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
                     shouldSkip = true
-                    refreshData.found++;
                     if (startsWithSeasonFormat(data.name)) {
+                        if (!tvArr.find(j => j.path == parent.path)) {
+                            refreshData.found++;
+                        }
                         tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                     } else {
                         if (data.name.includes(handleSeasonName(parent.name))) {
+                            if (!tvArr.find(j => j.path == parent.path)) {
+                                refreshData.found++;
+                            }
                             tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
+                            refreshData.found++;
                             tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
                         }
                     }
@@ -329,13 +341,19 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                 } else {
                     if (!shouldSkip && videoFormat.some((v) => child.name.includes(v))) {
                         shouldSkip = true;
-                        refreshData.found++;
                         if (startsWithSeasonFormat(data.name)) {
+                            if (!tvArr.find(j => j.path == parent.path)) {
+                                refreshData.found++;
+                            }
                             tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
+                                if (!tvArr.find(j => j.path == parent.path)) {
+                                    refreshData.found++;
+                                }
                                 tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
+                                refreshData.found++;
                                 tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
                             }
                         }

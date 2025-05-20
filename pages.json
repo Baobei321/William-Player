@@ -172,7 +172,8 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "William Player",
     "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#ffffff"
+    "backgroundColor": "#ffffff",
+    "rpxCalcMaxDeviceWidth": 800
   },
   "uniIdRouter": {},
   "tabBar": {
