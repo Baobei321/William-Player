@@ -74,7 +74,7 @@
             <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
           </div>
           <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView" :scroll-x="true" style="width: 100%" :enhanced="true"
-            :showScrollbar="false" v-if="tvList.length">
+            :showScrollbar="false" v-if="tvList.length" :style="{'--line-number':lineNumber}">
             <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+(index+1)" :key="item.name" @click="toPlayVideo(item,index)">
               <div class="item-img" :style="{backgroundImage:`url(${item.poster})`}">
                 <image src="@/static/playVideo-button.png" />
@@ -150,6 +150,8 @@ const historyTv = ref({});
 
 const localMovieTvData = ref({});
 const scrollIntoView = ref("");
+
+const lineNumber = ref(2);
 
 const toSelect = (item) => {
   if (item.text == "手动编辑") {
@@ -392,7 +394,7 @@ const handleTv = async (seasonData1 = null) => {
   tvList.value.forEach((v, vindex) => {
     if (res1.episodes) {
       v.title = res1.episodes[vindex]?.name || "暂无标题";
-      v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN +"/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
+      v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
       v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
     } else {
       v.title = `第${vindex + 1}集`;
@@ -424,7 +426,7 @@ const getMovieTvDetail = async () => {
   overview.value = res.overview;
   if (routerParams.value.type == "movie") {
     imgData.value = {
-      img: CONFIG.IMG_DOMAIN +"/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
+      img: CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
       score: res.vote_average.toFixed(1),
       releaseTime: res.release_date,
       runtime: calTime(res.runtime),
@@ -433,7 +435,7 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = imgData.value.img = CONFIG.IMG_DOMAIN +"/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
+    seasonFirst.value.img = imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
     seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
@@ -763,7 +765,7 @@ const resetMovieTvData = async () => {
     } else if (resetMovieTv.type == "movie") {
       let nowMovie = localMovieTvData.value.movie.find((i) => i.movieTvId == oldMovieTvId);
       let res = await getMovieTvDetail();
-      nowMovie.poster =CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
+      nowMovie.poster = CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
       nowMovie.releaseTime = res.release_date;
       nowMovie.type = "2";
       nowMovie.movieTvId = res.id;
@@ -775,6 +777,19 @@ const resetMovieTvData = async () => {
     actor_list.value.getActorList();
   }
 };
+
+const setItemWidth = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth;
+  if (windowWidth > 760) {
+    lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
+    let remain = windowWidth - 24 - lineNumber.value * 169.5;
+    if (remain < (lineNumber.value - 1) * 10) {
+      lineNumber.value--;
+    }
+  }
+};
+setItemWidth();
 
 onBeforeMount(async () => {
   judgeSelect();
@@ -869,7 +884,17 @@ page {
   width: 100%;
   height: 100%;
 }
+@media (min-width: 760px) {
+  .video-detail {
+    .video-detail-container {
+      height: 100%;
 
+      .video-detail-container__img {
+        height: 1200rpx !important;
+      }
+    }
+  }
+}
 .video-detail {
   width: 100%;
   height: 100%;
@@ -886,7 +911,7 @@ page {
         align-items: center;
         .nut-transition {
           position: absolute;
-          top: 25px;
+          top: 50rpx;
           right: 25%;
           z-index: 3000;
           .more-arrow {
@@ -1223,6 +1248,26 @@ page {
             top: 0;
             z-index: 99;
           }
+          ::v-deep .nut-tabs {
+            .nut-tabs__titles {
+              height: 92rpx;
+              .uni-scroll-view {
+                .uni-scroll-view-content {
+                  .nut-tabs__list {
+                    height: 92rpx;
+                    .nut-tabs__titles-item {
+                      .nut-tabs__titles-item__line {
+                        height: 6rpx;
+                      }
+                      .nut-tabs__titles-item__text {
+                        font-size: 28rpx;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
         .tv-version-scroll {
           width: 100%;
@@ -1238,7 +1283,7 @@ page {
           }
           .tv-version-list__item {
             margin-left: 24rpx;
-            flex: 0 0 calc((100% - 24rpx) / 2);
+            flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
             overflow: hidden;
 
             &:first-child {
@@ -1247,7 +1292,7 @@ page {
 
             .item-img {
               width: 100%;
-              height: 170rpx;
+              aspect-ratio: 169.5/85;
               background: rgb(212, 212, 212);
               background-position: center;
               background-repeat: no-repeat;

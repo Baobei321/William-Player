@@ -1,8 +1,16 @@
 <template>
   <div class="video-all">
+    <wil-navbar :title="routerParams.title" :leftShow="true">
+      <template #right>
+        <nut-icon name="more-x" custom-color="#000" size="20" @click="showPopover=true" v-if="routerParams.title=='电影'||routerParams.title=='电视剧'"></nut-icon>
+        <span v-if="routerParams.title=='最近观看'" style="color: #2457fd;font-weight: bold;" @click="editHistory()">{{isSelect?'取消':'编辑'}}</span>
+        <sort-popover :type="mapping[routerParams.title]" v-model="showPopover" @changeSort="changeSort"></sort-popover>
+      </template>
+    </wil-navbar>
     <div class="video-all-list" v-if="!isClearAll">
       <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false" idKey="path"
-        :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="12" :changeItemFn="changeItemFn">
+        :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="windowWidth>760?50:12" :changeItemFn="changeItemFn"
+        :style="{'--line-number':lineNumber}">
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
             <div class="item-poster">
@@ -31,11 +39,13 @@
 
 <script setup>
 import wilList from "../../components/wil-list/index.vue";
-import { ref, nextTick } from "vue";
+import { ref, nextTick, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
+import wilNavbar from "@/components/wil-navbar/index.vue";
 import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
+import sortPopover from "./components/index-component/sort-popover.vue";
 import { toStringfy } from "../mine/common";
 import { handleSeasonName } from "@/utils/scrape.js";
 import posterEmpty from "@/static/poster-empty.png";
@@ -57,6 +67,16 @@ const wil_list = ref(null);
 const wil_modal = ref(null);
 const selectType = ref({});
 const selectMedia = ref({});
+
+const showPopover = ref(false);
+
+const lineNumber = ref(3);
+
+const windowWidth = ref(375);
+
+const changeSort = () => {
+  wil_list.value.reload();
+};
 
 //判断选择的是webdav还是天翼云盘还是夸克
 const judgeSelect = () => {
@@ -164,8 +184,8 @@ const setItemFirst = (item) => {
 const toVideoDetail = async (item) => {
   //最近观看在选择状态下
   if (isSelect.value) {
-    changeItemFn.value = (item) => {
-      item.select ? (item.select = false) : (item.select = true);
+    changeItemFn.value = (vitem) => {
+      vitem.select ? (vitem.select = false) : (vitem.select = true);
     };
     if (item.select) {
       recentSelect.value = recentSelect.value.filter((i) => i.titlePlay != item.titlePlay);
@@ -230,8 +250,8 @@ const setEmptyImg = (poster) => {
 const longPress = (item) => {
   if (routerParams.value.title != "最近观看" || isSelect.value) return;
   isSelect.value = true;
-  changeItemFn.value = (item) => {
-    item.select ? (item.select = false) : (item.select = true);
+  changeItemFn.value = (vitem) => {
+    vitem.select ? (vitem.select = false) : (vitem.select = true);
   };
   if (item.select) {
     recentSelect.value = recentSelect.value.filter((i) => i.titlePlay != item.titlePlay);
@@ -240,6 +260,20 @@ const longPress = (item) => {
   }
   nextTick(() => {
     wil_list.value.handleEdit(item.path);
+  });
+};
+
+const editHistory = () => {
+  isSelect.value = !isSelect.value;
+  changeItemFn.value = (item) => {
+    item.select = false;
+  };
+  recentSelect.value = [];
+  nextTick(() => {
+    let historyPlay = uni.getStorageSync("historyPlay");
+    historyPlay.forEach((item) => {
+      wil_list.value.handleEdit(item.path);
+    });
   });
 };
 
@@ -297,10 +331,38 @@ const imgLoad = (item) => {
   });
 };
 
+//设置平板的宽高
+const setItemWidth = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  windowWidth.value = sysinfo.windowWidth;
+  if (windowWidth.value > 760) {
+    if (routerParams.value.title != "最近观看") {
+      lineNumber.value = Math.floor((windowWidth.value - 24) / 109);
+      let remain = windowWidth.value - 24 - lineNumber.value * 109;
+      if (remain < (lineNumber.value - 1) * 12) {
+        lineNumber.value--;
+      }
+    } else {
+      lineNumber.value = Math.floor((windowWidth.value - 24) / 169.5);
+      let remain = windowWidth.value - 24 - lineNumber.value * 169.5;
+      if (remain < (lineNumber.value - 1) * 12) {
+        lineNumber.value--;
+      }
+    }
+  } else {
+    if (routerParams.value.title != "最近观看") {
+      lineNumber.value = 3;
+    } else {
+      lineNumber.value = 2;
+    }
+  }
+};
+
 onLoad((options) => {
   judgeSelect();
   routerParams.value = options;
   routerParams.value.isConnected = routerParams.value.isConnected1 == "true" ? true : false;
+  setItemWidth();
   uni.setNavigationBarTitle({
     title: routerParams.value.title,
   });
@@ -317,6 +379,19 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  ::v-deep .wil-navbar {
+    .nut-navbar {
+      overflow: visible;
+      .nut-navbar__right {
+        display: block;
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
   .video-all-list {
     flex: 1;
     overflow: hidden;
@@ -328,19 +403,27 @@ page {
         flex-wrap: wrap;
         padding: 0 24rpx;
         padding-top: 16px;
-        .list-item {
-          margin-left: 24rpx;
+        gap: 24rpx;
+        &::after {
+          content: "";
+          flex: 1;
           margin-bottom: 24rpx;
-          flex: 0 0 calc((100% - 48rpx) / 3);
+          min-width: 218rpx; /* 确保最小宽度 */
+        }
+        .list-item {
+          margin-bottom: 24rpx;
+          // flex: 1 1 218rpx;
+          min-width: 218rpx; /* 确保最小宽度 */
+          flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
           .video-all-list__item {
             .item-poster {
               width: 100%;
-              height: 320rpx;
+              aspect-ratio: 109/160; /* 高度 = (109/160) × 宽度 */
               border-radius: 20rpx;
               position: relative;
               .item-poster-image {
                 width: 100% !important;
-                height: 320rpx !important;
+                height: 100%;
                 border-radius: 20rpx;
                 object-fit: cover;
               }
@@ -358,9 +441,9 @@ page {
               display: block;
             }
           }
-          &:nth-child(3n + 1) {
-            margin-left: 0;
-          }
+          // &:nth-child(3n + 1) {
+          //   margin-left: 0;
+          // }
         }
       }
       .list-recent {
@@ -369,19 +452,22 @@ page {
         flex-wrap: wrap;
         padding: 0 24rpx;
         padding-top: 32rpx;
+        gap: 24rpx;
         .list-item {
-          margin-left: 24rpx;
           margin-bottom: 24rpx;
-          flex: 0 0 calc((100% - 24rpx) / 2);
+          // flex: 1 1 218rpx;
+          min-width: 218rpx; /* 确保最小宽度 */
+          flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
           .video-all-list__item {
             .item-poster {
               width: 100%;
-              height: 180rpx;
+              aspect-ratio: 169.5/90; /* 高度 = (109/160) × 宽度 */
+              // height: 180rpx;
               border-radius: 20rpx;
               position: relative;
               .item-poster-image {
                 width: 100%;
-                height: 180rpx;
+                height: 100%;
                 border-radius: 20rpx;
                 object-fit: cover;
               }

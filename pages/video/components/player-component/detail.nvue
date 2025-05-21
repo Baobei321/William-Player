@@ -49,7 +49,7 @@
       <text class="play-platform-title">播出平台</text>
       <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <view v-for="(item,index) in detailData.networks" :key="item.id" class="container-item" :style="{marginLeft:index==0 ? '0' : '24rpx'}">
-          <image :src="CONFIG.IMG_DOMAIN+'/t/p/h30'+item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix" @load="loadImage"></image>
+          <image :src="IMG_DOMAIN+'/t/p/h30'+item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix" @load="loadImage"></image>
           <text v-else style="font-size: 32rpx;color: #000;">{{ item.name }}</text>
         </view>
         <view class="container-empty" v-if="!showPlatformImg"></view>
@@ -62,7 +62,7 @@
 import { getMovieTvById } from "@/utils/common.js";
 import { generateChineseNumberMapping } from "@/utils/scrape.js";
 import posterEmpty from "@/static/poster-empty.png";
-import * as CONFIG from "@/utils/config";
+import  { IMG_DOMAIN } from "../../../../utils/config"
 
 export default {
   props: {
@@ -111,7 +111,7 @@ export default {
         }
       });
       res.genres = genres;
-      res.poster = CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
+      res.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
       if (this.type == "movie") {
         res.networks = res.production_companies;
       }
@@ -120,10 +120,10 @@ export default {
         const numberMapping = generateChineseNumberMapping(40, "number");
         if (this.seasonData.season_number > 1) {
           this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
-          this.detailData.poster = CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
+          this.detailData.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
         } else if (this.seasonData.season_number == 0) {
           this.detailData.name = this.detailData.name + " 特别篇";
-          this.detailData.poster = CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
+          this.detailData.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
         }
         this.seasonData.season_number != 1 && this.seasonData.overview ? (this.detailData.overview = this.seasonData.overview) : "";
       }

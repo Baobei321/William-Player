@@ -195,6 +195,7 @@ page {
           &__wrap {
             .nut-form-item {
               &__body {
+                justify-content: center;
                 &__slots {
                   .nut-cell {
                     margin: 0;
@@ -202,6 +203,9 @@ page {
                     height: 100%;
                     box-shadow: none;
                     color: #353a45;
+                    .nut-cell__title{
+                      font-size: 28rpx;
+                    }
                   }
                 }
               }

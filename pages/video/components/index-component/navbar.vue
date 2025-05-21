@@ -14,12 +14,11 @@
         <div class="video-navbar-popover">
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
-          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{top:popoverPosition.top/windowWidth*750+'rpx'}"
+          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{top:Number(navBarHeight.split('px')[0])-12+'px'}"
             v-show="showPopover">
             <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
           </div>
-          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{top:(popoverPosition.top)/windowWidth*750+24+'rpx'}"
-            v-if="showPopover">
+          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{top:navBarHeight}" v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">
                 <span>{{ popoverData.title }}</span>
@@ -89,19 +88,23 @@ const windowWidth = ref(1);
 
 //计算设备navBar高度
 const getNavHeight = () => {
+  // let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  // windowWidth.value = sysinfo.windowWidth;
+  // let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
+  // navBarHeight.value = ((statusBarHeight + 54) / sysinfo.windowWidth) * 750 + "rpx"; //计算nav导航栏的高度
+  // contentHeight.value = "108rpx";
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  windowWidth.value = sysinfo.windowWidth;
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = ((statusBarHeight + 54) / sysinfo.windowWidth) * 750 + "rpx"; //计算nav导航栏的高度
-  contentHeight.value = "108rpx";
+  navBarHeight.value = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
+  contentHeight.value = "44px";
 };
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   windowWidth.value = sysinfo.windowWidth;
-  navBarHeight.value = "2.75rem";
-  contentHeight.value = "2.75rem";
+  navBarHeight.value = "44px";
+  contentHeight.value = "44px";
 };
 
 // #ifdef APP-PLUS
@@ -299,8 +302,8 @@ onMounted(() => {
       position: absolute;
       left: 0;
       .video-navbar-logo {
-        width: 70rpx;
-        height: 70rpx;
+        width: 35px;
+        height: 35px;
         // border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;
@@ -309,10 +312,10 @@ onMounted(() => {
       }
 
       span {
-        font-size: 40rpx;
+        font-size: 20px;
         font-weight: bold;
         color: #000;
-        padding-left: 10rpx;
+        padding-left: 5px;
       }
     }
 
@@ -328,22 +331,22 @@ onMounted(() => {
     .nut-navbar__right {
       right: 0;
       position: absolute;
-      padding: 0 32rpx;
+      // padding: 0 32rpx;
       .nut-icon-uploader {
-        margin-left: 30rpx;
+        margin-left: 15px;
       }
-      .nutui-iconfont {
-        font-size: 32rpx;
-        width: 40rpx;
-        height: 40rpx;
-      }
+      // .nutui-iconfont {
+      //   font-size: 16px;
+      //   width: 20px;
+      //   height: 20px;
+      // }
       .video-navbar-popover {
-        margin-left: 30rpx;
+        margin-left: 15px;
         .video-navbar-popover__arrow {
-          width: 32rpx;
-          height: 32rpx;
+          width: 16px;
+          height: 16px;
           position: fixed;
-          right: 36rpx;
+          right: 18px;
         }
         .show-animation {
           animation: opacity1 0.2s ease;
@@ -353,31 +356,31 @@ onMounted(() => {
         }
         .video-navbar-popover__container {
           position: fixed;
-          min-width: 200rpx;
+          min-width: 100px;
           background: #315ffd;
           z-index: 100;
-          padding: 24rpx;
-          border-radius: 20rpx;
-          right: 15rpx;
+          padding: 12px;
+          border-radius: 10px;
+          right: 7.5px;
           .popover-title {
             display: flex;
             align-items: center;
             justify-content: space-between;
             .popover-title-left {
-              font-size: 30rpx;
+              font-size: 15px;
               color: #fff;
               .popover-title-left__button {
                 display: inline-block;
-                border: 2rpx solid #fff;
-                margin-left: 10rpx;
-                padding: 0 4rpx;
+                border: 1px solid #fff;
+                margin-left: 5px;
+                padding: 0 2px;
               }
             }
             .popover-title-right {
               .nut-icon-close {
-                font-size: 30rpx;
-                width: 30rpx;
-                height: 30rpx;
+                font-size: 15px;
+                width: 15px;
+                height: 15px;
                 display: block;
               }
             }
@@ -385,29 +388,29 @@ onMounted(() => {
           .popover-list {
             display: flex;
             align-items: center;
-            margin-top: 20rpx;
+            margin-top: 10px;
             .popover-list-item {
               display: flex;
               align-items: baseline;
               span:first-child {
-                font-size: 28rpx;
+                font-size: 14px;
                 color: #d0d0d0;
               }
               span:last-child {
-                font-size: 28rpx;
-                padding-left: 6rpx;
+                font-size: 14px;
+                padding-left: 3px;
                 color: #fff;
                 font-weight: bold;
               }
             }
           }
           .popover-input {
-            margin-top: 24rpx;
+            margin-top: 12px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             .nut-input {
-              padding: 20rpx 30rpx;
+              padding: 10px 15px;
               .nut-input-value {
                 .nut-input-inner {
                   .nut-input-box {

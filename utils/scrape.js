@@ -1,4 +1,6 @@
 import { getFolder, get189Folder, getQuarkFolder } from './common'
+import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
+
 //处理秒
 const handleSecond = (val) => {
     let time = ''
@@ -275,16 +277,16 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                             if (!tvArr.find(j => j.path == parent.path)) {
                                 refreshData.found++;
                             }
-                            tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            tvArr.push({ ...parent, createTime: dayjs(parent.created).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.modified).format('YYYY-MM-DD HH:mm:ss'), season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
                                 if (!tvArr.find(j => j.path == parent.path)) {
                                     refreshData.found++;
                                 }
-                                tvArr.push({ ...parent, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                                tvArr.push({ ...parent, createTime: dayjs(parent.created).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.modified).format('YYYY-MM-DD HH:mm:ss'), season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
                                 refreshData.found++;
-                                tvArr.push({ ...data, season: '1', seasonPath: data.path })
+                                tvArr.push({ ...data, createTime: dayjs(data.created).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(data.modified).format('YYYY-MM-DD HH:mm:ss'), season: '1', seasonPath: data.path })
                             }
                         }
                     }
@@ -312,16 +314,16 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                         if (!tvArr.find(j => j.path == parent.path)) {
                             refreshData.found++;
                         }
-                        tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                        tvArr.push({ ...parent, createTime: dayjs(parent.createDate).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.lastOpTime).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                     } else {
                         if (data.name.includes(handleSeasonName(parent.name))) {
                             if (!tvArr.find(j => j.path == parent.path)) {
                                 refreshData.found++;
                             }
-                            tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            tvArr.push({ ...parent, createTime: dayjs(parent.createDate).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.lastOpTime).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             refreshData.found++;
-                            tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
+                            tvArr.push({ ...data, createTime: dayjs(data.createDate).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(data.lastOpTime).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: '1', seasonPath: data.path })
                         }
                     }
                 }
@@ -345,16 +347,16 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                             if (!tvArr.find(j => j.path == parent.path)) {
                                 refreshData.found++;
                             }
-                            tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
                                 if (!tvArr.find(j => j.path == parent.path)) {
                                     refreshData.found++;
                                 }
-                                tvArr.push({ ...parent, folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                                tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
                                 refreshData.found++;
-                                tvArr.push({ ...data, folderFileId: data.id, season: '1', seasonPath: data.path })
+                                tvArr.push({ ...data,createTime: dayjs(data.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(data.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: '1', seasonPath: data.path })
                             }
                         }
                         return

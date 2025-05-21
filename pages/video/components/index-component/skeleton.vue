@@ -19,7 +19,7 @@
           <view class="h5-div recent-played-list" style="overflow: hidden;">
             <view class="recent-played-list-scroll">
               <view class="h5-div recent-played-list-movie" style="scroll-snap-align: none;overflow: hidden;width: 100%;">
-                <view class="h5-div recent-played-list-movie__item" v-for="item in 2" :key="item">
+                <view class="h5-div recent-played-list-movie__item" v-for="item in 4" :key="item">
                   <view class="h5-div recent-played-list-movie__item-img sk-image"></view>
                   <view class="h5-span recent-played-list-movie__item-name sk-transparent sk-text-14-2857-57 sk-text">
                     我们一起摇太阳</view>
@@ -41,7 +41,7 @@
           <view class="h5-div hxList-list">
             <view class="hxList-list-scroll" style="overflow: hidden;">
               <view class="h5-div hxList-list-movie" style="scroll-snap-align: none;overflow: hidden;width: 100%;">
-                <view class="h5-div hxList-list-movie__item" v-for="item in 4" :key="item">
+                <view class="h5-div hxList-list-movie__item" v-for="item in 8" :key="item">
                   <image class="h5-img sk-image" mode="aspectFill"></image>
                   <view class="h5-span hxList-list-movie__item-name sk-transparent sk-text-14-2857-799 sk-text">
                     无名之火</view>
@@ -65,7 +65,7 @@
           <view class="h5-div hxList-list">
             <view class="hxList-list-scroll" style="overflow: hidden;">
               <view class="h5-div hxList-list-movie" style="scroll-snap-align: none;overflow: hidden;width: 100%;">
-                <view class="h5-div hxList-list-movie__item" v-for="item in 4" :key="item">
+                <view class="h5-div hxList-list-movie__item" v-for="item in 8" :key="item">
                   <image class="h5-img sk-image" mode="aspectFill"></image>
                 </view>
               </view>

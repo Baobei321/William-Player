@@ -35,7 +35,7 @@ import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "../../utils/common";
 import { calTime, handleSeasonName, generateChineseNumberMapping } from "../../utils/scrape";
-import * as CONFIG from "@/utils/config";
+import { IMG_DOMAIN } from "../../utils/config"
 
 export default {
   components: {
@@ -496,7 +496,7 @@ export default {
       //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
       this.tvList.forEach((v, vindex) => {
         v.title = res1.episodes[vindex]?.name || "暂无标题";
-        v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
+        v.poster = res1.episodes[vindex]?.still_path ? IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
         v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
       });
       uni.setStorageSync("tvList", this.tvList);

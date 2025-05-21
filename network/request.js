@@ -58,6 +58,7 @@ export default (params) => {
               //   },
               // });
               let userPassword = uni.getStorageSync('userPassword')
+              if (!userPassword) return
               let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
               uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
               getUserByopenId();
@@ -92,6 +93,7 @@ export default (params) => {
               //   },
               // });
               let userPassword = uni.getStorageSync('userPassword')
+              if (!userPassword) return
               let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
               uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
               getUserByopenId();
@@ -105,7 +107,7 @@ export default (params) => {
             default:
               uni.showToast({
                 title: '请重试...',
-                icon:'none',
+                icon: 'none',
                 duration: 2000,
               })
               break;
@@ -113,7 +115,11 @@ export default (params) => {
           reject()
         }
       },
-      fail(err) {
+      fail: async (err) => {
+        // let userPassword = uni.getStorageSync('userPassword')
+        // let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
+        // uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+        // getUserByopenId();
         if (err.errMsg.indexOf('request:fail') !== -1) {
           if (noToastUrl.indexOf(params.url) < 0) {
             uni.showToast({

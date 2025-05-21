@@ -59,7 +59,7 @@
         "navigationBarBackgroundColor": "#fff"
       }
     },
-       {
+    {
       "path": "pages/live/list",
       "style": {
         "navigationBarTitleText": "直播列表",
@@ -125,8 +125,7 @@
     {
       "path": "pages/video/video-all",
       "style": {
-        "navigationBarTitleText": "",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationStyle": "custom"
       }
     },
     {
@@ -173,7 +172,7 @@
     "navigationBarTitleText": "William Player",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#ffffff",
-    "rpxCalcMaxDeviceWidth": 800
+    "rpxCalcMaxDeviceWidth": 760
   },
   "uniIdRouter": {},
   "tabBar": {

@@ -1,9 +1,8 @@
 <template>
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
-    <div class="video-classify-list">
-      <div class="list-item" v-for="(item,index) in listData" :key="item.id"
-        :style="{ background: item.background,flex:`0 0 ${itemWidth}`,marginLeft:index%lineNumber===0?0:'20rpx' }" @click="toVideoAll(item)">
+    <div class="video-classify-list" :style="{'--line-number':lineNumber}">
+      <div class="list-item" v-for="item in listData" :key="item.id" :style="{ background: item.background }" @click="toVideoAll(item)">
         <div class="list-item-title">{{ item.label }}</div>
         <div class="list-item-img">
           <div class="img-one"></div>
@@ -31,7 +30,6 @@ const listData = ref([]);
 
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 
-const itemWidth = ref("341rpx");
 const lineNumber = ref(2);
 
 //获取当前缓存的影片的所有类别
@@ -63,15 +61,11 @@ const getGenre = () => {
 const setItemWidth = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let windowWidth = sysinfo.windowWidth;
-  if (windowWidth > 800) {
-    lineNumber.value = Math.floor((windowWidth - 24) / 170.5);
-    let remain = lineNumber.value * 170.5;
-    if (remain >= (lineNumber.value - 1) * 10) {
-      itemWidth.value = (windowWidth - 24 - (lineNumber.value - 1) * 10) / lineNumber.value + "px";
-      // return `0 0 ${itemWidth}px`;
-    } else {
+  if (windowWidth > 760) {
+    lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
+    let remain = windowWidth - 24 - lineNumber.value * 169.5;
+    if (remain < (lineNumber.value - 1) * 10) {
       lineNumber.value--;
-      itemWidth.value = (windowWidth - 24 - (lineNumber.value - 1) * 10) / lineNumber.value + "px";
     }
   }
 };
@@ -113,10 +107,11 @@ onShow(() => {
     // justify-content: space-between;
     box-sizing: border-box;
     width: 100%;
-
+    gap: 24rpx;
     .list-item {
-      flex: 0 0 341rpx;
-      height: 170rpx;
+      flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
+      // height: 170rpx;
+      aspect-ratio: 341/170;
       border-radius: 20rpx;
       margin-top: 20rpx;
       position: relative;

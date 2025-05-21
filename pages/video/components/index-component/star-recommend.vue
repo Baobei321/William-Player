@@ -93,6 +93,11 @@ onShow(() => {
 </script>
 
 <style lang="scss" scoped>
+@media (min-width: 760px) {
+  .star-recommend {
+    height: 800rpx !important;
+  }
+}
 .star-recommend {
   height: 500rpx;
   ::v-deep .wil-swiper {
@@ -103,7 +108,7 @@ onShow(() => {
             width: 100%;
             height: 100%;
             box-sizing: border-box;
-            padding: 140rpx 0 0 0;
+            // padding: 140rpx 0 0 0;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
             .swiper-content-container {
               padding: 0 24rpx;
@@ -111,7 +116,7 @@ onShow(() => {
               width: 100%;
               height: 100%;
               display: flex;
-              align-items: stretch;
+              align-items: center;
             }
             .swiper-content-left {
               flex: 0 0 192.6rpx;
