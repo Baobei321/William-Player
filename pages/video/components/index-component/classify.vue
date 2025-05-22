@@ -1,8 +1,9 @@
 <template>
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
-    <div class="video-classify-list" :style="{'--line-number':lineNumber}">
-      <div class="list-item" v-for="item in listData" :key="item.id" :style="{ background: item.background }" @click="toVideoAll(item)">
+    <div class="video-classify-list" :style="{'--line-number':lineNumber,'--line-height':lineHeight}">
+      <div class="list-item" v-for="(item,index) in listData" :key="item.id" :style="{ background: item.background,marginLeft:index % lineNumber == 0 ? 0 : '24rpx' }"
+        @click="toVideoAll(item)">
         <div class="list-item-title">{{ item.label }}</div>
         <div class="list-item-img">
           <div class="img-one"></div>
@@ -31,6 +32,7 @@ const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 
 const lineNumber = ref(2);
+const lineHeight = ref("");
 
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
@@ -61,13 +63,15 @@ const getGenre = () => {
 const setItemWidth = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let windowWidth = sysinfo.windowWidth;
-  if (windowWidth > 760) {
+  if (windowWidth > 700) {
     lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
     let remain = windowWidth - 24 - lineNumber.value * 169.5;
     if (remain < (lineNumber.value - 1) * 10) {
       lineNumber.value--;
     }
   }
+  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + "rpx";
 };
 setItemWidth();
 
@@ -107,16 +111,18 @@ onShow(() => {
     // justify-content: space-between;
     box-sizing: border-box;
     width: 100%;
-    gap: 24rpx;
+    // gap: 24rpx; //低版本webview不生效
     .list-item {
       flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
       // height: 170rpx;
-      aspect-ratio: 341/170;
+      // aspect-ratio: 341/170; //webview大于90版本可用
+      height: var(--line-height);
       border-radius: 20rpx;
       margin-top: 20rpx;
       position: relative;
       padding: 30rpx;
       box-sizing: border-box;
+      margin-left: 24rpx;
 
       .list-item-title {
         font-size: 36rpx;

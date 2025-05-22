@@ -5,7 +5,7 @@
     <slot name="prepend" />
 
     <div :class="listContainerClass">
-      <div v-for="(item, index) in list" :key="item[idKey]" class="list-item">
+      <div v-for="(item, index) in list" :key="item[idKey]" :style="props.listItemStyle?props.listItemStyle({...item,index}):{}" class="list-item">
         <slot v-bind="{ ...item, $index: index }" v-if="props.isUseCustom" />
         <slot v-bind="{ ...item, $index: index }" v-else></slot>
       </div>
@@ -59,7 +59,7 @@ const props = defineProps({
   refresherEnabled: { type: Boolean, default: true }, // 下拉刷新
   scrollHeight: { type: Number }, //高度
   listContainerClass: { type: String, default: "" },
-  listItemStyle: { type: Object, default: {} },
+  listItemStyle: { type: Function, default: null },
   showScrollBar: { type: Boolean, default: true },
   changeItemFn: { type: Function, default: () => {} }, //修改某一项的方法，需配合requireStore的editId使用
   isUseCustom: { type: Boolean, default: true }, //是否使用custom-wrapper提高性能,

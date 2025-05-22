@@ -734,11 +734,6 @@ onShow(async () => {
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   tmdbKey.value = uni.getStorageSync("settingData").tmdbKey || "";
-  let shareUrl1 = await getCutContent();
-  if (shareUrl1) {
-    shareUrl.value = shareUrl1;
-    showShareModal.value = true;
-  }
   if (uni.getStorageSync("secondPage") == "videoPlayer") {
     setTimeout(() => {
       historyPlay.value = uni.getStorageSync("historyPlay") || [];
@@ -771,6 +766,11 @@ onShow(async () => {
       );
     });
     uni.setStorageSync("historyPlay", historyPlay.value);
+  }
+  let shareUrl1 = await getCutContent();
+  if (shareUrl1) {
+    shareUrl.value = shareUrl1;
+    showShareModal.value = true;
   }
   uni.removeStorageSync("secondPage");
   webdavInfo.value = uni.getStorageSync("webdavInfo");

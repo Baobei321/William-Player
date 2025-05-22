@@ -56,22 +56,22 @@ export default {
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 0 24rpx;
+    padding: 0 12px;
     .navbar-nvue-container__back {
-      width: 40rpx;
-      height: 40rpx;
+      width: 20px;
+      height: 20px;
       position: absolute;
-      left: 24rpx;
+      left: 12px;
     }
     .navbar-nvue-container__bingo {
-      width: 46rpx;
-      height: 46rpx;
+      width: 23px;
+      height: 23px;
       position: absolute;
-      right: 24rpx;
+      right: 12px;
     }
     .navbar-nvue-container__empty {
-      width: 40rpx;
-      height: 40rpx;
+      width: 20px;
+      height: 20px;
     }
   }
 }

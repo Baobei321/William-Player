@@ -74,7 +74,7 @@
             <div class="tv-version-tabs__disabled" v-if="!tvList.length&&!showRehandleButton" @click="disabledTip"></div>
           </div>
           <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView" :scroll-x="true" style="width: 100%" :enhanced="true"
-            :showScrollbar="false" v-if="tvList.length" :style="{'--line-number':lineNumber}">
+            :showScrollbar="false" v-if="tvList.length" :style="{'--line-number':lineNumber,'--line-height':lineHeight}">
             <div class="tv-version-list__item" v-for="(item,index) in tvList" :id="'name'+(index+1)" :key="item.name" @click="toPlayVideo(item,index)">
               <div class="item-img" :style="{backgroundImage:`url(${item.poster})`}">
                 <image src="@/static/playVideo-button.png" />
@@ -152,6 +152,7 @@ const localMovieTvData = ref({});
 const scrollIntoView = ref("");
 
 const lineNumber = ref(2);
+const lineHeight = ref(0);
 
 const toSelect = (item) => {
   if (item.text == "手动编辑") {
@@ -781,13 +782,15 @@ const resetMovieTvData = async () => {
 const setItemWidth = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let windowWidth = sysinfo.windowWidth;
-  if (windowWidth > 760) {
+  if (windowWidth > 700) {
     lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
     let remain = windowWidth - 24 - lineNumber.value * 169.5;
     if (remain < (lineNumber.value - 1) * 10) {
       lineNumber.value--;
     }
   }
+  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + "rpx";
 };
 setItemWidth();
 
@@ -1279,7 +1282,7 @@ page {
             align-items: center;
             flex-wrap: nowrap;
             width: 100%;
-            height: 230rpx;
+            height: 250rpx;
           }
           .tv-version-list__item {
             margin-left: 24rpx;
@@ -1292,7 +1295,8 @@ page {
 
             .item-img {
               width: 100%;
-              aspect-ratio: 169.5/85;
+              // aspect-ratio: 169.5/85;
+              height: var(--line-height);
               background: rgb(212, 212, 212);
               background-position: center;
               background-repeat: no-repeat;
@@ -1343,7 +1347,7 @@ page {
         }
         .tv-version-empty {
           width: 100%;
-          height: 230rpx;
+          height: 250rpx;
           display: flex;
           align-items: center;
           justify-content: center;

@@ -10,7 +10,7 @@
     <div class="video-all-list" v-if="!isClearAll">
       <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false" idKey="path"
         :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="windowWidth>760?50:12" :changeItemFn="changeItemFn"
-        :style="{'--line-number':lineNumber}">
+        :listItemStyle="listItemStyle" :style="{'--line-number':lineNumber,'--line-height':lineHeight}">
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
             <div class="item-poster">
@@ -40,14 +40,14 @@
 <script setup>
 import wilList from "../../components/wil-list/index.vue";
 import { ref, nextTick, onMounted } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onShow, onLoad } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import wilNavbar from "@/components/wil-navbar/index.vue";
 import wilModal from "@/components/wil-modal/index.vue";
 import wilEmpty from "@/components/wil-empty/index.vue";
 import sortPopover from "./components/index-component/sort-popover.vue";
 import { toStringfy } from "../mine/common";
-import { handleSeasonName } from "@/utils/scrape.js";
+import { handleSeasonName, handleSecond, parseTime } from "@/utils/scrape.js";
 import posterEmpty from "@/static/poster-empty.png";
 import * as CONFIG from "@/utils/config";
 
@@ -71,6 +71,7 @@ const selectMedia = ref({});
 const showPopover = ref(false);
 
 const lineNumber = ref(3);
+const lineHeight = ref("");
 
 const windowWidth = ref(375);
 
@@ -335,26 +336,39 @@ const imgLoad = (item) => {
 const setItemWidth = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   windowWidth.value = sysinfo.windowWidth;
-  if (windowWidth.value > 760) {
+  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
+  if (windowWidth.value > 700) {
     if (routerParams.value.title != "最近观看") {
       lineNumber.value = Math.floor((windowWidth.value - 24) / 109);
       let remain = windowWidth.value - 24 - lineNumber.value * 109;
       if (remain < (lineNumber.value - 1) * 12) {
         lineNumber.value--;
       }
+      lineHeight.value = (((windowWidth.value - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 160) / 109 / scale + "rpx";
     } else {
       lineNumber.value = Math.floor((windowWidth.value - 24) / 169.5);
       let remain = windowWidth.value - 24 - lineNumber.value * 169.5;
       if (remain < (lineNumber.value - 1) * 12) {
         lineNumber.value--;
       }
+      lineHeight.value = (((windowWidth.value - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 90) / 169.5 / scale + "rpx";
     }
   } else {
     if (routerParams.value.title != "最近观看") {
       lineNumber.value = 3;
+      lineHeight.value = (((windowWidth.value - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 160) / 109 / scale + "rpx";
     } else {
       lineNumber.value = 2;
+      lineHeight.value = (((windowWidth.value - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 90) / 169.5 / scale + "rpx";
     }
+  }
+};
+
+const listItemStyle = (item) => {
+  if (item.index % lineNumber.value == 0) {
+    return { marginLeft: 0 };
+  } else {
+    return { marginLeft: "24rpx" };
   }
 };
 
@@ -403,13 +417,7 @@ page {
         flex-wrap: wrap;
         padding: 0 24rpx;
         padding-top: 16px;
-        gap: 24rpx;
-        &::after {
-          content: "";
-          flex: 1;
-          margin-bottom: 24rpx;
-          min-width: 218rpx; /* 确保最小宽度 */
-        }
+        // gap: 24rpx;
         .list-item {
           margin-bottom: 24rpx;
           // flex: 1 1 218rpx;
@@ -418,7 +426,8 @@ page {
           .video-all-list__item {
             .item-poster {
               width: 100%;
-              aspect-ratio: 109/160; /* 高度 = (109/160) × 宽度 */
+              // aspect-ratio: 109/160; /* 高度 = (109/160) × 宽度 */
+              height: var(--line-height);
               border-radius: 20rpx;
               position: relative;
               .item-poster-image {
@@ -452,7 +461,7 @@ page {
         flex-wrap: wrap;
         padding: 0 24rpx;
         padding-top: 32rpx;
-        gap: 24rpx;
+        // gap: 24rpx;
         .list-item {
           margin-bottom: 24rpx;
           // flex: 1 1 218rpx;
@@ -461,7 +470,8 @@ page {
           .video-all-list__item {
             .item-poster {
               width: 100%;
-              aspect-ratio: 169.5/90; /* 高度 = (109/160) × 宽度 */
+              height: var(--line-height);
+              // aspect-ratio: 169.5/90; /* 高度 = (109/160) × 宽度 */
               // height: 180rpx;
               border-radius: 20rpx;
               position: relative;
@@ -470,6 +480,23 @@ page {
                 height: 100%;
                 border-radius: 20rpx;
                 object-fit: cover;
+              }
+              .item-poster-runtime {
+                position: absolute;
+                right: 10rpx;
+                bottom: 10rpx;
+                background: rgba(0, 0, 0, 0.5);
+                color: #fff;
+                font-size: 24rpx;
+                border-radius: 8rpx;
+                padding: 4rpx 8rpx;
+              }
+              .item-poster-process {
+                height: 3.5rpx;
+                background: #ff6701;
+                position: absolute;
+                bottom: 0;
+                left: 0;
               }
               .item-poster-check {
                 width: 30rpx;
