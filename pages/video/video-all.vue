@@ -124,6 +124,7 @@ const getMovieTvList = async (params) => {
   let res = null;
   if (routerParams.value.title == "最近观看") {
     res = uni.getStorageSync("historyPlay");
+    res = res.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
     res.forEach((item) => {
       item.loadImg = true;
     });
@@ -168,19 +169,21 @@ const getMovieName = (val) => {
 //将点击了的视频放置到数组的第一个去
 const setItemFirst = (item) => {
   let historyPlay = uni.getStorageSync("historyPlay");
+  let historyArr1 = historyPlay.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+  let historyArr2 = historyPlay.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
   let index = null;
   if (item.type == "tv") {
-    index = historyPlay.findIndex((i) => i.type == item.type && i.titlePlay == item.titlePlay);
+    index = historyArr2.findIndex((i) => i.type == item.type && i.titlePlay == item.titlePlay);
   } else if (item.type == "movie") {
-    index = historyPlay.findIndex((i) => i.type == item.type && getMovieName(i.name) == getMovieName(item.name));
+    index = historyArr2.findIndex((i) => i.type == item.type && getMovieName(i.name) == getMovieName(item.name));
   }
   if (index > -1) {
-    historyPlay.splice(index, 1);
-    historyPlay.unshift(item);
+    historyArr2.splice(index, 1);
+    historyArr2.unshift(item);
   } else {
-    historyPlay.unshift(item);
+    historyArr2.unshift(item);
   }
-  uni.setStorageSync("historyPlay", historyPlay);
+  uni.setStorageSync("historyPlay", [...historyArr1, ...historyArr2]);
 };
 const toVideoDetail = async (item) => {
   //最近观看在选择状态下
@@ -287,7 +290,9 @@ const clearAll = () => {
       recentSelect.value = [];
       isClearAll.value = true;
       isSelect.value = false;
-      uni.setStorageSync("historyPlay", []);
+      let historyArr = uni.getStorageSync("historyPlay");
+      historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+      uni.setStorageSync("historyPlay", historyArr);
     },
   });
 };
@@ -298,17 +303,20 @@ const clearPart = () => {
     recentSelect.value = [];
     isClearAll.value = true;
     isSelect.value = false;
-    uni.setStorageSync("historyPlay", []);
+    historyPlay = historyPlay.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+    uni.setStorageSync("historyPlay", historyPlay);
   } else {
-    historyPlay = historyPlay.filter((item) => {
+    let historyArr = historyPlay.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
+    historyArr = historyArr.filter((item) => {
       return recentSelect.value.every((v) => v.path != item.path);
     });
+    historyPlay = historyPlay.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
     recentSelect.value.forEach((item) => {
       wil_list.value.handleDelete(item.path);
     });
     recentSelect.value = [];
     isSelect.value = false;
-    uni.setStorageSync("historyPlay", historyPlay);
+    uni.setStorageSync("historyPlay", [...historyPlay, ...historyArr]);
   }
 };
 

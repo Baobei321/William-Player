@@ -648,6 +648,7 @@ const refreshVideo = async () => {
     await refreshQuarkVideo();
   }
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
       localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
@@ -660,7 +661,11 @@ const refreshVideo = async () => {
       })
     );
   });
-  uni.setStorageSync("historyPlay", historyPlay.value);
+  console.log(historyPlay.value, "historyL");
+
+  let historyArr = uni.getStorageSync("historyPlay") || [];
+  historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+  uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
 };
 
 const pauseRefresh = () => {
@@ -703,7 +708,7 @@ const judgeSelect = () => {
     sourceList.value.find((item) => {
       let select = item.list.find((i) => i.active);
       if (select) {
-        selectMedia.value.name && selectMedia.value.name != select.name ? uni.setStorageSync("historyPlay", []) : "";
+        // selectMedia.value.name && selectMedia.value.name != select.name ? uni.setStorageSync("historyPlay", []) : "";
         selectMedia.value = select;
         return true;
       } else {
@@ -737,6 +742,7 @@ onShow(async () => {
   if (uni.getStorageSync("secondPage") == "videoPlayer") {
     setTimeout(() => {
       historyPlay.value = uni.getStorageSync("historyPlay") || [];
+      historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
       historyPlay.value = historyPlay.value.filter((item) => {
         return (
           localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
@@ -749,23 +755,31 @@ onShow(async () => {
           })
         );
       });
-      uni.setStorageSync("historyPlay", historyPlay.value);
+      let historyArr = uni.getStorageSync("historyPlay") || [];
+      historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+      uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
     }, 800); //为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
   } else {
-    historyPlay.value = uni.getStorageSync("historyPlay") || [];
-    historyPlay.value = historyPlay.value.filter((item) => {
-      return (
-        localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name) && v.movieTvId == item.movieTvId) ||
-        localMovieTvData.value.tv?.some((v) => {
-          if (item.season != "1") {
-            return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
-          } else {
-            return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
-          }
-        })
-      );
-    });
-    uni.setStorageSync("historyPlay", historyPlay.value);
+    historyPlay.value = [];
+    if (!uni.getStorageSync("isreload")) {
+      historyPlay.value = uni.getStorageSync("historyPlay") || [];
+      historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
+      historyPlay.value = historyPlay.value.filter((item) => {
+        return (
+          localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name) && v.movieTvId == item.movieTvId) ||
+          localMovieTvData.value.tv?.some((v) => {
+            if (item.season != "1") {
+              return handleSeasonName(v.name, true) == handleSeasonName(item.titlePlay) && v.movieTvId == item.movieTvId;
+            } else {
+              return handleSeasonName(v.name, true) == item.titlePlay && v.movieTvId == item.movieTvId;
+            }
+          })
+        );
+      });
+      let historyArr = uni.getStorageSync("historyPlay") || [];
+      historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+      uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
+    }
   }
   let shareUrl1 = await getCutContent();
   if (shareUrl1) {
@@ -811,6 +825,7 @@ onBeforeMount(async () => {
   judgeSelect();
   localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
   historyPlay.value = historyPlay.value.filter((item) => {
     return (
       localMovieTvData.value.movie?.some((v) => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||
@@ -823,7 +838,9 @@ onBeforeMount(async () => {
       })
     );
   });
-  uni.setStorageSync("historyPlay", historyPlay.value);
+  let historyArr = uni.getStorageSync("historyPlay") || [];
+  historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+  uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
   if (selectType.value.type == "WebDAV") {
     if (selectMedia.value.name) {
       let res1 = await loginUser(selectMedia.value);

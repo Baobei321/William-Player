@@ -189,6 +189,9 @@ const chooseOperation = (item) => {
         if (selectMedia.value.active) {
           uni.removeStorageSync("localMovieTvData");
         }
+        let historyPlay = uni.getStorageSync("historyPlay");
+        historyPlay = historyPlay.filter((v) => v.sourceType != selectType.type || v.sourceName != selectMedia.value.name);
+        uni.setStorageSync("historyPlay", historyPlay);
         judegeShow();
       },
     });

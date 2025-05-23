@@ -4,14 +4,14 @@
       <div class="recent-played-title-left">最近观看</div>
       <div class="recent-played-title-right" @click="toVideoAll">
         <span>全部</span>
-        <span>{{ listData.length }}</span>
+        <span>{{ props.listData.length }}</span>
         <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
       </div>
     </div>
     <div class="recent-played-list">
       <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="recent-played-list-movie">
-          <div class="recent-played-list-movie__item" v-for="item in listData" :key="item.name" @click="toVideoPlayer(item)">
+          <div class="recent-played-list-movie__item" v-for="item in props.listData" :key="item.name" @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img">
               <image :src="!isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
                 style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
@@ -45,8 +45,6 @@ const scrollData = ref([]);
 
 const selectType = ref({});
 const selectMedia = ref({});
-
-const tvList = ref([]);
 
 //判断选择的是webdav还是天翼云盘还是夸克
 const judgeSelect = () => {
@@ -92,7 +90,9 @@ const setItemFirst = (item) => {
   } else {
     scrollData.value.unshift(item);
   }
-  uni.setStorageSync("historyPlay", scrollData.value);
+  let historyArr = uni.getStorageSync("historyPlay") || [];
+  historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+  uni.setStorageSync("historyPlay", [...historyArr, ...scrollData.value]);
 };
 
 const toVideoPlayer = async (item) => {
@@ -116,9 +116,11 @@ const toVideoPlayer = async (item) => {
   } else if (item.type == "tv") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
     let nowTv = localMovieTvData.tv.find((i) => {
-      return i.source.some((v) => {
-        return v.seasonArr.some((h) => h.path + "/" + item.name == "/" + item.path);
-      })&& i.movieTvId == item.movieTvId;
+      return (
+        i.source.some((v) => {
+          return v.seasonArr.some((h) => h.path + "/" + item.name == "/" + item.path);
+        }) && i.movieTvId == item.movieTvId
+      );
     });
     let openEndTime = {};
     nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
@@ -155,11 +157,6 @@ const imgLoad = (item) => {
 onShow(() => {
   judgeSelect();
   scrollData.value = [...props.listData];
-  // let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
-  // scrollData.value = scrollData.value.filter((item) => {
-  //   return localMovieTvData.movie.some((v) => v.path == "/" + item.path && v.name == item.name) || localMovieTvData.tv.some((v) => v.name == item.titlePlay);
-  // });
-  // uni.setStorageSync("historyPlay", scrollData.value);
   scrollData.value.forEach((item) => {
     item.loadImg = true;
   });

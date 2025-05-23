@@ -515,6 +515,8 @@ const clickPlayButton = () => {
         title: selectSource.value.name,
         initialTime: "0",
         movieTvId: routerParams.value.movieTvId,
+        sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
+        sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
       };
       if (selectType.value.type == "WebDAV") {
         uni.navigateTo({
@@ -571,6 +573,8 @@ const clickPlayButton = () => {
         initialTime: "0",
         movieTvId: routerParams.value.movieTvId,
         season: activeSeason.value.season,
+        sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
+        sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
       };
       let openEndTime = {};
       routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
@@ -631,6 +635,8 @@ const toPlayVideo = (item, index) => {
       initialTime: "0",
       movieTvId: routerParams.value.movieTvId,
       season: activeSeason.value.season,
+      sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
+      sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
     };
 
     let openEndTime = {};

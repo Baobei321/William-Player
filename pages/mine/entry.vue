@@ -10,6 +10,9 @@ import * as CONFIG from "../../utils/config";
 import { getUserByopenId } from "./common.js";
 
 onBeforeMount(async () => {
+  if (!uni.getStorageSync("historyPlay")) {
+    uni.setStorageSync("historyPlay", []);
+  }
   if (uni.getStorageSync("Authorization")) {
     uni.reLaunch({
       url: "/pages/video/index",

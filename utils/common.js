@@ -437,6 +437,9 @@ const getCutContent = () => {
         } else {
           resolve(null)
         }
+      },
+      fail: () => {
+        resolve(null)
       }
     })
   })
