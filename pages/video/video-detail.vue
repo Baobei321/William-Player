@@ -193,13 +193,13 @@ const toSelect = (item) => {
       const remainingSeconds = String(nowTv.endTime % 60); // 剩余秒数
       pickerVal.value = [minutes, remainingSeconds];
     } else {
-      pickerVal.value = ["15", "0"];
+      pickerVal.value = ["0", "0"];
     }
     showPopover.value = false;
     pickerTitle.value = item.text;
     let arr1 = [];
     let arr2 = [];
-    for (let i = 15; i <= 180; i++) {
+    for (let i = 0; i <= 180; i++) {
       arr1.push({ text: String(i) + "分", value: String(i) });
     }
     for (let i = 0; i <= 59; i++) {
@@ -440,6 +440,8 @@ const getMovieTvDetail = async () => {
     seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
+    imgData.value.releaseTime = res.first_air_date;
+    imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有0集）`;
   }
   return res;
 };
@@ -661,6 +663,7 @@ const toPlayVideo = (item, index) => {
 //设置按钮文字
 const setButtonText = () => {
   historyPlay.value = uni.getStorageSync("historyPlay") || [];
+  historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
   if (routerParams.value.type == "movie") {
     let history = historyPlay.value?.find((i) => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true));
     if (history && selectSource.value.path == "/" + history.path) {
@@ -734,7 +737,9 @@ const resetMovieTvData = async () => {
       historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
     });
     historyPlay.value = historyPlay.value.filter((i) => i.titlePlay != imgData.value.title);
-    uni.setStorageSync("historyPlay", historyPlay.value);
+    let historyArr = uni.getStorageSync("historyPlay") || [];
+    historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
+    uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
     selectSource.value.name = resetMovieTv.name;
     localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
 
@@ -803,6 +808,7 @@ setItemWidth();
 onBeforeMount(async () => {
   judgeSelect();
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
+  historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
   let dict = [
     { value: "189CloudPC", label: "天翼云盘" },
     { value: "Quark", label: "夸克网盘" },

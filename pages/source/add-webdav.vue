@@ -120,6 +120,9 @@ const confirmSubmit = () => {
         }
         await loginUser(state.formData)
           .then((res) => {
+            let historyArr = uni.getStorageSync("historyPlay") || [];
+            historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != state.oldData.name);
+            uni.setStorageSync("historyPlay", historyArr);
             state.formData.token = res.data.token;
             let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
             Object.keys(state.formData).forEach((v) => {
@@ -203,7 +206,7 @@ page {
                     height: 100%;
                     box-shadow: none;
                     color: #353a45;
-                    .nut-cell__title{
+                    .nut-cell__title {
                       font-size: 28rpx;
                     }
                   }

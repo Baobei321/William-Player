@@ -11,10 +11,13 @@
     <div class="recent-played-list">
       <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
         <div class="recent-played-list-movie">
-          <div class="recent-played-list-movie__item" v-for="item in props.listData" :key="item.name" @click="toVideoPlayer(item)">
+          <div class="recent-played-list-movie__item" v-for="item in scrollData" :key="item.name" @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img">
-              <image :src="!isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
+              <image :src="!props.isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
                 style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
+              <span style="color: red;font-size: 30px;">
+                {{ item.loadImg }}
+              </span>
               <image :src="playVideoButton" class="img-button" />
               <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
               <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>
@@ -29,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref,watch } from "vue";
 import playVideoButton from "../../../../static/playVideo-button.png";
 import { handleSecond, parseTime, handleSeasonName } from "../../../../utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
@@ -161,6 +164,17 @@ onShow(() => {
     item.loadImg = true;
   });
 });
+
+watch(
+  () => props.listData,
+  (val) => {
+    scrollData.value = [...props.listData];
+    scrollData.value.forEach((item) => {
+      item.loadImg = true;
+    });
+  },
+  { immediate: true, deep: true }
+);
 </script>
 
 <style lang="scss" scoped>

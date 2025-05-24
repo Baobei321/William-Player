@@ -358,7 +358,7 @@ const getQuarkUser = (obj) => {
 
 //获取第几季的详情
 const getTvSeason = (data) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     uni.request({
       url: `https://api.tmdb.org/3/tv/${data.movieTvId}/season/${data.season}`,
       data: {
@@ -372,6 +372,9 @@ const getTvSeason = (data) => {
       success: (res) => {
         resolve(res.data);
       },
+      fail: (error) => {
+        reject(error);
+      }
     });
   });
 };

@@ -65,6 +65,11 @@ export default {
       if (res.res_code == 0) {
         let res1 = await get189User(this.cookieObj);
         if (cloud189.list.length) {
+          if (cloud189.list[0].name != res1.loginName) {
+            let historyArr = uni.getStorageSync("historyPlay") || [];
+            historyArr = historyArr.filter((v) => v.sourceType != "天翼云盘" || v.sourceName != cloud189.list[0].name);
+            uni.setStorageSync("historyPlay", historyArr);
+          }
           cloud189.list[0].name = res1.loginName;
           Object.keys(this.cookieObj).forEach((item) => {
             cloud189.list[0][item] = this.cookieObj[item];
@@ -79,7 +84,7 @@ export default {
           const prevPage = pages[pages.length - 2];
           console.log(prevPage);
           // 直接获取上一级页面的数据或调用方法
-          if (prevPage.route == "pages/video/source-list") {
+          if (prevPage.route == "pages/source/source-list") {
             if (this.routerParams.isActive == "1") {
               uni.setStorageSync("isreload", true);
             } else if (this.routerParams.isActive == "0") {

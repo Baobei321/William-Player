@@ -576,6 +576,7 @@ export default {
   onUnload() {
     let historyArr = uni.getStorageSync("historyPlay") || [];
     historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);
+    // console.log(this.historyPlay,'this.historyplay');
     uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
     uni.removeStorageSync("tvList");
     uni.removeStorageSync("seasonData");
