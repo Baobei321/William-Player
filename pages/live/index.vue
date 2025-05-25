@@ -212,8 +212,9 @@ page {
     align-items: center;
     justify-content: center;
     position: fixed;
-    bottom: 90rpx;
+    bottom: 180rpx;
     right: 24rpx;
+    box-shadow: 0 8rpx 12rpx #5b73a01a;
     image {
       width: 50rpx;
       height: 50rpx;

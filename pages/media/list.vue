@@ -535,6 +535,7 @@ page {
     position: fixed;
     bottom: 90rpx;
     right: 30rpx;
+    box-shadow: 0 8rpx 12rpx #5b73a01a;
     image {
       width: 60rpx;
       height: 60rpx;

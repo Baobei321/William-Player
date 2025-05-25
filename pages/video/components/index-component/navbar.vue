@@ -116,6 +116,13 @@ getH5NavbarHeight();
 // #endif
 
 const toVideoSearch = () => {
+  if (loading.value) {
+    uni.showToast({
+      title: "正在同步影片，请完成后再搜索",
+      icon: "none",
+    });
+    return;
+  }
   uni.navigateTo({
     url: "/pages/video/search",
   });

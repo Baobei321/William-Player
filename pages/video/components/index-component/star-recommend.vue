@@ -93,7 +93,7 @@ onShow(() => {
 </script>
 
 <style lang="scss" scoped>
-@media (min-width: 760px) {
+@media (min-width: 700px) {
   .star-recommend {
     height: 800rpx !important;
   }

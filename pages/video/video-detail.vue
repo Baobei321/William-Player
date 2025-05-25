@@ -899,7 +899,7 @@ page {
   width: 100%;
   height: 100%;
 }
-@media (min-width: 760px) {
+@media (min-width: 700px) {
   .video-detail {
     .video-detail-container {
       height: 100%;

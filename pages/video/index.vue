@@ -325,7 +325,7 @@ const getMovieTv = async (arr1, path1 = "/") => {
 //将网盘中的电影等都设置详细信息
 const setMovieTvImg = async (arr, type) => {
   if (showDialog.value) return;
-  const processedItems = await Promise.all(
+  const processedItems = await Promise.allSettled(
     arr.map(async (item) => {
       try {
         const numberMapping = generateChineseNumberMapping(40, "string");
@@ -401,6 +401,7 @@ const setMovieTvImg = async (arr, type) => {
           data.endTime ? (newItem.endTime = data.endTime) : ""; //本地刮削的重新设置片头时间
           return newItem;
         } else {
+          refreshData.value.fail++;
           return null;
         }
       } catch (error) {
@@ -409,7 +410,7 @@ const setMovieTvImg = async (arr, type) => {
       }
     })
   );
-  return processedItems.filter((item) => item !== null);
+  return processedItems.filter((item) => item.value !== null && item.status === "fulfilled").map((item) => item.value);
 };
 
 const toAddWebdav = () => {
@@ -451,7 +452,7 @@ const handleGx = async () => {
 
 //天翼云盘refresh
 const refresh189Video = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
   movieTvData.value = { movie: [], tv: [] };
   await get189MovieTv(listData.value[0]);
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
@@ -476,6 +477,8 @@ const refresh189Video = async () => {
   let tv = groupBySource(movieTvData.value.tv);
   compareMovieTv(movie, "movie");
   compareMovieTv(tv, "tv");
+  console.log(movie, tv);
+
   await setMovieTvImg(movie, "movie")
     .then((res) => {
       localMovieTvData.value.movie = res;
@@ -543,7 +546,7 @@ const get189MovieTv = async (obj) => {
 };
 //夸克网盘refresh
 const refreshQuarkVideo = async () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
   movieTvData.value = { movie: [], tv: [] };
   await getQuarkMovieTv(listData.value[0]);
   if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
@@ -661,15 +664,13 @@ const refreshVideo = async () => {
       })
     );
   });
-  console.log(historyPlay.value, "historyL");
-
   let historyArr = uni.getStorageSync("historyPlay") || [];
   historyArr = historyArr.filter((v) => v.sourceType != selectType.value.type || v.sourceName != selectMedia.value.name);
   uni.setStorageSync("historyPlay", [...historyArr, ...historyPlay.value]);
 };
 
 const pauseRefresh = () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0 };
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
   movieTvData.value = { movie: [], tv: [] };
   localMovieTvData.value.tv = [];
   localMovieTvData.value.movie = [];

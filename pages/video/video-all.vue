@@ -9,7 +9,7 @@
     </wil-navbar>
     <div class="video-all-list" v-if="!isClearAll">
       <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false" idKey="path"
-        :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="windowWidth>760?50:12" :changeItemFn="changeItemFn"
+        :listContainerClass="routerParams.title=='最近观看'?'list-recent':'list-container'" :pageSize="windowWidth>700?50:12" :changeItemFn="changeItemFn"
         :listItemStyle="listItemStyle" :style="{'--line-number':lineNumber,'--line-height':lineHeight}">
         <template #default="item">
           <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
