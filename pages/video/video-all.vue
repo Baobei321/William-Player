@@ -202,7 +202,7 @@ const toVideoDetail = async (item) => {
   } else {
     if (routerParams.value.title != "最近观看") {
       uni.navigateTo({
-        url: `/pages/video/video-detail?path=${item.path}&name=${item.name}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+        url: `/pages/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
       });
     } else {
       if (item.type == "movie") {

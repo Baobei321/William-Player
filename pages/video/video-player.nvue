@@ -200,7 +200,7 @@ export default {
         obj = this.historyPlay?.find((i) => i.name == name && i.path == this.routerParams.path) || {};
       }
       if (this.routerParams.item) {
-        this.historyObj = JSON.parse(this.routerParams.item);
+        this.historyObj = JSON.parse(decodeURIComponent(this.routerParams.item));
         this.config.poster = this.historyObj.poster;
         this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
       } else {
