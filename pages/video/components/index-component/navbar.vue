@@ -440,4 +440,36 @@ onMounted(() => {
     }
   }
 }
+@media (prefers-color-scheme: dark) {
+  .video-navbar {
+    background: #1e1e20;
+    border-bottom: 2rpx solid #1e1e20;
+    ::v-deep .nut-navbar {
+      background-color: #1e1e20;
+      .nut-navbar__left {
+        span {
+          color: #fff;
+        }
+      }
+      .nut-navbar__title {
+        .title {
+          color: #fff;
+        }
+      }
+      .nut-navbar__right {
+        .nut-icon-search {
+          color: #fff !important;
+        }
+        .nut-icon-uploader {
+          color: #fff !important;
+        }
+        .video-navbar-popover {
+          .nut-icon-refresh2 {
+            color: #fff !important;
+          }
+        }
+      }
+    }
+  }
+}
 </style>

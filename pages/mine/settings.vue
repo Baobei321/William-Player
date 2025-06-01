@@ -1,7 +1,7 @@
 <template>
   <div class="tmdb-key">
     <div class="tmdb-key-title">请输入要修改的tmdbKey</div>
-    <nut-input v-model="settingData.tmdbKey" placeholder="请输入tmdbKey" @blur="inputTmdb"></nut-input>
+    <nut-input v-model="settingData.tmdbKey" placeholder="请输入tmdbKey" @blur="inputTmdb" class="tmdb-key-input"></nut-input>
     <div class="tmdb-key-title">播放设置</div>
     <wil-form :options="settings1" :show-button="true" ref="base_form1" v-model="formData" :showButton="false">
       <template #showProgress>
@@ -26,9 +26,19 @@
           </template>
         </nut-cell>
       </template>
+      <template #theme>
+        <nut-cell title="主题" is-link :desc="themeText" @click="showPopover=true">
+          <template #icon>
+            <image src="@/static/theme-icon.png"></image>
+          </template>
+        </nut-cell>
+      </template>
     </wil-form>
-    <!-- <nut-button custom-color="#090909" @click="confirmSet">确认设置</nut-button> -->
+    <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
+      <nut-picker v-model="status" :columns="popoverList" title="主题" @confirm="confirmPicker" @cancel="showPopover = false" />
+    </nut-popup>
     <wil-modal ref="wil_modal"></wil-modal>
+    <!-- <nut-button custom-color="#090909" @click="confirmSet">确认设置</nut-button> -->
   </div>
 </template>
 
@@ -52,7 +62,17 @@ const settings1 = ref([
 const settings2 = ref([
   { label: "是否显示首页影视推荐", prop: "showRecommend" },
   { label: "", prop: "resetData" },
+  { label: "", prop: "theme" },
 ]);
+
+const showPopover = ref(false);
+const popoverList = ref([
+  { text: "跟随系统", value: "auto" },
+  { text: "浅色模式", value: "light" },
+  { text: "深色模式", value: "dark" },
+]);
+const status = ref(["light"]);
+const themeText = ref("跟随系统");
 
 const confirmSet = async () => {
   uni.setStorageSync("settingData", settingData.value);
@@ -90,11 +110,26 @@ const resetMtData = () => {
   });
 };
 
+const confirmPicker = ({ selectedValue, selectedOptions }) => {
+  showPopover.value = false;
+  status.value[0] = selectedValue[0];
+  themeText.value = popoverList.value.find((i) => i.value == selectedValue[0])?.text || "跟随系统";
+  plus.nativeUI.setUIStyle(selectedValue[0]);
+};
+
 onBeforeMount(() => {
   let settingData1 = uni.getStorageSync("settingData");
   if (settingData1) {
     settingData.value = settingData1;
   }
+  let systemInfo = uni.getSystemInfoSync();
+  status.value[0] = systemInfo.theme;
+  themeText.value = popoverList.value.find((i) => i.value == systemInfo.theme)?.text || "跟随系统";
+  uni.showToast({
+    title:systemInfo.theme,
+    icon:'none',
+    duration:7000
+  })
 });
 </script>
 
@@ -165,6 +200,10 @@ page {
                       line-height: 40rpx;
                       font-size: 32rpx;
                     }
+                    image {
+                      width: 40rpx;
+                      height: 40rpx;
+                    }
                   }
                   .nut-cell__title {
                     color: #353a45;
@@ -172,6 +211,39 @@ page {
                   }
                   .nut-cell__link {
                     // display: none;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .tmdb-key {
+    background: #1e1e20;
+    .tmdb-key-title {
+      color: #fff;
+    }
+    ::v-deep .tmdb-key-input {
+      background-color: #2f2f2f;
+      border-bottom: 1px solid #2f2f2f;
+    }
+    ::v-deep .base-form {
+      background-color: transparent;
+      .base-form-content {
+        .nut-form {
+          .nut-cell-group__wrap {
+            .nut-form-item {
+              .nut-form-item__body {
+                .nut-form-item__body__slots {
+                  .nut-cell {
+                    .nut-cell__title {
+                      color: #fff;
+                    }
                   }
                 }
               }

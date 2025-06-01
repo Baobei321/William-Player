@@ -15,6 +15,13 @@ export default {
   },
   onHide: function () {
     console.log("App Hide");
+    uni.removeStorageSync("isreload");
+  },
+  onThemeChange: ({ theme }) => {
+    uni.showToast({
+      title: theme,
+    });
+    console.log("onThemeChange", theme);
   },
 };
 </script>
@@ -24,5 +31,34 @@ export default {
 @import "@/uni_modules/nutui-uni/components/nutui-uni/styles/index.scss";
 .nut-button {
   border: none !important;
+}
+@media (prefers-color-scheme: dark) {
+  .nut-popup{
+    background: #272727 !important;
+  }
+  .nut-picker {
+    background: #272727 !important;
+    .nut-picker__bar {
+      .nut-picker__title {
+        color: #fff;
+      }
+    }
+    .nut-picker__column {
+      .nut-picker__columnitem {
+        .nut-picker__list {
+          .nut-picker-roller{
+            .nut-picker-roller-item-title{
+              color: #fff;
+            }
+          }
+          .nut-picker-roller-mask {
+            background-image: linear-gradient(180deg, rgba(27, 27, 27, 0.9), rgba(27, 27, 27, 0.4)), linear-gradient(0deg, rgba(27, 27, 27, 0.9), rgba(27, 27, 27, 0.4));
+            background-repeat: no-repeat;
+            background-position: top, bottom;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

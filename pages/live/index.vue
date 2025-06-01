@@ -221,4 +221,47 @@ page {
     }
   }
 }
+@media (prefers-color-scheme: dark) {
+  .live {
+    background: #1e1e20;
+    border-top: 2rpx solid #1e1e20;
+    ::v-deep .nut-cell-group {
+      .nut-cell-group__wrap {
+        .nut-swipe {
+          .nut-swipe__content {
+            .nut-cell {
+              background-color: #2f2f2f;
+              .nut-cell__title {
+                color: #fff;
+              }
+              .nut-icon {
+                color: #fff;
+              }
+              &::after {
+                border-bottom: 2rpx solid rgb(73, 73, 73);
+              }
+            }
+          }
+        }
+      }
+    }
+    .live-add {
+      width: 120rpx;
+      height: 120rpx;
+      background: #ff6701;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      bottom: 180rpx;
+      right: 24rpx;
+      box-shadow: 0 8rpx 12rpx #5b73a01a;
+      image {
+        width: 50rpx;
+        height: 50rpx;
+      }
+    }
+  }
+}
 </style>

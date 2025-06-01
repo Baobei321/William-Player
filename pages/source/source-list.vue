@@ -15,8 +15,9 @@
               <div class="list-item-img">
                 <image :src="item.img"></image>
               </div>
-              <div class="list-item-name" :style="{color:vitem.active?'#ff6701':'#000'}">{{ vitem.name }}</div>
-              <image class="list-item-button" :src="vitem.active ? moreButtonActive : moreButton" @click.stop="toShowMoreButton(item,vitem)"></image>
+              <div class="list-item-name" :class="[vitem.active?'list-item-activeName':'']">{{ vitem.name }}</div>
+              <image class="list-item-button" :src="vitem.active ? moreOrange : theme=='light' ? moreBlack : moreWhite" @click.stop="toShowMoreButton(item,vitem)">
+              </image>
             </div>
           </div>
         </template>
@@ -40,13 +41,14 @@
 <script setup>
 import { ref } from "vue";
 import wilNavbar from "@/components/wil-navbar/index.vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow, onUnload } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "../mine/common";
 import { loginUser, get189Folder, getQuarkFolder } from "../../utils/common";
 import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
-import moreButton from "@/static/more-button.png";
-import moreButtonActive from "@/static/more-button-active.png";
+import moreBlack from "@/static/more-black.png";
+import moreWhite from "@/static/more-white.png";
+import moreOrange from "@/static/more-orange.png";
 
 const sourceList = ref([]);
 const selectMedia = ref({});
@@ -55,6 +57,7 @@ const show = ref(true);
 const wil_modal = ref(null);
 
 const showBottom = ref(false);
+const theme = ref(uni.getSystemInfoSync().theme);
 
 const operationList = [{ name: "修改" }, { name: "删除" }];
 let selectType = {};
@@ -209,6 +212,13 @@ onShow(() => {
   sourceList.value = uni.getStorageSync("sourceList");
   judegeShow();
 });
+const changeTheme = () => {
+  theme.value = uni.getSystemInfoSync().theme;
+};
+uni.onThemeChange(changeTheme);
+onUnload(() => {
+  uni.offThemeChange(changeTheme);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -310,6 +320,10 @@ page {
           .list-item-name {
             padding-left: 10rpx;
             font-size: 32rpx;
+            color: #000;
+          }
+          .list-item-activeName {
+            color: #ff6701;
           }
 
           .list-item-button {
@@ -347,6 +361,7 @@ page {
       text-align: center;
       padding: 0 50rpx;
       padding-bottom: 24rpx;
+      color: #000;
     }
     ::v-deep .nut-button {
       border-radius: 12rpx;
@@ -368,6 +383,99 @@ page {
       }
       .nut-action-sheet__cancel {
         border-top: 20rpx solid #f6f7f8;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .source-list {
+    background: #1e1e20;
+    ::v-deep .wil-navbar {
+      .nut-navbar {
+        .nut-navbar__right {
+          .nut-icon-uploader {
+            color: #fff !important;
+          }
+        }
+      }
+    }
+
+    .source-list-container {
+      .source-list-item {
+        .source-list-item__title {
+          color: #bcbcbc;
+        }
+        .source-list-item__list {
+          background: #2f2f2f;
+          .list-item {
+            background: #2f2f2f;
+            &::before {
+              background: rgb(73, 73, 73);
+            }
+            &:active {
+              background: rgb(73, 73, 73);
+            }
+            .list-item-name {
+              color: #fff;
+            }
+            .list-item-activeName {
+              color: #ff6701;
+            }
+          }
+
+          .list-one {
+            border: 2rpx solid transparent !important;
+          }
+          .list-active {
+            border: 2rpx solid #ff6701 !important;
+          }
+        }
+      }
+    }
+    .source-list-empty {
+      background: #1e1e20;
+      .source-list-empty__tip {
+        color: #fff;
+      }
+      ::v-deep .nut-button {
+        background-color: #fff !important;
+        .nut-button__wrap {
+          .nut-icon-uploader {
+            color: #000 !important;
+          }
+          .nut-button__text {
+            color: #000 !important;
+          }
+        }
+        &::before {
+          background-color: #fff !important;
+        }
+      }
+    }
+    ::v-deep .nut-popup {
+      background-color: #464646;
+      .nut-action-sheet {
+        background-color: #464646;
+        .nut-action-sheet__title {
+          color: #b7b7b7;
+          background-color: #343437;
+          border-bottom: 2rpx solid #707070;
+          font-weight: bold;
+        }
+        .nut-action-sheet__menu {
+          background-color: #464646;
+          .nut-action-sheet__item {
+            background-color: #464646;
+            border-top: 2rpx solid #707070;
+            color: #fff;
+          }
+        }
+        .nut-action-sheet__cancel {
+          border-top: 20rpx solid #343437;
+          background-color: #464646;
+          color: #fff;
+        }
       }
     }
   }

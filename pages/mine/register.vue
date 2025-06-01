@@ -6,7 +6,7 @@
       <wil-form :options="settings" :show-button="true" ref="base_form" v-model="formData">
         <template #bottom>
           <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">注册并登录</nut-button>
-          <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree">注册并登录</nut-button>
+          <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">注册并登录</nut-button>
         </template>
       </wil-form>
       <div class="user-agreement" @click="checkAgree">
@@ -210,6 +210,31 @@ page {
       }
       span:nth-child(4) {
         color: #4080ff;
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .register {
+    background: #1e1e20;
+    &-title {
+      color: #fff;
+    }
+    ::v-deep .base-form {
+      background: transparent;
+      .nut-cell-group {
+        .nut-cell-group__wrap {
+          .nut-form-item {
+            &::after {
+              display: none;
+            }
+          }
+        }
+      }
+      .base-form-bottom {
+        .no-agree {
+          background: gray !important;
+        }
       }
     }
   }

@@ -901,16 +901,6 @@ page {
   align-items: center;
   background: #f6f7f8;
   box-sizing: border-box;
-  // .navbar-transparent {
-  //   position: absolute;
-  //   top: 0;
-  //   left: 0;
-  //   background: transparent;
-  //   border-bottom: 2rpx solid transparent;
-  //   ::v-deep .nut-navbar {
-  //     background: transparent;
-  //   }
-  // }
   .video-container {
     flex: 1;
     overflow: hidden;
@@ -954,12 +944,14 @@ page {
       image {
         width: 140rpx;
         height: 140rpx;
+        border-radius: 20rpx;
       }
 
       span {
         font-size: 36rpx;
         font-weight: bold;
         color: #000;
+        padding-top: 10rpx;
       }
     }
 
@@ -1002,6 +994,36 @@ page {
           .nut-dialog__footer-ok {
             background: #27c530;
           }
+        }
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .video {
+    background: #1e1e20;
+    .video-empty {
+      background: #1e1e20;
+      .video-empty-logo {
+        span {
+          color: #fff;
+        }
+      }
+      .video-empty-tip {
+        color: #fff;
+      }
+      ::v-deep .nut-button {
+        background-color: #fff !important;
+        .nut-button__wrap {
+          .nut-icon-uploader {
+            color: #000 !important;
+          }
+          .nut-button__text {
+            color: #000 !important;
+          }
+        }
+        &::before {
+          background-color: #fff !important;
         }
       }
     }

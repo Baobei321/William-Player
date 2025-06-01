@@ -291,4 +291,27 @@ page {
     }
   }
 }
+@media (prefers-color-scheme: dark) {
+  .video-list {
+    background: #1e1e20;
+    ::v-deep .load-list {
+      .list-item {
+        .nut-cell {
+          background-color: #2f2f2f;
+          align-items: center;
+          box-shadow: none;
+          &::after {
+            border-bottom: 2rpx solid rgb(73, 73, 73) !important;
+          }
+          .nut-cell__title {
+            color: #fff;
+          }
+          span {
+            color: rgb(154, 154, 154);
+          }
+        }
+      }
+    }
+  }
+}
 </style>

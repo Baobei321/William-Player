@@ -208,7 +208,7 @@ onBeforeMount(() => {
       font-size: 24rpx;
       color: #c2c5c6;
       padding-top: 20rpx;
-      word-break: break-all;  /* 允许在任意字符间断行 */
+      word-break: break-all; /* 允许在任意字符间断行 */
     }
 
     .tip-footer-timesize {
@@ -225,6 +225,80 @@ onBeforeMount(() => {
 
       span:last-child {
         padding-left: 10rpx;
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .actor-list {
+    .story-introduction {
+      .story-introduction-title {
+        color: #fff;
+      }
+      .story-introduction-text {
+        color: #fff;
+      }
+    }
+
+    .related-actors {
+      .related-actors-title {
+        color: #fff;
+      }
+
+      .related-actors-scroll {
+        .related-actors-list {
+          .related-actors-list__item {
+            .item-name {
+              color: #fff;
+            }
+
+            .item-role {
+              height: 35rpx;
+              line-height: 35rpx;
+              font-size: 24rpx;
+              color: #c2c5c6;
+              width: 100%;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+    .tip-footer {
+      margin-top: 50rpx;
+      padding-top: 20rpx;
+      border-top: 2rpx solid #c2c5c6;
+      width: 100%;
+      .tip-footer-name {
+        font-size: 24rpx;
+        color: #c2c5c6;
+      }
+
+      .tip-footer-webdav {
+        font-size: 24rpx;
+        color: #c2c5c6;
+        padding-top: 20rpx;
+        word-break: break-all; /* 允许在任意字符间断行 */
+      }
+
+      .tip-footer-timesize {
+        font-size: 24rpx;
+        color: #acacac;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        padding-top: 20rpx;
+
+        span:nth-child(2) {
+          padding-left: 10rpx;
+        }
+
+        span:last-child {
+          padding-left: 10rpx;
+        }
       }
     }
   }

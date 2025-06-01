@@ -8,7 +8,7 @@
             <image :src="vitem.img"></image>
           </div>
           <div class="list-item-name">{{ vitem.name }}</div>
-          <image class="list-item-button" src="../../static/ic-into.png"></image>
+          <image :src="theme=='light' ? icIntoBlack : icIntoWhite" class="list-item-button" />
         </div>
       </div>
     </div>
@@ -16,9 +16,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import webdavFileIcon from "../../static/webdav-fileIcon.png";
+import icIntoBlack from "../../static/ic-intoblack.png";
+import icIntoWhite from "../../static/ic-intowhite.png";
 import { toParse, toStringfy } from "../mine/common";
+import { onUnload } from "@dcloudio/uni-app";
+
+const theme = ref(uni.getSystemInfoSync().theme);
 
 const sourceList = ref([
   {
@@ -32,7 +37,7 @@ const sourceList = ref([
       },
       {
         name: "Emby",
-        img: 'https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc',
+        img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc",
         // path: "/pages/source/add-webdav",
         // query: { title: "添加WebDAV" },
       },
@@ -63,7 +68,7 @@ const sourceList = ref([
   },
 ]);
 
-const toPath = vitem => {
+const toPath = (vitem) => {
   if (vitem.path) {
     uni.navigateTo({
       url: vitem.path + "?" + toStringfy(vitem.query),
@@ -75,6 +80,14 @@ const toPath = vitem => {
     });
   }
 };
+const changeTheme = () => {
+  theme.value = uni.getSystemInfoSync().theme;
+};
+uni.onThemeChange(changeTheme);
+
+onUnload(() => {
+  uni.offThemeChange(changeTheme);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -110,17 +123,18 @@ page {
         display: flex;
         align-items: center;
         position: relative;
-
+        border-top: 2rpx solid rgb(241, 241, 241);
+        .list-item-name {
+          color: #000;
+        }
         &:active {
           background: rgb(241, 241, 241);
         }
-
         &:first-child {
           border-radius: 14rpx 14rpx 0 0;
+          border-top: none;
         }
-
         &:last-child {
-          border-top: 2rpx solid rgb(241, 241, 241);
           border-radius: 0 0 14rpx 14rpx;
         }
 
@@ -154,6 +168,29 @@ page {
       .list-one {
         border-radius: 14rpx !important;
         border: none !important;
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .fileSource {
+    background: #1e1e20;
+    .fileSource-item {
+      .fileSource-item__title {
+        color: rgb(154, 154, 154);
+      }
+      .fileSource-item__list {
+        background: #2f2f2f;
+        .list-item {
+          background: #2f2f2f;
+          border-top: 2rpx solid rgb(73, 73, 73);
+          .list-item-name {
+            color: #fff;
+          }
+          &:active {
+            background: rgb(73, 73, 73);
+          }
+        }
       }
     }
   }

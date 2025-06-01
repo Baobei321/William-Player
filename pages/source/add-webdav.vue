@@ -180,8 +180,6 @@ page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
-  //   center no-repeat;
   background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
   background-size: 100% 100%;
   box-sizing: border-box;
@@ -212,6 +210,9 @@ page {
                   }
                 }
               }
+              &:last-child {
+                padding-bottom: 0;
+              }
             }
           }
         }
@@ -220,6 +221,46 @@ page {
   }
   ::v-deep .nut-button {
     margin-top: 80rpx;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .add-webdav-form {
+    background: #1e1e20;
+    &__container {
+      ::v-deep .base-form {
+        background-color: #2f2f2f;
+        .nut-form {
+          .nut-cell-group {
+            &__wrap {
+              background-color: #2f2f2f;
+              .nut-form-item {
+                background-color: #2f2f2f;
+                .nut-form-item__label {
+                  color: #fff;
+                }
+                &__body {
+                  &__slots {
+                    .nut-cell {
+                      background-color: #2f2f2f;
+                      color: #fff;
+                      .nut-cell__title {
+                        font-size: 28rpx;
+                      }
+                    }
+                  }
+                }
+                &::after {
+                  border-color: rgb(73, 73, 73);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    ::v-deep .nut-button {
+      margin-top: 80rpx;
+    }
   }
 }
 </style>

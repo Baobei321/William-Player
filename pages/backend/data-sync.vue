@@ -122,4 +122,12 @@ page {
     margin-top: 20rpx;
   }
 }
+@media (prefers-color-scheme: dark) {
+  .data-sync {
+    background: #1e1e20;
+    .scan-text {
+      color: #fff;
+    }
+  }
+}
 </style>

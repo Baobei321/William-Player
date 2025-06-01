@@ -12,15 +12,19 @@
         <image :src="item[props.defaultProps.leftIcon]" v-if="item[props.defaultProps.leftIcon]" />
       </template>
       <template #link>
-        <image :src="icInto" class="right-icon" />
+        <image :src="theme=='light' ? icIntoBlack : icIntoWhite" class="right-icon" />
       </template>
     </nut-cell>
   </nut-cell-group>
 </template>
 
 <script setup>
-import icInto from "../../static/ic-into.png";
+import icIntoBlack from "../../static/ic-intoblack.png";
+import icIntoWhite from "../../static/ic-intowhite.png";
 import { toStringfy, toParse } from "../../pages/mine/common";
+import { onUnload } from "@dcloudio/uni-app";
+import { ref } from "vue";
+
 const props = defineProps({
   options: { type: Array, default: [] },
   defaultProps: {
@@ -34,6 +38,8 @@ const props = defineProps({
     },
   },
 });
+
+const theme = ref(uni.getSystemInfoSync().theme);
 
 const emits = defineEmits(["clickItem"]);
 
@@ -55,6 +61,14 @@ const clickItem = (item) => {
     emits("clickItem", item);
   }
 };
+
+const changeTheme = () => {
+  theme.value = uni.getSystemInfoSync().theme;
+};
+uni.onThemeChange(changeTheme);
+onUnload(() => {
+  uni.offThemeChange(changeTheme);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -104,6 +118,23 @@ const clickItem = (item) => {
       .right-icon {
         width: 36rpx;
         height: 36rpx;
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .base-cell {
+    ::v-deep .nut-cell-group__wrap {
+      background-color: #2f2f2f;
+      box-shadow: var(--nut-cell-box-shadow, 0 1px 7px 0 #000);
+      .nut-cell {
+        background-color: #2f2f2f;
+        &::after {
+          border-bottom: 2rpx solid rgb(73, 73, 73);
+        }
+        .nut-cell__title {
+          color: #fff;
+        }
       }
     }
   }

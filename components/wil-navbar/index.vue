@@ -22,50 +22,48 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from "vue";
 
 const props = defineProps({
-  title: { type: String, default: '' },
-  leftShow: { type: Boolean, default: process.env.uni_ENV === 'alipay' ? false : true },
-  arrowColor: { type: String, default: '#000' }
-})
+  title: { type: String, default: "" },
+  leftShow: { type: Boolean, default: process.env.uni_ENV === "alipay" ? false : true },
+  arrowColor: { type: String, default: "#000" },
+});
 
+const navBarHeight = ref("");
+const contentHeight = ref("");
 
-const navBarHeight = ref('')
-const contentHeight = ref('')
-
-const emits = defineEmits(['clickBack', 'getHeight'])
+const emits = defineEmits(["clickBack", "getHeight"]);
 
 //计算微信navBar高度
 const getNavHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = statusBarHeight + 44 + 'px'; //计算nav导航栏的高度
-  contentHeight.value = '44px'
-  emits('getHeight', navBarHeight.value)
-}
+  navBarHeight.value = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
+  contentHeight.value = "44px";
+  emits("getHeight", navBarHeight.value);
+};
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  navBarHeight.value = '44px'
-  contentHeight.value = '44px'
-  emits('getHeight', navBarHeight.value)
-}
+  navBarHeight.value = "44px";
+  contentHeight.value = "44px";
+  emits("getHeight", navBarHeight.value);
+};
 
 // #ifdef APP-PLUS
-getNavHeight()
+getNavHeight();
 // #endif
 
 // #ifdef H5
-getH5NavbarHeight()
+getH5NavbarHeight();
 // #endif
 
 const clickBack = () => {
-  uni.navigateBack()
-  emits('clickBack')
-}
-
+  uni.navigateBack();
+  emits("clickBack");
+};
 </script>
 
 <style lang="scss" scoped>
@@ -104,6 +102,29 @@ const clickBack = () => {
     }
     .nut-navbar__right {
       display: none;
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .wil-navbar {
+    ::v-deep .nut-navbar {
+      background-color: #1e1e20;
+      .nut-navbar__left {
+        .nut-icon-rect-left {
+          color: #fff !important;
+        }
+      }
+      .nut-navbar__title {
+        min-width: 60%;
+        .title {
+          color: #fff !important;
+          font-size: 17px;
+          font-weight: bold;
+        }
+      }
+      .nut-navbar__right {
+        display: none;
+      }
     }
   }
 }

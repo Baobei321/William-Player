@@ -62,6 +62,7 @@ page {
     padding: 0 50rpx;
     text-align: center;
     font-weight: bold;
+    color: #000;
   }
   .appreciate-title {
     margin-top: 50rpx;
@@ -87,6 +88,29 @@ page {
     overflow: auto;
     width: 100%;
     box-sizing: border-box;
+    .appreciate-list-item {
+      color: #000;
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .appreciate {
+    background: #1e1e20;
+    .appreciate-img {
+      background: #1e1e20;
+    }
+    .appreciate-tip {
+      color: #fff;
+    }
+    .appreciate-title {
+      border-bottom: 2rpx solid rgb(219, 219, 219);
+      color: #fff;
+    }
+    .appreciate-list {
+      .appreciate-list-item {
+        color: #fff;
+      }
+    }
   }
 }
 </style>

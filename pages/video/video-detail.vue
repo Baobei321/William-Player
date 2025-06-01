@@ -273,19 +273,20 @@ const handleTv = async (seasonData1 = null) => {
     tvList.value = result.data.content.sort((a, b) => {
       const regex = /S\d{2}E\d{2}/;
       const regex1 = /\d+/;
-      if (a.name.match(regex)) {
+      if (a.name.match(regex) && b.name.match(regex)) {
         let aName = a.name.match(regex)[0];
         let bName = b.name.match(regex)[0];
         const numA = parseInt(aName.slice(-2), 10);
         const numB = parseInt(bName.slice(-2), 10);
         return numA - numB;
-      } else if (a.name.match(regex1)) {
+      } else if (a.name.match(regex1) && b.name.match(regex1)) {
         let aName = a.name.match(regex1)[0];
         let bName = b.name.match(regex1)[0];
         const numA = parseInt(aName.slice(-2), 10);
         const numB = parseInt(bName.slice(-2), 10);
         return numA - numB;
       }
+      return a - b;
     });
     // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result?.data?.total || 0}集）`;
   } else if (selectType.value.type == "天翼云盘") {
@@ -309,19 +310,20 @@ const handleTv = async (seasonData1 = null) => {
     tvList.value = result.fileListAO.fileList.sort((a, b) => {
       const regex = /S\d{2}E\d{2}/;
       const regex1 = /\d+/;
-      if (a.name.match(regex)) {
+      if (a.name.match(regex) && b.name.match(regex)) {
         let aName = a.name.match(regex)[0];
         let bName = b.name.match(regex)[0];
         const numA = parseInt(aName.slice(-2), 10);
         const numB = parseInt(bName.slice(-2), 10);
         return numA - numB;
-      } else if (a.name.match(regex1)) {
+      } else if (a.name.match(regex1) && b.name.match(regex1)) {
         let aName = a.name.match(regex1)[0];
         let bName = b.name.match(regex1)[0];
         const numA = parseInt(aName.slice(-2), 10);
         const numB = parseInt(bName.slice(-2), 10);
         return numA - numB;
       }
+      return a - b;
     });
     // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result.fileListAO.count || 0}集）`;
   } else if (selectType.value.type == "夸克网盘") {
@@ -918,6 +920,7 @@ page {
   ::v-deep .wil-navbar {
     .nut-navbar {
       overflow: visible;
+      background: transparent;
       .nut-navbar__right {
         display: block;
         position: absolute;
@@ -1366,6 +1369,71 @@ page {
           ::v-deep .nut-button {
             height: initial;
             width: initial;
+          }
+        }
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .video-detail {
+    .video-detail-container {
+      .video-detail-container__content {
+        background: #1e1e20;
+        ::v-deep .nut-button {
+          background-color: gray !important;
+        }
+
+        .movie-version {
+          .movie-version-title {
+            color: #fff;
+          }
+
+          .movie-version-scroll {
+            .movie-version-list {
+              .movie-version-list__item {
+                color: #fff;
+                border: 2rpx solid #c2c5c6;
+              }
+
+              .movie-version-list__active {
+                color: #315ffd;
+                border: 2rpx solid #315ffd;
+              }
+            }
+          }
+        }
+
+        .tv-version {
+          .tv-version-tabs__cloud {
+            .tv-version-tabs__cloud-item {
+              color: #fff;
+              border: 2rpx solid #c2c5c6;
+            }
+            .tv-version-tabs__cloud-active {
+              color: #315ffd;
+              border: 2rpx solid #315ffd;
+            }
+          }
+          ::v-deep .nut-tabs {
+            &__titles {
+              background-color: #1e1e20 !important;
+              .nut-tabs__list {
+                .nut-tabs-active {
+                  color: #fff;
+                  .nut-tabs__titles-item__line {
+                    background: #fff !important;
+                  }
+                }
+              }
+            }
+          }
+          .tv-version-scroll {
+            .tv-version-list__item {
+              .item-title {
+                color: #fff;
+              }
+            }
           }
         }
       }

@@ -1,14 +1,18 @@
 <template>
   <view class="navbar-nvue" :style="{height:navBarHeight,flex:`0 0 ${navBarHeight}`}">
     <view class="navbar-nvue-container" :style="{height:contentHeight}">
-      <image src="@/static/rect-left.png" class="navbar-nvue-container__back" @click="toBack"></image>
-      <span>{{ title }}</span>
-      <image src="@/static/bingo-icon.png" class="navbar-nvue-container__bingo" @click="toConfirm" v-if="showRightIcon"></image>
+      <image :src="rectLeft" class="navbar-nvue-container__back" @click="toBack"></image>
+      <text class="navbar-nvue-container__title">{{ title }}</text>
+      <image :src="bingoIcon" class="navbar-nvue-container__bingo" @click="toConfirm" v-if="showRightIcon"></image>
     </view>
   </view>
 </template>
   
-  <script>
+<script>
+import rectLeftBlack from "@/static/rect-leftblack.png";
+import rectLeftWhite from "@/static/rect-leftwhite.png";
+import bingoIconBlack from "@/static/bingo-iconblack.png";
+import bingoIconWhite from "@/static/bingo-iconwhite.png";
 export default {
   props: {
     title: String,
@@ -18,6 +22,9 @@ export default {
     return {
       navBarHeight: "",
       contentHeight: "",
+      theme: uni.getSystemInfoSync().theme,
+      rectLeft: rectLeftBlack,
+      bingoIcon: bingoIconBlack,
     };
   },
   methods: {
@@ -35,15 +42,24 @@ export default {
       this.navBarHeight = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
       this.contentHeight = "44px";
     },
+    changeTheme() {
+      this.theme = uni.getSystemInfoSync().theme;
+      this.rectLeft = this.theme == "light" ? rectLeftBlack : rectLeftWhite;
+      this.bingoIcon = this.theme == "light" ? bingoIconBlack : bingoIconWhite;
+    },
   },
   created() {
     this.getNavHeight();
+    this.changeTheme();
+    uni.onThemeChange(this.changeTheme);
   },
-  onLoad(options) {},
+  beforeDestroy() {
+    uni.offThemeChange(this.changeTheme);
+  },
 };
 </script>
   
-  <style lang="scss">
+<style lang="scss">
 .navbar-nvue {
   width: 750rpx;
   background: #fff;
@@ -63,6 +79,9 @@ export default {
       position: absolute;
       left: 12px;
     }
+    .navbar-nvue-container__title {
+      color: #000;
+    }
     .navbar-nvue-container__bingo {
       width: 23px;
       height: 23px;
@@ -72,6 +91,16 @@ export default {
     .navbar-nvue-container__empty {
       width: 20px;
       height: 20px;
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .navbar-nvue {
+    background: #1e1e20;
+    .navbar-nvue-container {
+      .navbar-nvue-container__title {
+        color: #fff;
+      }
     }
   }
 }

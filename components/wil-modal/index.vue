@@ -7,7 +7,7 @@
         <div class="wil-modal-content" v-else>{{data.content}}</div>
       </div>
       <div class="wil-modal-button">
-        <div class="wil-modal-button__cancel" :style="{color:data.cancelColor}" @click="cancel">{{ data.cancelText }}</div>
+        <div class="wil-modal-button__cancel" :style="{color:theme=='light'?data.cancelColor:'#fff'}" @click="cancel">{{ data.cancelText }}</div>
         <div class="wil-modal-button__confirm" :style="{color:data.confirmColor}" @click="confirm">{{ data.confirmText }}</div>
       </div>
     </div>
@@ -29,17 +29,23 @@ const props = defineProps({
   cancel: { type: Function, default: () => {} },
 });
 
+const theme = ref(uni.getSystemInfoSync().theme);
+
 const data = ref({}); //由于app端无法引入这个方法使用，所以还是使用组件的形式
 
 const show = ref(false);
-
+const changeTheme = () => {
+  theme.value = uni.getSystemInfoSync().theme;
+};
 const showModal = (obj) => {
   data.value = { ...data.value, ...props, ...obj };
   show.value = true;
+  uni.onThemeChange(changeTheme);
 };
 
 const cancel = () => {
   show.value = false;
+  uni.offThemeChange(changeTheme);
   setTimeout(() => {
     data.value.cancel();
   }, 200);
@@ -47,6 +53,7 @@ const cancel = () => {
 
 const confirm = () => {
   show.value = false;
+  uni.offThemeChange(changeTheme);
   setTimeout(() => {
     data.value.confirm();
   }, 200);
@@ -138,7 +145,7 @@ defineExpose({
       text-align: center;
     }
   }
-  .wil-modal-height{
+  .wil-modal-height {
     height: 250rpx;
   }
   .wil-modal-button {
@@ -195,5 +202,33 @@ defineExpose({
 }
 .overlay-hide {
   animation: overlay2 0.2s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .wil-modal {
+    background: #2f2f2f;
+    .wil-modal-top {
+      .wil-modal-title {
+        color: #fff;
+      }
+      .wil-modal-content {
+        color: #fff;
+      }
+    }
+    .wil-modal-button {
+      border-top: 2rpx solid rgb(73, 73, 73);
+      .wil-modal-button__cancel {
+        border-right: 2rpx solid rgb(73, 73, 73);
+        color: #fff;
+        &:active {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      }
+      .wil-modal-button__confirm {
+        &:active {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
 }
 </style>

@@ -274,4 +274,30 @@ page {
     }
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .about-version {
+    background: #1e1e20;
+
+    .about-version-container {
+      .about-version-container__main {
+        .main-name {
+          span:first-child {
+            color: #fff;
+          }
+        }
+      }
+
+      ::v-deep .nut-cell {
+        .nut-cell__title {
+          color: #fff;
+        }
+
+        .nut-cell__value {
+          color: #fff;
+        }
+      }
+    }
+  }
+}
 </style>

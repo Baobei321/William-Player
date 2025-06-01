@@ -9,28 +9,24 @@
     {
       "path": "pages/backend/index",
       "style": {
-        "navigationBarBackgroundColor": "#fff"
       }
     },
     {
       "path": "pages/backend/data-sync",
       "style": {
-        "navigationBarTitleText": "数据同步",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "数据同步"
       }
     },
     {
       "path": "pages/backend/about-version",
       "style": {
-        "navigationBarTitleText": "关于",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "关于"
       }
     },
     {
       "path": "pages/backend/appreciate",
       "style": {
-        "navigationBarTitleText": "赞赏",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "赞赏"
       }
     },
     {
@@ -48,22 +44,19 @@
     {
       "path": "pages/backend/operation-guide",
       "style": {
-        "navigationBarTitleText": "操作指引",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "操作指引"
       }
     },
     {
       "path": "pages/live/index",
       "style": {
-        "navigationBarTitleText": "直播",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "直播"
       }
     },
     {
       "path": "pages/live/list",
       "style": {
-        "navigationBarTitleText": "直播列表",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "直播列表"
       }
     },
     {
@@ -87,8 +80,7 @@
     {
       "path": "pages/source/file-source",
       "style": {
-        "navigationBarTitleText": "添加新文件源",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "添加新文件源"
       }
     },
     {
@@ -113,7 +105,7 @@
       "path": "pages/video/search-match",
       "style": {
         "navigationBarTitleText": "编辑信息",
-        "navigationBarBackgroundColor": "#f7f7f7"
+        "navigationBarBackgroundColor": "@navigationBarBackgroundColor1"
       }
     },
     {
@@ -137,8 +129,7 @@
     {
       "path": "pages/mine/settings",
       "style": {
-        "navigationBarTitleText": "设置",
-        "navigationBarBackgroundColor": "#fff"
+        "navigationBarTitleText": "设置"
       }
     },
     {
@@ -168,17 +159,17 @@
     }
   },
   "globalStyle": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "William Player",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#ffffff",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "backgroundColor": "@backgroundColor",
     "rpxCalcMaxDeviceWidth": 700
   },
   "uniIdRouter": {},
   "tabBar": {
     "color": "#86909C",
     "selectedColor": "#ff6701",
-    "backgroundColor": "#fff",
+    "backgroundColor": "@tabBarBackgroundColor",
     "list": [
       {
         "pagePath": "pages/video/index",

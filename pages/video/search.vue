@@ -141,78 +141,123 @@ page {
       }
     }
   }
-}
-.video-search-list {
-  padding: 24rpx 24rpx 68rpx 24rpx;
-  flex: 1;
-  overflow: auto;
-  .video-search-list__item {
-    display: flex;
-    align-items: center;
-    margin-top: 30rpx;
-    .item-left {
-      width: 140rpx;
-      height: 220rpx;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      border-radius: 16rpx;
-      position: relative;
-      .item-left-logo {
-        display: inline-flex;
-        align-items: center;
-        background: #031963;
-        border-radius: 16rpx 0 16rpx 0;
-        padding: 8rpx;
-        position: absolute;
-        top: 0;
-        left: 0;
-        image {
-          width: 24rpx;
-          height: 24rpx;
-        }
-        span {
-          font-size: 22rpx;
-          color: #fff;
-          padding-left: 4rpx;
-        }
-      }
-      .item-left-tv {
-        background: #315bfd;
-      }
-    }
-    .item-right {
-      margin-left: 20rpx;
-      .item-right-name {
-        display: flex;
-        align-items: baseline;
-        font-size: 30rpx;
-        color: #000;
-        font-weight: bold;
-      }
-      .item-right-content {
-        display: flex;
-        align-items: center;
-        color: #7a787b;
-        font-size: 28rpx;
-        margin-top: 20rpx;
-        .item-right-content__date {
-          display: flex;
+  .video-search-list {
+    padding: 24rpx 24rpx 68rpx 24rpx;
+    flex: 1;
+    overflow: auto;
+    .video-search-list__item {
+      display: flex;
+      align-items: center;
+      margin-top: 30rpx;
+      .item-left {
+        width: 140rpx;
+        height: 220rpx;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        border-radius: 16rpx;
+        position: relative;
+        .item-left-logo {
+          display: inline-flex;
           align-items: center;
+          background: #031963;
+          border-radius: 16rpx 0 16rpx 0;
+          padding: 8rpx;
+          position: absolute;
+          top: 0;
+          left: 0;
+          image {
+            width: 24rpx;
+            height: 24rpx;
+          }
           span {
-            padding-left: 10rpx;
+            font-size: 22rpx;
+            color: #fff;
+            padding-left: 4rpx;
           }
         }
-        .item-right-content__line {
-          height: 28rpx;
-          width: 2rpx;
-          background: #cecece;
-          margin: 0 20rpx;
+        .item-left-tv {
+          background: #315bfd;
+        }
+      }
+      .item-right {
+        margin-left: 20rpx;
+        .item-right-name {
+          display: flex;
+          align-items: baseline;
+          font-size: 30rpx;
+          color: #000;
+          font-weight: bold;
+        }
+        .item-right-content {
+          display: flex;
+          align-items: center;
+          color: #7a787b;
+          font-size: 28rpx;
+          margin-top: 20rpx;
+          .item-right-content__date {
+            display: flex;
+            align-items: center;
+            span {
+              padding-left: 10rpx;
+            }
+          }
+          .item-right-content__line {
+            height: 28rpx;
+            width: 2rpx;
+            background: #cecece;
+            margin: 0 20rpx;
+          }
+        }
+      }
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .video-search {
+    ::v-deep .wil-navbar {
+      background-color: #1e1e20;
+      .nut-navbar {
+        background: #1e1e20;
+        .nut-navbar__title {
+          .nut-searchbar {
+            background: #1e1e20;
+            .nut-searchbar__search-input {
+              background: #2f2f2f;
+              .nut-searchbar__search-icon {
+                .nut-icon-search {
+                  color: #606060 !important;
+                }
+              }
+              .nut-searchbar__input-inner {
+                .nut-searchbar__input-form {
+                  .uni-input-input {
+                    color: #fff;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
-    &:first-child {
-      margin-top: 0;
+    .video-search-list {
+      .video-search-list__item {
+        .item-right {
+          .item-right-name {
+            color: #fff;
+          }
+          .item-right-content {
+            color: #b9b9b9;
+            .item-right-content__line {
+              background: #b9b9b9;
+            }
+          }
+        }
+      }
     }
   }
 }

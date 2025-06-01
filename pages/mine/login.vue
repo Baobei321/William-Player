@@ -4,7 +4,7 @@
     <base-form :options="settings" :show-button="true" ref="base_form" v-model="formData">
       <template #bottom>
         <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
-        <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree">登录</nut-button>
+        <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
         <div class="register-button">
           <div @click="touristEnter">游客进入</div>
           <div class="register-button-line"></div>
@@ -241,6 +241,35 @@ page {
       }
       span:nth-child(4) {
         color: #4080ff;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .login {
+    background: #1e1e20;
+    &-title {
+      color: #fff;
+    }
+    ::v-deep .base-form {
+      background: transparent;
+      padding: 0;
+      .nut-cell-group {
+        .nut-cell-group__wrap {
+          background: transparent;
+          .nut-form-item {
+            align-items: center;
+            &::after {
+              display: none;
+            }
+          }
+        }
+      }
+      .base-form-bottom {
+        .no-agree {
+          background: gray !important;
+        }
       }
     }
   }

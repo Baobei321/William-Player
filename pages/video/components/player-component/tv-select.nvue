@@ -21,7 +21,7 @@
           <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="list-scroll">
             <view class="list-item" v-for="item in dlnaList" @click="toSelectTv(item)" :key="item.udn">
               <text class="list-item-text">{{ item.name }}</text>
-              <image class="list-item-img" src="@/static/bingo-icon.png" v-if="selectUdn==item.udn"></image>
+              <image class="list-item-img" :src="bingoIcon" v-if="selectUdn==item.udn"></image>
             </view>
           </scroll-view>
         </view>
@@ -41,6 +41,8 @@
 </template>
     
 <script>
+import bingoIconBlack from "@/static/bingo-iconblack.png";
+import bingoIconWhite from "@/static/bingo-iconwhite.png";
 export default {
   props: {
     videoUrl: String,
@@ -55,6 +57,7 @@ export default {
       selectUdn: "",
       isPlaying: false,
       loading: true,
+      bingoIcon: bingoIconBlack,
     };
   },
   methods: {

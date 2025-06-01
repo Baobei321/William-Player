@@ -8,7 +8,8 @@
           <div class="more-popover-item__list">
             <div class="list-item" v-for="sitem in item.list" :key="sitem.value" @click="changeTypeOrWay(sitem,item.title)">
               <div class="list-item-bingo">
-                <image src="@/static/ic_player_check.png" v-if="item.title =='排序依据' ? sitem.value == sortWay[props.type].type : sitem.value == sortWay[props.type].way"></image>
+                <image src="@/static/ic_player_check.png" v-if="item.title =='排序依据' ? sitem.value == sortWay[props.type].type : sitem.value == sortWay[props.type].way">
+                </image>
               </div>
               <div class="list-item-name">{{ sitem.name }}</div>
             </div>

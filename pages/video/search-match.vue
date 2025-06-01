@@ -64,7 +64,7 @@ import showModal from "@/components/wil-modal/modal.js";
 import wilModal from "@/components/wil-modal/index.vue";
 import { generateChineseNumberMapping } from "../../utils/scrape";
 import { onLoad } from "@dcloudio/uni-app";
-import * as CONFIG from '@/utils/config'
+import * as CONFIG from "@/utils/config";
 
 const searchValue = ref("");
 const requestParams = ref({});
@@ -173,7 +173,7 @@ const handleSelect = async (item, index) => {
         title: "库内影片的季数大于当前影片",
         icon: "none",
       });
-      return
+      return;
     } else {
       if (res.seasons.length >= 2 && routerParams.value.maxSeasonLength == 1) {
         seasonColumns.value = res.seasons.map((v) => {
@@ -383,6 +383,51 @@ page {
             font-size: 28rpx;
             color: #7a787b;
             padding-top: 16rpx;
+          }
+        }
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .search-match {
+    background: #1e1e20;
+    ::v-deep .nut-searchbar {
+      background-color: #1e1e20;
+      .nut-searchbar__search-input {
+        background: #2f2f2f;
+        .nut-searchbar__search-icon {
+          .nut-icon-search {
+            color: #606060 !important;
+          }
+        }
+        .nut-searchbar__input-inner {
+          .nut-searchbar__input-form {
+            .uni-input-input {
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+    .search-match-list {
+      ::v-deep .load-list {
+        .search-match-list__item {
+          border: 2rpx solid rgb(40, 40, 40);
+
+          .item-right {
+            .item-right-name {
+              color: #fff;
+            }
+            .item-right-content {
+              color: #cacaca;
+              .item-right-content__line {
+                background: #cacaca;
+              }
+            }
+            .item-right-overview {
+              color: #cacaca;
+            }
           }
         }
       }

@@ -244,8 +244,6 @@ page {
 .mine {
   width: 100%;
   height: 100%;
-  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
-  //   center no-repeat;
   background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
   background-size: 100% 100%;
   display: flex;
@@ -392,6 +390,41 @@ page {
         font-size: 24rpx;
         color: #ffffff;
         margin-left: 16rpx;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .mine {
+    background: #1e1e20;
+    .mine-notLog {
+      background-color: #2f2f2f;
+      .mine-notLog__left {
+        .mine-notLog__left-info {
+          span:first-child {
+            color: #fff;
+          }
+          span:last-child {
+            color: gray;
+          }
+        }
+      }
+    }
+
+    &-loged {
+      background-color: #2f2f2f;
+      &__left {
+        display: flex;
+
+        .left-info {
+          .left-info-name {
+            color: #fff;
+          }
+          .left-info-phone {
+            color: #86909c;
+          }
+        }
       }
     }
   }

@@ -10,10 +10,10 @@
     <div class="base-form-content" :style="{paddingTop:props.title?'':'0'}">
       <nut-form :model-value="formData" :labelPosition="labelPosition" ref="formRef" :rules="rules">
         <nut-form-item :label="item.label" v-for="item in props.options" :key="item.prop" :prop="item.prop">
-          <input :value="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='input'" @blur="customBlurValidate(item.prop)" @input="(val)=>changeInput(val,item.prop)"
-            @click="clickInput(item)" :border="false" />
-          <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='textarea'" :disableDefaultPadding="true" @blur="customBlurValidate(item.prop)"
-            @change="change" />
+          <input :value="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='input'" @blur="customBlurValidate(item.prop)"
+            @input="(val)=>changeInput(val,item.prop)" @click="clickInput(item)" :border="false" />
+          <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type=='textarea'" :disableDefaultPadding="true"
+            @blur="customBlurValidate(item.prop)" @change="change" />
           <slot :name="item.prop" v-if="$slots[item.prop]&&!item.type" v-bind="{...item.formItemProps,customBlurValidate}" @blur="customBlurValidate(item.prop)"></slot>
         </nut-form-item>
         <slot name="item" v-if="$slots.item"></slot>
@@ -27,87 +27,85 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
-  title: { type: String, default: '' },
-  status: { type: String, default: '' },
+  title: { type: String, default: "" },
+  status: { type: String, default: "" },
   options: { type: Array, default: [] },
-  labelPosition: { type: String, default: 'left' },
+  labelPosition: { type: String, default: "left" },
   showButton: { type: Boolean, default: false },
   modelValue: { type: Object, default: {} },
-  buttonText: { type: String, default: '确认并发布' },
-})
+  buttonText: { type: String, default: "确认并发布" },
+});
 
-const formRef = ref(null)
+const formRef = ref(null);
 
+const formData = ref({});
 
-const formData = ref({})
-
-const emits = defineEmits(['submit', 'update:modelValue', 'changePicker', 'clickInput', 'blur'])
+const emits = defineEmits(["submit", "update:modelValue", "changePicker", "clickInput", "blur"]);
 
 const change = (val) => {
-  emits('update:modelValue', JSON.parse(JSON.stringify(formData.value)))
-}
+  emits("update:modelValue", JSON.parse(JSON.stringify(formData.value)));
+};
 
 const changeInput = (val, prop) => {
-  formData.value[prop] = val.detail.value
-  change(val.detail.value)
-}
+  formData.value[prop] = val.detail.value;
+  change(val.detail.value);
+};
 
 //失去焦点校验
 const customBlurValidate = (prop) => {
   formRef.value?.validate(prop).then(({ valid, errors }) => {
     if (valid) {
-      emits('blur', prop)
+      emits("blur", prop);
     } else {
-      console.warn('error:', errors, "更新焦点");
+      console.warn("error:", errors, "更新焦点");
     }
   });
-}
+};
 
 const clickInput = (item) => {
-  emits('clickInput', item)
-}
+  emits("clickInput", item);
+};
 
 //确认并发布按钮
 const confirmCommit = () => {
   return formRef.value?.validate().then(({ valid, errors }) => {
     if (valid) {
       // console.log('success:', valid);
-      emits('submit')
-      return valid
+      emits("submit");
+      return valid;
     } else {
       // console.warn('error:', errors);
       // return errors
     }
-  })
-}
-
+  });
+};
 
 const rules = computed(() => {
-  let rules1 = {}
-  props.options.forEach(item => {
-    rules1[item.prop] = item.rule
-  })
-  return rules1
-})
+  let rules1 = {};
+  props.options.forEach((item) => {
+    rules1[item.prop] = item.rule;
+  });
+  return rules1;
+});
 defineExpose({
-  confirmCommit
-})
+  confirmCommit,
+});
 
 watch(
   () => props.modelValue,
   (val, oldVal) => {
-    Object.keys(formData.value).forEach(v => {
-      delete formData.value[v]
-    })
-    Object.keys(val).forEach(v => {
-      formData.value[v] = val[v]
-    })
-  }, { deep: true, immediate: true }
-)
-
+    Object.keys(formData.value).forEach((v) => {
+      delete formData.value[v];
+    });
+    Object.keys(val).forEach((v) => {
+      formData.value[v] = val[v];
+    });
+  },
+  { deep: true, immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -209,11 +207,11 @@ watch(
                   }
                 }
               }
-              uni-input{
+              uni-input {
                 height: 46rpx;
                 line-height: 46rpx;
               }
-              .uni-input-placeholder{
+              .uni-input-placeholder {
                 font-size: 28rpx;
               }
               .uni-input-input {
@@ -271,6 +269,36 @@ watch(
       width: 100%;
       height: 80rpx;
       border-radius: 40rpx;
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .base-form {
+    background-color: #2f2f2f;
+    .base-form-content {
+      ::v-deep .nut-form {
+        .nut-cell-group {
+          &__wrap {
+            background-color: #2f2f2f;
+            .nut-form-item {
+              background-color: #2f2f2f;
+              .nut-form-item__label {
+                color: #fff;
+              }
+              &__body {
+                &__slots {
+                  .uni-input-input {
+                    color: #fff;
+                  }
+                }
+              }
+              &::after {
+                border-color: rgb(73, 73, 73);
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

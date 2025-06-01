@@ -104,7 +104,7 @@ export default {
       dom: null,
       windowWidth: 0,
       itemWidth: null,
-      imgDomain:IMG_DOMAIN,
+      imgDomain: IMG_DOMAIN,
     };
   },
   methods: {
@@ -313,10 +313,12 @@ export default {
       justify-content: space-between;
       .right-genres {
         // font-size: 26rpx;
+        color: #000;
       }
 
       .right-name {
         // font-size: 32rpx;
+        color: #000;
       }
 
       .right-info {
@@ -324,12 +326,15 @@ export default {
         flex-direction: row;
         align-items: center;
         font-weight: bold;
-
+        .right-info-date {
+          color: #000;
+        }
         .right-info-star {
           display: flex;
           flex-direction: row;
           align-items: center;
           // margin-left: 50rpx;
+          color: #000;
         }
       }
 
@@ -426,6 +431,7 @@ export default {
               // bottom: 10rpx;
               background: rgba(0, 0, 0, 0.5);
               color: #fff;
+              z-index: 2;
               // font-size: 24rpx;
               // border-radius: 8rpx;
               // padding: 4rpx 8rpx;
@@ -530,6 +536,64 @@ export default {
         // width: 702rpx;
         // height: 60rpx;
         background: #fff;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .player-detail {
+    background: #1e1e20;
+    .swiper-content {
+      .swiper-content-left {
+        background: rgb(212, 212, 212);
+      }
+      .swiper-content-right {
+        .right-desc {
+          color: rgb(182, 182, 182);
+        }
+        .right-genres {
+          color: #fff;
+        }
+
+        .right-name {
+          color: #fff;
+        }
+
+        .right-info {
+          .right-info-date {
+            color: #fff;
+          }
+          .right-info-star {
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    .now-play {
+      .now-play-title {
+        color: #fff;
+      }
+
+      .now-play-list {
+        .tv-version-scroll {
+          .item-title {
+            color: #fff !important;
+          }
+        }
+      }
+    }
+  }
+
+  .play-platform {
+    .play-platform-title {
+      color: #fff !important;
+    }
+
+    .play-platform-container {
+      .container-empty {
+        background: #1e1e20;
       }
     }
   }

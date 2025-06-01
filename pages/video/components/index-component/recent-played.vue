@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref,watch } from "vue";
+import { ref, watch } from "vue";
 import playVideoButton from "../../../../static/playVideo-button.png";
 import { handleSecond, parseTime, handleSeasonName } from "../../../../utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
@@ -264,6 +264,31 @@ watch(
           }
           &:first-child {
             margin-left: 0;
+          }
+        }
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .recent-played {
+    .recent-played-title {
+      .recent-played-title-left {
+        color: #fff;
+      }
+      .recent-played-title-right {
+        span {
+          color: rgb(154, 154, 154);
+        }
+      }
+    }
+    .recent-played-list {
+      .recent-played-list-scroll {
+        .recent-played-list-movie {
+          .recent-played-list-movie__item {
+            &-name {
+              color: #fff;
+            }
           }
         }
       }

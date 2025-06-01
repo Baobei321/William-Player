@@ -463,6 +463,7 @@ page {
         font-weight: bold;
         padding-bottom: 8rpx;
         font-size: 32rpx;
+        color: #000;
       }
       &__name {
         font-size: 26rpx;
@@ -641,6 +642,27 @@ page {
             }
           }
         }
+      }
+    }
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .video {
+    background: #1e1e20;
+    &-module {
+      &-item {
+        background: #2f2f2f;
+        &__value {
+          color: #fff;
+        }
+        &__name {
+          color: rgb(154, 154, 154);
+        }
+      }
+    }
+    &-list1 {
+      &-title {
+        color: rgb(154, 154, 154);
       }
     }
   }
