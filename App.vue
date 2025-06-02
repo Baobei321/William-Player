@@ -2,6 +2,9 @@
 export default {
   onLaunch: function () {
     console.log("App Launch");
+    // uni.onThemeChange((res) => {
+    //   console.log("当前主题模式:", res.theme); // dark | light
+    // });
     // #ifdef APP-PLUS
     plus.screen.lockOrientation("portrait-primary");
     if (process.env.NODE_ENV === "production") {
@@ -17,12 +20,6 @@ export default {
     console.log("App Hide");
     uni.removeStorageSync("isreload");
   },
-  onThemeChange: ({ theme }) => {
-    uni.showToast({
-      title: theme,
-    });
-    console.log("onThemeChange", theme);
-  },
 };
 </script>
 
@@ -33,7 +30,7 @@ export default {
   border: none !important;
 }
 @media (prefers-color-scheme: dark) {
-  .nut-popup{
+  .nut-popup {
     background: #272727 !important;
   }
   .nut-picker {
@@ -46,8 +43,8 @@ export default {
     .nut-picker__column {
       .nut-picker__columnitem {
         .nut-picker__list {
-          .nut-picker-roller{
-            .nut-picker-roller-item-title{
+          .nut-picker-roller {
+            .nut-picker-roller-item-title {
               color: #fff;
             }
           }

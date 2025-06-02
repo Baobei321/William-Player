@@ -26,13 +26,13 @@
           </template>
         </nut-cell>
       </template>
-      <template #theme>
+      <!-- <template #theme>
         <nut-cell title="主题" is-link :desc="themeText" @click="showPopover=true">
           <template #icon>
             <image src="@/static/theme-icon.png"></image>
           </template>
         </nut-cell>
-      </template>
+      </template> -->
     </wil-form>
     <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
       <nut-picker v-model="status" :columns="popoverList" title="主题" @confirm="confirmPicker" @cancel="showPopover = false" />
@@ -62,7 +62,7 @@ const settings1 = ref([
 const settings2 = ref([
   { label: "是否显示首页影视推荐", prop: "showRecommend" },
   { label: "", prop: "resetData" },
-  { label: "", prop: "theme" },
+  // { label: "", prop: "theme" },
 ]);
 
 const showPopover = ref(false);
@@ -125,11 +125,6 @@ onBeforeMount(() => {
   let systemInfo = uni.getSystemInfoSync();
   status.value[0] = systemInfo.theme;
   themeText.value = popoverList.value.find((i) => i.value == systemInfo.theme)?.text || "跟随系统";
-  uni.showToast({
-    title:systemInfo.theme,
-    icon:'none',
-    duration:7000
-  })
 });
 </script>
 

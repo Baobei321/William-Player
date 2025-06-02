@@ -8,8 +8,7 @@
     },
     {
       "path": "pages/backend/index",
-      "style": {
-      }
+      "style": {}
     },
     {
       "path": "pages/backend/data-sync",
