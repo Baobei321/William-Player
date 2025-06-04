@@ -1,0 +1,317 @@
+<template>
+  <view class="tv-select" :style="{zIndex:showOverlay?'2':'-1'}">
+    <view :class="['tv-select-overlay',popupShow ? 'overlay-show' : 'overlay-hide']" @click="hidePopup" v-if="showOverlay"></view>
+    <view :class="['tv-select-popup',popupShow ? 'popup-show' : 'popup-hide']" @click.stop="popupClick">
+      <view class="popup-title">
+        <view class="popup-title-close" @click="hidePopup">
+          <image src="@/static/close-black.png" class="popup-title-close__img"></image>
+        </view>
+        <view class="popup-title-name">
+          <text class="popup-title-name__text">选择投屏设备</text>
+        </view>
+        <view class="popup-title-guide" @click="toGuide">
+          <text class="popup-title-guide__text">操作指引</text>
+        </view>
+      </view>
+      <view class="popup-container">
+        <view class="popup-container-title">
+          <text class="popup-container-title__text">可连接设备</text>
+        </view>
+        <view class="popup-container-list" v-if="!loading&&dlnaList.length">
+          <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="list-scroll">
+            <view class="list-item" v-for="item in dlnaList" @click="toSelectTv(item)" :key="item.udn">
+              <text class="list-item-text">{{ item.name }}</text>
+              <image class="list-item-img" :src="bingoIcon" v-if="selectUdn==item.udn"></image>
+            </view>
+          </scroll-view>
+        </view>
+        <view class="popup-container-empty" v-if="!loading&&!dlnaList.length">
+          <image src="@/static/no-data.png" class="empty-nodata"></image>
+          <text class="empty-text">无可连接设备，请重试</text>
+          <button @click="showPopup" style="backgroundColor:#090909;borderColor:#090909;padding: 16rpx 24rpx;margin-top: 24rpx;">
+            <text style="color: #ffffff;fontSize:32rpx">重新搜索</text>
+          </button>
+        </view>
+        <view class="popup-container-loading" v-if="loading">
+          <image class="popup-container-loading__load" src="https://img.alicdn.com/imgextra/i4/O1CN01PyQnj21R1PCmPBuQS_!!6000000002051-1-tps-48-48.gif"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+    
+<script>
+import bingoIconBlack from "@/static/bingo-iconblack.png";
+import bingoIconWhite from "@/static/bingo-iconwhite.png";
+export default {
+  props: {
+    videoUrl: String,
+    initialTime: Number,
+  },
+  data() {
+    return {
+      dlnaList: [],
+      popupShow: false,
+      showOverlay: false,
+      lyzmlDLNA: null,
+      selectUdn: "",
+      isPlaying: false,
+      loading: true,
+      bingoIcon: bingoIconBlack,
+    };
+  },
+  methods: {
+    hidePopup() {
+      this.popupShow = false;
+      setTimeout(() => {
+        this.showOverlay = false;
+      }, 300);
+    },
+    showPopup() {
+      this.lyzmlDLNA.startSearch((resp) => {
+        if (resp.code == 0) {
+          this.loading = true;
+        } else if (resp.code == 1) {
+          //返回扫描的结果，eg: [{ip:"192.168.0.108",name:"xiaomiTV",udn:"uuid:fdaa8cbfdc2de4e3fcb3865f08dea7d7b227df3fe1a8354c4ee4b"}]
+          this.dlnaList = resp.result;
+        } else if (resp.code == 2) {
+          this.loading = false;
+        }
+      });
+      this.showOverlay = true;
+      setTimeout(() => {
+        this.popupShow = true;
+      }, 50);
+    },
+    toGuide() {
+      this.$emit("playOrPause", false);
+      uni.navigateTo({
+        url: "/pages/mobile/backend/operation-guide",
+      });
+    },
+    toSelectTv(item) {
+      if (this.isPlaying) {
+        this.lyzmlDLNA.stopVideo();
+      }
+      this.lyzmlDLNA.playVideo(
+        {
+          udn: item.udn,
+          mediaURL: this.videoUrl,
+        },
+        (resp) => {
+          //这里有个回调，可以不用
+          //返回信息{code:0,desc:"发送指令成功（并不代表投屏成功）"}
+          //code非0时为失败，desc返回失败原因
+          this.hidePopup();
+          if (resp && 0 != resp.code) {
+            uni.showToast({
+              icon: "none",
+              title: resp.desc,
+            });
+          } else if (resp && resp.code == 0) {
+            this.selectUdn = item.udn;
+            this.$emit("setTvButton", true);
+          }
+        }
+      );
+    },
+    stopVideo() {
+      this.lyzmlDLNA.stopVideo();
+    },
+    popupClick() {},
+  },
+  mounted() {
+    this.lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+    this.lyzmlDLNA.setPlayMonitor((resp) => {
+      switch (resp.code) {
+        case 1: //onGetTransportState，获取传输状态回调，
+          //参考项目中共有STOPPED、PLAYING、TRANSITIONING、PAUSED_PLAYBACK、PAUSED_RECORDING、RECORDING、NO_MEDIA_PRESENT、ERR
+          //目前测试只发现以下3种状态，其他的不知道啥场景会触发
+          let status = resp.result;
+          if ("PLAYING" == status) {
+            this.isPlaying = true;
+          } else if ("PAUSED_PLAYBACK" == status || "STOPPED" == status) {
+            this.isPlaying = false;
+          }
+          break;
+        case 2: //onGetMediaDuration,获取视频时长回调
+          break;
+        case 3: //onPlay,开始播放回调
+          this.lyzmlDLNA.seek(this.initialTime);
+          this.isPlaying = true;
+          break;
+        case 4: //onPause,暂停播放回调
+          this.isPlaying = false;
+          break;
+        case 5: //onStop,结束播放回调
+          this.isPlaying = false;
+          break;
+        case 6: //d,音量变化回调
+          break;
+        case 7: //Updated,播放进度回调
+          break;
+        case 8: //Complete,快进快退回调
+          break;
+        case 9: //onError,调用发生错误时的回调，可以打印出来看看，调试的时候可以看看，有时候莫名奇妙会不停回调错误
+          break;
+        default:
+          break;
+      }
+    });
+  },
+};
+</script>
+    
+<style lang="scss" scoped>
+.tv-select {
+  width: 750rpx;
+  //   background: rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0; /* 撑满父容器 */
+  z-index: -1;
+  .tv-select-overlay {
+    z-index: 99;
+    position: absolute;
+    width: 750rpx;
+    flex: 1;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0; /* 撑满父容器 */
+    background: rgba(0, 0, 0);
+    transition: opacity 0.3s ease-in-out; /* 过渡所有属性，持续0.3秒 */
+  }
+  .overlay-show {
+    background: rgba(0, 0, 0);
+    opacity: 0.5;
+  }
+  .overlay-hide {
+    background: rgba(0, 0, 0);
+    opacity: 0;
+  }
+  .tv-select-popup {
+    z-index: 100;
+    position: absolute;
+    bottom: 0;
+    height: 800rpx;
+    width: 750rpx;
+    border-radius: 40rpx 40rpx 0 0;
+    background: #fff;
+    transition: transform 0.3s ease-in-out; /* 过渡所有属性，持续0.3秒 */
+    padding: 30rpx 24rpx;
+    display: flex;
+    flex-direction: column;
+    .popup-title {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      position: relative;
+      .popup-title-close {
+        width: 38rpx;
+        height: 38rpx;
+        position: absolute;
+        left: 0;
+        top: 0;
+        .popup-title-close__img {
+          width: 38rpx;
+          height: 38rpx;
+        }
+      }
+      .popup-title-name {
+        .popup-title-name__text {
+          font-size: 32rpx;
+          color: #000;
+        }
+      }
+      .popup-title-guide {
+        position: absolute;
+        right: 0;
+        top: 0;
+        .popup-title-guide__text {
+          font-size: 32rpx;
+          color: #ff6701;
+        }
+      }
+    }
+    .popup-container {
+      padding-top: 24rpx;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      .popup-container-title {
+        .popup-container-title__text {
+          font-size: 28rpx;
+          color: rgb(99, 99, 99);
+        }
+      }
+      .popup-container-list {
+        flex: 1;
+        width: 702rpx;
+        display: flex;
+        flex-direction: column;
+        .list-scroll {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          overflow: auto;
+          .list-item {
+            height: 100rpx;
+            flex-direction: row;
+            // justify-content: space-between;
+            align-items: center;
+            border-bottom: 2rpx solid rgb(237, 237, 237);
+            .list-item-text {
+              font-size: 32rpx;
+              color: #000;
+              padding-right: 20rpx;
+            }
+            .list-item-img {
+              width: 40rpx;
+              height: 40rpx;
+            }
+          }
+        }
+      }
+      .popup-container-empty {
+        font-size: 28rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .empty-nodata {
+          width: 400rpx;
+          height: 400rpx;
+        }
+        .empty-text {
+          font-size: 32rpx;
+          color: #000;
+        }
+      }
+      .popup-container-loading {
+        flex: 1;
+        width: 702rpx;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .popup-container-loading__load {
+          width: 60rpx;
+          height: 60rpx;
+        }
+      }
+    }
+  }
+  .popup-show {
+    transform: translateY(0);
+  }
+  .popup-hide {
+    transform: translateY(1600rpx);
+  }
+}
+</style>

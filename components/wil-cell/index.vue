@@ -19,9 +19,9 @@
 </template>
 
 <script setup>
-import icIntoBlack from "../../static/ic-intoblack.png";
-import icIntoWhite from "../../static/ic-intowhite.png";
-import { toStringfy, toParse } from "../../pages/mine/common";
+import icIntoBlack from "@/static/ic-intoblack.png";
+import icIntoWhite from "@/static/ic-intowhite.png";
+import { toStringfy, toParse } from "../../pages/mobile/mine/common";
 import { onUnload } from "@dcloudio/uni-app";
 import { ref } from "vue";
 

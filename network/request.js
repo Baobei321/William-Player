@@ -1,7 +1,7 @@
 import * as CONFIG from '@/utils/config.js'
 import { loginByPhone } from './apis'
 import { encrypt } from "../utils/jsencrypt.js";
-import { getUserByopenId } from '../pages/mine/common.js'
+import { getUserByopenId } from '../pages/mobile/mine/common.js'
 // 全局请求封装
 const base_url = CONFIG.BASE_URL
 // const base_url = 'http://192.168.31.15:4040/ruoyi'
@@ -53,7 +53,7 @@ export default (params) => {
               //   showCancel: false,
               //   success: () => {
               //     uni.navigateTo({
-              //       url: "/pages/mine/login",
+              //       url: "/pages/mobile/mine/login",
               //     })
               //   },
               // });
@@ -87,7 +87,7 @@ export default (params) => {
               //   success() {
               //     setTimeout(() => {
               //       uni.navigateTo({
-              //         url: "/pages/mine/login",
+              //         url: "/pages/mobile/mine/login",
               //       })
               //     }, 1000);
               //   },

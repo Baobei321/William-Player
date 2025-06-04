@@ -1,0 +1,601 @@
+<template>
+  <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="player-detail">
+    <view class="swiper-content" :style="{height:setSize('330rpx'),paddingTop:setSize('60rpx')}">
+      <view class="swiper-content-container" v-if="detailData.name||detailData.title" :style="{padding:`0 ${setSize('24rpx')}`}">
+        <view class="swiper-content-left" :style="{width:setSize('192.6rpx'),flex:`0 0 ${setSize('192.6rpx')}`,height:setSize('270rpx'),borderRadius:setSize('12rpx')}">
+          <image mode="aspectFill" :src="detailData.poster" :style="{width: setSize('192.6rpx'),height: setSize('270rpx'),borderRadius: setSize('12rpx')}"></image>
+        </view>
+        <view class="swiper-content-right" :style="{height:setSize('270rpx'),marginLeft:setSize('24rpx')}">
+          <text class="right-genres" :style="{fontSize:setSize('26rpx')}">{{ detailData.genres }}</text>
+          <text class="right-name" :style="{fontSize:setSize('32rpx')}">{{ detailData.name||detailData.title }}</text>
+          <view class="right-info">
+            <text class="right-info-date" :style="{fontSize: setSize('24rpx')}">{{ detailData.first_air_date||detailData.release_date	 }}</text>
+            <view class="right-info-star" :style="{marginLeft:setSize('50rpx')}">
+              <image src="@/static/star-fill.png" :style="{width: setSize('30rpx'),height: setSize('30rpx')}"></image>
+              <text :style="{fontSize: setSize('24rpx')}">{{ detailData.vote_average?.toFixed(1) }}</text>
+            </view>
+          </view>
+          <text class="right-desc" :style="{fontSize:setSize('28rpx')}">{{ detailData.overview }}</text>
+        </view>
+      </view>
+    </view>
+    <view class="now-play" v-if="type=='tv'" :style="{padding:setSize('24rpx')}">
+      <text class="now-play-title" :style="{fontSize:setSize('32rpx'),paddingBottom:setSize('20rpx')}">正在播放</text>
+      <view class="now-play-list" :style="{height:setSize('230rpx'),width:windowWidth>700?windowWidth-24+'px':'702rpx'}">
+        <scroll-view class="tv-version-scroll" :scroll-x="true" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx', height:setSize('230rpx')}" :enhanced="true"
+          :scroll-into-view="scrollIntoView" :scroll-with-animation="true" :showScrollbar="false" v-if="tvListData.length" ref="tv_scroll">
+          <view class="tv-version-list__item"
+            :style="{marginLeft:index==0 ? 0 : setSize('24rpx'),flex:`0 0 ${itemWidth?itemWidth+'px' :setSize('339rpx')}`,width:itemWidth?itemWidth+'px' :setSize('339rpx')}"
+            v-for="(item,index) in tvListData" :key="item.name" :id="'name'+(index+1)" @click="changeVideo(item,index)">
+            <view class="item-img"
+              :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),height:itemWidth?itemWidth*170/339 :setSize('170rpx'),borderRadius:setSize('16rpx')}">
+              <image :src="item.poster || posterEmpty" class="item-bgc" mode="aspectFill"
+                :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),height:itemWidth?itemWidth*170/339 :setSize('170rpx'),borderRadius:setSize('16rpx')}"></image>
+              <image src="@/static/playVideo-button.png" v-if="name!=item.name" class="item-img-pause"
+                :style="{width:setSize('60rpx'),height:setSize('60rpx'),left:setSize('139.5rpx'),top:setSize('55rpx')}" />
+              <!-- <image src="https://y.qq.com/mediastyle/yqq/img/wave.gif?max_age=2592000" class="item-img-run" v-else></image> -->
+              <image src="https://img.alicdn.com/imgextra/i2/O1CN01PjwhOL1FfuzmXWggp_!!6000000000515-1-tps-72-72.gif"
+                :style="{width:setSize('30rpx'),height:setSize('30rpx'),left:setSize('154.5rpx'),top:setSize('70rpx')}" class="item-img-run" v-else></image>
+              <text class="item-img-runtime"
+                :style="{right:setSize('10rpx'),bottom:setSize('10rpx'),fontSize:setSize('24rpx'),borderRadius:setSize('8rpx'),padding:`${setSize('4rpx')} ${setSize('8rpx')}`}">{{ item.runtime }}</text>
+            </view>
+            <text class="item-title"
+              :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),fontSize:setSize('28rpx'),paddingTop:setSize('12rpx')}">{{ index+1+'.'+(item.title||`第${index+1}集`) }}</text>
+          </view>
+        </scroll-view>
+        <view class="tv-version-empty" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx',height:setSize('230rpx')}" v-else>
+          <button @click="reHandleTv" v-if="showRehandleButton"
+            :style="{backgroundColor:'#090909',borderColor:'#090909',padding: `${setSize('16rpx')} ${setSize('24rpx')}`}">
+            <text :style="{color: '#ffffff',fontSize:setSize('32rpx')}">重新加载</text>
+          </button>
+          <text v-else>加载中...</text>
+        </view>
+      </view>
+
+    </view>
+    <view class="play-platform" :style="{padding:setSize('24rpx')}">
+      <text class="play-platform-title" :style="{fontSize:setSize('32rpx'),paddingBottom:setSize('20rpx')}">播出平台</text>
+      <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
+        <view v-for="(item,index) in detailData.networks" :key="item.id" class="container-item"
+          :style="{marginLeft:index==0 ? '0' : setSize('24rpx'),padding:`${setSize('10rpx')} ${setSize('16rpx')}`,borderRadius:setSize('16rpx')}">
+          <image :src="imgDomain+'/t/p/h30'+item.logo_path" v-if="item.logo_path" :style="{height:setSize('40rpx')}" class="container-item-img" mode="heightFix"
+            @load="loadImage"></image>
+          <text v-else :style="{fontSize: setSize('32rpx'),color: '#000'}">{{ item.name }}</text>
+        </view>
+        <view class="container-empty" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx',height:setSize('60rpx')}" v-if="!showPlatformImg"></view>
+      </scroll-view>
+    </view>
+  </scroll-view>
+</template>
+
+<script>
+import { getMovieTvById } from "@/utils/common.js";
+import { generateChineseNumberMapping } from "@/utils/scrape.js";
+import posterEmpty from "@/static/poster-empty.png";
+import { IMG_DOMAIN } from "@/utils/config";
+
+export default {
+  props: {
+    movieTvId: String,
+    type: String,
+    tvListData: {
+      type: Array,
+    },
+    path: {
+      type: String,
+    },
+    showRehandleButton: Boolean,
+    seasonData: {
+      type: Object,
+    },
+    direction: Number,
+  },
+  data() {
+    return {
+      detailData: {},
+      tvList: [],
+      name: "",
+      scrollLeft: "0",
+      loadimgNum: 0,
+      showPlatformImg: false,
+      scrollIntoView: "name1",
+      scrollIntoView_copy: "name1",
+      season: "1",
+      dom: null,
+      windowWidth: 0,
+      itemWidth: null,
+      imgDomain: IMG_DOMAIN,
+    };
+  },
+  methods: {
+    async getMovieTvDetail() {
+      let res = await getMovieTvById(
+        {
+          movieTvId: this.movieTvId,
+        },
+        this.type
+      );
+      let genres = "";
+      res.genres.forEach((v, vindex) => {
+        if (vindex < res.genres.length - 1) {
+          genres += v.name + " ";
+        } else {
+          genres += v.name || "";
+        }
+      });
+      res.genres = genres;
+      res.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
+      if (this.type == "movie") {
+        res.networks = res.production_companies;
+      }
+      this.detailData = res;
+      if (this.seasonData.id) {
+        const numberMapping = generateChineseNumberMapping(40, "number");
+        if (this.seasonData.season_number > 1) {
+          this.detailData.name = this.detailData.name + ` 第${numberMapping[String(this.seasonData.season_number)]}季`;
+          this.detailData.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
+        } else if (this.seasonData.season_number == 0) {
+          this.detailData.name = this.detailData.name + " 特别篇";
+          this.detailData.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + this.seasonData.poster_path;
+        }
+        this.seasonData.season_number != 1 && this.seasonData.overview ? (this.detailData.overview = this.seasonData.overview) : "";
+      }
+    },
+    changeVideo(item, index) {
+      if (item.name == this.name) return;
+      this.$emit("changeVideo", index);
+    },
+    //裁剪格式获取电影名
+    getMovieName(val) {
+      const lastDotIndex = val.lastIndexOf(".");
+      let name = lastDotIndex === -1 ? val : val.substring(0, lastDotIndex);
+      return name;
+    },
+    reHandleTv() {
+      this.$emit("resetTv");
+    },
+    loadImage() {
+      this.loadimgNum++;
+      let imgNum = this.detailData.networks.filter((i) => i.logo_path).length;
+      if (this.loadimgNum == imgNum) {
+        this.showPlatformImg = true;
+      }
+    },
+    setSize(val) {
+      if (this.windowWidth > 700) {
+        return +val.split("rpx")[0] / 2 + "px";
+      } else {
+        return val;
+      }
+    },
+    setItemWidth() {
+      if (this.windowWidth > 700) {
+        let lineNumber = Math.floor((this.windowWidth - 24) / 169.5);
+        let remain = this.windowWidth - 24 - lineNumber * 169.5;
+        if (remain < (lineNumber - 1) * 10) {
+          lineNumber--;
+        }
+        this.itemWidth = (this.windowWidth - 24 - (lineNumber - 1) * 12) / lineNumber;
+      }
+    },
+  },
+  created() {
+    let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+    this.windowWidth = sysinfo.windowWidth;
+    this.setItemWidth();
+    this.getMovieTvDetail();
+  },
+  watch: {
+    // 监听 message 的变化
+    path: {
+      handler(newVal, oldVal) {
+        if (newVal && this.tvListData?.length) {
+          const lastIndex = newVal.lastIndexOf("/");
+          this.name = newVal.substring(lastIndex + 1);
+          setTimeout(() => {
+            let nowIndex = this.tvListData.findIndex((v) => v.name == this.name);
+            // this.scrollLeft = 363 * nowIndex + "rpx";
+            if (this.direction == 0) {
+              //竖屏的时候直接scroll到指定位置，横屏等竖屏之后再scroll
+              this.scrollIntoView_copy = this.scrollIntoView = "name" + (nowIndex + 1);
+            } else if (this.direction == 1) {
+              this.scrollIntoView_copy = "name" + (nowIndex + 1);
+            }
+            // uni.showToast({
+            //   title: this.scrollIntoView,
+            //   icon: "none",
+            //   duration: 1500,
+            // });
+          }, 100);
+        }
+      },
+      immediate: true, // 初始化时立即执行
+    },
+    tvListData: {
+      handler(newVal, oldVal) {
+        if (newVal && newVal.length && this.path) {
+          const lastIndex = this.path.lastIndexOf("/");
+          this.name = this.path.substring(lastIndex + 1);
+          setTimeout(() => {
+            let nowIndex = newVal.findIndex((v) => v.name == this.name);
+            // this.scrollLeft = 363 * nowIndex + "rpx";
+            if (this.direction == 0) {
+              //竖屏的时候直接scroll到指定位置，横屏等竖屏之后再scroll
+              this.scrollIntoView_copy = this.scrollIntoView = "name" + (nowIndex + 1);
+            } else if (this.direction == 1) {
+              this.scrollIntoView_copy = "name" + (nowIndex + 1);
+            }
+            // uni.showToast({
+            //   title: this.scrollIntoView,
+            //   icon: "none",
+            //   duration: 1500,
+            // });
+          }, 100);
+        }
+      },
+      immediate: true, // 初始化时立即执行
+      deep: true,
+    },
+    seasonData: {
+      handler(newVal, oldVal) {
+        if (newVal?.id) {
+          const numberMapping = generateChineseNumberMapping(40, "number");
+          if (this.detailData.id) {
+            if (newVal.season_number > 1) {
+              this.detailData.name = this.detailData.name + ` 第${numberMapping[String(newVal.season_number)]}季`;
+            }
+            newVal.season_number > 1 && newVal.overview ? (this.detailData.overview = newVal.overview) : "";
+          }
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
+    direction: {
+      handler(newVal, oldVal) {
+        if (newVal == 0) {
+          setTimeout(() => {
+            this.scrollIntoView = this.scrollIntoView_copy;
+          }, 1000);
+        }
+      },
+      immediate: true,
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.player-detail {
+  width: 750rpx;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+
+  .swiper-content {
+    width: 750rpx;
+    box-sizing: border-box;
+    // padding: 60rpx 0 0 0;
+    // height: 330rpx;
+
+    .swiper-content-container {
+      // padding: 0 24rpx;
+      box-sizing: border-box;
+      width: 750rpx;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .swiper-content-left {
+      // width: 192.6rpx;
+      // flex: 0 0 192.6rpx;
+      // height: 270rpx;
+      // border-radius: 12rpx;
+      background: rgb(212, 212, 212);
+
+      image {
+        // width: 192.6rpx;
+        // height: 270rpx;
+        // border-radius: 12rpx;
+      }
+    }
+
+    .swiper-content-right {
+      flex: 1;
+      overflow: hidden;
+      // height: 270rpx;
+      // margin-left: 24rpx;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .right-genres {
+        // font-size: 26rpx;
+        color: #000;
+      }
+
+      .right-name {
+        // font-size: 32rpx;
+        color: #000;
+      }
+
+      .right-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-weight: bold;
+        .right-info-date {
+          color: #000;
+        }
+        .right-info-star {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          // margin-left: 50rpx;
+          color: #000;
+        }
+      }
+
+      .right-desc {
+        // font-size: 28rpx;
+        color: rgb(54, 54, 54);
+        lines: 3;
+        /* 限制行数（可调整） */
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .now-play {
+    // padding: 24rpx;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    width: 750rpx;
+
+    .now-play-title {
+      // font-size: 32rpx;
+      font-weight: bold;
+      color: #000;
+      // padding-bottom: 20rpx;
+    }
+
+    .now-play-list {
+      // height: 230rpx;
+      // width: 702rpx;
+
+      .tv-version-scroll {
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        // height: 230rpx;
+        // width: 702rpx;
+
+        ::v-deep .uni-scroll-view-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          flex-wrap: nowrap;
+          width: 100%;
+        }
+
+        .tv-version-list__item {
+          // margin-left: 24rpx;
+          // flex: 0 0 339rpx;
+          // width: 339rpx;
+
+          .item-img {
+            // width: 339rpx;
+            // height: 170rpx;
+            background: rgb(212, 212, 212);
+            // border-radius: 16rpx;
+            position: relative;
+            overflow: hidden;
+
+            .item-bgc {
+              // width: 339rpx;
+              // height: 170rpx;
+              // border-radius: 16rpx;
+              object-fit: cover;
+              position: absolute;
+              right: 0;
+              bottom: 0;
+              z-index: 1;
+            }
+
+            .item-img-pause {
+              // width: 60rpx;
+              // height: 60rpx;
+              position: absolute;
+              // left: 139.5rpx;
+              // top: 55rpx;
+              z-index: 2;
+            }
+
+            .item-img-run {
+              // width: 30rpx;
+              // height: 30rpx;
+              position: absolute;
+              // left: 154.5rpx;
+              // top: 70rpx;
+              z-index: 2;
+            }
+
+            .item-img-runtime {
+              position: absolute;
+              // right: 10rpx;
+              // bottom: 10rpx;
+              background: rgba(0, 0, 0, 0.5);
+              color: #fff;
+              z-index: 2;
+              // font-size: 24rpx;
+              // border-radius: 8rpx;
+              // padding: 4rpx 8rpx;
+            }
+
+            .item-img-process {
+              height: 7rpx;
+              background: #ff6701;
+              position: absolute;
+              bottom: 0;
+              left: 0;
+            }
+          }
+
+          .item-title {
+            // width: 339rpx;
+            // font-size: 28rpx;
+            color: #000;
+            font-weight: bold;
+            // padding-top: 12rpx;
+            white-space: nowrap;
+            lines: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+
+      .tv-version-empty {
+        // width: 702rpx;
+        // height: 230rpx;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        .empty-button {
+          background-color: #090909;
+          width: 200px;
+          height: 80px;
+          background-color: #4caf50;
+          /* 背景色 */
+          color: white;
+          /* 文字颜色 */
+          border-radius: 10px;
+          /* 圆角 */
+          font-size: 16px;
+          /* 字体大小 */
+          border-width: 0;
+        }
+      }
+    }
+  }
+
+  .play-platform {
+    // padding: 24rpx;
+
+    .play-platform-title {
+      // font-size: 32rpx;
+      font-weight: bold;
+      color: #000;
+      // padding-bottom: 20rpx;
+    }
+
+    .play-platform-container {
+      display: flex;
+      flex-direction: row;
+      width: 750rpx;
+      overflow: hidden;
+      position: relative;
+
+      ::v-deep .uni-scroll-view-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
+      }
+
+      .container-item {
+        background: rgb(240, 240, 240);
+        // padding: 10rpx 16rpx;
+        box-sizing: border-box;
+        // border-radius: 16rpx;
+        // margin-left: 24rpx;
+        flex-direction: row;
+        width: auto;
+
+        // &:first-child {
+        //   margin-left: 0;
+        // }
+        .container-item-img {
+          // height: 40rpx;
+          // width: auto;
+        }
+      }
+
+      .container-empty {
+        position: absolute;
+        top: 0;
+        left: 0;
+        // width: 702rpx;
+        // height: 60rpx;
+        background: #fff;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .player-detail {
+    background: #1e1e20;
+    .swiper-content {
+      .swiper-content-left {
+        background: rgb(212, 212, 212);
+      }
+      .swiper-content-right {
+        .right-desc {
+          color: rgb(182, 182, 182);
+        }
+        .right-genres {
+          color: #fff;
+        }
+
+        .right-name {
+          color: #fff;
+        }
+
+        .right-info {
+          .right-info-date {
+            color: #fff;
+          }
+          .right-info-star {
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    .now-play {
+      .now-play-title {
+        color: #fff;
+      }
+
+      .now-play-list {
+        .tv-version-scroll {
+          .item-title {
+            color: #fff !important;
+          }
+        }
+      }
+    }
+  }
+
+  .play-platform {
+    .play-platform-title {
+      color: #fff !important;
+    }
+
+    .play-platform-container {
+      .container-empty {
+        background: #1e1e20;
+      }
+    }
+  }
+}
+</style>
