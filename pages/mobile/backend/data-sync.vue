@@ -9,7 +9,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import wilQrcode from "@/components/wil-qrcode/index.vue";
+import wilQrcode from "@/components/mobile/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
 import { setShareData, deleteShareData, getShareData } from "@/network/apis";
 import { onUnload } from "@dcloudio/uni-app";

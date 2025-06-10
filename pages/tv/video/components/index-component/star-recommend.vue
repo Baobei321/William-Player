@@ -1,23 +1,27 @@
 <template>
   <div class="star-recommend">
-    <wil-swiper :options="listData" :auto-play="3000" :pagination-visible="true" imgMode="aspectFill">
+    <wil-swiper :options="listData" :auto-play="3000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper">
       <template #item="data">
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
             <div class="swiper-content-left">
-              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN+'/t/p/w300_and_h450_bestv2' + data.poster"></image>
-            </div>
-            <div class="swiper-content-right">
-              <div class="right-genres">{{ data.genres }}</div>
-              <div class="right-name">{{ handleSeasonName(data.name,true) }}</div>
-              <div class="right-info">
-                <div class="right-info-date">{{ data.releaseTime }}</div>
-                <div class="right-info-star">
+              <div class="left-name">{{ handleSeasonName(data.name,true) }}</div>
+              <div class="left-info">
+                <div class="left-info-date">{{ data.releaseTime }}</div>
+                <div class="left-info-star">
                   <image src="@/static/star-fill.png"></image>
                   <span>{{ data.voteAverage.toFixed(1) }}</span>
                 </div>
+                <div class="left-info-genres">{{ data.genres }}</div>
               </div>
-              <div class="right-desc">{{ data.overview }}</div>
+              <div class="left-desc">{{ data.overview }}</div>
+              <div class="left-button">
+                <image src="@/static/play-black.png"></image>
+                <span>立即观看</span>
+              </div>
+            </div>
+            <div class="swiper-content-right">
+              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN+'/t/p/w300_and_h450_bestv2' + data.poster"></image>
             </div>
           </div>
         </div>
@@ -32,6 +36,8 @@ import { ref, onBeforeMount } from "vue";
 import { classifyList, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
+
+const emits = defineEmits(["getStarList", "change"]);
 
 const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
@@ -48,6 +54,11 @@ const toVideoDetail = (item) => {
     url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
+
+const changeSwiper = (index) => {
+  emits("change", index);
+};
+
 onShow(() => {
   classifyList1.value = JSON.parse(JSON.stringify(classifyList));
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
@@ -65,7 +76,7 @@ onShow(() => {
         }
       });
       item.genres = genres;
-      item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      //   item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
       return item;
     });
   }
@@ -84,32 +95,35 @@ onShow(() => {
         }
       });
       item.genres = genres;
-      item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
+      //   item.underImg = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + item.backdrop;
       return item;
     });
   }
   listData.value = [...tv, ...movie];
+  emits("getStarList", listData.value);
 });
 </script>
 
 <style lang="scss" scoped>
 @media (min-width: 700px) {
   .star-recommend {
-    height: 800rpx !important;
+    height: 1000rpx !important;
   }
 }
 .star-recommend {
-  height: 500rpx;
+  height: 1000rpx;
   ::v-deep .wil-swiper {
+    background: transparent;
     .nut-swiper {
       .nut-swiper-inner {
         .nut-swiper-item {
           .swiper-content {
+            padding: 0 80rpx;
             width: 100%;
             height: 100%;
             box-sizing: border-box;
             // padding: 140rpx 0 0 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            // background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
             .swiper-content-container {
               padding: 0 24rpx;
               box-sizing: border-box;
@@ -119,35 +133,31 @@ onShow(() => {
               align-items: center;
             }
             .swiper-content-left {
-              flex: 0 0 192.6rpx;
-              height: 270rpx;
-              border-radius: 12rpx;
-              image {
-                width: 100%;
-                height: 100%;
-                border-radius: 12rpx;
-              }
-            }
-            .swiper-content-right {
               flex: 1;
               overflow: hidden;
-              height: 270rpx;
-              margin-left: 24rpx;
+              //   height: 270rpx;
               display: flex;
               flex-direction: column;
               justify-content: space-between;
-              .right-genres {
-                font-size: 26rpx;
+              align-items: flex-start;
+
+              .left-name {
+                font-size: 66rpx;
+                font-weight: bold;
+                width: 800rpx;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2; /* 限制显示的行数 */
+                overflow: hidden;
+                text-overflow: ellipsis;
               }
-              .right-name {
-                font-size: 32rpx;
-              }
-              .right-info {
+              .left-info {
                 display: flex;
                 align-items: center;
-                font-size: 24rpx;
+                font-size: 28rpx;
                 font-weight: bold;
-                .right-info-star {
+                margin: 20rpx 0;
+                .left-info-star {
                   display: flex;
                   align-items: center;
                   margin-left: 50rpx;
@@ -156,15 +166,49 @@ onShow(() => {
                     height: 30rpx;
                   }
                 }
+                .left-info-genres {
+                  font-size: 28rpx;
+                  margin-left: 50rpx;
+                }
               }
-              .right-desc {
+              .left-desc {
                 font-size: 28rpx;
-                color: rgb(54, 54, 54);
+                color: #a2a2a2;
+                font-weight: bold;
                 display: -webkit-box;
-                -webkit-line-clamp: 3; /* 限制行数（可调整） */
+                -webkit-line-clamp: 5; /* 限制行数（可调整） */
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
+              }
+              .left-button {
+                display: flex;
+                align-items: center;
+                background: #e9dfd3;
+                box-sizing: border-box;
+                padding: 20rpx 50rpx;
+                border-radius: 40rpx;
+                margin-top: 40rpx;
+                image {
+                  width: 35rpx;
+                  height: 35rpx;
+                }
+                span {
+                  color: #372f28;
+                  font-size: 28rpx;
+                  padding-left: 10rpx;
+                }
+              }
+            }
+            .swiper-content-right {
+              flex: 0 0 385.2rpx;
+              height: 540rpx;
+              border-radius: 12rpx;
+              margin-left: 200rpx;
+              image {
+                width: 100%;
+                height: 100%;
+                border-radius: 12rpx;
               }
             }
           }

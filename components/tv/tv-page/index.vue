@@ -1,5 +1,5 @@
 <template>
-  <scroll-view scroll-y="true" :style="{height:windowHeight+'px'}" ref="page" :scroll-top="scrollTop" @scroll="scroll">
+  <scroll-view scroll-y="true" :style="{height:windowHeight+'px'}" ref="page" :scroll-top="scrollTop" @scroll="scroll" class="tv-page">
     <view @click="whole.onClick" id="onClick"></view>
     <slot></slot>
   </scroll-view>
@@ -85,13 +85,9 @@ export default {
 	}
 </script>
 <style scoped lang="scss">
-.log-key-view {
-  position: fixed;
-  right: 0;
-  color: #ffffff;
-  font-size: 20rpx;
-  background: #007aff;
-  top: 0;
-  z-index: 999;
+.tv-page{
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 </style>

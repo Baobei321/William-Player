@@ -40,12 +40,12 @@
 
 <script setup>
 import { ref } from "vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onShow, onUnload } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "../mine/common";
 import { loginUser, get189Folder, getQuarkFolder } from "@/utils/common";
-import showModal from "@/components/wil-modal/modal.js";
-import wilModal from "@/components/wil-modal/index.vue";
+import showModal from "@/components/mobile/wil-modal/modal.js";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
 import moreBlack from "@/static/more-black.png";
 import moreWhite from "@/static/more-white.png";
 import moreOrange from "@/static/more-orange.png";

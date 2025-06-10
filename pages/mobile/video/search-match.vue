@@ -56,12 +56,12 @@
 
 <script setup>
 import { ref } from "vue";
-import wilList from "@/components/wil-list/index";
-import wilEmpty from "@/components/wil-empty/index";
+import wilList from "@/components/mobile/wil-list/index";
+import wilEmpty from "@/components/mobile/wil-empty/index";
 import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
-import showModal from "@/components/wil-modal/modal.js";
-import wilModal from "@/components/wil-modal/index.vue";
+import showModal from "@/components/mobile/wil-modal/modal.js";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
 import { generateChineseNumberMapping } from "@/utils/scrape";
 import { onLoad } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";

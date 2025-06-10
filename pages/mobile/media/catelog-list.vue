@@ -1,6 +1,6 @@
 <template>
   <div class="video-list">
-    <load-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData"
+    <wil-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData"
       :refresher-enabled="false">
       <template #default="item">
         <nut-cell is-link :class="[item.$index==data.total-1 ? 'last-cell' : '']" @click="clickCell(item)">
@@ -16,13 +16,13 @@
           </template>
         </nut-cell>
       </template>
-    </load-list>
+    </wil-list>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import loadList from "@/components/wil-list/index.vue";
+import wilList from "@/components/mobile/wil-list/index.vue";
 import Folder from "@/static/folder.png";
 import videoPlayer from "@/static/video-player.png";
 import photoIcon from "@/static/photo-icon.png";
@@ -103,7 +103,6 @@ const getFileList = async (data) => {
       v.type = 1;
       v.folderFileId = v.id;
     });
-
     return { data: { content: [...res.fileListAO.folderList, ...res.fileListAO.fileList], total: res.fileListAO.count } };
   } else if (selectType.value.type == "夸克网盘") {
     let res = await getQuarkFolder({ ...data, fid: routerParams.value.folderFileId }, selectMedia.value);
@@ -113,7 +112,7 @@ const getFileList = async (data) => {
       v.big_thumbnail ? (v.thumb = v.big_thumbnail) : "";
       v.folderFileId = v.fid;
     });
-    return { data: { content: res.data.list, total: res.data.list.length } };
+    return { data: { content: res.data.list, total: res.metadata._total } };
   }
 };
 
@@ -196,7 +195,7 @@ onLoad((options) => {
     uni.setNavigationBarTitle({
       title: arr[arr.length - 1],
     });
-  }, 0);
+  }, 40);
 });
 </script>
 
@@ -222,7 +221,9 @@ page {
     .list-item {
       &:first-child {
         .nut-cell {
-          border-radius: 24rpx 24rpx 0 0;
+          // border-radius: 24rpx 24rpx 0 0;
+          border-top-left-radius: 24rpx;
+          border-top-right-radius: 24rpx;
         }
       }
       .nut-cell {
@@ -280,7 +281,9 @@ page {
         }
       }
       .last-cell {
-        border-radius: 0 0 24rpx 24rpx;
+        // border-radius: 0 0 24rpx 24rpx;
+        border-bottom-right-radius: 24rpx;
+        border-bottom-left-radius: 24rpx;
         &::after {
           display: none;
         }

@@ -21,8 +21,8 @@
 
 <script setup>
 import { onBeforeMount, ref, reactive } from "vue";
-import wilForm from "@/components/wil-form/index.vue";
-import wilModal from "@/components/wil-modal/index.vue";
+import wilForm from "@/components/mobile/wil-form/index.vue";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
 import shareDialog from "../video/components/index-component/share-dialog.vue";
 import { parseM3UToArray, groupByGroupTitle } from "./common.js";
 import { getCutContent } from "@/utils/common";

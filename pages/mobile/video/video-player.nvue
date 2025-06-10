@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import wilNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
 import playerDetail from "./components/player-component/detail.nvue";
 import tvSelect from "./components/player-component/tv-select.nvue";
 import tvButton from "./components/player-component/tv-button.nvue";
@@ -272,7 +272,7 @@ export default {
           // this.config.url = res.data[0].download_url;
         } else {
           uni.showToast({
-            title: "请使用88vip以上的夸克网盘",
+            title: "不是88vip以上或者登录已过期",
             icon: "none",
           });
         }

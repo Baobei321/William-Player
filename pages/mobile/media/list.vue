@@ -31,14 +31,14 @@
   
   <script setup>
 import { onBeforeMount, reactive, ref, nextTick } from "vue";
-import baseCell from "@/components/wil-cell/index.vue";
+import baseCell from "@/components/mobile/wil-cell/index.vue";
 import Folder from "@/static/folder.png";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { getFolder, get189Folder, getQuarkFolder } from "@/utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
-import wilEmpty from "@/components/wil-empty/index.vue";
-import wilModal from "@/components/wil-modal/index.vue";
-import wilForm from "@/components/wil-form/index.vue";
+import wilEmpty from "@/components/mobile/wil-empty/index.vue";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
+import wilForm from "@/components/mobile/wil-form/index.vue";
 
 const date = ref("暂未更新");
 

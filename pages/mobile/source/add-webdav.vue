@@ -19,8 +19,8 @@
   
   <script setup>
 import { onBeforeMount, reactive, ref } from "vue";
-import wilForm from "@/components/wil-form/index.vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
+import wilForm from "@/components/mobile/wil-form/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { loginUser } from "@/utils/common";
 

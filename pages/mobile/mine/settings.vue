@@ -45,8 +45,8 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
 import { setTmdbKey } from "@/network/apis";
-import wilForm from "@/components/wil-form/index.vue";
-import wilModal from "@/components/wil-modal/index.vue";
+import wilForm from "@/components/mobile/wil-form/index.vue";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
 const settingData = ref({
   tmdbKey: "",
   showProgress: true,

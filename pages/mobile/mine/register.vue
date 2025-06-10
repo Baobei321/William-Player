@@ -25,8 +25,8 @@
   
   <script setup>
 import { onMounted, ref, watch } from "vue";
-import wilForm from "@/components/wil-form/index.vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
+import wilForm from "@/components/mobile/wil-form/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import checkIcon from "@/static/check.png";
 import checkActiveIcon from "@/static/check-active.png";
 import { registerUser, getWeUserByopenId, loginByPhone } from "@/network/apis";

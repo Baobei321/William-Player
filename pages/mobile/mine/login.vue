@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref } from "vue";
-import baseForm from "@/components/wil-form/index.vue";
+import baseForm from "@/components/mobile/wil-form/index.vue";
 import checkIcon from "@/static/check.png";
 import checkActiveIcon from "@/static/check-active.png";
 import { loginByPhone, getWeUserByopenId } from "@/network/apis";

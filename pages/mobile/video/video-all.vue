@@ -38,13 +38,13 @@
 </template>
 
 <script setup>
-import wilList from "@/components/wil-list/index.vue";
+import wilList from "@/components/mobile/wil-list/index.vue";
 import { ref, nextTick, onMounted } from "vue";
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
-import wilNavbar from "@/components/wil-navbar/index.vue";
-import wilModal from "@/components/wil-modal/index.vue";
-import wilEmpty from "@/components/wil-empty/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
+import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import sortPopover from "./components/index-component/sort-popover.vue";
 import { toStringfy } from "../mine/common";
 import { handleSeasonName, handleSecond, parseTime } from "@/utils/scrape.js";

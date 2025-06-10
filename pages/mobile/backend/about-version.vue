@@ -37,7 +37,7 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import wilUpgrade from "@/components/wil-upgrade/index.vue";
+import wilUpgrade from "@/components/mobile/wil-upgrade/index.vue";
 import { getUntokenDicts } from "@/network/apis";
 import appLogo from "@/static/app-logo1.png";
 import * as CONFIG from "@/utils/config";

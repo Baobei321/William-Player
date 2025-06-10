@@ -92,7 +92,7 @@ const get189Folder = (data, cookieInfo) => {
   })
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `${CONFIG.Folder189Url}&folderId=${data.folderId}`,
+      url: `${CONFIG.Folder189Url}&folderId=${data.folderId}&pageNum=${data.pageNum || 1}&pageSize=${data.pageSize || 1000}`,
       timeout: 3000,
       method: "GET",
       header: {
@@ -256,7 +256,7 @@ const getQuarkFolder = (data, cookieInfo) => {
   let cookieStr = cookieInfo.Cookie;
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}`,
+      url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}&_page=${data.pageNum || 1}&_size=${data.pageSize || 1000}`,
       timeout: 3000,
       method: "GET",
       header: {

@@ -47,8 +47,8 @@
 
 <script setup>
 import { ref } from "vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
-import wilEmpty from "@/components/wil-empty/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
+import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import movieLittle from "@/static/movie-little.png";
 import tvLittle from "@/static/tv-little.png";
 import { handleSeasonName } from "@/utils/scrape.js";

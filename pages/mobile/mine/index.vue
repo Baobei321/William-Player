@@ -45,9 +45,9 @@
 
 <script setup>
 import { ref } from "vue";
-import baseCell from "@/components/wil-cell/index.vue";
+import baseCell from "@/components/mobile/wil-cell/index.vue";
 import shareDialog from "../video/components/index-component/share-dialog.vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import userImg from "@/static/user-img.png";
 import * as CONFIG from "@/utils/config";
 import logOut from "@/static/log-out.png";
@@ -62,9 +62,9 @@ import iconAbout from "@/static/icon-about.png";
 import { onShow } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "./common";
 import { getCutContent } from "@/utils/common";
-import showModal from "@/components/wil-modal/modal.js";
-import wilModal from "@/components/wil-modal/index.vue";
-import wilImage from "@/components/wil-image/index.vue";
+import showModal from "@/components/mobile/wil-modal/modal.js";
+import wilModal from "@/components/mobile/wil-modal/index.vue";
+import wilImage from "@/components/mobile/wil-image/index.vue";
 // const { getUntokenDict } = useDict()
 
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY));

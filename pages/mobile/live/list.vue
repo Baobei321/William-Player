@@ -22,8 +22,8 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { parseM3UToArray, groupByGroupTitle } from "./common.js";
-import wilCategoryList from "@/components/wil-category-list/index.vue";
-import wilEmpty from "@/components/wil-empty/index.vue";
+import wilCategoryList from "@/components/mobile/wil-category-list/index.vue";
+import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 
 const listProps = ref({

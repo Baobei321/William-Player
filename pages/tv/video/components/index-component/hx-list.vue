@@ -157,7 +157,6 @@ defineExpose({
         .hxList-list-movie__item {
           margin-left: 24rpx;
           flex: 0 0 214rpx;
-          border: 4rpx solid transparent;
           image {
             object-fit: cover;
             width: 100%;

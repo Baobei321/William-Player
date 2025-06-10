@@ -103,7 +103,7 @@
 
 <script setup>
 import { onBeforeMount, ref, nextTick } from "vue";
-import wilNavbar from "@/components/wil-navbar/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import actorList from "./components/detail-component/actor-list.vue";
 import { useDict } from "@/utils/useDict";
 import { loginUser, getFolder, get189Folder, getQuarkFolder, getTvSeason, getMovieTvById } from "@/utils/common";

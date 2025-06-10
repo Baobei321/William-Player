@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import wilNavbar from "@/components/wil-navbar/navbar.nvue";
+import wilNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
 import { get189Folder, get189User } from "@/utils/common";
 import { addOperLog } from "@/network/apis";
 
