@@ -229,6 +229,15 @@ export default {
     reloadVideo() {
       this.showReload = false;
     },
+    setQuarkUrl(res, num) {
+      if (num == 5) return;
+      if (res.data.video_list[num].video_info?.url) {
+        this.config.url = res.data.video_list[num].video_info.url;
+      } else {
+        num++;
+        this.setQuarkUrl(res, num);
+      }
+    },
     async setUrl() {
       let res = await this.getVideoUrl();
       if (this.selectType.type == "WebDAV") {
@@ -271,10 +280,12 @@ export default {
           // addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: res.data[0].download_url });
           // this.config.url = res.data[0].download_url;
         } else {
+          let num = 1;
           uni.showToast({
             title: "不是88vip以上或者登录已过期",
             icon: "none",
           });
+          this.setQuarkUrl(res, num);
         }
       }
     },

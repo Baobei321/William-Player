@@ -38,7 +38,7 @@ const props = defineProps({
   }
 }
 .under-img {
-  height: 1000rpx;
+  height: 70%;
   position: absolute;
   width: 100%;
   z-index: 1;
@@ -61,6 +61,7 @@ const props = defineProps({
     background-size: 100% 100%;
     z-index: 1;
     opacity: 0;
+    mask-image: linear-gradient(to bottom, #020201 80%, rgba(0, 0, 0, 0) 100%);
   }
   .leave {
     animation: move0 0.35s ease forwards;

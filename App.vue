@@ -29,6 +29,9 @@ export default {
 .nut-button {
   border: none !important;
 }
+div {
+  box-sizing: border-box;
+}
 @media (prefers-color-scheme: dark) {
   .nut-popup {
     background: #272727 !important;

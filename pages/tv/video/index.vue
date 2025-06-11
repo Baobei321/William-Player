@@ -6,6 +6,7 @@
       <star-recommend @getStarList="getStarList" @change="changeSwiper"></star-recommend>
       <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" ref="hx_list" style="margin-top: 50rpx;"></hx-list>
       <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" ref="hx_list1"></hx-list>
+      <video-classify></video-classify>
     </tv-page>
   </div>
 </template>
@@ -16,6 +17,7 @@ import tvPage from "@/components/tv/tv-page/index.vue";
 import hxList from "./components/index-component/hx-list.vue";
 import tvNavbar from "./components/index-component/navbar.vue";
 import starRecommend from "./components/index-component/star-recommend.vue";
+import videoClassify from "./components/index-component/classify.vue";
 import underImg from "./components/index-component/under-img.vue";
 import * as CONFIG from "@/utils/config";
 
@@ -49,10 +51,12 @@ const changeSwiper = (index) => {
 page {
   width: 100%;
   height: 100%;
+  background: #020201;
 }
 .tv-index {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: #020201;
 }
 </style>

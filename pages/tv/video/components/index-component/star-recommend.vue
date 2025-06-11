@@ -1,6 +1,6 @@
 <template>
   <div class="star-recommend">
-    <wil-swiper :options="listData" :auto-play="3000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper">
+    <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper">
       <template #item="data">
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
@@ -105,13 +105,8 @@ onShow(() => {
 </script>
 
 <style lang="scss" scoped>
-@media (min-width: 700px) {
-  .star-recommend {
-    height: 1000rpx !important;
-  }
-}
 .star-recommend {
-  height: 1000rpx;
+  height: 70%;
   ::v-deep .wil-swiper {
     background: transparent;
     .nut-swiper {

@@ -477,8 +477,6 @@ const refresh189Video = async () => {
   let tv = groupBySource(movieTvData.value.tv);
   compareMovieTv(movie, "movie");
   compareMovieTv(tv, "tv");
-  console.log(movie, tv);
-
   await setMovieTvImg(movie, "movie")
     .then((res) => {
       localMovieTvData.value.movie = res;
@@ -789,11 +787,13 @@ onShow(async () => {
   }
   uni.removeStorageSync("secondPage");
   webdavInfo.value = uni.getStorageSync("webdavInfo");
+  const pages = getCurrentPages();
+  const prevPage = pages[pages.length - 2];
   if (selectType.value.type == "WebDAV") {
     handleGx();
   } else if (selectType.value.type == "天翼云盘") {
     let isreload = uni.getStorageSync("isreload");
-    if (isreload) {
+    if (isreload || prevPage == "pages/mobile/backend/data-sync") {
       uni.removeStorageSync("isreload");
       let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
       listData.value = [res.fileListAO];
@@ -806,7 +806,7 @@ onShow(async () => {
     }
   } else if (selectType.value.type == "夸克网盘") {
     let isreload = uni.getStorageSync("isreload");
-    if (isreload) {
+    if (isreload || prevPage == "pages/mobile/backend/data-sync") {
       uni.removeStorageSync("isreload");
       let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
       listData.value = [res.data];

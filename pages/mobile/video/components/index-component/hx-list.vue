@@ -85,9 +85,6 @@ const setEmptyImg = (poster) => {
 };
 
 onShow(() => {
-  let systemInfo = uni.getSystemInfoSync()
-  console.log(systemInfo,'systemInfo');
-  
   nextTick(() => {
     listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30);
     listData1.value.forEach((item) => {

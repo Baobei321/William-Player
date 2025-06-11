@@ -1,5 +1,5 @@
 <template>
-  <div class="hxList" ref="hx_list">
+  <div class="hxList" ref="hx_list" :style="{'--line-height':lineHeight}">
     <div class="hxList-title">
       <div class="hxList-title-left">{{ props.title }}</div>
       <!-- <div class="hxList-title-right" @click="toVideoAll">
@@ -37,6 +37,7 @@ const props = defineProps({
 });
 
 const tabIndex = ref(0);
+const lineHeight = ref("");
 
 const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30));
 listData1.value.forEach((item) => {
@@ -88,6 +89,14 @@ const setEmptyImg = (poster) => {
   }
 };
 
+const setItemWidth = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth;
+  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(320)) / 6) * 160) / 107 / scale + "rpx";
+};
+setItemWidth();
+
 onShow(() => {
   nextTick(() => {
     listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30);
@@ -116,6 +125,8 @@ defineExpose({
   width: 100%;
   margin-bottom: 50rpx;
   overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 0 80rpx;
   .hxList-title {
     display: flex;
     align-items: center;
@@ -153,15 +164,19 @@ defineExpose({
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-
+        width: 100%;
         .hxList-list-movie__item {
-          margin-left: 24rpx;
-          flex: 0 0 214rpx;
+          margin-left: 32rpx;
+          // flex: 0 0 214rpx;
+          flex: 0 0 calc((100% - 160rpx) / 6);
+          box-sizing: border-box;
           image {
             object-fit: cover;
             width: 100%;
-            height: 320rpx;
+            // height: 320rpx;
+            height: var(--line-height);
             border-radius: 20rpx;
+            box-sizing: border-box;
           }
           .hxList-list-movie__img-active {
             border: 6rpx solid #ff6701;
@@ -177,7 +192,7 @@ defineExpose({
           }
           &-time {
             font-size: 24rpx;
-            color: gray;
+            color: #c3c6cf;
             padding-top: 6rpx;
             display: block;
           }
