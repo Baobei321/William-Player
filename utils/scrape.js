@@ -23,6 +23,36 @@ const handleSecond = (val) => {
     }
     return time
 }
+//节流函数
+function throttle(func, delay) {
+    let lastTime = 0; // 记录上次执行时间戳
+    return function (...args) {
+        const now = Date.now();
+        // 首次触发或距离上次执行超过间隔时间 → 立即执行
+        if (now - lastTime >= delay) {
+            func.apply(this, args);
+            lastTime = now; // 更新执行时间戳
+        }
+    };
+}
+//防抖函数
+function debounce(fn, wait) {
+    let timer = null;
+    return function () {
+        let context = this,
+            args = [...arguments];
+
+        // 如果此时存在定时器的话，则取消之前的定时器重新记时
+        if (timer) {
+            clearTimeout(timer);
+            timer = null;
+        }
+        // 设置定时器，使事件间隔指定事件后执行
+        timer = setTimeout(() => {
+            fn.apply(context, args);
+        }, wait);
+    };
+}
 //处理时间，例如1:10:00和1小时10分钟返回分钟
 const parseTime = (timeStr) => {
     // 中文格式解析（如："1小时10分钟" 或 "50分钟"）
@@ -347,16 +377,16 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
                             if (!tvArr.find(j => j.path == parent.path)) {
                                 refreshData.found++;
                             }
-                            tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                            tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                         } else {
                             if (data.name.includes(handleSeasonName(parent.name))) {
                                 if (!tvArr.find(j => j.path == parent.path)) {
                                     refreshData.found++;
                                 }
-                                tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
+                                tvArr.push({ ...parent, createTime: dayjs(parent.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(parent.updated_at).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: extractSeasonNumber(data.name), seasonPath: parent.path + '/' + data.name });
                             } else {
                                 refreshData.found++;
-                                tvArr.push({ ...data,createTime: dayjs(data.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(data.updated_at).format('YYYY-MM-DD HH:mm:ss'),folderFileId: data.id, season: '1', seasonPath: data.path })
+                                tvArr.push({ ...data, createTime: dayjs(data.created_at).format('YYYY-MM-DD HH:mm:ss'), updateTime: dayjs(data.updated_at).format('YYYY-MM-DD HH:mm:ss'), folderFileId: data.id, season: '1', seasonPath: data.path })
                             }
                         }
                         return
@@ -389,6 +419,6 @@ let classifyList = [
     { id: "14", label: "奇幻", img: "https://wx1.sinaimg.cn/large/0079wuTAly1gx7yuc7wzyj30ty16ojx9.jpg", background: "linear-gradient(to bottom, #da243d, #dd626e)" },
 ]
 export {
-    handleSecond, parseTime, calTime, handleSeasonName, handleNameYear,
+    handleSecond, parseTime, throttle, debounce, calTime, handleSeasonName, handleNameYear,
     generateChineseNumberMapping, recursionMovie, recursionTv, classifyList
 }

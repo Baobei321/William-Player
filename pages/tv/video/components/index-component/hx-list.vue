@@ -2,47 +2,76 @@
   <div class="hxList" ref="hx_list" :style="{'--line-height':lineHeight}">
     <div class="hxList-title">
       <div class="hxList-title-left">{{ props.title }}</div>
-      <!-- <div class="hxList-title-right" @click="toVideoAll">
-        <span>全部</span>
-        <span>{{ props.listData.length }}</span>
-        <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
-      </div> -->
     </div>
     <div class="hxList-list">
-      <scroll-view class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
-        <div class="hxList-list-movie">
-          <div class="hxList-list-movie__item" v-for="(item,index) in listData1" :key="item.name" @click="toVideoDetail(item)">
-            <image :src="setEmptyImg(item.poster)" mode="aspectFill" :class="[tabIndex==index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
-            </image>
-            <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-            <span class="hxList-list-movie__item-time">{{ item.releaseTime||'暂无' }}</span>
-          </div>
+      <tv-scroll class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false" :scrollIntoView="scrollIntoView">
+        <div class="hxList-list-movie__item" v-for="(item,index) in listData1" :id="'name'+(index+1)" :key="item.name" @click="toVideoDetail(item)">
+          <image :src="setEmptyImg(item.poster)" mode="aspectFill" :class="[tabIndex==index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
+          </image>
+          <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
+          <span class="hxList-list-movie__item-time">{{ item.releaseTime||'暂无' }}</span>
         </div>
-      </scroll-view>
+      </tv-scroll>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, nextTick } from "vue";
-import emptyBg from "@/static/empty_bg.png";
+import { ref, nextTick, watch } from "vue";
 import posterEmpty from "@/static/poster-empty.png";
 import { onShow } from "@dcloudio/uni-app";
-import { handleSeasonName } from "@/utils/scrape";
+import { handleSeasonName, throttle, debounce } from "@/utils/scrape";
 import * as CONFIG from "@/utils/config";
+import tvScroll from "@/components/tv/tv-scroll/index.vue";
 
 const props = defineProps({
   title: { type: String, default: "电影" },
   number: { type: String, default: "0" },
   listData: { type: Array, default: [] },
+  isFocus: { type: Boolean, default: false },
+  focusModel: { type: String, default: "" },
 });
 
-const tabIndex = ref(0);
+const emits = defineEmits(["setFocus"]);
+
+const tabIndex = ref(-1);
 const lineHeight = ref("");
+const scrollIntoView = ref("");
 
 const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30));
 listData1.value.forEach((item) => {
   item.loadImg = true;
 });
+
+//获取上下的组件
+const getUpDown = (direction) => {
+  if (props.focusModel === "hxMovie") {
+    if (direction === "up") {
+      if (props.historyPlay.length) {
+        return "recentPlayed";
+      }
+      return "starRecommend";
+    } else {
+      let localMovieTvData = uni.getStorageSync("localMovieTvData");
+      if (localMovieTvData?.tv?.length) {
+        return "hxTv";
+      }
+      return "videoClassify";
+    }
+  } else if (props.focusModel === "hxTv") {
+    if (direction === "up") {
+      let localMovieTvData = uni.getStorageSync("localMovieTvData");
+      if (localMovieTvData?.movie?.length) {
+        return "hxMovie";
+      }
+      if (props.historyPlay.length) {
+        return "recentPlayed";
+      }
+      return "starRecommend";
+    } else {
+      return "videoClassify";
+    }
+  }
+};
 
 const removeExtension = (filename) => {
   let name = handleSeasonName(filename, true);
@@ -51,7 +80,7 @@ const removeExtension = (filename) => {
   }
   return name;
 };
-
+let nowTime = 0;
 const evtMove = (keyCode) => {
   if (keyCode === "KeyRight") {
     if (tabIndex.value != props.listData.length - 1) {
@@ -61,9 +90,31 @@ const evtMove = (keyCode) => {
     if (tabIndex.value > 0) {
       tabIndex.value--;
     }
+  } else if (keyCode === "KeyUp") {
+    emits("setFocus", getUpDown("up"));
+  } else if (keyCode === "KeyDown") {
+    emits("setFocus", getUpDown("down"));
   }
-  console.log(keyCode);
+  let time = Date.now();
+  if (time - nowTime > 300) {
+    if (tabIndex.value >= 3) {
+      scrollIntoView.value = "name" + (tabIndex.value - 1);
+    } else {
+      scrollIntoView.value = "name1";
+    }
+  } else {
+    setScrollIntoView();
+  }
+  nowTime = time;
 };
+
+const setScrollIntoView = debounce(() => {
+  if (tabIndex.value >= 3) {
+    scrollIntoView.value = "name" + (tabIndex.value - 1);
+  } else {
+    scrollIntoView.value = "name1";
+  }
+}, 300);
 
 const typeMapping = {
   "电影": "movie",
@@ -105,6 +156,17 @@ onShow(() => {
     });
   });
 });
+
+watch(
+  () => props.isFocus,
+  (val) => {
+    if (val) {
+      tabIndex.value = 0;
+    } else {
+      tabIndex.value = -1;
+    }
+  }
+);
 
 defineExpose({
   evtMove,
@@ -157,13 +219,13 @@ defineExpose({
   .hxList-list {
     margin-top: 24rpx;
 
-    .hxList-list-scroll {
+    ::v-deep .hxList-list-scroll {
       width: 100%;
-
-      .hxList-list-movie {
+      .uni-scroll-view-content {
         display: flex;
-        flex-wrap: nowrap;
+        flex-direction: row;
         align-items: center;
+        flex-wrap: nowrap;
         width: 100%;
         .hxList-list-movie__item {
           margin-left: 32rpx;
@@ -201,10 +263,6 @@ defineExpose({
             margin-left: 0;
           }
         }
-        .hxList-list-movie__active {
-          border: 4rpx solid red;
-        }
-
         .is-move {
           transition: transform 0.3s ease;
         }

@@ -1,6 +1,6 @@
 <template>
   <div class="star-recommend">
-    <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper">
+    <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper" ref="wil_swiper">
       <template #item="data">
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
@@ -15,7 +15,7 @@
                 <div class="left-info-genres">{{ data.genres }}</div>
               </div>
               <div class="left-desc">{{ data.overview }}</div>
-              <div class="left-button">
+              <div class="left-button" :style="{border:props.isFocus ? '6rpx solid #ff6701' : '6rpx solid #e9dfd3'}">
                 <image src="@/static/play-black.png"></image>
                 <span>立即观看</span>
               </div>
@@ -36,8 +36,12 @@ import { ref, onBeforeMount } from "vue";
 import { classifyList, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
-
-const emits = defineEmits(["getStarList", "change"]);
+const props = defineProps({
+  isFocus: { type: Boolean, default: true },
+  historyPlay: { type: Array, default: [] },
+});
+const emits = defineEmits(["getStarList", "change", "setFocus"]);
+const wil_swiper = ref(null);
 
 const listData = ref([]);
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
@@ -58,6 +62,34 @@ const toVideoDetail = (item) => {
 const changeSwiper = (index) => {
   emits("change", index);
 };
+
+const evtMove = (keyCode) => {
+  if (keyCode === "KeyRight") {
+    wil_swiper.value.next();
+  } else if (keyCode === "KeyLeft") {
+    wil_swiper.value.prev();
+  } else if (keyCode === "KeyUp") {
+    emits("setFocus", "tvNavbar");
+  } else if (keyCode === "KeyDown") {
+    let localMovieTvData = uni.getStorageSync("localMovieTvData");
+    if (props.historyPlay.length) {
+      emits("setFocus", "recentPlayed");
+      return;
+    }
+    if (localMovieTvData?.movie?.length) {
+      emits("setFocus", "hxMovie");
+      return;
+    }
+    if (localMovieTvData?.tv?.length) {
+      emits("setFocus", "hxTv");
+      return;
+    }
+  }
+};
+
+defineExpose({
+  evtMove,
+});
 
 onShow(() => {
   classifyList1.value = JSON.parse(JSON.stringify(classifyList));
@@ -106,7 +138,7 @@ onShow(() => {
 
 <style lang="scss" scoped>
 .star-recommend {
-  height: 70%;
+  height: 80%;
   ::v-deep .wil-swiper {
     background: transparent;
     .nut-swiper {
@@ -137,6 +169,7 @@ onShow(() => {
               align-items: flex-start;
 
               .left-name {
+                color: #fff;
                 font-size: 66rpx;
                 font-weight: bold;
                 width: 800rpx;
@@ -152,6 +185,7 @@ onShow(() => {
                 font-size: 28rpx;
                 font-weight: bold;
                 margin: 20rpx 0;
+                color: #fff;
                 .left-info-star {
                   display: flex;
                   align-items: center;

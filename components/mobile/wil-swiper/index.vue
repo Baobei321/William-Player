@@ -49,6 +49,20 @@ const isAllUnder = computed(() => {
     return item.underImg;
   });
 });
+const prev = () => {
+  nut_swiper.value.prev();
+};
+const next = () => {
+  nut_swiper.value.next();
+};
+const to = (index) => {
+  nut_swiper.value.to(index);
+};
+defineExpose({
+  prev,
+  next,
+  to,
+});
 </script>
   
   <style lang="scss" scoped>

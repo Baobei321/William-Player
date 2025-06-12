@@ -66,7 +66,7 @@ export default {
 			window.document.onkeydown = function(evt) {
 				evt = evt || window.event;
 				var KeyCode = evt.which || evt.keyCode;
-				code = KeyName[KeyCode];				
+				code = KeyName[KeyCode];		
 				evt.preventDefault();
 				if (code != undefined) {
 					document.getElementById("onClick").click();
@@ -76,7 +76,7 @@ export default {
 		},
 		methods: {
 			onClick(event, ownerInstance) {
-				event.preventDefault();
+				// event.preventDefault();
 				console.log(ownerInstance,'ownerInstance');
 				
 				ownerInstance.callMethod('keyCodeClick', code);

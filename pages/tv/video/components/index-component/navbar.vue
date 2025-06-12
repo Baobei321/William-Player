@@ -24,6 +24,10 @@ import { ref } from "vue";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { onUnload } from "@dcloudio/uni-app";
 
+const props = defineProps({
+  isFocus: { type: Boolean, default: false },
+});
+
 const tabsArr = ref(["影视", "直播"]);
 const activeTab = ref("影视");
 const nowTime = ref("");
@@ -102,7 +106,7 @@ onUnload(() => {
       width: 50rpx;
       height: 50rpx;
     }
-    span{
+    span {
       padding-left: 30rpx;
       color: #fff;
       font-weight: bold;

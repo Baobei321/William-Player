@@ -38,7 +38,7 @@ const props = defineProps({
   }
 }
 .under-img {
-  height: 70%;
+  height: 80%;
   position: absolute;
   width: 100%;
   z-index: 1;
