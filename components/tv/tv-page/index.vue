@@ -1,43 +1,47 @@
 <template>
-  <scroll-view scroll-y="true" :style="{height:windowHeight+'px'}" ref="page" :scroll-top="scrollTop" @scroll="scroll" class="tv-page">
-    <view @click="whole.onClick" id="onClick"></view>
-    <slot></slot>
-  </scroll-view>
+	<scroll-view scroll-y="true" :style="{ height: windowHeight + 'px' }" ref="page" :scroll-top="scrollTop"
+		:scroll-with-animation="true" @scroll="scroll" class="tv-page" :scrollTop="scrollTop">
+		<view @click="whole.onClick" id="onClick"></view>
+		<slot></slot>
+	</scroll-view>
 </template>
 
 <script>
 export default {
-  data() {
-    return {};
-  },
-  methods: {
-    keyCodeClick(keyCode) {
-      //   this.key = keyCode;
-      //   uni.$emit("keyDown", keyCode);
-      console.log(keyCode, "123");
-      this.$emit("keyCodeClick", keyCode);
-      switch (keyCode) {
-        case "KeyUp":
-          //   this.evtArrow("up");
-          break;
-        case "KeyDown":
-          //   this.evtArrow("down");
-          break;
-        case "KeyLeft":
-          //   this.evtArrow("left");
-          break;
-        case "KeyRight":
-          //   this.evtArrow("right");
-          break;
-        case "KeyEnter":
-          //   this.evtEnter();
-          break;
-        case "KeyBack":
-          //   this.evtBack();
-          break;
-      }
-    },
-  },
+	props: {
+		scrollTop: Number,
+	},
+	data() {
+		return {};
+	},
+	methods: {
+		keyCodeClick(keyCode) {
+			//   this.key = keyCode;
+			//   uni.$emit("keyDown", keyCode);
+			console.log(keyCode, "123");
+			this.$emit("keyCodeClick", keyCode);
+			switch (keyCode) {
+				case "KeyUp":
+					//   this.evtArrow("up");
+					break;
+				case "KeyDown":
+					//   this.evtArrow("down");
+					break;
+				case "KeyLeft":
+					//   this.evtArrow("left");
+					break;
+				case "KeyRight":
+					//   this.evtArrow("right");
+					break;
+				case "KeyEnter":
+					//   this.evtEnter();
+					break;
+				case "KeyBack":
+					//   this.evtBack();
+					break;
+			}
+		},
+	},
 };
 </script>
 <script module="whole" lang="renderjs">
@@ -85,9 +89,9 @@ export default {
 	}
 </script>
 <style scoped lang="scss">
-.tv-page{
-  width: 100%;
-  height: 100%;
-  overflow: auto;
+.tv-page {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
 }
 </style>

@@ -7,6 +7,7 @@ import { onShow, onUnload } from "@dcloudio/uni-app";
 import { chineseToPinYin } from "@/utils/pinyin.js";
 import * as CONFIG from "@/utils/config";
 import Folder from "@/static/folder.png";
+import webdavFileIcon from "@/static/webdav-fileIcon.png";
 
 export function useVideoIndex() {
     const video_navbar = ref(null);

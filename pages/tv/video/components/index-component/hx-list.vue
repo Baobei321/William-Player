@@ -1,22 +1,25 @@
 <template>
-  <div class="hxList" ref="hx_list" :style="{'--line-height':lineHeight}">
+  <div class="hxList" ref="hx_list" :style="{ '--line-height': lineHeight }">
     <div class="hxList-title">
       <div class="hxList-title-left">{{ props.title }}</div>
     </div>
     <div class="hxList-list">
-      <tv-scroll class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false" :scrollIntoView="scrollIntoView">
-        <div class="hxList-list-movie__item" v-for="(item,index) in listData1" :id="'name'+(index+1)" :key="item.name" @click="toVideoDetail(item)">
-          <image :src="setEmptyImg(item.poster)" mode="aspectFill" :class="[tabIndex==index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
+      <tv-scroll class="hxList-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false"
+        :scrollIntoView="scrollIntoView">
+        <div class="hxList-list-movie__item" v-for="(item, index) in listData1" :id="'name' + (index + 1)"
+          :key="item.name" @click="toVideoDetail(item)">
+          <image :src="setEmptyImg(item.poster)" mode="aspectFill"
+            :class="[props.title == '电影' ? 'hxList-list-movie__img-movie' : 'hxList-list-movie__img-tv', tabIndex == index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
           </image>
           <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-          <span class="hxList-list-movie__item-time">{{ item.releaseTime||'暂无' }}</span>
+          <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
         </div>
       </tv-scroll>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, nextTick, watch } from "vue";
+import { ref, nextTick, watch, onMounted } from "vue";
 import posterEmpty from "@/static/poster-empty.png";
 import { onShow } from "@dcloudio/uni-app";
 import { handleSeasonName, throttle, debounce } from "@/utils/scrape";
@@ -29,6 +32,8 @@ const props = defineProps({
   listData: { type: Array, default: [] },
   isFocus: { type: Boolean, default: false },
   focusModel: { type: String, default: "" },
+  historyPlay: { type: Array, default: [] },
+  offsetTop: { type: Number, default: 0 },
 });
 
 const emits = defineEmits(["setFocus"]);
@@ -36,6 +41,8 @@ const emits = defineEmits(["setFocus"]);
 const tabIndex = ref(-1);
 const lineHeight = ref("");
 const scrollIntoView = ref("");
+
+const scrollTop = ref(0)
 
 const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30));
 listData1.value.forEach((item) => {
@@ -91,9 +98,9 @@ const evtMove = (keyCode) => {
       tabIndex.value--;
     }
   } else if (keyCode === "KeyUp") {
-    emits("setFocus", getUpDown("up"));
+    emits("setFocus", getUpDown("up"), 'KeyUp');
   } else if (keyCode === "KeyDown") {
-    emits("setFocus", getUpDown("down"));
+    emits("setFocus", getUpDown("down"), 'KeyDown');
   }
   let time = Date.now();
   if (time - nowTime > 300) {
@@ -155,6 +162,31 @@ onShow(() => {
       item.loadImg = true;
     });
   });
+  setTimeout(() => {
+    let windowHeight = uni.getSystemInfoSync().windowHeight
+    const query = uni.createSelectorQuery();
+    if (props.title == '电影') {
+      query.select(".hxList-list-movie__img-movie").fields(
+        {
+          rect: true,
+          size: true,
+        },
+        (res) => {
+          scrollTop.value = (props.offsetTop + res.top - windowHeight / 2 + res.height / 2) < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
+        }
+      ).exec();
+    } else if (props.title == '电视剧') {
+      query.select(".hxList-list-movie__img-tv").fields(
+        {
+          rect: true,
+          size: true,
+        },
+        (res) => {
+          scrollTop.value = (props.offsetTop + res.top - windowHeight / 2 + res.height / 2) < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
+        }
+      ).exec();
+    }
+  }, 0);
 });
 
 watch(
@@ -168,8 +200,14 @@ watch(
   }
 );
 
+const getScrollTop = () => {
+  return scrollTop.value
+}
+
+
 defineExpose({
   evtMove,
+  getScrollTop
 });
 </script>
 <style lang="scss" scoped>
@@ -189,6 +227,7 @@ defineExpose({
   overflow-x: hidden;
   box-sizing: border-box;
   padding: 0 80rpx;
+
   .hxList-title {
     display: flex;
     align-items: center;
@@ -221,17 +260,20 @@ defineExpose({
 
     ::v-deep .hxList-list-scroll {
       width: 100%;
+
       .uni-scroll-view-content {
         display: flex;
         flex-direction: row;
         align-items: center;
         flex-wrap: nowrap;
         width: 100%;
+
         .hxList-list-movie__item {
           margin-left: 32rpx;
           // flex: 0 0 214rpx;
           flex: 0 0 calc((100% - 160rpx) / 6);
           box-sizing: border-box;
+
           image {
             object-fit: cover;
             width: 100%;
@@ -240,18 +282,22 @@ defineExpose({
             border-radius: 20rpx;
             box-sizing: border-box;
           }
+
           .hxList-list-movie__img-active {
             border: 6rpx solid #ff6701;
           }
+
           &-img {
             border: 6rpx solid transparent;
           }
+
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: #fff;
             display: block;
           }
+
           &-time {
             font-size: 24rpx;
             color: #c3c6cf;
@@ -263,6 +309,7 @@ defineExpose({
             margin-left: 0;
           }
         }
+
         .is-move {
           transition: transform 0.3s ease;
         }
@@ -274,6 +321,7 @@ defineExpose({
     }
   }
 }
+
 @media (prefers-color-scheme: dark) {
   .hxList {
     .hxList-title {
@@ -292,6 +340,7 @@ defineExpose({
         }
       }
     }
+
     .hxList-list {
       .hxList-list-scroll {
         .hxList-list-movie {
@@ -299,6 +348,7 @@ defineExpose({
             &-name {
               color: #fff;
             }
+
             &-time {
               color: rgb(154, 154, 154);
             }

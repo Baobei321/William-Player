@@ -1,11 +1,12 @@
 <template>
   <div class="star-recommend">
-    <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill" @change="changeSwiper" ref="wil_swiper">
+    <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill"
+      @change="changeSwiper" ref="wil_swiper">
       <template #item="data">
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
             <div class="swiper-content-left">
-              <div class="left-name">{{ handleSeasonName(data.name,true) }}</div>
+              <div class="left-name">{{ handleSeasonName(data.name, true) }}</div>
               <div class="left-info">
                 <div class="left-info-date">{{ data.releaseTime }}</div>
                 <div class="left-info-star">
@@ -15,13 +16,13 @@
                 <div class="left-info-genres">{{ data.genres }}</div>
               </div>
               <div class="left-desc">{{ data.overview }}</div>
-              <div class="left-button" :style="{border:props.isFocus ? '6rpx solid #ff6701' : '6rpx solid #e9dfd3'}">
+              <div class="left-button" :style="{ border: props.isFocus ? '6rpx solid #ff6701' : '6rpx solid #e9dfd3' }">
                 <image src="@/static/play-black.png"></image>
                 <span>立即观看</span>
               </div>
             </div>
             <div class="swiper-content-right">
-              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN+'/t/p/w300_and_h450_bestv2' + data.poster"></image>
+              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + data.poster"></image>
             </div>
           </div>
         </div>
@@ -69,26 +70,31 @@ const evtMove = (keyCode) => {
   } else if (keyCode === "KeyLeft") {
     wil_swiper.value.prev();
   } else if (keyCode === "KeyUp") {
-    emits("setFocus", "tvNavbar");
+    emits("setFocus", "tvNavbar", "KeyUp");
   } else if (keyCode === "KeyDown") {
     let localMovieTvData = uni.getStorageSync("localMovieTvData");
     if (props.historyPlay.length) {
-      emits("setFocus", "recentPlayed");
+      emits("setFocus", "recentPlayed", "KeyDown");
       return;
     }
     if (localMovieTvData?.movie?.length) {
-      emits("setFocus", "hxMovie");
+      emits("setFocus", "hxMovie", "KeyDown");
       return;
     }
     if (localMovieTvData?.tv?.length) {
-      emits("setFocus", "hxTv");
+      emits("setFocus", "hxTv", "KeyDown");
       return;
     }
   }
 };
 
+const getScrollTop = () => {
+  return 0
+}
+
 defineExpose({
   evtMove,
+  getScrollTop
 });
 
 onShow(() => {
@@ -139,8 +145,10 @@ onShow(() => {
 <style lang="scss" scoped>
 .star-recommend {
   height: 80%;
+
   ::v-deep .wil-swiper {
     background: transparent;
+
     .nut-swiper {
       .nut-swiper-inner {
         .nut-swiper-item {
@@ -149,6 +157,7 @@ onShow(() => {
             width: 100%;
             height: 100%;
             box-sizing: border-box;
+
             // padding: 140rpx 0 0 0;
             // background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
             .swiper-content-container {
@@ -159,6 +168,7 @@ onShow(() => {
               display: flex;
               align-items: center;
             }
+
             .swiper-content-left {
               flex: 1;
               overflow: hidden;
@@ -175,10 +185,12 @@ onShow(() => {
                 width: 800rpx;
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
-                -webkit-line-clamp: 2; /* 限制显示的行数 */
+                -webkit-line-clamp: 2;
+                /* 限制显示的行数 */
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
+
               .left-info {
                 display: flex;
                 align-items: center;
@@ -186,30 +198,36 @@ onShow(() => {
                 font-weight: bold;
                 margin: 20rpx 0;
                 color: #fff;
+
                 .left-info-star {
                   display: flex;
                   align-items: center;
                   margin-left: 50rpx;
+
                   image {
                     width: 30rpx;
                     height: 30rpx;
                   }
                 }
+
                 .left-info-genres {
                   font-size: 28rpx;
                   margin-left: 50rpx;
                 }
               }
+
               .left-desc {
                 font-size: 28rpx;
                 color: #a2a2a2;
                 font-weight: bold;
                 display: -webkit-box;
-                -webkit-line-clamp: 5; /* 限制行数（可调整） */
+                -webkit-line-clamp: 5;
+                /* 限制行数（可调整） */
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
+
               .left-button {
                 display: flex;
                 align-items: center;
@@ -218,10 +236,12 @@ onShow(() => {
                 padding: 20rpx 50rpx;
                 border-radius: 40rpx;
                 margin-top: 40rpx;
+
                 image {
                   width: 35rpx;
                   height: 35rpx;
                 }
+
                 span {
                   color: #372f28;
                   font-size: 28rpx;
@@ -229,11 +249,13 @@ onShow(() => {
                 }
               }
             }
+
             .swiper-content-right {
               flex: 0 0 385.2rpx;
               height: 540rpx;
               border-radius: 12rpx;
               margin-left: 200rpx;
+
               image {
                 width: 100%;
                 height: 100%;
