@@ -273,7 +273,6 @@ defineExpose({
           // flex: 0 0 214rpx;
           flex: 0 0 calc((100% - 160rpx) / 6);
           box-sizing: border-box;
-
           image {
             object-fit: cover;
             width: 100%;
@@ -282,15 +281,12 @@ defineExpose({
             border-radius: 20rpx;
             box-sizing: border-box;
           }
-
           .hxList-list-movie__img-active {
             border: 6rpx solid #ff6701;
           }
-
           &-img {
             border: 6rpx solid transparent;
           }
-
           &-name {
             font-size: 28rpx;
             font-weight: bold;
