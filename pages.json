@@ -154,6 +154,12 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },
+     {
+      "path": "pages/tv/video/video-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
     }
   ],
   "easycom": {

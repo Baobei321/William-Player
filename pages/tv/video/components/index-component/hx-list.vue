@@ -101,6 +101,8 @@ const evtMove = (keyCode) => {
     emits("setFocus", getUpDown("up"), 'KeyUp');
   } else if (keyCode === "KeyDown") {
     emits("setFocus", getUpDown("down"), 'KeyDown');
+  }else if(keyCode==='KeyEnter'){
+
   }
   let time = Date.now();
   if (time - nowTime > 300) {
@@ -129,7 +131,7 @@ const typeMapping = {
 };
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    url: `/pages/tv/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
 
