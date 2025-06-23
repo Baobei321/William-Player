@@ -1,28 +1,29 @@
 <template>
-    <div class="video-detail" :style="{ backgroundImage: `url(${imgData.img})` }">
-        <div class="video-detail-left">
-            <div class="left-title">{{ imgData.title }}</div>
-            <div class="left-info">
-                <div class="left-info-date">
-                    <image src="@/static/date-iconwhite.png"></image>
-                    <span>{{ imgData.releaseTime }}</span>
+    <tv-page @keyCodeClick="keyCodeClick">
+        <div class="video-detail" :style="{ backgroundImage: `url(${imgData.img})` }">
+            <div class="video-detail-left">
+                <div class="left-title">{{ imgData.title }}</div>
+                <div class="left-info">
+                    <div class="left-info-date">
+                        <image src="@/static/date-iconwhite.png"></image>
+                        <span>{{ imgData.releaseTime }}</span>
+                    </div>
+                    <div class="left-info-score">
+                        <image src="@/static/star-fill.png"></image>
+                        <span>{{ imgData.score }}</span>
+                    </div>
+                    <div class="left-info-runtime">{{ imgData.runtime }}</div>
                 </div>
-                <div class="left-info-score">
-                    <image src="@/static/star-fill.png"></image>
-                    <span>{{ imgData.score }}</span>
-                </div>
-                <div class="left-info-runtime">{{ imgData.runtime }}</div>
+                <div class="left-genres">{{ imgData.genres }}</div>
+                <div class="left-overview">{{ overview }}</div>
+                <operation-button ref="operation_button"></operation-button>
             </div>
-            <div class="left-genres">{{ imgData.genres }}</div>
-            <div class="left-overview">{{ overview }}</div>
-            <operation-button></operation-button>
         </div>
-    </div>
+    </tv-page>
 </template>
 
 <script setup>
 import { onBeforeMount, ref, nextTick } from "vue";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { useDict } from "@/utils/useDict";
 import { loginUser, getFolder, get189Folder, getQuarkFolder, getTvSeason, getMovieTvById } from "@/utils/common";
 import { parseTime, calTime, handleSecond, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
@@ -32,6 +33,7 @@ import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "@/pages/mobile/mine/common";
 import * as CONFIG from "@/utils/config";
 import operationButton from "./components/detail-component/operation-button.vue";
+import tvPage from "@/components/tv/tv-page/index.vue";
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -72,6 +74,10 @@ const scrollIntoView = ref("");
 
 const lineNumber = ref(2);
 const lineHeight = ref(0);
+
+const focusModel = ref('operationButton')
+const operation_button = ref(null)
+
 
 const toSelect = (item) => {
     if (item.text == "手动编辑") {
@@ -141,6 +147,14 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
     }
     uni.setStorageSync("localMovieTvData", localMovieTvData);
     showTimePicker.value = false;
+};
+
+const keyCodeClick = (keyCode) => {
+    if (!operation_button.value) return; //用于保证dom已加载完成
+    let mapping = {
+        "operationButton": operation_button.value,
+    };
+    mapping[focusModel.value].evtMove(keyCode);
 };
 
 //处理电视的详情和剧集等
@@ -850,6 +864,8 @@ page {
         padding: 30rpx 80rpx 30rpx 80rpx;
         box-sizing: border-box;
         background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 0) 100%);
+        display: flex;
+        flex-direction: column;
 
         .left-title {
             color: #fff;
