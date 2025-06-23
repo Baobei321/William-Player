@@ -4,7 +4,7 @@
       <div class="recent-played-title-left">最近观看</div>
       <div class="recent-played-title-right" @click="toVideoAll">
         <span>全部</span>
-        <span>{{ props.listData.length }}</span>
+        <span>{{ props.listData?.length }}</span>
         <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
       </div>
     </div>
@@ -168,7 +168,7 @@ onShow(() => {
 watch(
   () => props.listData,
   (val) => {
-    scrollData.value = [...props.listData];
+    scrollData.value = [...val];
     scrollData.value.forEach((item) => {
       item.loadImg = true;
     });
