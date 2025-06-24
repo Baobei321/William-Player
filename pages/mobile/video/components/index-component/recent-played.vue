@@ -9,21 +9,27 @@
       </div>
     </div>
     <div class="recent-played-list">
-      <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
+      <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
+        :showScrollbar="false">
         <div class="recent-played-list-movie">
-          <div class="recent-played-list-movie__item" v-for="item in scrollData" :key="item.name" @click="toVideoPlayer(item)">
+          <div class="recent-played-list-movie__item" v-for="item in scrollData" :key="item.name"
+            @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img">
-              <image :src="!props.isConnected&&!item.loadImg ? emptyBg : item.poster" @error="imgError(item)" @load="imgLoad(item)"
-                style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
+              <image :src="!props.isConnected && !item.loadImg ? emptyBg : setEmptyImg(item.poster)" @error="imgError(item)"
+                @load="imgLoad(item)" style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
               <span style="color: red;font-size: 30px;">
                 {{ item.loadImg }}
               </span>
               <image :src="playVideoButton" class="img-button" />
-              <span class="img-runtime">{{ handleSecond(item.initialTime)+'/'+ item.runtime }}</span>
-              <div class="img-process" :style="{width:Number(item.initialTime)/(Number(parseTime(item.runtime))*0.6)+'%'}"></div>
+              <span class="img-runtime">{{ handleSecond(item.initialTime) + '/' + (item.runtime || '00:00') }}</span>
+              <div class="img-process"
+                :style="{ width: item.runtime ? (Number(item.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%') : '0' }">
+              </div>
             </div>
-            <span class="recent-played-list-movie__item-name" v-if="item.type=='movie'">{{ handleSeasonName(removeExtension(item.name)) }}</span>
-            <span class="recent-played-list-movie__item-name" v-if="item.type=='tv'">{{ removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
+            <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{
+              handleSeasonName(removeExtension(item.name)) }}</span>
+            <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">{{
+              removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title || '第' + item.ji + '集'}`) }}</span>
           </div>
         </div>
       </scroll-view>
@@ -62,7 +68,13 @@ const judgeSelect = () => {
     }
   });
 };
-
+const setEmptyImg = (poster) => {
+  if (poster) {
+    return poster;
+  } else {
+    return emptyBg;
+  }
+};
 const removeExtension = (filename) => {
   const firstDotIndex = filename.indexOf(".");
   let name = firstDotIndex === -1 ? filename : filename.substring(0, firstDotIndex);
@@ -181,6 +193,7 @@ watch(
 .recent-played {
   width: 100%;
   margin-bottom: 50rpx;
+
   .recent-played-title {
     display: flex;
     align-items: center;
@@ -207,6 +220,7 @@ watch(
       }
     }
   }
+
   .recent-played-list {
     margin-top: 24rpx;
 
@@ -218,9 +232,11 @@ watch(
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
+
         .recent-played-list-movie__item {
           margin-left: 24rpx;
           flex: 0 0 520rpx;
+
           .recent-played-list-movie__item-img {
             background-position: center;
             background-repeat: no-repeat;
@@ -230,6 +246,7 @@ watch(
             border-radius: 20rpx;
             position: relative;
             overflow: hidden;
+
             .img-button {
               width: 80rpx;
               height: 80rpx;
@@ -239,6 +256,7 @@ watch(
               transform: translate(-50%, -50%);
               object-fit: cover;
             }
+
             .img-runtime {
               position: absolute;
               right: 10rpx;
@@ -249,6 +267,7 @@ watch(
               border-radius: 8rpx;
               padding: 4rpx 8rpx;
             }
+
             .img-process {
               height: 7rpx;
               background: #ff6701;
@@ -257,11 +276,13 @@ watch(
               left: 0;
             }
           }
+
           &-name {
             font-size: 28rpx;
             font-weight: bold;
             color: #000;
           }
+
           &:first-child {
             margin-left: 0;
           }
@@ -270,18 +291,21 @@ watch(
     }
   }
 }
+
 @media (prefers-color-scheme: dark) {
   .recent-played {
     .recent-played-title {
       .recent-played-title-left {
         color: #fff;
       }
+
       .recent-played-title-right {
         span {
           color: rgb(154, 154, 154);
         }
       }
     }
+
     .recent-played-list {
       .recent-played-list-scroll {
         .recent-played-list-movie {

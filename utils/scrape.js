@@ -55,6 +55,7 @@ function debounce(fn, wait) {
 }
 //处理时间，例如1:10:00和1小时10分钟返回分钟
 const parseTime = (timeStr) => {
+    if(!timeStr) return 0
     // 中文格式解析（如："1小时10分钟" 或 "50分钟"）
     if (timeStr.includes('小时') || timeStr.includes('分钟')) {
         const cnRegex = /(\d+)小时?(\d+)?分钟?/;
