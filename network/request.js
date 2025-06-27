@@ -120,20 +120,22 @@ export default (params) => {
         // let res = await loginByPhone({ phone: userPassword.phone, password: encrypt(userPassword.password) });
         // uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
         // getUserByopenId();
-        if (err.errMsg.indexOf('request:fail') !== -1) {
-          if (noToastUrl.indexOf(params.url) < 0) {
-            uni.showToast({
-              title: '网络异常',
-              icon: "error",
-              duration: 2000
-            })
-          }
-        } else {
-          uni.showToast({
-            title: '未知异常',
-            duration: 2000
-          })
-        }
+
+        
+        // if (err.errMsg.indexOf('request:fail') !== -1) {
+        //   if (noToastUrl.indexOf(params.url) < 0) {
+        //     uni.showToast({
+        //       title: '网络异常',
+        //       icon: "error",
+        //       duration: 2000
+        //     })
+        //   }
+        // } else {
+        //   uni.showToast({
+        //     title: '未知异常',
+        //     duration: 2000
+        //   })
+        // }
         reject(err);
       },
       complete() {
