@@ -7,16 +7,16 @@
             <nut-icon name="search" custom-color="#000"></nut-icon>
           </template>
           <template #rightout>
-            <span :style="{color:searchValue?'#315ffd':'#d0d0d0'}" @click="toSearch">搜索</span>
+            <span :style="{ color: searchValue ? '#315ffd' : '#d0d0d0' }" @click="toSearch">搜索</span>
           </template>
         </nut-searchbar>
       </template>
     </wil-navbar>
     <div class="video-search-list" v-if="listData.length">
       <div class="video-search-list__item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)">
-        <div class="item-left" :style="{backgroundImage:`url(${setEmptyImg(item.poster)})`}">
-          <div :class="['item-left-logo',item.type=='1'?'item-left-tv':'']">
-            <template v-if="item.type=='1'">
+        <div class="item-left" :style="{ backgroundImage: `url(${setEmptyImg(item.poster)})` }">
+          <div :class="['item-left-logo', item.type == '1' ? 'item-left-tv' : '']">
+            <template v-if="item.type == '1'">
               <image :src="tvLittle" />
               <span>电视剧</span>
             </template>
@@ -28,7 +28,8 @@
         </div>
         <div class="item-right">
           <div class="item-right-name">
-            <span v-for="second in handleName(item.name)" :key="second" :style="{color:second.color}">{{ second.label }}</span>
+            <span v-for="second in handleName(item.name)" :key="second" :style="{ color: second.color }">{{ second.label
+              }}</span>
           </div>
           <div class="item-right-content">
             <div class="item-right-content__date">
@@ -36,7 +37,7 @@
               <span>{{ item.releaseTime }}</span>
             </div>
             <div class="item-right-content__line"></div>
-            <div class="item-right-content__type">{{ item.type=='1'?'电视剧':'电影' }}</div>
+            <div class="item-right-content__type">{{ item.type == '1' ? '电视剧' : '电影' }}</div>
           </div>
         </div>
       </div>
@@ -94,7 +95,7 @@ const setEmptyImg = (poster) => {
 
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-detail?path=${item.path}&name=${item.name}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
 </script>
@@ -104,35 +105,44 @@ page {
   width: 100%;
   height: 100%;
 }
+
 .video-search {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+
   ::v-deep .wil-navbar {
     background: #fff;
+
     .nut-navbar {
       padding-right: 0;
+
       .nut-navbar__title {
         margin: 0 0 0 20rpx;
         flex: 1;
         max-width: 100%;
+
         .nut-searchbar {
           .nut-searchbar__search-input {
             border-radius: 12rpx;
             align-items: center;
             overflow: hidden;
+
             .nut-searchbar__input-bar {
               color: #000;
               min-height: 0;
             }
           }
+
           .nut-searchbar__search-icon {
             margin-top: -6rpx;
+
             span {
               font-size: 30rpx;
             }
           }
+
           .nut-searchbar__right-search-icon {
             margin-top: 0;
             white-space: nowrap;
@@ -141,14 +151,17 @@ page {
       }
     }
   }
+
   .video-search-list {
     padding: 24rpx 24rpx 68rpx 24rpx;
     flex: 1;
     overflow: auto;
+
     .video-search-list__item {
       display: flex;
       align-items: center;
       margin-top: 30rpx;
+
       .item-left {
         width: 140rpx;
         height: 220rpx;
@@ -157,6 +170,7 @@ page {
         background-size: cover;
         border-radius: 16rpx;
         position: relative;
+
         .item-left-logo {
           display: inline-flex;
           align-items: center;
@@ -166,22 +180,27 @@ page {
           position: absolute;
           top: 0;
           left: 0;
+
           image {
             width: 24rpx;
             height: 24rpx;
           }
+
           span {
             font-size: 22rpx;
             color: #fff;
             padding-left: 4rpx;
           }
         }
+
         .item-left-tv {
           background: #315bfd;
         }
       }
+
       .item-right {
         margin-left: 20rpx;
+
         .item-right-name {
           display: flex;
           align-items: baseline;
@@ -189,19 +208,23 @@ page {
           color: #000;
           font-weight: bold;
         }
+
         .item-right-content {
           display: flex;
           align-items: center;
           color: #7a787b;
           font-size: 28rpx;
           margin-top: 20rpx;
+
           .item-right-content__date {
             display: flex;
             align-items: center;
+
             span {
               padding-left: 10rpx;
             }
           }
+
           .item-right-content__line {
             height: 28rpx;
             width: 2rpx;
@@ -210,28 +233,35 @@ page {
           }
         }
       }
+
       &:first-child {
         margin-top: 0;
       }
     }
   }
 }
+
 @media (prefers-color-scheme: dark) {
   .video-search {
     ::v-deep .wil-navbar {
       background-color: #1e1e20;
+
       .nut-navbar {
         background: #1e1e20;
+
         .nut-navbar__title {
           .nut-searchbar {
             background: #1e1e20;
+
             .nut-searchbar__search-input {
               background: #2f2f2f;
+
               .nut-searchbar__search-icon {
                 .nut-icon-search {
                   color: #606060 !important;
                 }
               }
+
               .nut-searchbar__input-inner {
                 .nut-searchbar__input-form {
                   .uni-input-input {
@@ -244,14 +274,17 @@ page {
         }
       }
     }
+
     .video-search-list {
       .video-search-list__item {
         .item-right {
           .item-right-name {
             color: #fff;
           }
+
           .item-right-content {
             color: #b9b9b9;
+
             .item-right-content__line {
               background: #b9b9b9;
             }

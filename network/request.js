@@ -34,7 +34,7 @@ export default (params) => {
       method: method,
       header: header,
       data: data,
-      timeout: noToastUrl.indexOf(url) > -1 ? 1000 : timeout,
+      timeout: noToastUrl.indexOf(url) > -1 ? 8000 : timeout,
       success: async (response) => {
         const res = response
         // 根据返回的状态码做出对应的操作

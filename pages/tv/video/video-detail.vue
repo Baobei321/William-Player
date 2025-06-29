@@ -1,7 +1,8 @@
 <template>
     <tv-page @keyCodeClick="keyCodeClick">
         <div class="video-detail" :style="{ backgroundImage: `url(${imgData.img})` }">
-            <div class="video-detail-left">
+            <div class="video-detail-left"
+                :style="{ background: showRightPopup ? 'rgba(0,0,0,0.4)' : 'linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 0) 100%)' }">
                 <div class="left-title">{{ imgData.title }}</div>
                 <div class="left-info">
                     <div class="left-info-date">
@@ -16,7 +17,13 @@
                 </div>
                 <div class="left-genres">{{ imgData.genres }}</div>
                 <div class="left-overview">{{ overview }}</div>
-                <operation-button ref="operation_button"></operation-button>
+                <operation-button ref="operation_button" :focusModel="focusModel" @openPopup="openPopup"></operation-button>
+            </div>
+            <div class="video-detail-right"
+                :style="{ backgroundColor: showRightPopup ? 'rgba(0,0,0,0.4)' : 'transparent' }">
+                <nut-popup v-model:visible="showRightPopup" :overlay="false">
+                    <cloud-list :list="sourceList"></cloud-list>
+                </nut-popup>
             </div>
         </div>
     </tv-page>
@@ -34,6 +41,7 @@ import { toStringfy } from "@/pages/mobile/mine/common";
 import * as CONFIG from "@/utils/config";
 import operationButton from "./components/detail-component/operation-button.vue";
 import tvPage from "@/components/tv/tv-page/index.vue";
+import cloudList from "./components/detail-component/cloud-list.vue";
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -77,6 +85,7 @@ const lineHeight = ref(0);
 
 const focusModel = ref('operationButton')
 const operation_button = ref(null)
+const showRightPopup = ref(false)
 
 
 const toSelect = (item) => {
@@ -738,6 +747,11 @@ const setItemWidth = () => {
 };
 setItemWidth();
 
+const openPopup=()=>{
+    showRightPopup.value=true
+    focusModel.value = 'popup'
+}
+
 onBeforeMount(async () => {
     judgeSelect();
     // historyPlay.value = uni.getStorageSync('historyPlay') || []
@@ -933,6 +947,19 @@ page {
             overflow: hidden;
             text-overflow: ellipsis;
             color: #c2c5c6;
+        }
+    }
+
+    .video-detail-right {
+        flex: 1;
+        height: 100%;
+        position: relative;
+        ::v-deep .nut-popup{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: transparent !important;
+            padding: 40rpx;
         }
     }
 }
