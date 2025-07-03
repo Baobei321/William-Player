@@ -8,7 +8,6 @@ node_modules/
 /idea/
 .vscode/
 /unpackage/
-/utils/config.js
 .hbuilderx/launch.json
 .project.config.json
 .project.private.config.json
