@@ -1,12 +1,12 @@
 <template>
-    <div class="cloud-list">
+    <div class="season-list">
         <tv-scroll :scroll-y="true" style="width: 100%;height: 100%;" :enhanced="true" :showScrollbar="false"
             :scrollIntoView="scrollIntoView">
-            <div class="cloud-list-item" v-for="(item, index) in props.list" :key="item.provider + item.name"
-                :class="[tabIndex === index ? 'cloud-list-active' : '']" :id="'name' + (index + 1)">
-                <image src="@/static/wangpan-black.png" v-if="tabIndex === index"></image>
-                <image src="@/static/wangpan-gray.png" v-else></image>
-                <span>{{ item.sourceName }}</span>
+            <div class="season-list-item" v-for="(item, index) in props.list" :key="item.season"
+                :class="[tabIndex === index ? 'season-list-active' : '']" :id="'name' + (index + 1)">
+                <image src="@/static/season-black.png" v-if="tabIndex === index"></image>
+                <image src="@/static/season-gray.png" v-else></image>
+                <span>{{ item.name }}</span>
             </div>
         </tv-scroll>
     </div>
@@ -69,11 +69,11 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.cloud-list {
+.season-list {
     width: 100%;
     height: 100%;
 
-    .cloud-list-item {
+    .season-list-item {
         display: flex;
         align-items: center;
         background: transparent;
@@ -93,7 +93,7 @@ defineExpose({
         }
     }
 
-    .cloud-list-active {
+    .season-list-active {
         background: #e5e6ec;
 
         span {

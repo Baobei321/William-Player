@@ -17,12 +17,15 @@
                 </div>
                 <div class="left-genres">{{ imgData.genres }}</div>
                 <div class="left-overview">{{ overview }}</div>
-                <operation-button ref="operation_button" :focusModel="focusModel" @openPopup="openPopup"></operation-button>
+                <operation-button ref="operation_button" :focusModel="focusModel"
+                    @openPopup="openPopup"></operation-button>
             </div>
             <div class="video-detail-right"
                 :style="{ backgroundColor: showRightPopup ? 'rgba(0,0,0,0.4)' : 'transparent' }">
-                <nut-popup v-model:visible="showRightPopup" :overlay="false">
-                    <cloud-list :list="sourceList"></cloud-list>
+                <nut-popup v-model:visible="showRightPopup" :overlay="false" position="right">
+                    <cloud-list :list="sourceList" @backLeft="backLeft" ref="cloud_list"
+                        v-if="focusModel === 'cloudList'"></cloud-list>
+                    <season-list :list="selectSource.seasonArr" v-if="focusModel === 'seasonList'" ref="season_list"></season-list>
                 </nut-popup>
             </div>
         </div>
@@ -42,6 +45,7 @@ import * as CONFIG from "@/utils/config";
 import operationButton from "./components/detail-component/operation-button.vue";
 import tvPage from "@/components/tv/tv-page/index.vue";
 import cloudList from "./components/detail-component/cloud-list.vue";
+import seasonList from "./components/detail-component/season-list.vue";
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -85,6 +89,8 @@ const lineHeight = ref(0);
 
 const focusModel = ref('operationButton')
 const operation_button = ref(null)
+const cloud_list = ref(null)
+const season_list = ref(null)
 const showRightPopup = ref(false)
 
 
@@ -162,6 +168,8 @@ const keyCodeClick = (keyCode) => {
     if (!operation_button.value) return; //用于保证dom已加载完成
     let mapping = {
         "operationButton": operation_button.value,
+        "cloudList": cloud_list.value,
+        "seasonList": season_list.value,
     };
     mapping[focusModel.value].evtMove(keyCode);
 };
@@ -747,9 +755,16 @@ const setItemWidth = () => {
 };
 setItemWidth();
 
-const openPopup=()=>{
-    showRightPopup.value=true
-    focusModel.value = 'popup'
+//打开右侧弹窗
+const openPopup = (val) => {
+    showRightPopup.value = true
+    focusModel.value = val
+}
+
+//回到左侧按钮
+const backLeft = () => {
+    showRightPopup.value = false
+    focusModel.value = 'operationButton'
 }
 
 onBeforeMount(async () => {
@@ -954,7 +969,8 @@ page {
         flex: 1;
         height: 100%;
         position: relative;
-        ::v-deep .nut-popup{
+
+        ::v-deep .nut-popup {
             width: 100%;
             height: 100%;
             position: absolute;

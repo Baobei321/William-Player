@@ -2,7 +2,8 @@
     <div class="operation-button">
         <div class="operation-button-play"
             :class="[props.focusModel === 'operationButton' && activeButton === 'play' ? 'operation-button-active' : '']">
-            <image src="@/static/play-black.png" v-if="props.focusModel === 'operationButton' && activeButton === 'play'">
+            <image src="@/static/play-black.png"
+                v-if="props.focusModel === 'operationButton' && activeButton === 'play'">
             </image>
             <image src="@/static/play-gray.png" v-else></image>
             <div class="operation-button-play__text">
@@ -63,6 +64,14 @@ let tvButtonArr = ['play', 'source', 'season', 'tvlist', 'actor', 'more']
 let movieButtonArr = ['play', 'source', 'actor', 'more']
 let buttonArr = props.type === 'tv' ? tvButtonArr : movieButtonArr
 
+const mapping = {
+    'source': 'cloudList',
+    'season': 'seasonList',
+    'tvList': 'tvList',
+    'actor': 'actorList',
+    'more': 'more'
+}
+
 const evtMove = (keyCode) => {
     if (keyCode === "KeyUp") {
         let index = buttonArr.findIndex(i => i === activeButton.value)
@@ -71,17 +80,13 @@ const evtMove = (keyCode) => {
         }
     } else if (keyCode === "KeyDown") {
         let index = buttonArr.findIndex(i => i === activeButton.value)
-        console.log(index, 'index');
-
         if (index < buttonArr.length - 1) {
             activeButton.value = buttonArr[index + 1]
         }
-        console.log(activeButton.value, 'active.value');
-
     } else if (keyCode === 'KeyEnter') {
-        if (activeButton.value === 'play') {
+        if (activeButton.value === 'play') { //跳转到视频播放页面
         } else {
-            emits('openPopup', true)
+            emits('openPopup', mapping[activeButton.value])
         }
     }
 };
