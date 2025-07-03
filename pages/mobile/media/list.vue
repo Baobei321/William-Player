@@ -74,6 +74,7 @@ const loginUser = () => {
       header: { "Content-Type": "application/json" },
       success: (res) => {
         uni.setStorageSync("webdavInfo", { ...selectMedia.value, token: res.data.data.token });
+        selectMedia.value.token = res.data.data.token
         resolve(res.data);
       },
     });

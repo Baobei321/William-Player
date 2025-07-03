@@ -22,7 +22,7 @@
         <div class="mine-loged__left">
           <div class="left-img">
             <wil-image backgroundColor="#efefef"
-              :src="userInfo.avatar||'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
+              :src="userInfo.avatar || 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
             </wil-image>
           </div>
           <div class="left-info">
@@ -34,8 +34,10 @@
         </div>
       </div>
       <div class="mine-cell">
-        <base-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell" @toLogin="openLoginPopup"></base-cell>
-        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization&&userInfo.phonenumber != '19994658532'"></base-cell>
+        <base-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell"
+          @toLogin="openLoginPopup"></base-cell>
+        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell"
+          v-if="Authorization && userInfo.phonenumber != '19994658532'"></base-cell>
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
@@ -147,10 +149,24 @@ const openUrl = () => {
           url: `/pages/mobile/backend/index?url=${res.result}`,
         });
       } else {
-        uni.showToast({
-          title: "不是网页地址，无法打开",
-          icon: "none",
-        });
+        let result = JSON.parse(res.result)
+        if (result.type == "dataSync") {
+          let obj = {
+            localMovieTvData: uni.getStorageSync("localMovieTvData"),
+            sourceList: uni.getStorageSync("sourceList"),
+            historyPlay: uni.getStorageSync("historyPlay"),
+          };
+          await setShareData({ port: result.port, data: obj });
+          uni.showToast({
+            title: "同步成功",
+            icon: "none",
+          });
+        } else {
+          uni.showToast({
+            title: "扫描此二维码无效",
+            icon: "none",
+          });
+        }
       }
     },
   });
@@ -250,6 +266,7 @@ page {
   flex-direction: column;
   position: relative;
   box-sizing: border-box;
+
   ::v-deep .wil-navbar {
     .nut-navbar {
       .nut-navbar__right {
@@ -288,14 +305,17 @@ page {
         flex: 0 0 136rpx;
         border-radius: 50%;
       }
+
       .mine-notLog__left-info {
         padding-left: 24rpx;
+
         span:first-child {
           display: block;
           font-size: 32rpx;
           color: #353a45;
           font-weight: bold;
         }
+
         span:last-child {
           display: block;
           font-size: 24rpx;
@@ -320,6 +340,7 @@ page {
     align-items: center;
     // margin-top: 34rpx;
     margin-top: 0;
+
     &__left {
       display: flex;
       align-items: center;
@@ -398,13 +419,16 @@ page {
 @media (prefers-color-scheme: dark) {
   .mine {
     background: #1e1e20;
+
     .mine-notLog {
       background-color: #2f2f2f;
+
       .mine-notLog__left {
         .mine-notLog__left-info {
           span:first-child {
             color: #fff;
           }
+
           span:last-child {
             color: gray;
           }
@@ -414,6 +438,7 @@ page {
 
     &-loged {
       background-color: #2f2f2f;
+
       &__left {
         display: flex;
 
@@ -421,6 +446,7 @@ page {
           .left-info-name {
             color: #fff;
           }
+
           .left-info-phone {
             color: #86909c;
           }
