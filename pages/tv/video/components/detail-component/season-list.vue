@@ -38,10 +38,7 @@ const evtMove = (keyCode) => {
     } else if (keyCode === "KeyLeft") {
         emits('backLeft')
     } else if (keyCode === 'KeyEnter') {
-        if (activeButton.value === 'play') {
-        } else {
-            emits('openPopup', true)
-        }
+        emits('openPopup', true)
     }
     let time = Date.now();
     if (time - nowTime > 300) {

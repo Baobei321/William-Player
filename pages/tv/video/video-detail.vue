@@ -24,8 +24,13 @@
                 :style="{ backgroundColor: showRightPopup ? 'rgba(0,0,0,0.4)' : 'transparent' }">
                 <nut-popup v-model:visible="showRightPopup" :overlay="false" position="right">
                     <cloud-list :list="sourceList" @backLeft="backLeft" ref="cloud_list"
-                        v-if="focusModel === 'cloudList'"></cloud-list>
-                    <season-list :list="selectSource.seasonArr" v-if="focusModel === 'seasonList'" ref="season_list"></season-list>
+                        v-if="focusModel === 'cloudList'">
+                    </cloud-list>
+                    <season-list :list="selectSource.seasonArr" @backLeft="backLeft" v-if="focusModel === 'seasonList'"
+                        ref="season_list">
+                    </season-list>
+                    <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft">
+                    </tv-listd>
                 </nut-popup>
             </div>
         </div>
@@ -46,6 +51,7 @@ import operationButton from "./components/detail-component/operation-button.vue"
 import tvPage from "@/components/tv/tv-page/index.vue";
 import cloudList from "./components/detail-component/cloud-list.vue";
 import seasonList from "./components/detail-component/season-list.vue";
+import tvListd from "./components/detail-component/tv-list.vue"
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -91,6 +97,7 @@ const focusModel = ref('operationButton')
 const operation_button = ref(null)
 const cloud_list = ref(null)
 const season_list = ref(null)
+const tv_list = ref(null)
 const showRightPopup = ref(false)
 
 
@@ -170,6 +177,7 @@ const keyCodeClick = (keyCode) => {
         "operationButton": operation_button.value,
         "cloudList": cloud_list.value,
         "seasonList": season_list.value,
+        "tvList": tv_list.value
     };
     mapping[focusModel.value].evtMove(keyCode);
 };
@@ -349,6 +357,7 @@ const handleTv = async (seasonData1 = null) => {
             v.title = res1.episodes[vindex]?.name || "暂无标题";
             v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
             v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
+            v.overview = res1.episodes[vindex]?.overview || "暂无简介";
         } else {
             v.title = `第${vindex + 1}集`;
         }

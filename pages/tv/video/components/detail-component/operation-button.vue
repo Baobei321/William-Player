@@ -67,7 +67,7 @@ let buttonArr = props.type === 'tv' ? tvButtonArr : movieButtonArr
 const mapping = {
     'source': 'cloudList',
     'season': 'seasonList',
-    'tvList': 'tvList',
+    'tvlist': 'tvList',
     'actor': 'actorList',
     'more': 'more'
 }
