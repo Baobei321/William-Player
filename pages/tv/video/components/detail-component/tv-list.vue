@@ -4,7 +4,7 @@
             :scrollIntoView="scrollIntoView">
             <div :class="['tv-list-item', tabIndex === index ? 'tv-list-active' : '']"
                 v-for="(item, index) in props.list" :key="item.id" :id="'name' + (index + 1)">
-                <image :src="item.poster"></image>
+                <image :src="item.poster" mode="aspectFill"></image>
                 <div class="item-right">
                     <div class="item-right-name">
                         {{ item.title ? `第${index + 1}集 ${item.title}` : `第${index + 1}集` }}

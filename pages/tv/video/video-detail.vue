@@ -31,6 +31,7 @@
                     </season-list>
                     <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft">
                     </tv-listd>
+                    <actor-list :routerParams="routerParams" ref="actor_list" v-if="focusModel === 'actorList'" @backLeft="backLeft"></actor-list>
                 </nut-popup>
             </div>
         </div>
@@ -52,6 +53,7 @@ import tvPage from "@/components/tv/tv-page/index.vue";
 import cloudList from "./components/detail-component/cloud-list.vue";
 import seasonList from "./components/detail-component/season-list.vue";
 import tvListd from "./components/detail-component/tv-list.vue"
+import actorList from "./components/detail-component/actor-list.vue";
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -177,7 +179,8 @@ const keyCodeClick = (keyCode) => {
         "operationButton": operation_button.value,
         "cloudList": cloud_list.value,
         "seasonList": season_list.value,
-        "tvList": tv_list.value
+        "tvList": tv_list.value,
+        "actorList": actor_list.value
     };
     mapping[focusModel.value].evtMove(keyCode);
 };
