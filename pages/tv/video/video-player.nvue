@@ -1,0 +1,634 @@
+<template>
+  <view class="video-player">
+    <view class="video-player-container" :style="{height:videoHeight,flex:`0 0 ${videoHeight}`}">
+      <view :style="{width:'750rpx',height:videoHeight,background:'#000',position:'relative'}" v-if="plateForm=='android'&&uniPlatform=='app'">
+        <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type=='tv'" :title="config.title" :url="config.url"
+          :showProgress="settingData.showProgress" :showPre="this.historyObj.ji>1" :showNext="this.historyObj.ji<tvList.length" @timeupdate="setHistory"
+          @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo" @getorientation="getOrientation" @ontv="castTv"
+          :style="{width:'750rpx',height:videoHeight}" ref="video_view">
+        </video-view>
+        <tv-button v-if="showTvButton" :style="{width:'750rpx',height:videoHeight}" @setTvButton="setTvButton" @changeTv="castTv"></tv-button>
+      </view>
+      <view v-else>
+        <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop" :initial-time="config.initialTime" :is-live="config.isLive"
+          :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory" @pause="pauseVideo"
+          v-if="config.url&&!showReload">
+        </video>
+        <button class="video-button" v-if="showReload" @click="reloadVideo">
+          <text style="color:#fff">重新加载</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import { addOperLog } from "@/network/apis";
+import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
+import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
+import { IMG_DOMAIN } from "@/utils/config";
+
+export default {
+  data() {
+    return {
+      historyPlay: [],
+      historyObj: {
+        initialTime: "0",
+      },
+      sum: 0,
+      routerParams: {},
+      showReload: false,
+      plateForm: "",
+      uniPlatform: "",
+      pipStatus: false,
+      videoHeight: "580rpx",
+      settingData: {},
+      emptyUrl:
+        "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
+      config: {
+        url: "",
+        // 是否自动播放
+        autoplay: true,
+        //播放器预览背景图片，支持网络地址
+        poster: "",
+        //是否循环播放
+        loop: false,
+        //开始播放位置，单位：秒
+        initialTime: 0,
+        //是否是直播
+        isLive: false,
+        //是否静音播放
+        muted: false,
+        codec: "hardware",
+        title: "",
+        playStrategy: 0,
+
+        cookieStr: "",
+      },
+      sourceList: [],
+      selectMedia: {},
+      selectType: {},
+      tvList: [],
+      showRehandleButton: false,
+      direction: 0,
+      showTvButton: false,
+      seasonData: {},
+    };
+  },
+
+  methods: {
+    //判断选择的是webdav还是天翼云盘还是夸克
+    judgeSelect() {
+      this.sourceList = uni.getStorageSync("sourceList");
+      this.selectType =
+        this.sourceList.find((item) => {
+          let select = item.list.find((i) => i.active);
+          if (select) {
+            this.selectMedia = select;
+            return true;
+          } else {
+            return false;
+          }
+        }) || {};
+    },
+    async getVideoUrl() {
+      this.judgeSelect();
+      if (this.selectType.type == "WebDAV") {
+        if (this.selectMedia.name) {
+          let res = await getWebDAVUrl(
+            {
+              path: decodeURIComponent(this.routerParams.path),
+            },
+            this.selectMedia
+          );
+          return res;
+        }
+      } else if (this.selectType.type == "天翼云盘") {
+        if (this.selectMedia.name) {
+          let res = await get189VideoUrl(
+            {
+              folderFileId: this.routerParams.folderFileId,
+            },
+            this.selectMedia
+          );
+          return res;
+        }
+      } else if (this.selectType.type == "夸克网盘") {
+        if (this.selectMedia.name) {
+          let res = await getQuarkResolutionUrl(
+            {
+              folderFileId: this.routerParams.folderFileId,
+            },
+            this.selectMedia
+          );
+          // let res = await getQuarkVideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
+          return res;
+        }
+      }
+    },
+    setHistory(event) {
+      if (this.routerParams.noSetHistory == 0) return;
+      if (!this.routerParams.type) return;
+      if (this.plateForm == "ios") {
+        this.sum += 1;
+        if (this.sum == 5) {
+          this.sum = 0;
+          this.historyObj.initialTime = Math.round(event.detail.currentTime);
+          let index = null;
+          if (this.routerParams.type == "tv") {
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay));
+          } else if (this.routerParams.type == "movie") {
+            index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name, true) == handleSeasonName(this.historyObj.name, true));
+          }
+          if (index > -1) {
+            this.historyPlay.splice(index, 1);
+            this.historyPlay.unshift(this.historyObj);
+          } else {
+            if (this.historyObj.type) {
+              this.historyPlay.unshift(this.historyObj);
+            }
+          }
+        }
+      } else if (this.plateForm == "android") {
+        this.historyObj.initialTime = Math.round(event.detail.currentTime);
+        this.historyObj.wjjId = this.routerParams.wjjId;
+        let index = null;
+        if (this.routerParams.type == "tv") {
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay));
+        } else if (this.routerParams.type == "movie") {
+          index = this.historyPlay.findIndex((i) => i.type == this.routerParams.type && handleSeasonName(i.name) == handleSeasonName(this.historyObj.name));
+        }
+        if (index > -1) {
+          this.historyPlay.splice(index, 1);
+          this.historyPlay.unshift(this.historyObj);
+        } else {
+          if (this.historyObj.type) {
+            this.historyPlay.unshift(this.historyObj);
+          }
+        }
+      }
+      this.arriveTimeNext();
+    },
+    //初始化进入的时候，设置从哪儿开始播放
+    setInitialTime() {
+      if (!decodeURIComponent(this.routerParams.path)) return;
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      let obj = {};
+      if (this.routerParams.type == "movie") {
+        let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
+        obj = this.historyPlay?.find((i) => i.name == name) || {};
+      } else if (this.routerParams.type == "tv") {
+        let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
+        const secondLastSlashIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/", lastIndex - 1);
+        // let titlePlay = handleSeasonName(this.routerParams.titlePlay, true);
+        let titlePlay = handleSeasonName(decodeURIComponent(this.routerParams.path).substring(secondLastSlashIndex + 1, lastIndex), true);
+        obj = this.historyPlay?.find((i) => i.name == name && i.path == this.routerParams.path) || {};
+      }
+      if (this.routerParams.item) {
+        this.historyObj = JSON.parse(decodeURIComponent(this.routerParams.item));
+        this.config.poster = this.historyObj.poster;
+        this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
+      } else {
+        if (this.routerParams.type) {
+          this.historyObj = obj;
+          this.config.poster = this.historyObj.poster;
+        } else {
+          this.config.initialTime = 0;
+          this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
+          this.historyObj = {};
+          return;
+        }
+        this.config.initialTime = Number(this.historyObj.initialTime) || 0;
+      }
+
+      if (this.routerParams.type == "movie") {
+        this.config.title = handleSeasonName(this.historyObj.title, true);
+      } else {
+        if (this.historyObj.titlePlay) {
+          this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+        } else {
+          this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
+        }
+      }
+    },
+    reloadVideo() {
+      this.showReload = false;
+    },
+    setQuarkUrl(res, num) {
+      if (num == 5) return;
+      if (res.data.video_list[num].video_info?.url) {
+        this.config.url = res.data.video_list[num].video_info.url;
+      } else {
+        num++;
+        this.setQuarkUrl(res, num);
+      }
+    },
+    async setUrl() {
+      let res = await this.getVideoUrl();
+      if (this.selectType.type == "WebDAV") {
+        this.config.url = res.data.raw_url;
+        addOperLog({
+          title: this.config.title.slice(0, 30),
+          businessType: 10,
+          operatorType: 2,
+          operUrl: this.config.url,
+        });
+      } else if (this.selectType.type == "天翼云盘") {
+        // this.config.url = res.normal.url;
+        const NetworkModule = uni.requireNativePlugin("NetworkModule");
+        NetworkModule.request(
+          {
+            url: res.normal.url,
+            timeout: 5000,
+            method: "GET",
+          },
+          (res1) => {
+            this.config.url = res1.location;
+            addOperLog({
+              title: this.config.title.slice(0, 30),
+              businessType: 10,
+              operatorType: 2,
+              operUrl: this.config.url,
+            });
+          },
+          (error) => {}
+        );
+      } else if (this.selectType.type == "夸克网盘") {
+        if (res.data.video_list[0].video_info?.url) {
+          this.config.url = res.data.video_list[0].video_info.url;
+          addOperLog({
+            title: this.config.title.slice(0, 30),
+            businessType: 10,
+            operatorType: 2,
+            operUrl: this.config.url,
+          });
+          // addOperLog({ title: this.config.title.slice(0, 30), businessType: 10, operatorType: 2, operUrl: res.data[0].download_url });
+          // this.config.url = res.data[0].download_url;
+        } else {
+          let num = 1;
+          uni.showToast({
+            title: "不是88vip以上或者登录已过期",
+            icon: "none",
+          });
+          this.setQuarkUrl(res, num);
+        }
+      }
+    },
+    getPipStatus(event) {
+      this.pipStatus = event.detail.isPip;
+      if (this.pipStatus) {
+        this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + "rpx";
+      } else {
+        this.videoHeight = "580rpx";
+      }
+    },
+    pauseVideo() {
+      if (this.routerParams.noSetHistory != 0 && this.routerParams.type) {
+        let historyArr = uni.getStorageSync("historyPlay");
+        historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);
+        uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
+      }
+    },
+    prevVideo() {
+      this.historyObj.initialTime = 0;
+      this.tvList = uni.getStorageSync("tvList") || [];
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      let nowIndex = this.tvList.findIndex((item) => item.name == decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)); //获取当前集在数组中的索引index
+      this.changeVideo(nowIndex - 1);
+    },
+    nextVideo() {
+      this.historyObj.initialTime = 0;
+      this.tvList = uni.getStorageSync("tvList") || [];
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      let nowIndex = this.tvList.findIndex((item) => item.name == decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)); //获取当前集在数组中的索引index
+      this.changeVideo(nowIndex + 1);
+    },
+    async changeVideo(currentIndex) {
+      this.showTvButton = false;
+      let initObj = JSON.parse(JSON.stringify(this.historyObj));
+      this.historyObj.initialTime = 0;
+      this.tvList = uni.getStorageSync("tvList") || [];
+      const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
+      // this.$refs.video_view.release();
+      this.config.url = "";
+      this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
+      this.routerParams.path = decodeURIComponent(this.routerParams.path).slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
+      if (this.selectType.type != "WebDAV") {
+        this.historyObj.folderFileId = this.routerParams.folderFileId = this.tvList[currentIndex].id;
+      }
+      this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
+      //跳转下一集重新设置historyObj
+      this.historyObj.path = decodeURIComponent(this.routerParams.path);
+      this.historyObj.ji = String(currentIndex + 1);
+      this.historyObj.poster = this.tvList[currentIndex].poster || this.historyObj.poster;
+      this.historyObj.name = this.tvList[currentIndex].name;
+      this.historyObj.runtime = this.tvList[currentIndex].runtime;
+      this.historyObj.title = this.tvList[currentIndex].title;
+      this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+      this.historyObj.initialTime = String(this.config.initialTime);
+      this.config.poster = this.historyObj.poster;
+      try {
+        await this.setUrl();
+      } catch (error) {
+        this.historyObj = initObj;
+      }
+    },
+    getOrientation(event) {
+      this.direction = event.detail.direction;
+    },
+    castTv() {
+      this.$refs.tv_select.showPopup();
+    },
+    setTvButton(val) {
+      if (val) {
+        this.$refs.video_view.onPause();
+      } else {
+        this.$refs.video_view.onPlay();
+        this.$refs.tv_select.stopVideo();
+        this.$refs.selectUdn = "";
+      }
+      this.showTvButton = val;
+    },
+    playOrPauseVideo(val) {
+      if (val) {
+        this.$refs.video_view.onPlay();
+      } else {
+        this.$refs.video_view.onPause();
+      }
+    },
+    async resetTv() {
+      if (this.selectType.type == "WebDAV") {
+        let res1 = await loginUser(this.selectMedia);
+        this.selectMedia.token = res1.data.token;
+        uni.setStorageSync("sourceList", this.sourceList);
+        this.handleTv(this.routerParams);
+        this.setUrl();
+      } else {
+        uni.showToast({
+          title: "请重新登录网盘",
+          icon: "none",
+        });
+      }
+    },
+    //播放到片尾时间跳转下一集
+    arriveTimeNext() {
+      if (this.historyObj.initialTime >= this.routerParams.endTime) {
+        this.nextVideo();
+      }
+    },
+
+    async handleTv(data) {
+      this.showRehandleButton = false;
+      let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
+      const lastIndex = data.path.lastIndexOf("/");
+      let nowTv = localMovieTvData.tv.find((i) => {
+        return (
+          i.source.some((v) => {
+            return v.seasonArr.some((h) => h.path == "/" + data.path.slice(0, lastIndex));
+          }) && i.movieTvId == data.movieTvId
+        );
+      });
+      const numberMapping = generateChineseNumberMapping(40, "string");
+      const match = this.routerParams.titlePlay.match(/第([一二三四五六七八九十\d]+)季/);
+      let season = "";
+      if (match) {
+        if (!isNaN(Number(match[1])) && match[1].trim() !== "") {
+          season = match[1];
+        } else {
+          season = numberMapping[match[1]];
+        }
+      } else {
+        if (this.routerParams.titlePlay.indexOf("特别篇") > -1) {
+          season = "0";
+        } else {
+          season = "1";
+        }
+      }
+      let result = {};
+      let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
+      if (this.selectType.type == "WebDAV") {
+        try {
+          result = await getFolder(
+            {
+              path: data.path.slice(0, lastIndex),
+            },
+            this.selectMedia
+          );
+        } catch (error) {
+          this.showRehandleButton = true;
+          return;
+        }
+        result.data.content = result.data.content.filter((h) => {
+          return videoFormat.some((v) => h.name.includes(v));
+        });
+        //对电视进行排序
+        this.tvList = result.data.content.sort((a, b) => {
+          const regex = /S\d{2}E\d{2}/;
+          const regex1 = /\d+/;
+          if (a.name.match(regex)) {
+            let aName = a.name.match(regex)[0];
+            let bName = b.name.match(regex)[0];
+            const numA = parseInt(aName.slice(-2), 10);
+            const numB = parseInt(bName.slice(-2), 10);
+            return numA - numB;
+          } else if (a.name.match(regex1)) {
+            let aName = a.name.match(regex1)[0];
+            let bName = b.name.match(regex1)[0];
+            const numA = parseInt(aName.slice(-2), 10);
+            const numB = parseInt(bName.slice(-2), 10);
+            return numA - numB;
+          }
+        });
+      } else if (this.selectType.type == "天翼云盘") {
+        try {
+          result = await get189Folder(
+            {
+              folderId: data.wjjId,
+            },
+            this.selectMedia
+          );
+        } catch (error) {
+          this.showRehandleButton = true;
+          return;
+        }
+        result.fileListAO.fileList = result.fileListAO.fileList.filter((h) => {
+          return videoFormat.some((v) => h.name.includes(v));
+        });
+        //对电视进行排序
+        this.tvList = result.fileListAO.fileList.sort((a, b) => {
+          const regex = /S\d{2}E\d{2}/;
+          const regex1 = /\d+/;
+          if (a.name.match(regex)) {
+            let aName = a.name.match(regex)[0];
+            let bName = b.name.match(regex)[0];
+            const numA = parseInt(aName.slice(-2), 10);
+            const numB = parseInt(bName.slice(-2), 10);
+            return numA - numB;
+          } else if (a.name.match(regex1)) {
+            let aName = a.name.match(regex1)[0];
+            let bName = b.name.match(regex1)[0];
+            const numA = parseInt(aName.slice(-2), 10);
+            const numB = parseInt(bName.slice(-2), 10);
+            return numA - numB;
+          }
+        });
+      } else if (this.selectType.type == "夸克网盘") {
+        try {
+          result = await getQuarkFolder(
+            {
+              fid: data.wjjId,
+            },
+            this.selectMedia
+          );
+        } catch (error) {
+          this.showRehandleButton = true;
+          return;
+        }
+        result.data.list = result.data.list.filter((h) => {
+          return videoFormat.some((v) => h.file_name.includes(v));
+        });
+        //对电视进行排序
+        this.tvList = result.data.list
+          .sort((a, b) => {
+            const regex = /S\d{2}E\d{2}/;
+            const regex1 = /\d+/;
+            if (a.file_name.match(regex)) {
+              let aName = a.file_name.match(regex)[0];
+              let bName = b.file_name.match(regex)[0];
+              const numA = parseInt(aName.slice(-2), 10);
+              const numB = parseInt(bName.slice(-2), 10);
+              return numA - numB;
+            } else if (a.file_name.match(regex1)) {
+              let aName = a.file_name.match(regex1)[0];
+              let bName = b.file_name.match(regex1)[0];
+              const numA = parseInt(aName.slice(-2), 10);
+              const numB = parseInt(bName.slice(-2), 10);
+              return numA - numB;
+            }
+          })
+          .map((i) => {
+            return {
+              id: i.fid,
+              name: i.file_name,
+              path: "/我的视频/电视剧",
+              provider: "Quark",
+            };
+          });
+      }
+      let res1 = {};
+      res1 = await getTvSeason({
+        movieTvId: nowTv.movieTvId,
+        season: season,
+      });
+      this.seasonData = {
+        _id: res1._id,
+        air_date: res1.air_date,
+        name: res1.name,
+        overview: res1.overview,
+        id: res1.id,
+        poster_path: res1.poster_path,
+        season_number: res1.season_number,
+        vote_average: res1.vote_average,
+      };
+      //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
+      this.tvList.forEach((v, vindex) => {
+        v.title = res1.episodes[vindex]?.name || "暂无标题";
+        v.poster = res1.episodes[vindex]?.still_path ? IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
+        v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
+      });
+      uni.setStorageSync("tvList", this.tvList);
+    },
+  },
+  async onLoad(options) {
+    this.judgeSelect();
+    let systemInfo = uni.getSystemInfoSync();
+    this.plateForm = systemInfo.platform;
+    this.uniPlatform = systemInfo.uniPlatform;
+    this.settingData = uni.getStorageSync("settingData");
+    if (this.uniPlatform != "app") {
+      uni.showToast({
+        title: "目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕",
+        duration: 3000,
+        icon: "none",
+      });
+    }
+    this.historyPlay = uni.getStorageSync("historyPlay") || [];
+    this.historyPlay = this.historyPlay.filter((v) => v.sourceType == this.selectType.type && v.sourceName == this.selectMedia.name);
+    this.routerParams = options;
+    this.setInitialTime();
+    this.seasonData = uni.getStorageSync("seasonData") || {};
+    this.tvList = uni.getStorageSync("tvList") || [];
+    if (this.routerParams.titlePlay) {
+      this.handleTv(this.routerParams);
+    }
+    // options.openingTime ? (this.config.initialTime = options.openingTime) : "";
+    if (options.videoUrl) {
+      this.config.url = decodeURIComponent(options.videoUrl);
+      this.config.title = options.liveTitle;
+      return;
+    }
+    this.setUrl();
+  },
+  onUnload() {
+    let historyArr = uni.getStorageSync("historyPlay") || [];
+    historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);
+    // console.log(this.historyPlay,'this.historyplay');
+    uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
+    uni.removeStorageSync("tvList");
+    uni.removeStorageSync("seasonData");
+  },
+  onBackPress() {
+    if (this.direction == 1) {
+      this.$refs.video_view.toggleFullScreen();
+      return true; // 阻止默认返回
+    } else {
+      if (this.$refs.tv_select.popupShow) {
+        this.$refs.tv_select.hidePopup();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+};
+</script>
+
+<style lang="scss">
+page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.video-player {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  overflow: hidden;
+  width: 750rpx;
+
+  .video-player-container {
+    background: #000000;
+    width: 750rpx;
+    flex: 1;
+
+    .video-button {
+      width: 200rpx;
+      border-color: #00b2a0;
+      height: 80rpx;
+      background: #00b2a0;
+      color: #ffffff;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      border-radius: 30rpx;
+      line-height: 80rpx;
+    }
+  }
+}
+</style>

@@ -17,8 +17,8 @@
                 </div>
                 <div class="left-genres">{{ imgData.genres }}</div>
                 <div class="left-overview">{{ overview }}</div>
-                <operation-button ref="operation_button" :focusModel="focusModel"
-                    @openPopup="openPopup"></operation-button>
+                <operation-button ref="operation_button" :focusModel="focusModel" :title="buttonText" :type="routerParams.type"
+                    @openPopup="openPopup" @toPlay="clickPlayButton"></operation-button>
             </div>
             <div class="video-detail-right"
                 :style="{ backgroundColor: showRightPopup ? 'rgba(0,0,0,0.4)' : 'transparent' }">
@@ -31,7 +31,8 @@
                     </season-list>
                     <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft">
                     </tv-listd>
-                    <actor-list :routerParams="routerParams" ref="actor_list" v-if="focusModel === 'actorList'" @backLeft="backLeft"></actor-list>
+                    <actor-list :routerParams="routerParams" ref="actor_list" v-if="focusModel === 'actorList'"
+                        @backLeft="backLeft"></actor-list>
                 </nut-popup>
             </div>
         </div>
@@ -464,11 +465,11 @@ const clickPlayButton = () => {
         if (history && selectSource.value.path == "/" + history.path) {
             if (selectType.value.type == "WebDAV") {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&type=movie`,
+                    url: `/pages/tv/video/video-player?path=${selectSource.value.path.slice(1)}&type=movie`,
                 });
             } else {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&type=movie`,
+                    url: `/pages/tv/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&type=movie`,
                 });
             }
         } else {
@@ -486,12 +487,12 @@ const clickPlayButton = () => {
             };
             if (selectType.value.type == "WebDAV") {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=movie`,
+                    url: `/pages/tv/video/video-player?path=${selectSource.value.path.slice(1)}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=movie`,
                 });
             } else {
                 historyItem.folderFileId = selectSource.value.folderFileId;
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&item=${JSON.stringify(historyItem)}&type=movie`,
+                    url: `/pages/tv/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&item=${JSON.stringify(historyItem)}&type=movie`,
                 });
             }
         }
@@ -519,11 +520,11 @@ const clickPlayButton = () => {
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
             if (selectType.value.type == "WebDAV") {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
                 });
             } else {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${history.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${history.folderFileId}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
                 });
             }
         } else {
@@ -548,12 +549,12 @@ const clickPlayButton = () => {
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
             if (selectType.value.type == "WebDAV") {
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
                 });
             } else {
                 historyItem.folderFileId = tvList.value[0].id;
                 uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
+                    url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
                         }`,
                 });
             }
@@ -644,9 +645,9 @@ const setButtonText = () => {
         historyTv.value = history || {};
         if (history && activeSeason.value.path + "/" + history.name == "/" + history.path && history.season == activeSeason.value.season) {
             let time = handleSecond(history.initialTime);
-            buttonText.value = `第${history.ji}集 ${time}`;
+            buttonText.value = `第${history.ji}集 ${time}-${history.title}`;
         } else {
-            buttonText.value = "播放";
+            buttonText.value = "暂无播放记录";
         }
     }
 };
@@ -900,7 +901,7 @@ page {
     .video-detail-left {
         position: relative;
         z-index: 2;
-        flex: 0 0 40%;
+        flex: 0 0 45%;
         height: 100%;
         padding: 30rpx 80rpx 30rpx 80rpx;
         box-sizing: border-box;

@@ -2,7 +2,8 @@
     <div class="actor-list">
         <tv-scroll :scroll-y="true" style="width: 100%;height: 100%;" :enhanced="true" :showScrollbar="false"
             :scrollIntoView="scrollIntoView">
-            <div class="actor-list-item" v-for="item in actorList" :key="item.id">
+            <div :class="['actor-list-item', tabIndex === index ? 'actor-list-active' : '']"
+                v-for="(item, index) in actorList" :key="item.id" :id="'name' + (index + 1)">
                 <image
                     :src="item.profile_path ? CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + item.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
                     mode="aspectFill">
@@ -24,12 +25,18 @@
 import tvScroll from "@/components/tv/tv-scroll/index.vue";
 import * as CONFIG from "@/utils/config";
 import { ref } from "vue";
+import { debounce } from "@/utils/scrape";
 
 const props = defineProps({
     routerParams: { type: Object, default: {} },
 })
 
+const emits = defineEmits(['backLeft', 'openPopup'])
+
+
 const actorList = ref([])
+const scrollIntoView = ref('name1')
+const tabIndex = ref(0)
 
 //获取演员表
 const getActorById = (data, type) => {
@@ -66,20 +73,76 @@ const getActorList = async () => {
         props.routerParams.type
     );
     actorList.value = res.cast.slice(0, 20);
-    res.crew[0] ? actorList.value.unshift(res.crew[0]) : ''
-
+    let director = res.crew.find(v => v.known_for_department === 'Directing')
+    if (director) {
+        actorList.value.unshift(director)
+    } else {
+        if (res.crew[0]) {
+            actorList.value.unshift(res.crew[0])
+        }
+    }
 };
 getActorList()
+let nowTime = 0
+const evtMove = (keyCode) => {
+    if (keyCode === "KeyUp") {
+        if (tabIndex.value > 1) {
+            tabIndex.value = tabIndex.value - 2
+        }
+    } else if (keyCode === "KeyDown") {
+        if (tabIndex.value < actorList.value.length - 2) {
+            tabIndex.value = tabIndex.value + 2
+        }
+    } else if (keyCode === "KeyLeft") {
+        if (tabIndex.value > 0) {
+            tabIndex.value--
+        } else {
+            emits('backLeft')
+        }
+    } else if (keyCode === 'KeyRight') {
+        if (tabIndex.value < actorList.value.length - 1) {
+            tabIndex.value++
+        }
+    }
+    let time = Date.now();
+    if (time - nowTime > 300) {
+        if (tabIndex.value >= 4) {
+            scrollIntoView.value = "name" + (tabIndex.value - 1);
+        } else {
+            scrollIntoView.value = "name1";
+        }
+    } else {
+        setScrollIntoView();
+    }
+    console.log(scrollIntoView.value,'asd');
+    
+    nowTime = time;
+};
+const setScrollIntoView = debounce(() => {
+    if (tabIndex.value >= 4) {
+        scrollIntoView.value = "name" + (tabIndex.value - 1);
+    } else {
+        scrollIntoView.value = "name1";
+    }
+}, 300);
+defineExpose({
+    evtMove
+})
+
 </script>
 
 <style lang="scss" scoped>
 .actor-list {
+    width: 100%;
+    height: 100%;
+
     ::v-deep .tv-scroll {
         .uni-scroll-view {
             .uni-scroll-view-content {
                 display: flex;
                 align-items: center;
                 flex-wrap: wrap;
+
                 .actor-list-item {
                     display: flex;
                     flex: 0 0 50%;
@@ -123,6 +186,12 @@ getActorList()
                             border-radius: 10rpx;
                             padding: 6rpx 10rpx;
                         }
+                    }
+                }
+
+                .actor-list-active {
+                    image {
+                        border: 6rpx solid #ff6701;
                     }
                 }
             }

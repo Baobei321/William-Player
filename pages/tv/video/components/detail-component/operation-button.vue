@@ -1,14 +1,14 @@
 <template>
     <div class="operation-button">
         <div class="operation-button-play"
-            :class="[props.focusModel === 'operationButton' && activeButton === 'play' ? 'operation-button-active' : '']">
+            :class="[props.focusModel === 'operationButton' && activeButton === 'play' ? 'operation-button-active' : '']" @click="toPlay">
             <image src="@/static/play-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'play'">
             </image>
             <image src="@/static/play-gray.png" v-else></image>
             <div class="operation-button-play__text">
                 <span>立即观看</span>
-                <span>第一集</span>
+                <span>{{ props.title }}</span>
             </div>
         </div>
         <div class="operation-button-source operation-button-item"
@@ -54,10 +54,11 @@ import { ref } from 'vue'
 
 const props = defineProps({
     type: { type: String, default: 'tv' },
-    focusModel: { type: String, default: '' }
+    focusModel: { type: String, default: '' },
+    title: { type: String, default: '暂无播放记录' }
 })
 
-const emits = defineEmits(['openPopup'])
+const emits = defineEmits(['openPopup','toPlay'])
 
 const activeButton = ref('play')
 let tvButtonArr = ['play', 'source', 'season', 'tvlist', 'actor', 'more']
@@ -90,6 +91,11 @@ const evtMove = (keyCode) => {
         }
     }
 };
+
+const toPlay=()=>{
+    emits('toPlay')
+}
+
 defineExpose({
     evtMove,
 })
@@ -159,10 +165,5 @@ defineExpose({
         }
     }
 
-    .operation-button-more {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-    }
 }
 </style>

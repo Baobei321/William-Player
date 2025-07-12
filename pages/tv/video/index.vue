@@ -1,6 +1,7 @@
 <template>
   <div class="tv-index">
-    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel" @setFocus="setFocus"></tv-navbar>
+    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel"
+      @setFocus="setFocus"></tv-navbar>
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
     <tv-page @keyCodeClick="keyCodeClick" style="width: 100%;height: 100%;z-index: 999;position: relative;"
       :scrollTop="scrollTop">
