@@ -1,6 +1,6 @@
 {
   "pages": [
-     {
+       {
       "path": "pages/tv/video/index",
       "style": {
         "navigationStyle": "custom"
@@ -155,19 +155,31 @@
         "navigationStyle": "custom"
       }
     },
-   
+ 
     {
       "path": "pages/tv/video/video-detail",
       "style": {
         "navigationStyle": "custom"
       }
     },
-     {
+    {
       "path": "pages/tv/video/video-player",
       "style": {
         "navigationStyle": "custom"
       }
     }
+    // {
+    //   "path": "uni_modules/HF-HF_debugging/pages/next/next",
+    //   "style": {
+    //     "navigationStyle": "custom",
+    //     "backgroundColor": "transparent",
+    //     "app-plus": {
+    //       "animationType": "slide-in-bottom",
+    //       "background": "transparent",
+    //       "popGesture": "none"
+    //     }
+    //   }
+    // }
   ],
   "easycom": {
     "autoscan": true,

@@ -1,7 +1,8 @@
 <template>
     <div class="operation-button">
         <div class="operation-button-play"
-            :class="[props.focusModel === 'operationButton' && activeButton === 'play' ? 'operation-button-active' : '']" @click="toPlay">
+            :class="[props.focusModel === 'operationButton' && activeButton === 'play' ? 'operation-button-active' : '']"
+            @click="toPlay">
             <image src="@/static/play-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'play'">
             </image>
@@ -58,7 +59,7 @@ const props = defineProps({
     title: { type: String, default: '暂无播放记录' }
 })
 
-const emits = defineEmits(['openPopup','toPlay'])
+const emits = defineEmits(['openPopup', 'toPlay'])
 
 const activeButton = ref('play')
 let tvButtonArr = ['play', 'source', 'season', 'tvlist', 'actor', 'more']
@@ -86,13 +87,14 @@ const evtMove = (keyCode) => {
         }
     } else if (keyCode === 'KeyEnter') {
         if (activeButton.value === 'play') { //跳转到视频播放页面
+            emits('toPlay')
         } else {
             emits('openPopup', mapping[activeButton.value])
         }
     }
 };
 
-const toPlay=()=>{
+const toPlay = () => {
     emits('toPlay')
 }
 

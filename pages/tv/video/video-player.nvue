@@ -568,6 +568,9 @@ export default {
       return;
     }
     this.setUrl();
+    setTimeout(() => {
+      this.$refs.video_view.toggleFullScreen();
+    }, 8000);
   },
   onUnload() {
     let historyArr = uni.getStorageSync("historyPlay") || [];

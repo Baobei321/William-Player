@@ -112,6 +112,8 @@ const getAppUpdateInfo = async () => {
   return res;
 };
 onShow(async () => {
+  console.log("asda阿萨的黄金卡稍等哈",process.env.NODE_ENV);
+  
   let shareUrl1 = await getCutContent();
   if (shareUrl1) {
     shareUrl.value = shareUrl1;
