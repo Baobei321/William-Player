@@ -583,7 +583,10 @@ export default {
     uni.removeStorageSync("seasonData");
   },
   onBackPress() {
-    if (this.direction != 1) {
+    if( (this.direction == 1)){
+      this.$refs.video_view.toggleFullScreen();
+      return false;
+    }else {
       if (this.$refs.tv_select.popupShow) {
         this.$refs.tv_select.hidePopup();
         return true;
