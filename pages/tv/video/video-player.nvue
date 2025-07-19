@@ -10,8 +10,6 @@
           @getorientation="getOrientation" @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }"
           ref="video_view">
         </video-view>
-        <tv-button v-if="showTvButton" :style="{ width: '750rpx', height: videoHeight }" @setTvButton="setTvButton"
-          @changeTv="castTv"></tv-button>
       </view>
       <view v-else>
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
@@ -76,7 +74,6 @@ export default {
       tvList: [],
       showRehandleButton: false,
       direction: 0,
-      showTvButton: false,
       seasonData: {},
     };
   },
@@ -309,7 +306,6 @@ export default {
       this.changeVideo(nowIndex + 1);
     },
     async changeVideo(currentIndex) {
-      this.showTvButton = false;
       let initObj = JSON.parse(JSON.stringify(this.historyObj));
       this.historyObj.initialTime = 0;
       this.tvList = uni.getStorageSync("tvList") || [];
@@ -340,19 +336,6 @@ export default {
     },
     getOrientation(event) {
       this.direction = event.detail.direction;
-    },
-    castTv() {
-      this.$refs.tv_select.showPopup();
-    },
-    setTvButton(val) {
-      if (val) {
-        this.$refs.video_view.onPause();
-      } else {
-        this.$refs.video_view.onPlay();
-        this.$refs.tv_select.stopVideo();
-        this.$refs.selectUdn = "";
-      }
-      this.showTvButton = val;
     },
     playOrPauseVideo(val) {
       if (val) {
