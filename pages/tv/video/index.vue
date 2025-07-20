@@ -7,8 +7,8 @@
       :scrollTop="scrollTop">
       <star-recommend @getStarList="getStarList" @change="changeSwiper" @setFocus="setFocus"
         :isFocus="focusModel == 'starRecommend'" :historyPlay="historyPlay" ref="star_recommend"></star-recommend>
-      <recent-played v-if="historyPlay.length" :listData="historyPlay" ref="recent_played"
-        :isFocus="focusModel == 'recentPlayed'"></recent-played>
+      <recent-played v-if="historyPlay.length" :listData="historyPlay" ref="recent_played" @setFocus="setFocus"
+        :isFocus="focusModel == 'recentPlayed'" :offsetTop="scrollTop"></recent-played>
       <hx-list title="电影" :listData="localMovieTvData?.movie" :isFocus="focusModel == 'hxMovie'"
         v-if="localMovieTvData?.movie?.length" style="margin-top: 50rpx;" ref="hx_movie" :focusModel="focusModel"
         :historyPlay="historyPlay" :offsetTop="scrollTop" @setFocus="setFocus"></hx-list>
@@ -63,7 +63,6 @@ const keyCodeClick = (keyCode) => {
 };
 
 const setScrollTop = debounce(async (refValue) => {
-  console.log("执行");
   nextTick(() => {
     scrollTop.value = refValue.getScrollTop()
   })
@@ -99,7 +98,7 @@ const setFocus = async (val, keyCode) => {
     let time = Date.now();
     if (time - nowTime > 300) {
       nextTick(() => {
-        scrollTop.value = mapping[focusModel.value].getScrollTop()
+        scrollTop.value = mapping[focusModel.value].getScrollTop()  //用于设置tv-page页面的滚动，获取模块距离顶部的距离
       })
     } else {
       setScrollTop(mapping[focusModel.value]);

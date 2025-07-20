@@ -1,11 +1,5 @@
 {
   "pages": [
-       {
-      "path": "pages/tv/video/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
     {
       "path": "pages/mobile/mine/entry",
       "style": {
@@ -155,7 +149,18 @@
         "navigationStyle": "custom"
       }
     },
- 
+    {
+      "path": "pages/tv/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/video/video-all",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/tv/video/video-detail",
       "style": {

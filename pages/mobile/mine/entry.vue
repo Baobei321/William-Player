@@ -13,38 +13,44 @@ onBeforeMount(async () => {
   if (!uni.getStorageSync("historyPlay")) {
     uni.setStorageSync("historyPlay", []);
   }
-  if (uni.getStorageSync("Authorization")) {
+  if (CONFIG.PLATFORM === 'TV') { //tv端跳转到tv的首页
     uni.reLaunch({
-      url: "/pages/mobile/video/index",
+      url: "/pages/tv/video/index",
     });
-  } else {
-    uni.setStorageSync("userPassword", { phone: "19994658532", password: "123456789" });
-    await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
-      .then((res) => {
-        uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
-        getUserByopenId();
-        uni.reLaunch({
-          url: "/pages/mobile/video/index",
-        });
-      })
-      .catch((error) => {
-        uni.reLaunch({
-          url: "/pages/mobile/video/index",
-        });
-        let settingData = uni.getStorageSync("settingData");
-        if (settingData) {
-          settingData.tmdbKey = "9e0add7c02b66868ab0a368df820a335";
-          uni.setStorageSync("settingData", settingData);
-        } else {
-          uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
-        }
+  } else {//手机端跳转到手机端首页
+    if (uni.getStorageSync("Authorization")) {
+      uni.reLaunch({
+        url: "/pages/mobile/video/index",
       });
-    // uni.reLaunch({
-    //   url: "/pages/mobile/mine/login",
-    // });
+    } else {
+      uni.setStorageSync("userPassword", { phone: "19994658532", password: "123456789" });
+      await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
+        .then((res) => {
+          uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+          getUserByopenId();
+          uni.reLaunch({
+            url: "/pages/mobile/video/index",
+          });
+        })
+        .catch((error) => {
+          uni.reLaunch({
+            url: "/pages/mobile/video/index",
+          });
+          let settingData = uni.getStorageSync("settingData");
+          if (settingData) {
+            settingData.tmdbKey = "9e0add7c02b66868ab0a368df820a335";
+            uni.setStorageSync("settingData", settingData);
+          } else {
+            uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
+          }
+        });
+      // uni.reLaunch({
+      //   url: "/pages/mobile/mine/login",
+      // });
+    }
   }
+
 });
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

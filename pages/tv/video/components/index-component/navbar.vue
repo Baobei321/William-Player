@@ -6,7 +6,7 @@
         <span>搜索</span>
       </div>
       <div class="tv-navbar-left__tabs">
-        <nut-tabs v-model="activeTab" custom-color="#fff" background="transparent" @change="changeTvSeason">
+        <nut-tabs v-model="activeTab" custom-color="#fff" background="transparent">
           <nut-tab-pane :title="item" :pane-key="item" v-for="item in tabsArr" :key="item">
           </nut-tab-pane>
         </nut-tabs>

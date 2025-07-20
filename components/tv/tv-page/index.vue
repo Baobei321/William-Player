@@ -1,6 +1,6 @@
 <template>
-	<scroll-view scroll-y="true" :style="{ height: windowHeight + 'px' }" ref="page" :scroll-top="scrollTop"
-		:scroll-with-animation="true" @scroll="scroll" class="tv-page" :scrollTop="scrollTop">
+	<scroll-view scroll-y="true" :style="{ height: '100%' }" ref="page" :scroll-top="scrollTop"
+		:scroll-with-animation="true" class="tv-page">
 		<view @click="whole.onClick" id="onClick"></view>
 		<slot></slot>
 	</scroll-view>
@@ -82,7 +82,7 @@ export default {
 			onClick(event, ownerInstance) {
 				// event.preventDefault();
 				console.log(ownerInstance,'ownerInstance');
-				
+		        		
 				ownerInstance.callMethod('keyCodeClick', code);
 			}
 		}

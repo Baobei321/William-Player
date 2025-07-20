@@ -3,7 +3,8 @@
         <tv-scroll :scroll-y="true" style="width: 100%;height: 100%;" :enhanced="true" :showScrollbar="false"
             :scrollIntoView="scrollIntoView">
             <div :class="['tv-list-item', tabIndex === index ? 'tv-list-active' : '']"
-                v-for="(item, index) in props.list" :key="item.id" :id="'name' + (index + 1)">
+                v-for="(item, index) in props.list" :key="item.id" :id="'name' + (index + 1)"
+                @click="toPlay(item, index)">
                 <image :src="item.poster" mode="aspectFill"></image>
                 <div class="item-right">
                     <div class="item-right-name">
@@ -28,7 +29,7 @@ const props = defineProps({
 const tabIndex = ref(0)
 const scrollIntoView = ref("");
 
-const emits = defineEmits(['backLeft', 'openPopup'])
+const emits = defineEmits(['backLeft', 'openPopup', 'toPlay'])
 let nowTime = 0
 const evtMove = (keyCode) => {
     if (keyCode === "KeyUp") {
@@ -42,7 +43,8 @@ const evtMove = (keyCode) => {
     } else if (keyCode === "KeyLeft") {
         emits('backLeft')
     } else if (keyCode === 'KeyEnter') {
-        emits('openPopup', true)
+        let item = props.list[tabIndex.value]
+        toPlay(item, tabIndex.value)
     }
     let time = Date.now();
     if (time - nowTime > 300) {
@@ -56,6 +58,10 @@ const evtMove = (keyCode) => {
     }
     nowTime = time;
 };
+
+const toPlay = (item, index) => {
+    emits("toPlay", item, index)
+}
 
 const setScrollIntoView = debounce(() => {
     if (tabIndex.value >= 2) {
@@ -92,6 +98,7 @@ defineExpose({
         .item-right {
             padding-left: 20rpx;
             padding-top: 6rpx;
+
             .item-right-name {
                 font-size: 36rpx;
                 font-weight: bold;

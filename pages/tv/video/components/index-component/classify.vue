@@ -133,8 +133,6 @@ const toVideoAll = (item) => {
 
 const getScrollTop = () => {
   let row = Math.floor(tabIndex.value / 4)
-  console.log(scrollTop.value + row * gridPx.value, 'row');
-
   return scrollTop.value + row * gridPx.value
 }
 

@@ -284,7 +284,7 @@ export default {
         this.videoHeight = "580rpx";
       }
     },
-    pauseVideo() {
+    pauseVideo() {    
       if (this.routerParams.noSetHistory != 0 && this.routerParams.type) {
         let historyArr = uni.getStorageSync("historyPlay");
         historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);

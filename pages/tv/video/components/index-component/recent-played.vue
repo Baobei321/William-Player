@@ -2,35 +2,27 @@
   <div class="recent-played">
     <div class="recent-played-title">
       <div class="recent-played-title-left">最近观看</div>
-      <div class="recent-played-title-right" @click="toVideoAll">
-        <span>全部</span>
-        <span>{{ props.listData.length }}</span>
-        <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
-      </div>
     </div>
     <div class="recent-played-list">
-      <scroll-view class="recent-played-list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
-        :showScrollbar="false">
-        <div class="recent-played-list-movie">
-          <div class="recent-played-list-movie__item" v-for="item in scrollData" :key="item.name"
-            @click="toVideoPlayer(item)">
-            <div class="recent-played-list-movie__item-img">
-              <image :src="item.poster" style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
-              <span style="color: red;font-size: 30px;">
-                {{ item.loadImg }}
-              </span>
-              <image :src="playVideoButton" class="img-button" />
-              <span class="img-runtime">{{ handleSecond(item.initialTime) + '/' + item.runtime }}</span>
-              <div class="img-process"
-                :style="{ width: Number(item.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"></div>
-            </div>
-            <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{
-              handleSeasonName(removeExtension(item.name)) }}</span>
-            <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">{{
-              removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
+      <tv-scroll class="recent-played-list-scroll" style="width: 100%" :scrollIntoView="scrollIntoView">
+        <div class="recent-played-list-movie__item" v-for="(item, index) in scrollData" :key="item.name"
+          @click="toVideoPlayer(item)">
+          <div class="recent-played-list-movie__item-img" :class="[tabIndex == index ? 'img-active' : '']">
+            <image :src="item.poster" style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
+            <span style="color: red;font-size: 30px;">
+              {{ item.loadImg }}
+            </span>
+            <image :src="playVideoButton" class="img-button" />
+            <span class="img-runtime">{{ handleSecond(item.initialTime) + '/' + item.runtime }}</span>
+            <div class="img-process"
+              :style="{ width: Number(item.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"></div>
           </div>
+          <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{
+            handleSeasonName(removeExtension(item.name)) }}</span>
+          <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">{{
+            removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
         </div>
-      </scroll-view>
+      </tv-scroll>
     </div>
   </div>
 </template>
@@ -38,22 +30,29 @@
 <script setup>
 import { ref, watch } from "vue";
 import playVideoButton from "@/static/playVideo-button.png";
-import { handleSecond, parseTime, handleSeasonName } from "@/utils/scrape";
+import { handleSecond, parseTime, handleSeasonName, debounce } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import { toStringfy } from "@/pages/mobile/mine/common";
+import tvScroll from "@/components/tv/tv-scroll/index.vue";
+
 
 const props = defineProps({
   isFocus: { type: Boolean, default: true },
   listData: { type: Array, default: [] },
+  offsetTop: { type: Number, default: 0 },
 });
+
+const emits = defineEmits(['setFocus'])
 
 const scrollData = ref([]);
 const tabIndex = ref(-1);
 
+const scrollTop = ref(0)
 
 const selectType = ref({});
 const selectMedia = ref({});
+const scrollIntoView = ref("");
 
 //判断选择的是webdav还是天翼云盘还是夸克
 const judgeSelect = () => {
@@ -109,14 +108,14 @@ const toVideoPlayer = async (item) => {
   if (item.type == "movie") {
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&type=movie`,
+        url: `/pages/tv/video/video-player?path=${item.path}&type=movie`,
         success: () => {
           setItemFirst(item);
         },
       });
     } else {
       uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=movie`,
+        url: `/pages/tv/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=movie`,
         success: () => {
           setItemFirst(item);
         },
@@ -136,14 +135,14 @@ const toVideoPlayer = async (item) => {
     nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
     if (selectType.value.type == "WebDAV") {
       uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&type=tv&movieTvId=${item.movieTvId}&${toStringfy(openEndTime)}`,
+        url: `/pages/tv/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&type=tv&movieTvId=${item.movieTvId}&${toStringfy(openEndTime)}`,
         success: () => {
           setItemFirst(item);
         },
       });
     } else {
       uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&wjjId=${item.wjjId}&movieTvId=${item.movieTvId}&folderFileId=${item.folderFileId}&type=tv&${toStringfy(openEndTime)}`,
+        url: `/pages/tv/video/video-player?path=${item.path}&titlePlay=${item.titlePlay}&wjjId=${item.wjjId}&movieTvId=${item.movieTvId}&folderFileId=${item.folderFileId}&type=tv&${toStringfy(openEndTime)}`,
       });
     }
   }
@@ -151,7 +150,7 @@ const toVideoPlayer = async (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-all?title=最近观看`,
+    url: `/pages/tv/video/video-all?title=最近观看`,
   });
 };
 //获取上下的组件
@@ -184,7 +183,7 @@ const evtMove = (keyCode) => {
   } else if (keyCode === "KeyDown") {
     emits("setFocus", getUpDown("down"), 'KeyDown');
   } else if (keyCode === 'KeyEnter') {
-
+    toVideoPlayer(scrollData.value[tabIndex.value])
   }
   let time = Date.now();
   if (time - nowTime > 300) {
@@ -198,13 +197,32 @@ const evtMove = (keyCode) => {
   }
   nowTime = time;
 };
-
+const setScrollIntoView = debounce(() => {
+  if (tabIndex.value >= 3) {
+    scrollIntoView.value = "name" + (tabIndex.value - 1);
+  } else {
+    scrollIntoView.value = "name1";
+  }
+}, 300);
 onShow(() => {
   judgeSelect();
   scrollData.value = [...props.listData];
   scrollData.value.forEach((item) => {
     item.loadImg = true;
   });
+  setTimeout(() => {
+    let windowHeight = uni.getSystemInfoSync().windowHeight
+    const query = uni.createSelectorQuery();
+    query.select(".recent-played-list-movie__item-img").fields(
+      {
+        rect: true,
+        size: true,
+      },
+      (res) => {
+        scrollTop.value = (props.offsetTop + res.top - windowHeight / 2 + res.height / 2) < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
+      }
+    ).exec();
+  }, 0);
 });
 
 watch(
@@ -228,9 +246,12 @@ watch(
     }
   }
 );
-
+const getScrollTop = () => {
+  return scrollTop.value
+}
 defineExpose({
-  evtMove
+  evtMove,
+  getScrollTop
 })
 </script>
 
@@ -270,14 +291,16 @@ defineExpose({
   .recent-played-list {
     margin-top: 24rpx;
 
-    .recent-played-list-scroll {
+    ::v-deep .recent-played-list-scroll {
       width: 100%;
       overflow-x: auto;
 
-      .recent-played-list-movie {
+      .uni-scroll-view-content {
         display: flex;
-        flex-wrap: nowrap;
+        flex-direction: row;
         align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
 
         .recent-played-list-movie__item {
           margin-left: 24rpx;
@@ -292,6 +315,9 @@ defineExpose({
             border-radius: 20rpx;
             position: relative;
             overflow: hidden;
+            border: 6rpx solid transparent;
+
+
 
             .img-button {
               width: 80rpx;
@@ -323,10 +349,14 @@ defineExpose({
             }
           }
 
+          .img-active {
+            border: 6rpx solid #ff6701;
+          }
+
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: #fff;
           }
 
           &:first-child {

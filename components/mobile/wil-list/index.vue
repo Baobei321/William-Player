@@ -1,11 +1,14 @@
 <template>
-  <scroll-view class="load-list" :scroll-y="true" :enhanced="true" :refresherEnabled="refresherEnabled" :refresherTriggered="refreshData.refreshed"
-    refresherBackground="transparent" @refresherrefresh="handleRefresherRefresh" @scrolltolower="handleScrollToLower"
-    :style="{ 'height': scrollHeight ? `${scrollHeight}px` : '100%' }" :showScrollbar="props.showScrollBar" @scroll="scroll">
+  <scroll-view class="load-list" :scroll-y="true" :enhanced="true" :refresherEnabled="refresherEnabled"
+    :refresherTriggered="refreshData.refreshed" refresherBackground="transparent"
+    @refresherrefresh="handleRefresherRefresh" @scrolltolower="handleScrollToLower"
+    :style="{ 'height': scrollHeight ? `${scrollHeight}px` : '100%' }" :showScrollbar="props.showScrollBar"
+    v-bind="$attrs" @scroll="scroll">
     <slot name="prepend" />
 
     <div :class="listContainerClass">
-      <div v-for="(item, index) in list" :key="item[idKey]" :style="props.listItemStyle?props.listItemStyle({...item,index}):{}" class="list-item">
+      <div v-for="(item, index) in list" :id="'name' + (index + 1)" :key="item[idKey]"
+        :style="props.listItemStyle ? props.listItemStyle({ ...item, index }) : {}" class="list-item">
         <slot v-bind="{ ...item, $index: index }" v-if="props.isUseCustom" />
         <slot v-bind="{ ...item, $index: index }" v-else></slot>
       </div>
@@ -61,7 +64,7 @@ const props = defineProps({
   listContainerClass: { type: String, default: "" },
   listItemStyle: { type: Function, default: null },
   showScrollBar: { type: Boolean, default: true },
-  changeItemFn: { type: Function, default: () => {} }, //修改某一项的方法，需配合requireStore的editId使用
+  changeItemFn: { type: Function, default: () => { } }, //修改某一项的方法，需配合requireStore的editId使用
   isUseCustom: { type: Boolean, default: true }, //是否使用custom-wrapper提高性能,
   pageNumKey: { type: String, default: "pageNum" }, //配置分页参数的属性名
 });
@@ -345,12 +348,14 @@ $b: load-list;
     padding-bottom: 68rpx;
     width: 100%;
   }
+
   &__loading-text {
     display: flex;
     align-items: center;
     justify-content: center;
     padding-bottom: 68rpx;
     width: 100%;
+
     span {
       font-size: 28rpx;
       color: #666;

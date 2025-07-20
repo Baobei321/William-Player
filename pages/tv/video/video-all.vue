@@ -1,63 +1,101 @@
 <template>
-  <div class="video-all">
-    <wil-navbar :title="routerParams.title" :leftShow="true">
-      <template #right>
-        <nut-icon name="more-x" custom-color="#000" size="20" @click="showPopover = true"
-          v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"></nut-icon>
-        <span v-if="routerParams.title == '最近观看'" style="color: #2457fd;font-weight: bold;" @click="editHistory()">{{
-          isSelect ? '取消' : '编辑' }}</span>
-        <sort-popover :type="mapping[routerParams.title]" v-model="showPopover" @changeSort="changeSort"></sort-popover>
-      </template>
-    </wil-navbar>
-    <div class="video-all-list" v-if="!isClearAll">
-      <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
-        idKey="path" :listContainerClass="routerParams.title == '最近观看' ? 'list-recent' : 'list-container'"
-        :pageSize="windowWidth > 700 ? 50 : 12" :changeItemFn="changeItemFn" :listItemStyle="listItemStyle"
-        :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
-        <template #default="item">
-          <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
-            <div class="item-poster">
-              <image
-                :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg : (routerParams.title == '最近观看' ? setRecentImg(item.poster) : setEmptyImg(item.poster))"
-                class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
-              </image>
-              <div :class="[item.select ? 'item-poster-check' : 'item-poster-nocheck']" v-if="isSelect">
-                <image src="@/static/check-active.png" v-if="item.select"></image>
+  <tv-page @keyCodeClick="evtMove">
+    <div class="video-all">
+      <div class="video-all-title">{{ routerParams.title }}</div>
+      <div class="video-all-list">
+        <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
+          idKey="path" :listContainerClass="routerParams.title == '最近观看' ? 'list-recent' : 'list-container'"
+          :pageSize="windowWidth > 700 ? 12 : 12" :changeItemFn="changeItemFn" :style="{ '--line-height': lineHeight }"
+          :scrollIntoView="scrollIntoView" :scroll-with-animation="true" @currentData="currentData">
+          <template #default="item">
+            <div :class="['video-all-list__item', tabIndex === item.$index ? 'video-all-list__active' : '']"
+              @click="toVideoDetail(item)" @longpress="longPress(item)">
+              <div class="item-poster">
+                <image
+                  :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg : (routerParams.title == '最近观看' ? setRecentImg(item.poster) : setEmptyImg(item.poster))"
+                  class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
+                </image>
               </div>
+              <span class="item-name">{{ removeExtension(item) }}</span>
+              <span class="item-time" v-if="routerParams.title != '最近观看'">{{ item.releaseTime || '暂无' }}</span>
             </div>
-            <span class="item-name">{{ removeExtension(item) }}</span>
-            <span class="item-time" v-if="routerParams.title != '最近观看'">{{ item.releaseTime || '暂无' }}</span>
-          </div>
-        </template>
-      </wil-list>
+          </template>
+        </wil-list>
+      </div>
     </div>
-    <wil-empty v-else text="没有更多了"></wil-empty>
-    <div class="video-all-bottom" v-if="isSelect">
-      <div class="video-all-bottom__left" @click="clearAll">全部清空</div>
-      <div class="video-all-bottom__right"
-        :style="{ color: recentSelect.length ? 'rgb(255, 44, 44)' : 'rgb(188, 188, 188)' }" @click="clearPart">
-        {{ recentSelect.length ? '删除' : '取消' }}</div>
-    </div>
-    <wil-modal ref="wil_modal"></wil-modal>
-  </div>
+  </tv-page>
 </template>
 
 <script setup>
 import wilList from "@/components/mobile/wil-list/index.vue";
 import emptyBg from "@/static/empty_bg.png";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import wilModal from "@/components/mobile/wil-modal/index.vue";
-import wilEmpty from "@/components/mobile/wil-empty/index.vue";
-import sortPopover from "./components/index-component/sort-popover.vue";
 import { ref } from 'vue'
 import { useVideoAll } from "@/hooks/useVideoAll";
+import tvPage from "@/components/tv/tv-page/index.vue";
+import { debounce } from "@/utils/scrape";
+
 const wil_list = ref(null);
 const wil_modal = ref(null);
+const lineHeight = ref('')
+const tabIndex = ref(0)
+const scrollIntoView = ref('')
 
-const { routerParams, showPopover, editHistory, isSelect, mapping, changeSort, isClearAll,
-  getMovieTvList, requestParams, windowWidth, changeItemFn, listItemStyle, lineNumber, lineHeight,
-  toVideoDetail, longPress, setRecentImg, setEmptyImg, imgError, imgLoad, removeExtension, clearAll, recentSelect, clearPart } = useVideoAll({ wil_list, wil_modal })
+const listData = ref([])
 
+const { routerParams, showPopover, editHistory, mapping, changeSort, clearPart,
+  getMovieTvList, requestParams, windowWidth, changeItemFn, recentSelect,
+  toVideoDetail, longPress, setRecentImg, setEmptyImg, imgError, imgLoad, removeExtension, clearAll, } = useVideoAll({ wil_list, wil_modal })
+
+
+const setItemWidth = () => {
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth;
+  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(224)) / 6) * 160) / 109 / scale + "rpx";
+};
+setItemWidth();
+
+const currentData = (data) => {
+  listData.value = JSON.parse(JSON.stringify(data.list))
+}
+
+let nowTime = 0
+const evtMove = (keyCode) => {
+  if (keyCode === "KeyUp") {
+    if (tabIndex.value > 5) {
+      tabIndex.value = tabIndex.value - 6
+    }
+  } else if (keyCode === "KeyDown") {
+    if (tabIndex.value < listData.value.length - 6) {
+      tabIndex.value = tabIndex.value + 6
+    }
+  } else if (keyCode === "KeyLeft") {
+    if (tabIndex.value > 0) {
+      tabIndex.value--
+    }
+  } else if (keyCode === 'KeyRight') {
+    if (tabIndex.value < listData.value.length - 1) {
+      tabIndex.value++
+    }
+  } else if (keyCode === 'KeyEnter') {
+    toVideoDetail(listData.value[tabIndex.value])
+  }
+  let time = Date.now();
+  if (time - nowTime > 300) {
+    scrollIntoView.value = `name${Math.floor(tabIndex.value / 6) * 6 + 1}`
+  } else {
+    setScrollIntoView();
+  }
+  console.log(scrollIntoView.value, 'asd');
+
+  nowTime = time;
+};
+const setScrollIntoView = debounce(() => {
+  scrollIntoView.value = `name${Math.floor(tabIndex.value / 6) * 6 + 1}`
+}, 300);
+defineExpose({
+  evtMove
+})
 </script>
 
 <style lang="scss" scoped>
@@ -72,6 +110,7 @@ page {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: #1b1b20;
 
   ::v-deep .wil-navbar {
     .nut-navbar {
@@ -87,6 +126,13 @@ page {
     }
   }
 
+  .video-all-title {
+    padding: 24rpx 32rpx;
+    font-size: 40rpx;
+    font-weight: bold;
+    color: #fff;
+  }
+
   .video-all-list {
     flex: 1;
     overflow: hidden;
@@ -97,24 +143,27 @@ page {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        padding: 0 24rpx;
-        padding-top: 16px;
+        padding: 0 32rpx;
+        // padding-top: 32rpx;
 
         // gap: 24rpx;
         .list-item {
-          margin-bottom: 24rpx;
+          margin-bottom: 32rpx;
+          margin-left: 32rpx;
           // flex: 1 1 218rpx;
           min-width: 218rpx;
           /* 确保最小宽度 */
-          flex: 0 0 calc((100% - (var(--line-number) - 1) * 24rpx) / var(--line-number));
+          flex: 0 0 calc((100% - 160rpx) / 6);
 
           .video-all-list__item {
             .item-poster {
               width: 100%;
-              // aspect-ratio: 109/160; /* 高度 = (109/160) × 宽度 */
+              // aspect-ratio: 109/160;
+              /* 高度 = (109/160) × 宽度 */
               height: var(--line-height);
               border-radius: 20rpx;
               position: relative;
+              border: 6rpx solid transparent;
 
               .item-poster-image {
                 width: 100% !important;
@@ -127,7 +176,7 @@ page {
             .item-name {
               font-size: 28rpx;
               font-weight: bold;
-              color: #000;
+              color: #fff;
               display: block;
             }
 
@@ -139,9 +188,15 @@ page {
             }
           }
 
-          // &:nth-child(3n + 1) {
-          //   margin-left: 0;
-          // }
+          .video-all-list__active {
+            .item-poster {
+              border: 6rpx solid #ff6701;
+            }
+          }
+
+          &:nth-child(6n+1) {
+            margin-left: 0;
+          }
         }
       }
 
@@ -149,12 +204,12 @@ page {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        padding: 0 24rpx;
+        padding: 0 32rpx;
         padding-top: 32rpx;
 
         // gap: 24rpx;
         .list-item {
-          margin-bottom: 24rpx;
+          margin-bottom: 32rpx;
           // flex: 1 1 218rpx;
           min-width: 218rpx;
           /* 确保最小宽度 */

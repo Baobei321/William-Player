@@ -8,11 +8,24 @@
         :scrollIntoView="scrollIntoView">
         <div class="hxList-list-movie__item" v-for="(item, index) in listData1" :id="'name' + (index + 1)"
           :key="item.name" @click="toVideoDetail(item)">
-          <image :src="setEmptyImg(item.poster)" mode="aspectFill"
-            :class="[props.title == '电影' ? 'hxList-list-movie__img-movie' : 'hxList-list-movie__img-tv', tabIndex == index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
-          </image>
-          <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-          <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
+          <template v-if="item.isMore">
+            <div :class="['hxList-list-movie__more-img', tabIndex == index ? 'hxList-list-movie__more-active' : '']">
+              <div class="img-icon">
+                <image :src="tabIndex == index ? icIntoblack : icIntowhite"></image>
+              </div>
+              <span class="img-all">查看全部</span>
+              <span class="img-number">共{{ props.listData.length }}部</span>
+            </div>
+            <span class="hxList-list-movie__item-name" style="opacity: 0;">毒液</span>
+            <span class="hxList-list-movie__item-time" style="opacity: 0;">暂无</span>
+          </template>
+          <template v-else>
+            <image :src="setEmptyImg(item.poster)" mode="aspectFill"
+              :class="[props.title == '电影' ? 'hxList-list-movie__img-movie' : 'hxList-list-movie__img-tv', tabIndex == index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img']">
+            </image>
+            <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
+          </template>
         </div>
       </tv-scroll>
     </div>
@@ -25,6 +38,8 @@ import { onShow } from "@dcloudio/uni-app";
 import { handleSeasonName, throttle, debounce } from "@/utils/scrape";
 import * as CONFIG from "@/utils/config";
 import tvScroll from "@/components/tv/tv-scroll/index.vue";
+import icIntoblack from '@/static/ic-intoblack.png'
+import icIntowhite from '@/static/ic-intowhite.png'
 
 const props = defineProps({
   title: { type: String, default: "电影" },
@@ -44,7 +59,8 @@ const scrollIntoView = ref("");
 
 const scrollTop = ref(0)
 
-const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30));
+const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 10));
+listData1.value.push({ isMore: true })
 listData1.value.forEach((item) => {
   item.loadImg = true;
 });
@@ -90,7 +106,7 @@ const removeExtension = (filename) => {
 let nowTime = 0;
 const evtMove = (keyCode) => {
   if (keyCode === "KeyRight") {
-    if (tabIndex.value != props.listData.length - 1) {
+    if (tabIndex.value != listData1.value.length - 1) {
       tabIndex.value++;
     }
   } else if (keyCode === "KeyLeft") {
@@ -101,8 +117,12 @@ const evtMove = (keyCode) => {
     emits("setFocus", getUpDown("up"), 'KeyUp');
   } else if (keyCode === "KeyDown") {
     emits("setFocus", getUpDown("down"), 'KeyDown');
-  }else if(keyCode==='KeyEnter'){
-
+  } else if (keyCode === 'KeyEnter') {
+    if (tabIndex.value == listData1.value.length - 1) {
+      toVideoAll()
+    } else {
+      toVideoDetail(listData1.value[tabIndex.value])
+    }
   }
   let time = Date.now();
   if (time - nowTime > 300) {
@@ -137,7 +157,7 @@ const toVideoDetail = (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-all?title=${props.title}`,
+    url: `/pages/tv/video/video-all?title=${props.title}`,
   });
 };
 
@@ -159,7 +179,8 @@ setItemWidth();
 
 onShow(() => {
   nextTick(() => {
-    listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 30);
+    listData1.value = JSON.parse(JSON.stringify(props.listData)).slice(0, 10);
+    listData1.value.push({ isMore: true })
     listData1.value.forEach((item) => {
       item.loadImg = true;
     });
@@ -275,6 +296,7 @@ defineExpose({
           // flex: 0 0 214rpx;
           flex: 0 0 calc((100% - 160rpx) / 6);
           box-sizing: border-box;
+
           image {
             object-fit: cover;
             width: 100%;
@@ -283,12 +305,62 @@ defineExpose({
             border-radius: 20rpx;
             box-sizing: border-box;
           }
+
           .hxList-list-movie__img-active {
             border: 6rpx solid #ff6701;
           }
+
+          .hxList-list-movie__more-img {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: var(--line-height);
+            background: #2f2f30;
+            border-radius: 20rpx;
+            border: 6rpx solid transparent;
+
+            .img-icon {
+              width: 70rpx;
+              height: 70rpx;
+              background: #6a6a6d;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              image {
+                width: 30rpx;
+                height: 30rpx;
+              }
+            }
+
+            .img-all {
+              margin-top: 40rpx;
+              font-size: 36rpx;
+              color: #fff;
+              font-weight: bold;
+            }
+
+            .img-number {
+              margin-top: 20rpx;
+              font-size: 28rpx;
+              color: #a8a8a8;
+            }
+          }
+
+          .hxList-list-movie__more-active {
+            border: 6rpx solid #ff6701;
+
+            .img-icon {
+              background: #fff;
+            }
+          }
+
           &-img {
             border: 6rpx solid transparent;
           }
+
           &-name {
             font-size: 28rpx;
             font-weight: bold;

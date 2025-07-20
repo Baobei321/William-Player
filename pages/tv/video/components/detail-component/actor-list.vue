@@ -5,13 +5,13 @@
             <div :class="['actor-list-item', tabIndex === index ? 'actor-list-active' : '']"
                 v-for="(item, index) in actorList" :key="item.id" :id="'name' + (index + 1)">
                 <image
-                    :src="item.profile_path ? CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + item.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
+                    :src="item.profile_path ? CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + item.profile_path : 'https://img1.baidu.com/it/u=429698422,319829798&fm=253&app=120&f=JPEG?w=800&h=800'"
                     mode="aspectFill">
                 </image>
                 <div class="item-right">
                     <div class="item-right-name">{{ item.name }}</div>
                     <div class="item-right-role">{{ item.known_for_department != 'Acting' ? '导演' : '饰' + item.character
-                        }}
+                    }}
                     </div>
                     <div class="item-right-gender">{{ item.gender == 1 ? '女' : '男' }}</div>
                     <div class="item-right-tag">TMDB</div>
@@ -114,8 +114,8 @@ const evtMove = (keyCode) => {
     } else {
         setScrollIntoView();
     }
-    console.log(scrollIntoView.value,'asd');
-    
+    console.log(scrollIntoView.value, 'asd');
+
     nowTime = time;
 };
 const setScrollIntoView = debounce(() => {
@@ -149,6 +149,7 @@ defineExpose({
                     margin-bottom: 24rpx;
 
                     image {
+                        flex: 0 0 250rpx;
                         width: 250rpx;
                         height: 375rpx;
                         border-radius: 20rpx;

@@ -29,7 +29,7 @@
                     <season-list :list="selectSource.seasonArr" @backLeft="backLeft" v-if="focusModel === 'seasonList'"
                         ref="season_list">
                     </season-list>
-                    <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft">
+                    <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft" @toPlay="toPlayVideo">
                     </tv-listd>
                     <actor-list :routerParams="routerParams" ref="actor_list" v-if="focusModel === 'actorList'"
                         @backLeft="backLeft"></actor-list>
@@ -110,7 +110,7 @@ const toSelect = (item) => {
         //获取当前源里面的最大季数
         const maxSeasonArrLength = Math.max(...sourceList.value.map((v) => v.seasonArr.length));
         uni.navigateTo({
-            url: `/pages/mobile/video/search-match?type=${routerParams.value.type}&maxSeasonLength=${maxSeasonArrLength}`,
+            url: `/pages/tv/video/search-match?type=${routerParams.value.type}&maxSeasonLength=${maxSeasonArrLength}`,
         });
     } else if (item.text == "设置跳过片头时间") {
         let localMovieTvData = uni.getStorageSync("localMovieTvData");
@@ -581,11 +581,11 @@ const toPlayVideo = (item, index) => {
         nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
         if (selectType.value.type == "WebDAV") {
             uni.navigateTo({
-                url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
             });
         } else {
             uni.navigateTo({
-                url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
             });
         }
     } else {
@@ -611,12 +611,12 @@ const toPlayVideo = (item, index) => {
         nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
         if (selectType.value.type == "WebDAV") {
             uni.navigateTo({
-                url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
             });
         } else {
             historyItem.folderFileId = item.id;
             uni.navigateTo({
-                url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
+                url: `/pages/tv/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
                     }`,
             });
         }
