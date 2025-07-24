@@ -66,8 +66,16 @@ export default {
 	};
 	export default {
 		mounted() {
+			console.log("监听");
+			
 			//全局监听按键输入
-			window.document.onkeydown = function(evt) {
+			window.document.onkeydown = this.onKeydown
+		},
+		beforeDestroy() {
+			window.document.onkeydown = null;
+		},
+		methods: {
+			onKeydown(evt){
 				evt = evt || window.event;
 				var KeyCode = evt.which || evt.keyCode;
 				code = KeyName[KeyCode];		
@@ -75,10 +83,7 @@ export default {
 				if (code != undefined) {
 					document.getElementById("onClick").click();
 				}
-			}
-
-		},
-		methods: {
+			},
 			onClick(event, ownerInstance) {
 				// event.preventDefault();
 				console.log(ownerInstance,'ownerInstance');

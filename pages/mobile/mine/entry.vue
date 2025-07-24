@@ -14,9 +14,16 @@ onBeforeMount(async () => {
     uni.setStorageSync("historyPlay", []);
   }
   if (CONFIG.PLATFORM === 'TV') { //tv端跳转到tv的首页
-    uni.reLaunch({
-      url: "/pages/tv/video/index",
-    });
+    let localMovieTvData = uni.getStorageSync('localMovieTvData')
+    if (!localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length) {
+      uni.reLaunch({
+        url: "/pages/tv/mine/data-sync",
+      });
+    } else {
+      uni.reLaunch({
+        url: "/pages/tv/video/index",
+      });
+    }
   } else {//手机端跳转到手机端首页
     if (uni.getStorageSync("Authorization")) {
       uni.reLaunch({

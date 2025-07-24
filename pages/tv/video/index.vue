@@ -1,5 +1,5 @@
 <template>
-  <div class="tv-index">
+  <div class="tv-index" ref="tv_index" :tabindex="-1">
     <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel"
       @setFocus="setFocus"></tv-navbar>
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
@@ -33,6 +33,8 @@ import underImg from "./components/index-component/under-img.vue";
 import * as CONFIG from "@/utils/config";
 import { useVideoIndex } from "@/hooks/useVideoIndex.js";
 import { debounce } from "@/utils/scrape";
+import { onShow } from "@dcloudio/uni-app";
+
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex();
 
 const tv_navbar = ref(null);
