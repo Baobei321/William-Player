@@ -1,7 +1,8 @@
 <template>
   <div class="tv-index" ref="tv_index" :tabindex="-1">
-    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel"
-      @setFocus="setFocus"></tv-navbar>
+    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel" @setFocus="setFocus"
+      @changeSetting="changeSetting"></tv-navbar>
+    <!-- <span style="font-size: 38rpx;color: #fff;">{{ scrollTop }}</span> -->
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
     <tv-page @keyCodeClick="keyCodeClick" style="width: 100%;height: 100%;z-index: 999;position: relative;"
       :scrollTop="scrollTop">
@@ -18,6 +19,7 @@
       <video-classify ref="video_classify" :isFocus="focusModel == 'videoClassify'" :focusModel="focusModel"
         :offsetTop="scrollTop" @setFocus="setFocus"></video-classify>
     </tv-page>
+    <settings-popup v-model:visible="showSettings" ref="settings_popup" @changeSetting="changeSetting"></settings-popup>
   </div>
 </template>
 
@@ -30,10 +32,10 @@ import tvNavbar from "./components/index-component/navbar.vue";
 import starRecommend from "./components/index-component/star-recommend.vue";
 import videoClassify from "./components/index-component/classify.vue";
 import underImg from "./components/index-component/under-img.vue";
+import settingsPopup from "./components/index-component/settings-popup.vue";
 import * as CONFIG from "@/utils/config";
 import { useVideoIndex } from "@/hooks/useVideoIndex.js";
 import { debounce } from "@/utils/scrape";
-import { onShow } from "@dcloudio/uni-app";
 
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex();
 
@@ -43,6 +45,7 @@ const recent_played = ref(null);
 const hx_movie = ref(null);
 const hx_tv = ref(null);
 const video_classify = ref(null);
+const settings_popup = ref(null)
 
 const underImgArr = ref([]);
 const swipeIndex = ref(0);
@@ -50,6 +53,8 @@ const leave = ref(false);
 
 const focusModel = ref("starRecommend");
 const scrollTop = ref(0)
+
+const showSettings = ref(false)
 
 const keyCodeClick = (keyCode) => {
   if (!tv_navbar.value) return; //用于保证dom已加载完成
@@ -60,13 +65,14 @@ const keyCodeClick = (keyCode) => {
     "hxMovie": hx_movie.value,
     "hxTv": hx_tv.value,
     "videoClassify": video_classify.value,
+    'settingsPopup': settings_popup.value,
   };
   mapping[focusModel.value].evtMove(keyCode);
 };
 
 const setScrollTop = debounce(async (refValue) => {
   nextTick(() => {
-    scrollTop.value = refValue.getScrollTop()
+    scrollTop.value = refValue.getScrollTop() || 0
   })
 }, 300);
 
@@ -100,7 +106,7 @@ const setFocus = async (val, keyCode) => {
     let time = Date.now();
     if (time - nowTime > 300) {
       nextTick(() => {
-        scrollTop.value = mapping[focusModel.value].getScrollTop()  //用于设置tv-page页面的滚动，获取模块距离顶部的距离
+        scrollTop.value = mapping[focusModel.value].getScrollTop() || 0  //用于设置tv-page页面的滚动，获取模块距离顶部的距离
       })
     } else {
       setScrollTop(mapping[focusModel.value]);
@@ -108,6 +114,19 @@ const setFocus = async (val, keyCode) => {
     nowTime = time;
   }
 };
+
+//打开设置
+const changeSetting = (val) => {
+  showSettings.value = val
+  if (val) {
+    focusModel.value = 'settingsPopup'
+  } else {
+    focusModel.value = 'tvNavbar'
+    nextTick(() => {
+      tv_navbar.value.tabIndex = 3
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>

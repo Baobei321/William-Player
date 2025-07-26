@@ -55,7 +55,8 @@ import * as CONFIG from "@/utils/config";
 import logOut from "@/static/log-out.png";
 import iconMedia from "@/static/icon-media.png";
 import iconTb from "@/static/icon-tb.png";
-import iconDownload from "@/static/icon-download.png";
+// import iconDownload from "@/static/icon-download.png";
+import iconMulu from "@/static/icon-mulu.png"
 import iconDeepseek from "@/static/icon-deepseek.png";
 import iconFeedback from "@/static/icon-feedback.png";
 import iconGift from "@/static/icon-gift.png";
@@ -95,10 +96,9 @@ const cellOptions = ref([
       tip: "敬请期待...",
     },
     {
-      title: "下载管理",
-      leftIcon: iconDownload,
-      path: null,
-      tip: "敬请期待...",
+      title: "目录设置",
+      leftIcon: iconMulu,
+      path: "/pages/mobile/media/catelog-setting",
     },
     {
       title: "深度求索",

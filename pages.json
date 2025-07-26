@@ -71,6 +71,12 @@
       }
     },
     {
+      "path": "pages/mobile/media/catelog-setting",
+      "style": {
+        "navigationBarTitleText": "目录设置"
+      }
+    },
+    {
       "path": "pages/mobile/source/source-list",
       "style": {
         "navigationStyle": "custom"
@@ -207,7 +213,7 @@
     "rpxCalcMaxDeviceWidth": 700
   },
   "uniIdRouter": {},
-  "tabBar": {
+  "tabBar": { //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
     "color": "#86909C",
     "selectedColor": "#ff6701",
     "backgroundColor": "@tabBarBackgroundColor",

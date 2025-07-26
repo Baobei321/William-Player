@@ -13,6 +13,7 @@ import wilQrcode from "@/components/mobile/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
 import { setShareData, deleteShareData, getShareData } from "@/network/apis";
 import { onUnload } from "@dcloudio/uni-app";
+import * as CONFIG from '@/utils/config'
 
 const wilQrcodeRef = ref(null);
 let port = "";
@@ -24,6 +25,7 @@ const scanCode = () => {
       let result = JSON.parse(res.result);
       if (result.type == "dataSync") {
         let obj = {
+          userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
           localMovieTvData: uni.getStorageSync("localMovieTvData"),
           sourceList: uni.getStorageSync("sourceList"),
           historyPlay: uni.getStorageSync("historyPlay"),
@@ -104,10 +106,12 @@ page {
   align-items: center;
   padding-top: 200rpx;
   box-sizing: border-box;
+
   .scan-text {
     font-size: 32rpx;
     color: #000;
   }
+
   .scan-tip {
     margin-top: 100rpx;
     padding: 0 100rpx;
@@ -122,9 +126,11 @@ page {
     margin-top: 20rpx;
   }
 }
+
 @media (prefers-color-scheme: dark) {
   .data-sync {
     background: #1e1e20;
+
     .scan-text {
       color: #fff;
     }

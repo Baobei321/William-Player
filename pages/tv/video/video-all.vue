@@ -5,7 +5,7 @@
       <div class="video-all-list">
         <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
           idKey="path" :listContainerClass="routerParams.title == '最近观看' ? 'list-recent' : 'list-container'"
-          :pageSize="windowWidth > 700 ? 12 : 12" :changeItemFn="changeItemFn" :style="{ '--line-height': lineHeight }"
+          :pageSize="windowWidth > 700 ? 18 : 12" :changeItemFn="changeItemFn" :style="{ '--line-height': lineHeight }"
           :scrollIntoView="scrollIntoView" :scroll-with-animation="true" @currentData="currentData">
           <template #default="item">
             <div :class="['video-all-list__item', tabIndex === item.$index ? 'video-all-list__active' : '']"

@@ -15,6 +15,7 @@ import wilQrcode from "@/components/mobile/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
 import { setShareData, deleteShareData, getShareData } from "@/network/apis";
 import { onUnload } from "@dcloudio/uni-app";
+import * as CONFIG from '@/utils/config'
 
 const wilQrcodeRef = ref(null);
 let port = "";
@@ -32,6 +33,10 @@ const refreshStatus = () => {
         await getShareData({ port: port })
             .then((res) => {
                 if (res.data) {
+                    uni.setStorageSync(CONFIG.USER_KEY, res.data.userInfo.userKey)
+                    uni.setStorageSync(CONFIG.USER_ID, res.data.userInfo.userId)
+                    uni.setStorageSync('userPassword', res.data.userInfo.userPassword)
+                    uni.setStorageSync('Authorization', res.data.userInfo.Authorization)
                     uni.setStorageSync("localMovieTvData", res.data.localMovieTvData);
                     uni.setStorageSync("sourceList", res.data.sourceList);
                     uni.setStorageSync("historyPlay", res.data.historyPlay);
@@ -67,10 +72,11 @@ onUnload(() => {
 </script>
 
 <style lang="scss" scoped>
-page{
+page {
     width: 100%;
     height: 100%;
 }
+
 .info-sync {
     width: 100%;
     height: 100%;

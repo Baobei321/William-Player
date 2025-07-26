@@ -102,6 +102,8 @@ const evtMove = (keyCode) => {
       tabIndex.value += 4
       emits("setFocus", 'videoClassify', 'KeyDown');
     }
+  } else if (keyCode === 'KeyEnter') {
+    toVideoAll(listData.value[tabIndex.value])
   }
   // let time = Date.now();
   // if (time - nowTime > 300) {
@@ -127,7 +129,7 @@ setItemWidth();
 //跳转到videoAll
 const toVideoAll = (item) => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-all?title=${item.label}&genreId=${item.id}`,
+    url: `/pages/tv/video/video-all?title=${item.label}&genreId=${item.id}`,
   });
 };
 

@@ -79,7 +79,7 @@ const confirm = ({ selectedValue, selectedOptions }) => {
 
 const toQQpage = () => {
   let query = {
-    url: CONFIG.BASE_URL.split(":4040")[0] + ":8080/app-webview/#/qqTalk",
+    url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview/#/qqTalk",
     title: "问题与反馈",
   };
   uni.navigateTo({

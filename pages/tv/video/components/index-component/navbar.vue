@@ -13,7 +13,8 @@
       </div>
     </div>
     <div class="tv-navbar-right">
-      <div :class="['tv-navbar-right__icon', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']">
+      <div :class="['tv-navbar-right__icon', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']"
+        @click="openSetting">
         <image class="tv-navbar-right__icon-img" src="@/static/chilun-icon.png"></image>
       </div>
       <span>{{ nowTime }}</span>
@@ -30,7 +31,7 @@ const props = defineProps({
   isFocus: { type: Boolean, default: false },
   focusModel: { type: String, default: "" },
 });
-const emits = defineEmits(["setFocus"]);
+const emits = defineEmits(["setFocus", "changeSetting"]);
 
 const tabsArr = ref(["影视", "直播"]);
 const activeTab = ref("影视");
@@ -50,6 +51,12 @@ const evtMove = (keyCode) => {
     }
   } else if (keyCode === "KeyDown") {
     emits("setFocus", 'starRecommend', 'KeyDown');
+  } else if (keyCode === 'KeyEnter') {
+    if (tabIndex.value === 0) { //点击搜索
+
+    } else if (tabIndex.value === 3) {//点击设置
+      openSetting()
+    }
   }
   if (tabIndex.value == 1) {
     activeTab.value = '影视'
@@ -57,6 +64,9 @@ const evtMove = (keyCode) => {
     activeTab.value = '直播'
   }
 };
+const openSetting = () => {
+  emits('changeSetting', true)
+}
 const getScrollTop = () => {
   return 0
 }
@@ -85,6 +95,7 @@ watch(
 defineExpose({
   evtMove,
   getScrollTop,
+  tabIndex
 })
 </script>
 
@@ -165,6 +176,7 @@ defineExpose({
       padding: 10rpx;
       border: 4rpx solid transparent;
       display: flex;
+      cursor: pointer;
 
       .tv-navbar-right__icon-img {
         width: 50rpx;

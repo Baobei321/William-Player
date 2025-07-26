@@ -32,9 +32,13 @@ export default {
 div {
   box-sizing: border-box;
 }
+*:focus {
+  outline: none;
+}
+
 @media (prefers-color-scheme: dark) {
   .nut-popup {
-    background: #272727 !important;
+    // background: #272727 !important;
   }
   .nut-picker {
     background: #272727 !important;
