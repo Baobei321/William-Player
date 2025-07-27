@@ -77,6 +77,12 @@
       }
     },
     {
+      "path": "pages/mobile/media/catelog-mulu",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
       "path": "pages/mobile/source/source-list",
       "style": {
         "navigationStyle": "custom"
@@ -155,6 +161,7 @@
         "navigationStyle": "custom"
       }
     },
+    //TV端页面
     {
       "path": "pages/tv/video/index",
       "style": {

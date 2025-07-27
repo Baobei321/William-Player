@@ -187,7 +187,6 @@ page {
                   padding: 26rpx 0;
                   box-shadow: none;
                   background: transparent;
-                  box-shadow: none;
                   .nut-cell__icon {
                     .nutui-icon {
                       width: 40rpx;

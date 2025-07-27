@@ -1,6 +1,6 @@
 import App from './App'
 import * as Pinia from 'pinia';
-import { HFdebugging } from '@/uni_modules/HF-HF_debugging/common/next.js'
+// import { HFdebugging } from '@/uni_modules/HF-HF_debugging/common/next.js'
 
 // #ifndef VUE3
 import Vue from 'vue'
