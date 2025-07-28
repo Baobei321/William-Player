@@ -3,7 +3,7 @@
         <div class="select-folder-title">
             <nut-icon name="rect-left" :custom-color="props.arrowColor" @click="toBack"></nut-icon>
             <span>添加{{ props.title }}目录</span>
-            <span class="title-right">确认</span>
+            <span class="title-right" @click="confirm">确认</span>
         </div>
         <wil-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :key="key"
             :responseAdapter="responseAdapter" @currentData="handleData" :refresher-enabled="false">
@@ -38,6 +38,7 @@ import videoPlayer from "@/static/video-player.png";
 import photoIcon from "@/static/photo-icon.png";
 import checkIcon from '@/static/check.png'
 import checkActive from '@/static/check-active.png'
+import { onBeforeMount } from 'vue';
 
 const props = defineProps({
     selectType: { type: Object, default: {} },
@@ -46,8 +47,9 @@ const props = defineProps({
     title: { type: String, default: '' }
 })
 
-const emits = defineEmits(['openSource'])
+const emits = defineEmits(['openSource', 'confirm'])
 
+const muluData = ref(uni.getStorageSync('muluData') || {})
 const isInit = ref(true)
 const path = ref('')
 const folderFileId = ref(null)
@@ -110,7 +112,7 @@ const getFileList = async (data) => {
         return new Promise((resolve) => {
             uni.request({
                 url: props.selectMedia.protocol + "://" + props.selectMedia.address + ":" + props.selectMedia.port + "/api/fs/list",
-                data: JSON.stringify({ path: "/" + path.value, page: data.pageNum, per_page: data.pageSize, refresh: false }),
+                data: JSON.stringify({ path: path.value ? path.value : '/', page: data.pageNum, per_page: data.pageSize, refresh: false }),
                 method: "POST",
                 header: { Authorization: props.selectMedia.token, "Content-Type": "application/json" },
                 success: (res) => {
@@ -201,6 +203,31 @@ const setImg = (item) => {
         }
     }
 };
+
+//确认选择该路径
+const confirm = () => {
+    if (!selectName.value) {
+        uni.showToast({
+            title: "请选择目录",
+            icon: "none"
+        })
+        return
+    }
+    if (props.selectType.type == 'WebDAV') {
+        let obj = { type: props.selectType.type, name: props.selectMedia.name, path: path.value || '/' }
+        props.title == '电视剧' ? muluData.value.tv.push(obj) : muluData.value.movie.push(obj)
+    } else {
+        let obj = { type: props.selectType.type, name: props.selectMedia.name, path: path.value || '/', folderFileId: folderFileId.value }
+        props.title == '电视剧' ? muluData.value.tv.push(obj) : muluData.value.movie.push(obj)
+    }
+    emits('confirm')
+    uni.setStorageSync('muluData', muluData.value)
+}
+onBeforeMount(() => {
+    muluData.value = uni.getStorageSync('muluData') || {}
+    muluData.value?.tv ? '' : muluData.value.tv = []
+    muluData.value?.movie ? '' : muluData.value.movie = []
+})
 </script>
 
 <style lang="scss" scoped>
@@ -227,7 +254,8 @@ const setImg = (item) => {
             position: absolute;
             left: 24rpx;
         }
-        .title-right{
+
+        .title-right {
             color: #2457fd;
             font-size: 32rpx;
             position: absolute;

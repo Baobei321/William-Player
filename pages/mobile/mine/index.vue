@@ -98,8 +98,8 @@ const cellOptions = ref([
     {
       title: "目录设置",
       leftIcon: iconMulu,
-      // path: "/pages/mobile/media/catelog-setting",
-      path: null,
+      path: "/pages/mobile/media/catelog-setting",
+      // path: null,
       tip: "敬请期待...",
     },
     {
