@@ -13,7 +13,6 @@
                     <div class="right-path">{{ item.path }}</div>
                 </div>
             </div>
-            <Popover v-model:visible="showPopover" :options="popoverOptions"></Popover>
         </div>
         <div class="catelog-mulu-add catelog-mulu-item" @click="toSelectSource">
             <div class="catelog-mulu-add__icon">
@@ -25,6 +24,7 @@
             <select-folder v-if="showModel === 'folder'" :selectType="selectType" :selectMedia="selectMedia"
                 :result="res" :title="routerParams.title" @openSource="openSource" @confirm="confirm"></select-folder>
         </nut-popup>
+        <Popover v-model:visible="showPopover" :options="popoverOptions" :position="position"></Popover>
     </div>
 </template>
 
@@ -38,6 +38,7 @@ import dyBlack from '@/static/dy-black.png'
 import webdavFileIcon from "@/static/webdav-fileIcon.png";
 import Popover from './components/popover.vue';
 import tongbuIcon from '@/static/tongbu-icon.png'
+import editIcon from '@/static/edit_icon.png'
 import deleteIcon from '@/static/delete-icon.png'
 
 
@@ -52,17 +53,27 @@ const routerParams = ref({})
 
 const showPopover = ref(false)
 const selectItem = ref({})
+const position = ref({})
+const mapping1 = {
+    '电视剧': 'tv',
+    '电影': 'movie'
+}
 
 const handleGx = () => {
 
 }
 
+// const handleEdit = () => {}
+
 const handleDelete = () => {
     listData.value = listData.value.filter(item => item.name != selectItem.value.name)
+    muluData.value[mapping1[routerParams.value.title]] = listData.value
+    uni.setStorageSync('muluData', muluData.value)
 }
 
 const popoverOptions = ref([
     { icon: tongbuIcon, label: '刮削', color: '#1B1B1B', func: handleGx },
+    // { icon: editIcon, label: '修改', color: '#1B1B1B', func: handleEdit },
     { icon: deleteIcon, label: '删除', color: '#FE4344', func: handleDelete }
 ])
 
@@ -75,6 +86,8 @@ const mapping = {
 const clickItem = (event, item) => {
     selectItem.value = item
     showPopover.value = true
+    position.value.clientX = event.clientX || event.touches[0].clientX
+    position.value.clientY = event.clientY || event.touches[0].clientY
 }
 
 const toSelectSource = () => {
@@ -93,10 +106,11 @@ const openSource = () => {
     showModel.value = 'source'
 }
 
-const confirm = () => {
+const confirm = (data) => {
     showBottom.value = false
     showModel.value = 'source'
-    muluData.value = uni.getStorageSync('muluData') || {}
+    muluData.value = data
+    listData.value = muluData.value[mapping1[routerParams.value.title]]
 }
 
 onLoad((options) => {
@@ -104,11 +118,7 @@ onLoad((options) => {
     muluData.value?.tv ? '' : muluData.value.tv = []
     muluData.value?.movie ? '' : muluData.value.movie = []
     routerParams.value = options
-    if (options.title == '电视剧') {
-        listData.value = muluData.value.tv
-    } else if (options.title == '电影') {
-        listData.value = muluData.value.movie
-    }
+    listData.value = muluData.value[mapping1[routerParams.value.title]]
     setTimeout(() => {
         uni.setNavigationBarTitle({
             title: options.title + '目录设置',
@@ -140,7 +150,6 @@ page {
         height: 250rpx;
         display: flex;
         flex-direction: column;
-        position: relative;
         margin-top: 24rpx;
 
         .item-top {

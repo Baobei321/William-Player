@@ -58,6 +58,11 @@ const key = ref('1')
 const folderFileIdArr = ref([])
 const selectName = ref('') //选中的文件夹的name
 
+const mapping = {
+    '电视剧': 'tv',
+    '电影': 'movie'
+}
+
 const responseAdapter = (result) => {
     if (!result) {
         return {
@@ -172,7 +177,6 @@ const getFileList = async (data) => {
 const clickCell = async (item) => {
     if (item.type == "1") {
         selectName.value = ''
-        console.log(selectName.value);
         path.value = path.value + "/" + item.name
         if (props.selectType.type == "WebDAV") {
             key.value === '1' ? key.value = '2' : key.value = '1'
@@ -203,7 +207,7 @@ const setImg = (item) => {
         }
     }
 };
-
+``
 //确认选择该路径
 const confirm = () => {
     if (!selectName.value) {
@@ -214,13 +218,21 @@ const confirm = () => {
         return
     }
     if (props.selectType.type == 'WebDAV') {
-        let obj = { type: props.selectType.type, name: props.selectMedia.name, path: path.value || '/' }
-        props.title == '电视剧' ? muluData.value.tv.push(obj) : muluData.value.movie.push(obj)
+        let exit = muluData.value[mapping[props.title]].find(v => v.type == props.selectType.type && v.name == props.selectMedia.name)
+        //已存在就替换，不存在就新增
+        exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[props.title]].push({ type: props.selectType.type, name: props.selectMedia.name, path: path.value + '/' + selectName.value || '/' })
     } else {
-        let obj = { type: props.selectType.type, name: props.selectMedia.name, path: path.value || '/', folderFileId: folderFileId.value }
-        props.title == '电视剧' ? muluData.value.tv.push(obj) : muluData.value.movie.push(obj)
+        let exit = muluData.value[mapping[props.title]].find(v => v.type == props.selectType.type && v.name == props.selectMedia.name)
+        //已存在就替换，不存在就新增
+        if (exit) {
+            exit.path = path.value + '/' + selectName.value || '/'
+            exit.folderFileId = folderFileId.value
+        } else {
+            let obj = { type: props.selectType.type, name: props.selectMedia.name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
+            muluData.value[mapping[props.title]].push(obj)
+        }
     }
-    emits('confirm')
+    emits('confirm', muluData.value)
     uni.setStorageSync('muluData', muluData.value)
 }
 onBeforeMount(() => {

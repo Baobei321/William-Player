@@ -1,12 +1,19 @@
 <template>
-    <nut-transition :show="showPopover" name="fade" :duration="200">
-        <div class="popover" ref="popoverRef" :style="{ left: positionObj.left, top: positionObj.top }">
+    <nut-transition :show="showPopover" name="fade" :duration="200" style="z-index: 9999;">
+        <div class="popover" :style="{ left: positionObj.left, top: positionObj.top }">
             <div class="popover-item" v-for="item in props.options" :key="item.label" @click="clickItem(item)">
                 <image :src="item.icon"></image>
                 <span :style="{ color: item.color }">{{ item.label }}</span>
             </div>
         </div>
     </nut-transition>
+    <div class="popover-overlay" v-show="showPopover" @click="closePopover"></div>
+    <div class="seat-popover" ref="seat_popover">
+        <div class="popover-item" v-for="item in props.options" :key="item.label">
+            <image :src="item.icon"></image>
+            <span :style="{ color: item.color }">{{ item.label }}</span>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -24,21 +31,49 @@ const showPopover = ref(false)
 
 const isInit = ref(true)
 const positionObj = ref({})
+const rectValue = ref({})
 
-const popoverRef = ref(null)
+const seat_popover = ref(null)
 
 // 判断弹窗显示的位置
 const adjustMenuPosition = () => {
-    if (!popoverRef.value) return
+    if (!seat_popover.value) return
+    console.log("daozhe", props.position);
     // 获取系统信息（替代 window.innerWidth/Height）
     const systemInfo = uni.getSystemInfoSync()
     const viewportWidth = systemInfo.windowWidth
     const viewportHeight = systemInfo.windowHeight
-        console.log(viewportHeight, 'asd');
+    console.log(44);
+
+    if (rectValue.value.width) {
+        const menuWidth = rectValue.value.width
+        const menuHeight = rectValue.value.height
+
+        // 计算最终位置
+        let finalX = props.position.clientX
+        let finalY = props.position.clientY
+        // 右侧空间检查
+        if (finalX + menuWidth > viewportWidth) {
+            finalX = viewportWidth - menuWidth - 5
+        }
+
+        // 底部空间检查
+        if (finalY + menuHeight > viewportHeight) {
+            finalY = props.position.clientY - menuHeight
+        }
+        // 应用位置（通过 CSS 变量或直接设置样式）
+        positionObj.value = {
+            left: `${finalX}px`,
+            top: `${finalY - 44}px`,
+        }
+        showPopover.value = true
+        return
+    }
     // 创建节点查询（替代 offsetWidth/Height）
     const query = uni.createSelectorQuery().in(this)
-    query.select('.popover').boundingClientRect(rect => {
+    query.select('.seat-popover').boundingClientRect(rect => {
         if (!rect) return
+        rectValue.value = rect
         const menuWidth = rect.width
         const menuHeight = rect.height
 
@@ -53,32 +88,41 @@ const adjustMenuPosition = () => {
         // 底部空间检查
         if (finalY + menuHeight > viewportHeight) {
             finalY = props.position.clientY - menuHeight
-        } else {
         }
 
         // 应用位置（通过 CSS 变量或直接设置样式）
         positionObj.value = {
             left: `${finalX}px`,
-            top: `${finalY}px`,
+            top: `${finalY - 44}px`,
         }
+        showPopover.value = true
 
     }).exec()
 }
 
+const closePopover = () => {
+    showPopover.value = false
+    emits('update:visible', false)
+}
+
 // 点击选项
 const clickItem = (item) => {
+    showPopover.value = false
+    emits('update:visible', false)
     item.func()
 }
 
 watch(
     () => props.visible,
     (val) => {
-        showPopover.value = val
+        if (!val) {
+            showPopover.value = val
+        } else {
+            adjustMenuPosition()
+        }
     }, { immediate: true })
 onMounted(() => {
-    setTimeout(() => {
-        adjustMenuPosition()
-    }, 1000);
+    // adjustMenuPosition()
 })
 onBeforeUnmount(() => {
 })
@@ -87,9 +131,9 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .popover {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%);
+    // left: 50%;
+    // top: 50%;
+    // transform: translateX(-50%);
     background: #fff;
     z-index: 999;
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.11);
@@ -112,7 +156,8 @@ onBeforeUnmount(() => {
         span {
             padding-left: 4px;
             font-size: 14px;
-              white-space: nowrap; /* 防止文字换行 */
+            white-space: nowrap;
+            /* 防止文字换行 */
         }
 
         &:active {
@@ -122,11 +167,53 @@ onBeforeUnmount(() => {
     }
 }
 
-.m-app {
-    .popover-item {
-        span {
-            font-size: 0.933rem;
+.popover-overlay {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: transparent;
+    position: fixed;
+    z-index: 99;
+}
 
+.seat-popover {
+    position: absolute;
+    right: -600rpx;
+    opacity: 0;
+
+    // left: 50%;
+    // top: 50%;
+    // transform: translateX(-50%);
+    background: #fff;
+    z-index: 999;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.11);
+    border-radius: 8px 8px 8px 8px;
+    border: 1px solid #E0E0E0;
+    padding: 4px;
+
+    .popover-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        image {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        span {
+            padding-left: 4px;
+            font-size: 14px;
+            white-space: nowrap;
+            /* 防止文字换行 */
+        }
+
+        &:active {
+            background: #F6F6F6;
+            border-radius: 6px 6px 6px 6px;
         }
     }
 }
