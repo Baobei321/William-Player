@@ -23,9 +23,22 @@ export default {
       sourceList: [],
       cookieObj: {},
       routerParams: {},
+      oldName: ''
     };
   },
   methods: {
+    editMulu(newName) {
+      const muluData = uni.getStorageSync('muluData')
+      let muluMovie = muluData.movie?.find(v => v.name == this.oldName)
+      let muluTv = muluData.tv?.find(v => v.name == this.oldName)
+      if (muluMovie) {
+        muluMovie.name = newName
+      }
+      if (muluTv) {
+        muluTv.name = newName
+      }
+      uni.setStorageSync('muluData', muluData)
+    },
     debounce(func, wait) {
       return function () {
         let context = this; // 保存this指向
@@ -65,10 +78,12 @@ export default {
       if (res.res_code == 0) {
         let res1 = await get189User(this.cookieObj);
         if (cloud189.list.length) {
+          this.oldName = cloud189.list[0].name
           if (cloud189.list[0].name != res1.loginName) {
             let historyArr = uni.getStorageSync("historyPlay") || [];
             historyArr = historyArr.filter((v) => v.sourceType != "天翼云盘" || v.sourceName != cloud189.list[0].name);
             uni.setStorageSync("historyPlay", historyArr);
+            this.editMulu(res1.loginName) //修改电视剧电影目录
           }
           cloud189.list[0].name = res1.loginName;
           Object.keys(this.cookieObj).forEach((item) => {
@@ -113,6 +128,11 @@ export default {
             title: "添加成功",
             icon: "none",
           });
+          setTimeout(() => {
+            uni.navigateTo({
+              url: '/pages/mobile/media/catelog-setting'
+            })
+          }, 1800);
           addOperLog({ title: "登录天翼云盘", businessType: 12, operatorType: 2, operUrl: "" });
         }
         uni.setStorageSync("sourceList", this.sourceList);
@@ -146,6 +166,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+
   .wil-webview {
     flex: 1;
   }

@@ -87,7 +87,7 @@ const clickItem = (event, item) => {
     selectItem.value = item
     showPopover.value = true
     position.value.clientX = event.clientX || event.touches[0].clientX
-    position.value.clientY = event.clientY || event.touches[0].clientY
+    position.value.clientY = event.clientY - 44 || event.touches[0].clientY
 }
 
 const toSelectSource = () => {
@@ -136,21 +136,23 @@ page {
 .catelog-mulu {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     // align-items: flex-start;
     align-content: flex-start;
     padding: 24rpx;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 
     .catelog-mulu-item {
         flex: 0 0 calc(50% - 12rpx);
+        overflow: hidden;
         background: #f9f8ff;
         border-radius: 16rpx;
         height: 250rpx;
         display: flex;
         flex-direction: column;
         margin-top: 24rpx;
+        margin-left: 24rpx;
 
         .item-top {
             display: flex;
@@ -178,6 +180,7 @@ page {
             flex: 1;
             padding-left: 24rpx;
             padding-right: 12rpx;
+            overflow: hidden;
 
             image {
                 flex: 0 0 70rpx;
@@ -189,6 +192,7 @@ page {
             .item-bottom-right {
                 flex: 1;
                 margin-left: 24rpx;
+                overflow: hidden;
 
                 .right-name {
                     font-size: 28rpx;
@@ -197,6 +201,8 @@ page {
                     -webkit-box-orient: vertical;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    width: 100%;
+                    word-break: break-all;
                 }
 
                 .right-path {
@@ -207,6 +213,8 @@ page {
                     -webkit-box-orient: vertical;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    width: 100%;
+                    word-break: break-all;
                 }
             }
         }
@@ -217,6 +225,10 @@ page {
 
         &:nth-child(2) {
             margin-top: 0;
+        }
+
+        &:nth-child(2n+1) {
+            margin-left: 0;
         }
     }
 

@@ -405,7 +405,9 @@ export function useVideoIndex() {
     //根据设定好的文件路径进行查找天翼云盘的文件
     const get189MovieTv = async () => {
         let muluData = uni.getStorageSync('muluData') || {}
-        if (!muluData?.tv?.length && !muluData?.movie?.length) {
+        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
+        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
+        if (!movieMulu && !tvMulu) {
             uni.showToast({
                 title: '请设置电影电视剧目录',
                 icon: 'none'
@@ -414,7 +416,6 @@ export function useVideoIndex() {
         }
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
         if (movieMulu) {
             let movieResult = await get189Folder({ folderId: movieMulu.folderFileId }, selectMedia.value);
             let movieArr = movieResult.fileListAO.fileList.filter((v) => {
@@ -437,9 +438,8 @@ export function useVideoIndex() {
                 icon: 'none'
             })
         }
-        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
-        if (tvMulu) {
-            let tvResult = await getFolder({ folderId: tvMulu.folderFileId }, selectMedia.value);
+        if (tvMulu) {            
+            let tvResult = await get189Folder({ folderId: tvMulu.folderFileId }, selectMedia.value);
             tvResult.fileListAO.folderList ? "" : (tvResult.fileListAO.folderList = []);
             await Promise.allSettled(
                 tvResult.fileListAO.folderList.map(async (v) => {
@@ -506,7 +506,9 @@ export function useVideoIndex() {
     //查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
     const getQuarkMovieTv = async () => {
         let muluData = uni.getStorageSync('muluData') || {}
-        if (!muluData?.tv?.length && !muluData?.movie?.length) {
+        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
+        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
+        if (!movieMulu && !tvMulu) {
             uni.showToast({
                 title: '请设置电影电视剧目录',
                 icon: 'none'
@@ -515,7 +517,6 @@ export function useVideoIndex() {
         }
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
         if (movieMulu) {
             let movieResult = await getQuarkFolder({ fid: movieMulu.folderFileId }, selectMedia.value);
             await Promise.allSettled(
@@ -540,7 +541,6 @@ export function useVideoIndex() {
                 icon: 'none'
             })
         }
-        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
         if (tvMulu) {
             let tvResult = await getQuarkFolder({ fid: tvMulu.folderFileId }, selectMedia.value);
             tvResult.data.list ? "" : (tvResult.data.list = []);

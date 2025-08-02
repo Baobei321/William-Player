@@ -43,7 +43,6 @@ const adjustMenuPosition = () => {
     const systemInfo = uni.getSystemInfoSync()
     const viewportWidth = systemInfo.windowWidth
     const viewportHeight = systemInfo.windowHeight
-    console.log(44);
 
     if (rectValue.value.width) {
         const menuWidth = rectValue.value.width
@@ -64,7 +63,7 @@ const adjustMenuPosition = () => {
         // 应用位置（通过 CSS 变量或直接设置样式）
         positionObj.value = {
             left: `${finalX}px`,
-            top: `${finalY - 44}px`,
+            top: `${finalY}px`,
         }
         showPopover.value = true
         return
@@ -93,7 +92,7 @@ const adjustMenuPosition = () => {
         // 应用位置（通过 CSS 变量或直接设置样式）
         positionObj.value = {
             left: `${finalX}px`,
-            top: `${finalY - 44}px`,
+            top: `${finalY}px`,
         }
         showPopover.value = true
 
@@ -178,7 +177,7 @@ onBeforeUnmount(() => {
 }
 
 .seat-popover {
-    position: absolute;
+    position: fixed;
     right: -600rpx;
     opacity: 0;
 

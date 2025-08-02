@@ -15,7 +15,7 @@
                     <template #icon>
                         <div class="cell-icon">
                             <image :src="selectName == item.name ? checkActive : checkIcon"
-                                @click.stop="chooseName(item.name)"></image>
+                                @click.stop="chooseName(item)"></image>
                             <image :src="setImg(item)" />
                         </div>
                     </template>
@@ -89,8 +89,9 @@ const removeLastSegment = (dateStr) => {
     return dateStr.substring(0, lastSlashIndex);
 }
 
-const chooseName = (name) => {
-    selectName.value == name ? selectName.value = '' : selectName.value = name
+const chooseName = (item) => {
+    selectName.value == item.name ? selectName.value = '' : selectName.value = item.name
+    folderFileId.value = item.folderFileId
 }
 
 const toBack = () => {
@@ -102,9 +103,11 @@ const toBack = () => {
             emits('openSource')
         }
     } else { //如果是天翼或者夸克
-        if (folderFileIdArr.value.length) {
+        if (folderFileIdArr.value.length > 1) {
+            path.value = removeLastSegment(path.value)
             folderFileIdArr.value.pop()
             folderFileId.value = folderFileIdArr.value[folderFileIdArr.value.length - 1]
+            key.value === '1' ? key.value = '2' : key.value = '1'
         } else {
             emits('openSource')
         }
@@ -155,6 +158,7 @@ const getFileList = async (data) => {
     } else if (props.selectType.type == "夸克网盘") {
         if (isInit.value) {//初始化用传过来的res
             isInit.value = false
+            folderFileIdArr.value.push('0')
             let result1 = JSON.parse(JSON.stringify(props.result))
             result1.data.list.forEach((v) => {
                 v.file_type == 0 ? (v.type = 1) : (v.type = 0);
@@ -183,9 +187,11 @@ const clickCell = async (item) => {
         } else if (props.selectType.type == "天翼云盘") {
             folderFileIdArr.value.push(item.folderFileId)
             folderFileId.value = item.folderFileId
+            key.value === '1' ? key.value = '2' : key.value = '1'
         } else if (props.selectType.type == "夸克网盘") {
             folderFileIdArr.value.push(item.folderFileId)
             folderFileId.value = item.folderFileId
+            key.value === '1' ? key.value = '2' : key.value = '1'
         }
     } else {
         uni.showToast({
@@ -232,6 +238,7 @@ const confirm = () => {
             muluData.value[mapping[props.title]].push(obj)
         }
     }
+    console.log(muluData.value);
     emits('confirm', muluData.value)
     uni.setStorageSync('muluData', muluData.value)
 }

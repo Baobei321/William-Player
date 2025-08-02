@@ -21,9 +21,12 @@
 import { ref } from 'vue'
 import datasyncGray from '@/static/datasync-gray.png'
 import datasyncBlack from '@/static/datasync-black.png'
+import guanyuGray from '@/static/guanyu-gray.png'
+import guanyuBlack from '@/static/guanyu-black.png'
 const settings = [
     [
         { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 0, path: '/pages/tv/mine/data-sync' },
+        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 1, path: '/pages/tv/mine/about-version' },
     ]
 ]
 const tabIndex = ref(0)
@@ -52,7 +55,7 @@ const evtMove = (keyCode) => {
     } else if (keyCode === 'KeyEnter') {
         let targetObject = null;
         for (const innerArray of settings) { // 遍历外层数组
-            targetObject = innerArray.find(item => item.index === 0); // 在内层数组中查找
+            targetObject = innerArray.find(item => item.index === tabIndex.value); // 在内层数组中查找
             if (targetObject) break; // 找到后立即终止循环
         }
         clickItem(targetObject)

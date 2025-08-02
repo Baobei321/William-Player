@@ -10,13 +10,15 @@
         <template v-if="item.list.length">
           <div class="source-list-item__title">{{ item.type }}</div>
           <div class="source-list-item__list">
-            <div :class="['list-item', item.list.length == 1 ? 'list-one' : '',vitem.active?'list-active':'']" v-for="vitem in item.list" :key="vitem.name"
-              @click="handleSelect(item,vitem)">
+            <div :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.active ? 'list-active' : '']"
+              v-for="vitem in item.list" :key="vitem.name" @click="handleSelect(item, vitem)">
               <div class="list-item-img">
                 <image :src="item.img"></image>
               </div>
-              <div class="list-item-name" :class="[vitem.active?'list-item-activeName':'']">{{ vitem.name }}</div>
-              <image class="list-item-button" :src="vitem.active ? moreOrange : theme=='light' ? moreBlack : moreWhite" @click.stop="toShowMoreButton(item,vitem)">
+              <div class="list-item-name" :class="[vitem.active ? 'list-item-activeName' : '']">{{ vitem.name }}</div>
+              <image class="list-item-button"
+                :src="vitem.active ? moreOrange : theme == 'light' ? moreBlack : moreWhite"
+                @click.stop="toShowMoreButton(item, vitem)">
               </image>
             </div>
           </div>
@@ -33,7 +35,8 @@
         <span>添加新资源</span>
       </nut-button>
     </div>
-    <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消" @choose="chooseOperation" />
+    <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消"
+      @choose="chooseOperation" />
     <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
@@ -59,7 +62,7 @@ const wil_modal = ref(null);
 const showBottom = ref(false);
 const theme = ref(uni.getSystemInfoSync().theme);
 
-const operationList = [{ name: "修改" }, { name: "删除" }];
+const operationList = [{ name: '设置电影目录' }, { name: '设置电视剧目录' }, { name: "修改" }, { name: "删除" }];
 let selectType = {};
 
 const mapping = {
@@ -171,7 +174,15 @@ const toShowMoreButton = (item, vitem) => {
 };
 
 const chooseOperation = (item) => {
-  if (item.name == "修改") {
+  if (item.name == '设置电影目录') {
+    uni.navigateTo({
+      url: `/pages/mobile/media/catelog-mulu?title=电影`
+    })
+  } else if (item.name == '设置电视剧目录') {
+    uni.navigateTo({
+      url: `/pages/mobile/media/catelog-mulu?title=电视剧`
+    })
+  } else if (item.name == "修改") {
     if (selectType.type == "WebDAV") {
       uni.navigateTo({
         url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}&isActive=${selectMedia.value.active ? "1" : "0"}`,
@@ -272,6 +283,7 @@ page {
           align-items: center;
           position: relative;
           border: 2prx solid transparent;
+
           &::before {
             position: absolute;
             content: "";
@@ -281,12 +293,14 @@ page {
             left: 0;
             top: 0;
           }
+
           &:active {
             background: rgb(241, 241, 241);
           }
 
           &:first-child {
             border-radius: 14rpx;
+
             &::before {
               display: none;
             }
@@ -322,6 +336,7 @@ page {
             font-size: 32rpx;
             color: #000;
           }
+
           .list-item-activeName {
             color: #ff6701;
           }
@@ -340,12 +355,14 @@ page {
           border-radius: 14rpx !important;
           border: 2rpx solid transparent !important;
         }
+
         .list-active {
           border: 2rpx solid #ff6701 !important;
         }
       }
     }
   }
+
   .source-list-empty {
     display: flex;
     flex-direction: column;
@@ -353,16 +370,19 @@ page {
     justify-content: center;
     width: 100%;
     height: 100%;
+
     .source-list-empty__img {
       width: 400rpx;
       height: 400rpx;
     }
+
     .source-list-empty__tip {
       text-align: center;
       padding: 0 50rpx;
       padding-bottom: 24rpx;
       color: #000;
     }
+
     ::v-deep .nut-button {
       border-radius: 12rpx;
     }
@@ -373,14 +393,17 @@ page {
       .nut-action-sheet__title {
         color: gray;
       }
+
       .nut-action-sheet__menu {
         .nut-action-sheet__item {
           border-top: 2rpx solid #f6f6f6;
+
           &:first-child {
             border-top: none;
           }
         }
       }
+
       .nut-action-sheet__cancel {
         border-top: 20rpx solid #f6f7f8;
       }
@@ -391,6 +414,7 @@ page {
 @media (prefers-color-scheme: dark) {
   .source-list {
     background: #1e1e20;
+
     ::v-deep .wil-navbar {
       .nut-navbar {
         .nut-navbar__right {
@@ -406,19 +430,25 @@ page {
         .source-list-item__title {
           color: #bcbcbc;
         }
+
         .source-list-item__list {
           background: #2f2f2f;
+
           .list-item {
             background: #2f2f2f;
+
             &::before {
               background: rgb(73, 73, 73);
             }
+
             &:active {
               background: rgb(73, 73, 73);
             }
+
             .list-item-name {
               color: #fff;
             }
+
             .list-item-activeName {
               color: #ff6701;
             }
@@ -427,50 +457,63 @@ page {
           .list-one {
             border: 2rpx solid transparent !important;
           }
+
           .list-active {
             border: 2rpx solid #ff6701 !important;
           }
         }
       }
     }
+
     .source-list-empty {
       background: #1e1e20;
+
       .source-list-empty__tip {
         color: #fff;
       }
+
       ::v-deep .nut-button {
         background-color: #fff !important;
+
         .nut-button__wrap {
           .nut-icon-uploader {
             color: #000 !important;
           }
+
           .nut-button__text {
             color: #000 !important;
           }
         }
+
         &::before {
           background-color: #fff !important;
         }
       }
     }
+
     ::v-deep .nut-popup {
       background-color: #464646;
+
       .nut-action-sheet {
         background-color: #464646;
+
         .nut-action-sheet__title {
           color: #b7b7b7;
           background-color: #343437;
           border-bottom: 2rpx solid #707070;
           font-weight: bold;
         }
+
         .nut-action-sheet__menu {
           background-color: #464646;
+
           .nut-action-sheet__item {
             background-color: #464646;
             border-top: 2rpx solid #707070;
             color: #fff;
           }
         }
+
         .nut-action-sheet__cancel {
           border-top: 20rpx solid #343437;
           background-color: #464646;
