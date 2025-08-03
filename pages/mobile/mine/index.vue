@@ -68,6 +68,8 @@ import { getCutContent } from "@/utils/common";
 import showModal from "@/components/mobile/wil-modal/modal.js";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import wilImage from "@/components/mobile/wil-image/index.vue";
+import { setShareData } from "@/network/apis";
+
 // const { getUntokenDict } = useDict()
 
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY));

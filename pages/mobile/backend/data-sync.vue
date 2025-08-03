@@ -18,6 +18,11 @@ import * as CONFIG from '@/utils/config'
 const wilQrcodeRef = ref(null);
 let port = "";
 let timer = null;
+let init = true
+// #ifdef APP-PLUS
+const TcpModule = uni.requireNativePlugin("TcpModule");
+const lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+// #endif
 
 const scanCode = () => {
   uni.scanCode({
@@ -30,11 +35,22 @@ const scanCode = () => {
           sourceList: uni.getStorageSync("sourceList"),
           historyPlay: uni.getStorageSync("historyPlay"),
         };
-        await setShareData({ port: result.port, data: obj });
-        uni.showToast({
-          title: "同步成功",
-          icon: "none",
-        });
+        // await setShareData({ port: result.port, data: obj });
+        if (init) {
+          TcpModule.connectAsClient(result.port, 1025, (res) => {
+            init = false
+            TcpModule.send(JSON.stringify(obj), (res) => {
+            })
+          })
+        } else {
+          TcpModule.send(JSON.stringify(obj), (res) => {
+          })
+        }
+
+        // uni.showToast({
+        //   title: "同步成功",
+        //   icon: "none",
+        // });
       } else {
         uni.showToast({
           title: "扫描此二维码无效",
@@ -46,8 +62,15 @@ const scanCode = () => {
 };
 
 const setQrcode = () => {
+  let ipAddress = ''
+  // #ifdef APP-PLUS
+  lyzmlDLNA.getIpAddress(val => {
+    ipAddress = val
+  })
+  // #endif
   port = String(Math.floor(Math.random() * 90000) + 10000);
-  let obj = { type: "dataSync", port: port };
+  // let obj = { type: "dataSync", port: port };
+  let obj = { type: "dataSync", port: ipAddress };
   wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
 };
 
@@ -80,14 +103,34 @@ const refreshStatus = () => {
       });
   }, 10000);
 };
-refreshStatus();
+// refreshStatus();
+
+//作为服务端开启服务
+const startServer = () => {
+  TcpModule.startServer(1025, (res) => { //接收别的设备发过来的数据
+    let result = JSON.parse(res)
+    if (result.code == 500) {
+      uni.showToast({
+        title: '出错了',
+        icon: 'none',
+      })
+    }
+  });
+}
+
 onMounted(() => {
+  console.log(JSON.stringify({ code: "500", msg: "出错了" }));
+
   setQrcode();
+  // #ifdef APP-PLUS
+  startServer()
+  // #endif
 });
 onUnload(() => {
   clearInterval(timer);
   timer = null;
   deleteShareData({ port: port });
+  TcpModule.closeAllConnections()
 });
 </script>
 
