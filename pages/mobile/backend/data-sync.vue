@@ -20,7 +20,7 @@ let port = "";
 let timer = null;
 let init = true
 // #ifdef APP-PLUS
-const TcpModule = uni.requireNativePlugin("TcpModule");
+let TcpModule = uni.requireNativePlugin("TcpModule");
 const lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
 // #endif
 
@@ -35,22 +35,49 @@ const scanCode = () => {
           sourceList: uni.getStorageSync("sourceList"),
           historyPlay: uni.getStorageSync("historyPlay"),
         };
-        // await setShareData({ port: result.port, data: obj });
         if (init) {
-          TcpModule.connectAsClient(result.port, 1025, (res) => {
-            init = false
-            TcpModule.send(JSON.stringify(obj), (res) => {
-            })
+          TcpModule.connectAsClient(result.port.split(':')[0], 1025, async (res) => {
+            let result = JSON.parse(res)
+            if (result.code == 500) {
+              await setShareData({ port: result.port.split(':')[1], data: obj });
+              uni.showToast({
+                title: "同步成功",
+                icon: "none",
+              });
+            } else {
+              init = false
+              TcpModule.send(JSON.stringify(obj), (res1) => {
+                let res2 = JSON.parse(res1)
+                if (res2.code == 500) {
+                  uni.showToast({
+                    title: '同步失败请重新扫描',
+                    icon: 'none'
+                  })
+                } else {
+                  uni.showToast({
+                    title: "同步成功",
+                    icon: "none",
+                  });
+                }
+              })
+            }
           })
         } else {
-          TcpModule.send(JSON.stringify(obj), (res) => {
+          TcpModule.send(JSON.stringify(obj), (res1) => {
+            let res2 = JSON.parse(res1)
+            if (res2.code == 500) {
+              uni.showToast({
+                title: '同步失败请重新扫描',
+                icon: 'none'
+              })
+            } else {
+              uni.showToast({
+                title: "同步成功",
+                icon: "none",
+              });
+            }
           })
         }
-
-        // uni.showToast({
-        //   title: "同步成功",
-        //   icon: "none",
-        // });
       } else {
         uni.showToast({
           title: "扫描此二维码无效",
@@ -68,16 +95,16 @@ const setQrcode = () => {
     ipAddress = val
   })
   // #endif
-  port = String(Math.floor(Math.random() * 90000) + 10000);
+  port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
   // let obj = { type: "dataSync", port: port };
-  let obj = { type: "dataSync", port: ipAddress };
+  let obj = { type: "dataSync", port: port };
   wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
 };
 
 //10s刷新一次同步状态
 const refreshStatus = () => {
   timer = setInterval(async () => {
-    await getShareData({ port: port })
+    await getShareData({ port: port.split(':')[1] })
       .then((res) => {
         if (res.data) {
           uni.setStorageSync("localMovieTvData", res.data.localMovieTvData);
@@ -85,7 +112,7 @@ const refreshStatus = () => {
           uni.setStorageSync("historyPlay", res.data.historyPlay);
           clearInterval(timer);
           timer = null;
-          deleteShareData({ port: port });
+          deleteShareData({ port: port.split(':')[1] });
           uni.showToast({
             title: "同步成功",
             icon: "none",
@@ -103,7 +130,7 @@ const refreshStatus = () => {
       });
   }, 10000);
 };
-// refreshStatus();
+refreshStatus();
 
 //作为服务端开启服务
 const startServer = () => {
@@ -119,8 +146,6 @@ const startServer = () => {
 }
 
 onMounted(() => {
-  console.log(JSON.stringify({ code: "500", msg: "出错了" }));
-
   setQrcode();
   // #ifdef APP-PLUS
   startServer()
@@ -129,8 +154,9 @@ onMounted(() => {
 onUnload(() => {
   clearInterval(timer);
   timer = null;
-  deleteShareData({ port: port });
-  TcpModule.closeAllConnections()
+  deleteShareData({ port: port.split(':')[1] });
+  TcpModule ? TcpModule.closeAllConnections() : ''
+  TcpModule = null
 });
 </script>
 

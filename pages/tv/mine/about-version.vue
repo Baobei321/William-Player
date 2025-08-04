@@ -15,10 +15,12 @@
             </div>
             <div class="about-version-protocol">
                 <image src="@/static/tmdb-xy.png"></image>
-                <div class="about-version-protocol__button" @click="toQQpage">联系我们</div>
+                <div :class="['about-version-protocol__button', tabIndex === 1 ? 'active-protocol' : '']"
+                    @click="toQQpage">
+                    联系我们</div>
                 <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
             </div>
-            <div class="about-version-button">
+            <div :class="['about-version-button', tabIndex == 2 ? 'about-check-active' : '']">
                 <nut-button :disabled="isLoading" custom-color="#ff6701" @click="checkUpdate" v-if="showButton">
                     <template #icon>
                         <nut-icon name="refresh2" class="nut-icon-am-rotate nut-icon-am-infinite"
@@ -135,23 +137,23 @@ const closedPopup = () => {
 //监听键盘事件
 const evtMove = (keyCode) => {
     if (keyCode === "KeyUp") {
-        if (tabIndex.value > 5) {
-            tabIndex.value = tabIndex.value - 6
+        if (tabIndex.value > 0) {
+            tabIndex.value = tabIndex.value - 1
         }
     } else if (keyCode === "KeyDown") {
-        if (tabIndex.value < listData.value.length - 6) {
-            tabIndex.value = tabIndex.value + 6
-        }
-    } else if (keyCode === "KeyLeft") {
-        if (tabIndex.value > 0) {
-            tabIndex.value--
-        }
-    } else if (keyCode === 'KeyRight') {
-        if (tabIndex.value < listData.value.length - 1) {
-            tabIndex.value++
+        if (tabIndex.value < 2) {
+            tabIndex.value = tabIndex.value + 1
         }
     } else if (keyCode === 'KeyEnter') {
-        toVideoDetail(listData.value[tabIndex.value])
+        if (tabIndex.value == 0) {//打开popup设置检查更新频率
+
+        } else if (tabIndex.value == 1) {//打开联系我们
+            uni.navigateTo({
+                url: "/pages/mobile/backend/index"
+            })
+        } else if (tabIndex.value == 2) {//检查更新
+
+        }
     }
 };
 
@@ -173,8 +175,9 @@ page {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     box-sizing: border-box;
-    padding-top: 250rpx;
+    // padding-top: 250rpx;
     position: relative;
     background: #1b1b20;
 
@@ -190,8 +193,8 @@ page {
             align-items: center;
 
             image {
-                width: 240rpx;
-                height: 240rpx;
+                width: 200rpx;
+                height: 200rpx;
                 border-radius: 60rpx;
             }
 
@@ -201,7 +204,7 @@ page {
 
                 span:first-child {
                     font-weight: bold;
-                    font-size: 50rpx;
+                    font-size: 40rpx;
                     color: #fff;
                 }
 
@@ -220,7 +223,7 @@ page {
             }
 
             .main-time {
-                font-size: 40rpx;
+                font-size: 35rpx;
                 margin-top: 20rpx;
                 color: #fff;
             }
@@ -234,7 +237,7 @@ page {
             width: 30%;
             background: transparent;
             box-shadow: none;
-            margin-top: 72rpx;
+            margin-top: 30rpx;
 
             .nut-cell__title {
                 font-size: 32rpx;
@@ -280,6 +283,13 @@ page {
             font-weight: bold;
             font-size: 28rpx;
             color: #68c6b3;
+            padding: 16rpx 24rpx;
+            border: 2rpx solid transparent;
+            border-radius: 16rpx;
+        }
+
+        .active-protocol {
+            border: 2rpx solid #68c6b3;
         }
 
         // .about-version-protocol__tip{
@@ -292,10 +302,13 @@ page {
     }
 
     .about-version-button {
-        position: absolute;
-        bottom: 50rpx;
+        // position: absolute;
+        // bottom: 50rpx;
+        margin-top: 50rpx;
 
         ::v-deep .nut-button {
+            border: 4rpx solid #ff6701;
+
             .nut-button__wrap {
                 flex-direction: row-reverse;
 
@@ -307,6 +320,12 @@ page {
                     margin-left: 10rpx;
                 }
             }
+        }
+    }
+
+    .about-check-active {
+        ::v-deep .nut-button {
+            border: 4rpx solid #fff !important;
         }
     }
 

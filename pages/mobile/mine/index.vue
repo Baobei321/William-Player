@@ -81,6 +81,10 @@ const wil_modal = ref(null);
 const showShareModal = ref(false);
 const shareUrl = ref("");
 
+// #ifdef APP-PLUS
+let TcpModule = uni.requireNativePlugin("TcpModule");
+// #endif
+
 const cellOptions = ref([
   [
     // { title: '报账信息', leftIcon: cellClock, path: '/pages/mobile/account-information/list' },
@@ -153,18 +157,41 @@ const openUrl = () => {
           url: `/pages/mobile/backend/index?url=${res.result}`,
         });
       } else {
-        let result = JSON.parse(res.result)
+        let result = JSON.parse(res.result);
         if (result.type == "dataSync") {
           let obj = {
+            userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
             localMovieTvData: uni.getStorageSync("localMovieTvData"),
             sourceList: uni.getStorageSync("sourceList"),
             historyPlay: uni.getStorageSync("historyPlay"),
           };
-          await setShareData({ port: result.port, data: obj });
-          uni.showToast({
-            title: "同步成功",
-            icon: "none",
-          });
+          TcpModule.connectAsClient(result.port.split(':')[0], 1025, async (res) => {
+            let result = JSON.parse(res)
+            if (result.code == 500) {
+              await setShareData({ port: result.port.split(':')[1], data: obj });
+              uni.showToast({
+                title: "同步成功",
+                icon: "none",
+              });
+            } else {
+              TcpModule.send(JSON.stringify(obj), (res1) => {
+                let res2 = JSON.parse(res1)
+                if (res2.code == 500) {
+                  uni.showToast({
+                    title: '同步失败请重新扫描',
+                    icon: 'none'
+                  })
+                } else {
+                  uni.showToast({
+                    title: "同步成功",
+                    icon: "none",
+                  });
+                }
+              })
+            }
+            TcpModule ? TcpModule.closeAllConnections() : ''
+            TcpModule = null
+          })
         } else {
           uni.showToast({
             title: "扫描此二维码无效",

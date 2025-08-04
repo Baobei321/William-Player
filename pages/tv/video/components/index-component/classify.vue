@@ -167,7 +167,9 @@ onShow(() => {
             size: true,
           },
           (res1) => {
-            gridPx.value = res1.top - res.top
+            if (res1?.top) {
+              gridPx.value = res1.top - res.top
+            }
           }
         ).exec();
       }

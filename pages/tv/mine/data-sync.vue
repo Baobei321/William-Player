@@ -20,9 +20,19 @@ import * as CONFIG from '@/utils/config'
 const wilQrcodeRef = ref(null);
 let port = "";
 let timer = null;
-
+// #ifdef APP-PLUS
+let TcpModule = uni.requireNativePlugin("TcpModule");
+const lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+// #endif
 const setQrcode = () => {
-    port = String(Math.floor(Math.random() * 90000) + 10000);
+    let ipAddress = ''
+    // #ifdef APP-PLUS
+    lyzmlDLNA.getIpAddress(val => {
+        ipAddress = val
+    })
+    // #endif
+    port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
+    // let obj = { type: "dataSync", port: port };
     let obj = { type: "dataSync", port: port };
     wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
 };
@@ -61,13 +71,31 @@ const refreshStatus = () => {
     }, 10000);
 };
 refreshStatus();
+
+//作为服务端开启服务
+const startServer = () => {
+    TcpModule.startServer(1025, (res) => { //接收别的设备发过来的数据
+        let result = JSON.parse(res)
+        if (result.code == 500) {
+            uni.showToast({
+                title: '出错了',
+                icon: 'none',
+            })
+        }
+    });
+}
 onMounted(() => {
     setQrcode();
+    // #ifdef APP-PLUS
+    startServer()
+    // #endif
 });
 onUnload(() => {
     clearInterval(timer);
     timer = null;
-    deleteShareData({ port: port });
+    deleteShareData({ port: port.split(':')[1] });
+    TcpModule ? TcpModule.closeAllConnections() : ''
+    TcpModule = null
 });
 </script>
 
