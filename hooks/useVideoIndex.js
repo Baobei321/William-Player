@@ -8,6 +8,9 @@ import { chineseToPinYin } from "@/utils/pinyin.js";
 import * as CONFIG from "@/utils/config";
 import Folder from "@/static/folder.png";
 import webdavFileIcon from "@/static/webdav-fileIcon.png";
+import { getMainView, getEmbyList, getEmbyNewList } from '@/utils/emby'
+import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
+import emptyBg from "@/static/poster-empty.png";
 
 export function useVideoIndex() {
     const video_navbar = ref(null);
@@ -438,7 +441,7 @@ export function useVideoIndex() {
                 icon: 'none'
             })
         }
-        if (tvMulu) {            
+        if (tvMulu) {
             let tvResult = await get189Folder({ folderId: tvMulu.folderFileId }, selectMedia.value);
             tvResult.fileListAO.folderList ? "" : (tvResult.fileListAO.folderList = []);
             await Promise.allSettled(
@@ -562,6 +565,41 @@ export function useVideoIndex() {
         }
     };
 
+    //Emby的refresh
+    const refreshEmby = async () => {
+        const CollectionTypeArr = ['movies', 'tvshows', 'music', 'games', 'books', 'musicvideos', 'homevideos', 'livetv', 'channels']
+        let res1 = await getMainView(selectMedia.value)
+        let embyMovieTvList = res1.Items.map(v => {
+            return {
+                name: v.Name, collectionType: v.CollectionType,
+                poster: v?.ImageTags?.Primary ? `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${v.Id}/Images/Primary?tag=${v.ImageTags.Primary}` : emptyBg,
+                id: v.Id, list: []
+            }
+        })
+        let embyObj = {
+            EnableImageTypes: 'Primary,Backdrop,Thumb',
+            Fields: 'BasicSyncInfo,CanDelete,Container,PrimaryImageAspectRatio,ProductionYear,Status,EndDate,Prefix',
+            MediaTypes: 'Video',
+            Limit: '20',
+            Recursive: true,
+            ImageTypeLimit: '1'
+        }
+        await Promise.all(embyMovieTvList.map(async v => {
+            if (CollectionTypeArr.includes(v.collectionType)) {
+                embyObj.ParentId = v.id
+                let res2 = await getEmbyNewList(embyObj, selectMedia.value)
+                let arr = res2.map(i => {
+                    return {
+                        id: i.Id, name: i.Name, provider: 'Emby', releaseTime: dayjs(i.EndDate).format('YYYY-MM-DD'),
+                        poster: i.ImageTags.Primary ? `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${i.Id}/Images/Primary?tag=${i.ImageTags.Primary}` : emptyBg
+                    }
+                })
+                v.list = arr
+            }
+        }))
+        uni.setStorageSync('embyMovieTvList', embyMovieTvList)
+    }
+
     const refreshVideo = async () => {
         if (selectType.value.type == "WebDAV") {
             await refreshWebDavVideo();
@@ -569,6 +607,8 @@ export function useVideoIndex() {
             await refresh189Video();
         } else if (selectType.value.type == "夸克网盘") {
             await refreshQuarkVideo();
+        } else if (selectType.value.type == 'Emby') {
+            await refreshEmby()
         }
         historyPlay.value = uni.getStorageSync("historyPlay") || [];
         historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
@@ -610,6 +650,7 @@ export function useVideoIndex() {
         if (!sourceList.value) {
             sourceList.value = [
                 { type: "WebDAV", list: [], img: webdavFileIcon },
+                { type: "Emby", list: [], img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc" },
                 {
                     type: "天翼云盘",
                     list: [],
@@ -693,6 +734,14 @@ export function useVideoIndex() {
                     video_navbar.value.showProgress();
                 }
             }
+        } else if (selectType.value.type == 'Emby') {
+            let isreload = uni.getStorageSync('isreload')
+            if (isreload || prevPage == "pages/mobile/backend/data-sync") {
+                uni.removeStorageSync("isreload");
+                if (uni.getStorageSync("settingData").tmdbKey) {
+                    video_navbar.value.showProgress();
+                }
+            }
         }
         //初始化资源库列表
     });
@@ -745,7 +794,7 @@ export function useVideoIndex() {
         }
     });
     return {
-        video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey,
+        video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, selectType,
         historyPlay, settingData, refreshVideo
     }
 }

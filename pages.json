@@ -101,6 +101,12 @@
       }
     },
     {
+      "path": "pages/mobile/source/add-emby",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mobile/video/index",
       "style": {
         "navigationStyle": "custom"
@@ -192,7 +198,7 @@
         "navigationStyle": "custom"
       }
     },
-     {
+    {
       "path": "pages/tv/mine/about-version",
       "style": {
         "navigationStyle": "custom"

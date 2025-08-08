@@ -27,7 +27,7 @@
     </div>
     <div class="source-list-empty" v-else>
       <image src="@/static/no-data.png" class="source-list-empty__img"></image>
-      <span class="source-list-empty__tip">请按照【/我的视频/电影，/我的视频/电视剧】路径存储资源，否则无法生成海报墙，只能在我的页面的(媒体库列表)按照文件夹进行视频播放</span>
+      <span class="source-list-empty__tip">添加完资源之后，请为此资源添加电影、电视剧目录！！！</span>
       <nut-button custom-color="#090909" @click="toAddFile">
         <template #icon>
           <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
@@ -162,6 +162,8 @@ const handleSelect = (item, vitem) => {
               icon: "none",
             });
           });
+      } else if (item.type == 'Emby') {
+        resetSelect(vitem)
       }
     },
   });

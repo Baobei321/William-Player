@@ -17,9 +17,9 @@
             <div class="recent-played-list-movie__item-img">
               <image :src="!props.isConnected && !item.loadImg ? emptyBg : setEmptyImg(item.poster)" @error="imgError(item)"
                 @load="imgLoad(item)" style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
-              <span style="color: red;font-size: 30px;">
+              <!-- <span style="color: red;font-size: 30px;">
                 {{ item.loadImg }}
-              </span>
+              </span> -->
               <image :src="playVideoButton" class="img-button" />
               <span class="img-runtime">{{ handleSecond(item.initialTime) + '/' + (item.runtime || '00:00') }}</span>
               <div class="img-process"

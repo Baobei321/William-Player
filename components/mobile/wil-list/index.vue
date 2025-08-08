@@ -161,6 +161,7 @@ const execLoad = async () => {
 
 const reload = async () => {
   loaded.value = false;
+  loading.value = false;
   paginationData.currentPage = 1;
   paginationData.total = 0;
   isAdd.value = false; //手动添加操作完成，将isAdd设置为false
