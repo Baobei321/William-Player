@@ -4,43 +4,28 @@
       <template #right>
         <nut-icon name="more-x" custom-color="#000" size="20" @click="showPopover = true"
           v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"></nut-icon>
-        <span v-if="routerParams.title == '最近观看'" style="color: #2457fd;font-weight: bold;" @click="editHistory()">{{
-          isSelect ? '取消' : '编辑' }}</span>
         <sort-popover :type="mapping[routerParams.title]" v-model="showPopover" @changeSort="changeSort"></sort-popover>
       </template>
     </wil-navbar>
-    <div class="video-all-list" v-if="!isClearAll">
-      <wil-tabs :tabsList="tabList" lineColor="#52b54b" @changeTab="changeTab" v-model="embyActiveTab"></wil-tabs>
+    <div class="video-all-list">
+      <wil-tabs :tabsList="tabList" lineColor="#52b54b" @changeTab="changeTab" v-model="embyActiveTab" v-if="routerParams.type=='emby'"></wil-tabs>
       <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
-        idKey="path" :listContainerClass="routerParams.title == '最近观看' ? 'list-recent' : 'list-container'"
-        :pageSize="windowWidth > 700 ? 50 : 12" :changeItemFn="changeItemFn" :listItemStyle="listItemStyle"
+        idKey="path" listContainerClass="list-container" :pageSize="windowWidth > 700 ? 50 : 12"
+        :changeItemFn="changeItemFn" :listItemStyle="listItemStyle"
         :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
         <template #default="item">
-          <div class="video-all-list__item" @click="toVideoDetail(item)" @longpress="longPress(item)">
+          <div class="video-all-list__item" @click="toVideoDetail(item)">
             <div class="item-poster">
-              <image
-                :src="(!routerParams.isConnected && !item.loadImg) ? posterEmpty : (routerParams.title == '最近观看' ? setRecentImg(item.poster) : setEmptyImg(item.poster))"
+              <image :src="(!routerParams.isConnected && !item.loadImg) ? posterEmpty : setEmptyImg(item.poster)"
                 class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
               </image>
-              <div :class="[item.select ? 'item-poster-check' : 'item-poster-nocheck']" v-if="isSelect">
-                <image src="@/static/check-active.png" v-if="item.select"></image>
-              </div>
             </div>
             <span class="item-name">{{ removeExtension(item) }}</span>
-            <span class="item-time" v-if="routerParams.title != '最近观看' && !item.notShowTime">{{ item.releaseTime || '暂无'
-              }}</span>
+            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
           </div>
         </template>
       </wil-list>
     </div>
-    <wil-empty v-else text="没有更多了"></wil-empty>
-    <div class="video-all-bottom" v-if="isSelect">
-      <div class="video-all-bottom__left" @click="clearAll">全部清空</div>
-      <div class="video-all-bottom__right"
-        :style="{ color: recentSelect.length ? 'rgb(255, 44, 44)' : 'rgb(188, 188, 188)' }" @click="clearPart">
-        {{ recentSelect.length ? '删除' : '取消' }}</div>
-    </div>
-    <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
@@ -49,18 +34,15 @@ import wilList from "@/components/mobile/wil-list/index.vue";
 // import emptyBg from "@/static/empty_bg.png";
 import posterEmpty from "@/static/poster-empty.png";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import wilModal from "@/components/mobile/wil-modal/index.vue";
-import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import sortPopover from "./components/index-component/sort-popover.vue";
 import wilTabs from "@/components/mobile/wil-tabs/index.vue"
 import { ref } from 'vue'
 import { useVideoAll } from "@/hooks/useVideoAll";
 const wil_list = ref(null);
-const wil_modal = ref(null);
 
-const { routerParams, showPopover, editHistory, isSelect, mapping, changeSort, isClearAll, tabList, changeTab,
+const { routerParams, showPopover, mapping, changeSort, tabList, changeTab,
   getMovieTvList, requestParams, windowWidth, changeItemFn, listItemStyle, lineNumber, lineHeight, embyActiveTab,
-  toVideoDetail, longPress, setRecentImg, setEmptyImg, imgError, imgLoad, removeExtension, clearAll, recentSelect, clearPart } = useVideoAll({ wil_list, wil_modal })
+  toVideoDetail, setEmptyImg, imgError, imgLoad, removeExtension } = useVideoAll({ wil_list })
 
 </script>
 

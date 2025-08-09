@@ -2,7 +2,7 @@
   <div class="recent-played">
     <div class="recent-played-title">
       <div class="recent-played-title-left">最近观看</div>
-      <div class="recent-played-title-right" @click="toVideoAll">
+      <div class="recent-played-title-right" @click="toHistoryPlayed">
         <span>全部</span>
         <span>{{ props.listData?.length }}</span>
         <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
@@ -155,9 +155,9 @@ const toVideoPlayer = async (item) => {
   }
 };
 
-const toVideoAll = () => {
+const toHistoryPlayed = () => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-all?title=最近观看&isConnected1=${props.isConnected}`,
+    url: `/pages/mobile/video/history-played?title=最近观看&isConnected1=${props.isConnected}`,
   });
 };
 const imgError = (item) => {

@@ -399,9 +399,9 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
 }
 let classifyList = [
     { id: "18", label: "剧情", img: "https://n.sinaimg.cn/sinakd20230822s/429/w1000h1029/20230822/85c9-12a6845ed1089e9489c8510b78bfd6ef.jpg", background: "linear-gradient(to bottom, #e90c00, #fc633d)" },
-    { id: "10749", label: "爱情", img: "http://mms2.baidu.com/it/u=2417138206,3826310341&fm=253&app=138&f=JPEG?w=500&h=711", background: "linear-gradient(to bottom, #152de0, #5c6bf8)" },
+    { id: "10749", label: "爱情",labelEn:'Romance', img: "http://mms2.baidu.com/it/u=2417138206,3826310341&fm=253&app=138&f=JPEG?w=500&h=711", background: "linear-gradient(to bottom, #152de0, #5c6bf8)" },
     { id: "10751", label: "家庭", img: "http://mms2.baidu.com/it/u=3450351846,2320385931&fm=253&app=138&f=JPEG?w=500&h=714", background: "linear-gradient(to bottom, #e2860f, #ef9c41)" },
-    { id: "35", label: "喜剧", img: "https://img31.mtime.cn/pi/2014/03/06/100404.23427262_1000X1000.jpg", background: "linear-gradient(to bottom, #00a9e8, #55cff7)" },
+    { id: "35", label: "喜剧",labelEn:'Comedy', img: "https://img31.mtime.cn/pi/2014/03/06/100404.23427262_1000X1000.jpg", background: "linear-gradient(to bottom, #00a9e8, #55cff7)" },
     { id: "36", label: "历史", img: "http://mms2.baidu.com/it/u=1997636151,980359615&fm=253&app=138&f=JPEG?w=500&h=889", background: "linear-gradient(to bottom, #f3743f, #f98f61)" },
     { id: "12", label: "冒险", img: "http://mms2.baidu.com/it/u=1171152207,1406454474&fm=253&app=138&f=JPEG?w=498&h=778", background: "linear-gradient(to bottom, #8c8259, #a8a17a)" },
     { id: "878", label: "科幻", img: "http://mms0.baidu.com/it/u=543696733,898405375&fm=253&app=120&f=JPEG?w=608&h=950", background: "linear-gradient(to bottom, #4f7077, #74959c)" },

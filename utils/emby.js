@@ -1,5 +1,7 @@
 //emby的接口封装
 import { toStringfy, toParse } from "@/pages/mobile/mine/common";
+import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
+import { classifyList } from '@/utils/scrape'
 
 //通用方法请求emby接口
 const getEmby = (data, apiInfo) => {
@@ -96,5 +98,29 @@ const getGenresList = (data, selectMedia) => {
     return getEmby({}, apiInfo)
 }
 
+//获取影片详情，对齐getMovieTvById
+const getEmbyMovieTv = async (data, selectMedia) => {
+    const apiInfo = {
+        url: `/Users/${selectMedia.userId}/Items/${data.movieTvId}`,
+        method: 'GET',
+        ...selectMedia
+    }
+    let res = await getEmby({}, apiInfo)
+    return {
+        id: res.Id,
+        overview: res.Overview,
+        vote_average: res.CommunityRating,
+        release_date: dayjs(res.EndDate).format('YYYY-MM-DD'),
+        runtime: res.runtime,//电影专用
+        genres: res.GenreItems.map(item => {
+            let obj = classifyList.find(v => v.labelEn == item.Name)
+            return { name: obj.name, id: obj.id }
+        }),
+        backdrop_path: `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${item.Id}/Images/Backdrop?tag=${item.BackdropImageTags[0]}`,
+        number_of_episodes: res.UserData.UnplayedItemCount,
+        poster_path: `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}`,
+    }
+}
 
-export { loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList }
+
+export { loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv }

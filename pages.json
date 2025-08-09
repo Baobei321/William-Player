@@ -138,6 +138,12 @@
       }
     },
     {
+      "path": "pages/mobile/video/history-played",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mobile/video/video-player",
       "style": {
         "navigationStyle": "custom"
