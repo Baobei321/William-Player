@@ -138,7 +138,7 @@ export function useVideoAll({ wil_list }) {
         let arr = res.Items.map(i => {
             return {
                 id: i.Id, name: i.Name, provider: 'Emby', releaseTime: dayjs(i.EndDate).format('YYYY-MM-DD'),
-                poster: setEmbyImg(i)
+                poster: setEmbyImg(i),type:i.Type
             }
         })
         return {
@@ -241,6 +241,8 @@ export function useVideoAll({ wil_list }) {
     };
 
     const toVideoDetail = async (item) => {
+        console.log(item,'item111');
+        
         if (routerParams.value.type == 'emby') {
             if (item.type == 'Genre') {
                 uni.navigateTo({
@@ -252,7 +254,7 @@ export function useVideoAll({ wil_list }) {
                 })
             } else if (item.type == 'Series' || item.type == 'Movie') {//直接跳转到剧集或者电影的详情页
                 uni.navigateTo({
-                    url: `/pages/${CONFIG.PLATFORM === 'TV' ? 'tv' : 'mobile'}/video/video-detail?name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&movieTvId=${item.id}&isEmby=true`,
+                    url: `/pages/${CONFIG.PLATFORM === 'TV' ? 'tv' : 'mobile'}/video/video-detail?name=${handleSeasonName(item.name, true)}&type=${item.type == "Series" ? "tv" : "movie"}&movieTvId=${item.id}&isEmby=true`,
                 });
             }
         } else {

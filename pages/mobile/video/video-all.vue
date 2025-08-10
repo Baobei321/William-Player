@@ -8,7 +8,8 @@
       </template>
     </wil-navbar>
     <div class="video-all-list">
-      <wil-tabs :tabsList="tabList" lineColor="#52b54b" @changeTab="changeTab" v-model="embyActiveTab" v-if="routerParams.type=='emby'"></wil-tabs>
+      <wil-tabs :tabsList="tabList" lineColor="#52b54b" @changeTab="changeTab" v-model="embyActiveTab"
+        v-if="routerParams.type == 'emby' && (routerParams.embyIncludeItemTypes == 'Series' || routerParams.embyIncludeItemTypes == 'Movie')"></wil-tabs>
       <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
         idKey="path" listContainerClass="list-container" :pageSize="windowWidth > 700 ? 50 : 12"
         :changeItemFn="changeItemFn" :listItemStyle="listItemStyle"

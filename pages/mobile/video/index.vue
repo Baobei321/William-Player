@@ -72,7 +72,8 @@ import { onShow, onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
 import { useVideoIndex } from "@/hooks/useVideoIndex.js";
 
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex();
+const wil_modal = ref(null)
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex({ wil_modal });
 const showDialog = ref(false);
 const showShareModal = ref(false);
 const shareUrl = ref("");

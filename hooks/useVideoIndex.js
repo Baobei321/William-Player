@@ -12,7 +12,7 @@ import { getMainView, getEmbyList, getEmbyNewList } from '@/utils/emby'
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import emptyBg from "@/static/poster-empty.png";
 
-export function useVideoIndex() {
+export function useVideoIndex({ wil_modal }) {
     const video_navbar = ref(null);
     const listData = ref([]);
     const sourceList = ref([]);

@@ -124,7 +124,7 @@ import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "../mine/common";
 import * as CONFIG from "@/utils/config";
-import { getEmbyMovieTv } from '@/utils/emby'
+import { getEmbyMovieTv, getEmbySeasonList } from '@/utils/emby'
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -384,6 +384,8 @@ const handleTv = async (seasonData1 = null) => {
       });
 
     // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
+  }else if(selectType.value.type=='Emby'){
+    
   }
   let res1 = {};
   if (!seasonData1) {
@@ -396,7 +398,7 @@ const handleTv = async (seasonData1 = null) => {
   imgData.value.releaseTime = res1.air_date;
   imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
   if (season != "1") {
-    imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
+    imgData.value.img = routerParams.value.isEmby ? res1.backdrop_path : CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
     overview.value = res1.overview;
   } else {
     imgData.value.img = seasonFirst.value.img;
@@ -446,7 +448,7 @@ const getMovieTvDetail = async () => {
   overview.value = res.overview;
   if (routerParams.value.type == "movie") {
     imgData.value = {
-      img: CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
+      img: routerParams.value.isEmby ? res.backdrop_path : CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
       score: res.vote_average.toFixed(1),
       releaseTime: res.release_date,
       runtime: calTime(res.runtime),
@@ -455,8 +457,8 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
-    seasonFirst.value.overview = res.overview;
+    seasonFirst.value.img = imgData.value.img = routerParams.value.isEmby ? res.backdrop_path : CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
+      seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
     imgData.value.releaseTime = res.first_air_date;
@@ -829,8 +831,28 @@ onBeforeMount(async () => {
   let dict = [
     { value: "189CloudPC", label: "天翼云盘" },
     { value: "Quark", label: "夸克网盘" },
+    { value: "Emby", label: "Emby" },
   ];
-  let source = JSON.parse(routerParams.value.source);
+  let source = []
+  if (routerParams.value.source) { //source从上一个页面传过来
+    source = JSON.parse(routerParams.value.source);
+  } else {//emby是没有source从上一个页面传过来的，需要从接口获取季，自己生成
+    const seasonInfo = {
+      movieTvId: routerParams.value.movieTvId,
+      UserId: selectMedia.value.userId,
+      Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,Overview',
+      IsSpecialSeason: false,
+      EnableUserData: false,
+      EnableTotalRecordCount: false,
+      EnableImages: false
+    }
+    let res = await getEmbySeasonList(seasonInfo, selectMedia.value)
+    source = [{
+      provider: 'Emby', name: res.Items[0].SeriesName, seasonArr: res.Items.map(v => {
+        return { name: v.Name, season: String(v.IndexNumber) }
+      })
+    }]
+  }
   sourceList.value = source.map((i) => {
     if (source.filter((v) => v.provider == i.provider).length > 1) {
       let label = dict.find((v) => v.value == i.provider).label;
@@ -898,6 +920,11 @@ onLoad((options) => {
   routerParams.value = options;
   if (options.movieTvId == "undefined") {
     routerParams.value.movieTvId = undefined;
+  }
+  if (options.isEmby == 'true') {
+    routerParams.value.isEmby = true;
+  } else {
+    routerParams.value.isEmby = false;
   }
   if (routerParams.value.type == "movie") {
     popoverArr.value = [{ icon: editIcon, text: "手动编辑" }];

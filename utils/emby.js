@@ -113,14 +113,28 @@ const getEmbyMovieTv = async (data, selectMedia) => {
         release_date: dayjs(res.EndDate).format('YYYY-MM-DD'),
         runtime: res.runtime,//电影专用
         genres: res.GenreItems.map(item => {
-            let obj = classifyList.find(v => v.labelEn == item.Name)
-            return { name: obj.name, id: obj.id }
+            let obj = classifyList.find(v => v.labelEn == item.Name || v.label == item.Name) || { label: item.Name, id: item.Id }
+            console.log(obj,'obj');
+            
+            return { name: obj.label, id: obj.id }
         }),
-        backdrop_path: `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${item.Id}/Images/Backdrop?tag=${item.BackdropImageTags[0]}`,
+        backdrop_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Backdrop?tag=${res.BackdropImageTags[0]}`,
         number_of_episodes: res.UserData.UnplayedItemCount,
-        poster_path: `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}`,
+        poster_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Primary?tag=${res.ImageTags.Primary}`,
     }
 }
 
+//获取季信息列表
+const getEmbySeasonList = (data, selectMedia) => {
+    let movieTvId = data.movieTvId
+    delete data.movieTvId
+    const apiInfo = {
+        url: `/Shows/${movieTvId}/Seasons?${toStringfy(data)}`,
+        method: 'GET',
+        ...selectMedia
+    }
+    return getEmby({}, apiInfo)
+}
 
-export { loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv }
+
+export { loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv, getEmbySeasonList }
