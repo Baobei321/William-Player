@@ -1,8 +1,30 @@
 //emby的接口封装
 import { toStringfy, toParse } from "@/pages/mobile/mine/common";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
-import { classifyList } from '@/utils/scrape'
+import { classifyList, formatNanoseconds } from '@/utils/scrape'
+import posterEmpty from "@/static/poster-empty.png";
 
+//处理内存大小
+const handleSize = (size) => {
+    if (size == 0) return "0";
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(size) / Math.log(1024));
+    const formatted = parseFloat((size / Math.pow(1024, i)).toFixed(2));
+    return formatted + " " + sizes[i];
+};
+const setEmbyImg = (item, selectMedia, emptyImg = posterEmpty) => {
+    if (item?.ImageTags?.Primary) {
+        return `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${item.Id}/Images/Primary?tag=${item.ImageTags.Primary}`
+    } else if (item.PrimaryImageItemId) {
+        if (item.PrimaryImageTag) {
+            return `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${item.PrimaryImageItemId}/Images/Primary?tag=${item.PrimaryImageTag}`
+        } else {
+            return emptyImg
+        }
+    } else {
+        return emptyImg
+    }
+}
 //通用方法请求emby接口
 const getEmby = (data, apiInfo) => {
     return new Promise((resolve, reject) => {
@@ -110,16 +132,22 @@ const getEmbyMovieTv = async (data, selectMedia) => {
         id: res.Id,
         overview: res.Overview,
         vote_average: res.CommunityRating,
+        name: res.Name,
         release_date: dayjs(res.EndDate).format('YYYY-MM-DD'),
-        runtime: res.runtime,//电影专用
+        runtime: formatNanoseconds(res.RunTimeTicks),//电影专用
+        size: handleSize(res.Size),
+        actors: res.People.map(item => {
+            return {
+                name: item.Name, character: item.Role, profile_path: setEmbyImg({ PrimaryImageItemId: item.Id, PrimaryImageTag: item.PrimaryImageTag },
+                    selectMedia, 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png')
+            }
+        }),
         genres: res.GenreItems.map(item => {
             let obj = classifyList.find(v => v.labelEn == item.Name || v.label == item.Name) || { label: item.Name, id: item.Id }
-            console.log(obj,'obj');
-            
             return { name: obj.label, id: obj.id }
         }),
         backdrop_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Backdrop?tag=${res.BackdropImageTags[0]}`,
-        number_of_episodes: res.UserData.UnplayedItemCount,
+        number_of_episodes: res.UserData.UnplayedItemCount + res.UserData.PlayCount,
         poster_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Primary?tag=${res.ImageTags.Primary}`,
     }
 }
@@ -136,5 +164,21 @@ const getEmbySeasonList = (data, selectMedia) => {
     return getEmby({}, apiInfo)
 }
 
+//获取视频播放链接
+const getEmbyPlayerUrl = (data, selectMedia) => {
+    let params = {
+        UserId:selectMedia.userId,
+        StartTimeTicks:0,
+        IsPlayback:false,
+        AutoOpenLiveStream:false,
+        ...data
+    }
+    const apiInfo = {
+        url: `Items/${data.movieTvId}/PlaybackInfo?${toStringfy(params)}`,
+        method: 'POST',
+        ...selectMedia
+    }
+}
 
-export { loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv, getEmbySeasonList }
+
+export { setEmbyImg, loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv, getEmbySeasonList, getEmbyPlayerUrl }

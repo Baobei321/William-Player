@@ -8,7 +8,8 @@
           :url="config.url" :showProgress="settingData.showProgress" :showPre="this.historyObj.ji > 1"
           :showNext="this.historyObj.ji < tvList.length" :initialFullScreen="false" @timeupdate="setHistory"
           @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo"
-          @getorientation="getOrientation" @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }" ref="video_view">
+          @getorientation="getOrientation" @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }"
+          ref="video_view">
         </video-view>
         <tv-button v-if="showTvButton" :style="{ width: '750rpx', height: videoHeight }" @setTvButton="setTvButton"
           @changeTv="castTv"></tv-button>
@@ -41,6 +42,7 @@ import tvButton from "./components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
 import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
+import { getEmbyPlayerUrl } from '@/utils/emby'
 import { IMG_DOMAIN } from "@/utils/config";
 
 export default {
@@ -137,6 +139,17 @@ export default {
       } else if (this.selectType.type == "夸克网盘") {
         if (this.selectMedia.name) {
           let res = await getQuarkResolutionUrl(
+            {
+              folderFileId: this.routerParams.folderFileId,
+            },
+            this.selectMedia
+          );
+          // let res = await getQuarkVideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
+          return res;
+        }
+      } else if (this.selectType.type == 'Emby') {
+        if (this.selectMedia.name) {
+          let res = await getEmbyPlayerUrl(
             {
               folderFileId: this.routerParams.folderFileId,
             },

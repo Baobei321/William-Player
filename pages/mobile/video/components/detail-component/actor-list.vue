@@ -6,31 +6,31 @@
     </div>
     <div class="related-actors" v-if="actors.length">
       <div class="related-actors-title">相关演员</div>
-      <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
+      <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
+        :showScrollbar="false">
         <div class="related-actors-list">
           <div class="related-actors-list__item" v-if="director.name">
             <image class="item-avatar" backgroundColor='#efefef'
-              :src="director.profile_path ? CONFIG.IMG_DOMAIN+'/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
+              :src="director.profile_path ? CONFIG.IMG_DOMAIN + '/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
               mode="aspectFill" />
-            <div class="item-name">{{director.name}}</div>
+            <div class="item-name">{{ director.name }}</div>
             <div class="item-job">导演</div>
           </div>
           <div class="related-actors-list__item" v-for="item in actors" :key="item.name">
-            <image class="item-avatar" backgroundColor='#efefef'
-              :src="item.profile_path ? CONFIG.IMG_DOMAIN+'/t/p/w100_and_h100_bestv2'+item.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
-              mode="aspectFill" />
-            <div class="item-name">{{item.name}}</div>
+            <image class="item-avatar" backgroundColor='#efefef' :src="setActorAvatar(item.profile_path)" mode="aspectFill" />
+            <div class="item-name">{{ item.name }}</div>
             <div class="item-role">饰 {{ item.character }}</div>
           </div>
         </div>
       </scroll-view>
     </div>
     <div class="tip-footer">
-      <span class="tip-footer-name">{{ handleSeasonName(props.selectSource.name,true)+'-' }}</span>
+      <span class="tip-footer-name">{{ handleSeasonName(props.selectSource.name, true) + '-' }}</span>
       <span class="tip-footer-webdav">路径：{{ props.selectSource.path }}</span>
       <div class="tip-footer-timesize">
         <span v-if="imgData.runtime">{{ imgData.runtime }}</span><span>{{ props.selectSource.sourceName }}</span>
-        <span v-if="props.selectSource.size">{{ props.routerParams.type=='movie' ? props.selectSource.size : handleSize(props.selectSource.size) }}</span>
+        <span v-if="props.selectSource.size">{{ props.routerParams.type == 'movie' ? props.selectSource.size :
+          handleSize(props.selectSource.size) }}</span>
       </div>
     </div>
   </div>
@@ -45,6 +45,8 @@ const props = defineProps({
   routerParams: { type: Object, default: {} },
   selectSource: { type: Object, default: {} },
   imgData: { type: Object, default: {} },
+  actorArr: { type: Array, default: [] },
+  type: { type: String, default: 'normal' }
 });
 const director = ref({});
 const actors = ref([]);
@@ -93,17 +95,32 @@ const getActorList = async () => {
   director.value = res.crew[0] || {};
   actors.value = res.cast.slice(0, 20);
 };
+
+//设置演员头像
+const setActorAvatar = (url) => {
+  if (props.type == 'normal') {
+    return url ? CONFIG.IMG_DOMAIN + '/t/p/w100_and_h100_bestv2' + url : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
+  } else if (props.type == 'emby') {
+    return url
+  }
+}
+
 defineExpose({
   getActorList,
 });
 onBeforeMount(() => {
-  getActorList();
+  if (props.actorArr.length) {
+    actors.value = props.actorArr
+  } else {
+    getActorList();
+  }
 });
 </script>
 
 <style lang="scss" scoped>
 .actor-list {
   width: 100%;
+
   .story-introduction {
     margin-top: 50rpx;
 
@@ -194,11 +211,13 @@ onBeforeMount(() => {
       }
     }
   }
+
   .tip-footer {
     margin-top: 50rpx;
     padding-top: 20rpx;
     border-top: 2rpx solid #c2c5c6;
     width: 100%;
+
     .tip-footer-name {
       font-size: 24rpx;
       color: #c2c5c6;
@@ -208,7 +227,8 @@ onBeforeMount(() => {
       font-size: 24rpx;
       color: #c2c5c6;
       padding-top: 20rpx;
-      word-break: break-all; /* 允许在任意字符间断行 */
+      word-break: break-all;
+      /* 允许在任意字符间断行 */
     }
 
     .tip-footer-timesize {
@@ -229,78 +249,78 @@ onBeforeMount(() => {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .actor-list {
-    .story-introduction {
-      .story-introduction-title {
-        color: #fff;
-      }
-      .story-introduction-text {
-        color: #fff;
-      }
-    }
 
-    .related-actors {
-      .related-actors-title {
-        color: #fff;
-      }
+// @media (prefers-color-scheme: dark) {
+//   .actor-list {
+//     .story-introduction {
+//       .story-introduction-title {
+//         color: #fff;
+//       }
+//       .story-introduction-text {
+//         color: #fff;
+//       }
+//     }
 
-      .related-actors-scroll {
-        .related-actors-list {
-          .related-actors-list__item {
-            .item-name {
-              color: #fff;
-            }
+//     .related-actors {
+//       .related-actors-title {
+//         color: #fff;
+//       }
 
-            .item-role {
-              height: 35rpx;
-              line-height: 35rpx;
-              font-size: 24rpx;
-              color: #c2c5c6;
-              width: 100%;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              text-align: center;
-            }
-          }
-        }
-      }
-    }
-    .tip-footer {
-      margin-top: 50rpx;
-      padding-top: 20rpx;
-      border-top: 2rpx solid #c2c5c6;
-      width: 100%;
-      .tip-footer-name {
-        font-size: 24rpx;
-        color: #c2c5c6;
-      }
+//       .related-actors-scroll {
+//         .related-actors-list {
+//           .related-actors-list__item {
+//             .item-name {
+//               color: #fff;
+//             }
 
-      .tip-footer-webdav {
-        font-size: 24rpx;
-        color: #c2c5c6;
-        padding-top: 20rpx;
-        word-break: break-all; /* 允许在任意字符间断行 */
-      }
+//             .item-role {
+//               height: 35rpx;
+//               line-height: 35rpx;
+//               font-size: 24rpx;
+//               color: #c2c5c6;
+//               width: 100%;
+//               white-space: nowrap;
+//               overflow: hidden;
+//               text-overflow: ellipsis;
+//               text-align: center;
+//             }
+//           }
+//         }
+//       }
+//     }
+//     .tip-footer {
+//       margin-top: 50rpx;
+//       padding-top: 20rpx;
+//       border-top: 2rpx solid #c2c5c6;
+//       width: 100%;
+//       .tip-footer-name {
+//         font-size: 24rpx;
+//         color: #c2c5c6;
+//       }
 
-      .tip-footer-timesize {
-        font-size: 24rpx;
-        color: #acacac;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        padding-top: 20rpx;
+//       .tip-footer-webdav {
+//         font-size: 24rpx;
+//         color: #c2c5c6;
+//         padding-top: 20rpx;
+//         word-break: break-all; /* 允许在任意字符间断行 */
+//       }
 
-        span:nth-child(2) {
-          padding-left: 10rpx;
-        }
+//       .tip-footer-timesize {
+//         font-size: 24rpx;
+//         color: #acacac;
+//         font-weight: bold;
+//         display: flex;
+//         align-items: center;
+//         padding-top: 20rpx;
 
-        span:last-child {
-          padding-left: 10rpx;
-        }
-      }
-    }
-  }
-}
-</style>
+//         span:nth-child(2) {
+//           padding-left: 10rpx;
+//         }
+
+//         span:last-child {
+//           padding-left: 10rpx;
+//         }
+//       }
+//     }
+//   }
+// }</style>

@@ -31,20 +31,20 @@ const scanCode = () => {
       if (result.type == "dataSync") {
         let obj = {
           userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
-          localMovieTvData: uni.getStorageSync("localMovieTvData"),
+          // localMovieTvData: uni.getStorageSync("localMovieTvData"),
           sourceList: uni.getStorageSync("sourceList"),
           historyPlay: uni.getStorageSync("historyPlay"),
         };
         if (init) {
           TcpModule.connectAsClient(result.port.split(':')[0], 1025, async (res) => {
             let result = JSON.parse(res)
-            if (result.code == 500) {
+            if (result.code == 500) { //本地局域网同步失败，走后端接口同步
               await setShareData({ port: result.port.split(':')[1], data: obj });
               uni.showToast({
                 title: "同步成功",
                 icon: "none",
               });
-            } else {
+            } else { //本机局域网同步成功
               init = false
               TcpModule.send(JSON.stringify(obj), (res1) => {
                 let res2 = JSON.parse(res1)
@@ -136,10 +136,22 @@ refreshStatus();
 const startServer = () => {
   TcpModule.startServer(1025, (res) => { //接收别的设备发过来的数据
     let result = JSON.parse(res)
+    uni.showToast({
+      title:result,
+      icon:'none',
+      duration:7000
+    })
     if (result.code == 500) {
       uni.showToast({
         title: '出错了',
         icon: 'none',
+      })
+    } else {
+      uni.setStorageSync('sourceList', result.sourceList)
+      uni.setStorageSync('historyPlay', result.historyPlay)
+      uni.setStorageSync('isreload', true)
+      uni.switchTab({
+        url:'/pages/mobile/video/index'
       })
     }
   });

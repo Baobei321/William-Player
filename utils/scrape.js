@@ -55,7 +55,7 @@ function debounce(fn, wait) {
 }
 //处理时间，例如1:10:00和1小时10分钟返回分钟
 const parseTime = (timeStr) => {
-    if(!timeStr) return 0
+    if (!timeStr) return 0
     // 中文格式解析（如："1小时10分钟" 或 "50分钟"）
     if (timeStr.includes('小时') || timeStr.includes('分钟')) {
         const cnRegex = /(\d+)小时?(\d+)?分钟?/;
@@ -106,6 +106,22 @@ const calTime = (val, type = "cn") => {
         }
     }
 };
+
+//emby纳秒时间转换
+const formatNanoseconds = (ns, type = 'cn') => {
+    if (isNaN(ns) || ns < 0) return "0分钟"; // 处理无效输入
+
+    // 单位换算常量
+    const NS_PER_SECOND = 10000000;   // 1秒 = 10^9纳秒
+    const SECONDS_PER_MINUTE = 60;
+
+    // 转换为秒（保留浮点数精度）
+    const totalSeconds = ns / NS_PER_SECOND;
+
+    // 计算小时和分钟
+    const minutes = Math.round(totalSeconds / SECONDS_PER_MINUTE);
+    return minutes
+}
 
 const isSeasonString = (str) => {
     return /^第(?:[一二三四五六七八九十]|十[一二三四五六七八九]?)+季$/.test(str);
@@ -399,9 +415,9 @@ const recursionTv = async (data, parent, tvArr, selectType, selectMedia, refresh
 }
 let classifyList = [
     { id: "18", label: "剧情", img: "https://n.sinaimg.cn/sinakd20230822s/429/w1000h1029/20230822/85c9-12a6845ed1089e9489c8510b78bfd6ef.jpg", background: "linear-gradient(to bottom, #e90c00, #fc633d)" },
-    { id: "10749", label: "爱情",labelEn:'Romance', img: "http://mms2.baidu.com/it/u=2417138206,3826310341&fm=253&app=138&f=JPEG?w=500&h=711", background: "linear-gradient(to bottom, #152de0, #5c6bf8)" },
+    { id: "10749", label: "爱情", labelEn: 'Romance', img: "http://mms2.baidu.com/it/u=2417138206,3826310341&fm=253&app=138&f=JPEG?w=500&h=711", background: "linear-gradient(to bottom, #152de0, #5c6bf8)" },
     { id: "10751", label: "家庭", img: "http://mms2.baidu.com/it/u=3450351846,2320385931&fm=253&app=138&f=JPEG?w=500&h=714", background: "linear-gradient(to bottom, #e2860f, #ef9c41)" },
-    { id: "35", label: "喜剧",labelEn:'Comedy', img: "https://img31.mtime.cn/pi/2014/03/06/100404.23427262_1000X1000.jpg", background: "linear-gradient(to bottom, #00a9e8, #55cff7)" },
+    { id: "35", label: "喜剧", labelEn: 'Comedy', img: "https://img31.mtime.cn/pi/2014/03/06/100404.23427262_1000X1000.jpg", background: "linear-gradient(to bottom, #00a9e8, #55cff7)" },
     { id: "36", label: "历史", img: "http://mms2.baidu.com/it/u=1997636151,980359615&fm=253&app=138&f=JPEG?w=500&h=889", background: "linear-gradient(to bottom, #f3743f, #f98f61)" },
     { id: "12", label: "冒险", img: "http://mms2.baidu.com/it/u=1171152207,1406454474&fm=253&app=138&f=JPEG?w=498&h=778", background: "linear-gradient(to bottom, #8c8259, #a8a17a)" },
     { id: "878", label: "科幻", img: "http://mms0.baidu.com/it/u=543696733,898405375&fm=253&app=120&f=JPEG?w=608&h=950", background: "linear-gradient(to bottom, #4f7077, #74959c)" },
@@ -420,6 +436,6 @@ let classifyList = [
     { id: "14", label: "奇幻", img: "https://wx1.sinaimg.cn/large/0079wuTAly1gx7yuc7wzyj30ty16ojx9.jpg", background: "linear-gradient(to bottom, #da243d, #dd626e)" },
 ]
 export {
-    handleSecond, parseTime, throttle, debounce, calTime, handleSeasonName, handleNameYear,
+    handleSecond, parseTime, throttle, debounce, calTime, formatNanoseconds, handleSeasonName, handleNameYear,
     generateChineseNumberMapping, recursionMovie, recursionTv, classifyList
 }

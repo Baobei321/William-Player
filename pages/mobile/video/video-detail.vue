@@ -124,7 +124,7 @@ import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "../mine/common";
 import * as CONFIG from "@/utils/config";
-import { getEmbyMovieTv, getEmbySeasonList } from '@/utils/emby'
+import { getEmbyMovieTv, getEmbySeasonList, getEmbyList } from '@/utils/emby'
 
 const { getUntokenDict } = useDict();
 const showPopover = ref(false);
@@ -143,7 +143,7 @@ const selectSource = ref({}); //切换选中的来源
 
 const actor_list = ref(null);
 
-const activeSeason = ref("");
+const activeSeason = ref({});
 const seasonFirst = ref({});
 
 const tvList = ref([]); //目前网盘所拥有的电视集数列表
@@ -378,14 +378,39 @@ const handleTv = async (seasonData1 = null) => {
         return {
           id: i.fid,
           name: i.file_name,
-          path: "/我的视频/电视剧",
+          // path: "/我的视频/电视剧",
           provider: "Quark",
         };
       });
 
     // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
-  }else if(selectType.value.type=='Emby'){
-    
+  } else if (selectType.value.type == 'Emby') {
+    try {
+      let embyObj = {
+        ParentId: routerParams.value.movieTvId,
+        IsFolder: false,
+        EnableImageTypes: 'Primary,Backdrop,Thumb',
+        Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,Overview,PremiereDate,ProductionYear,RunTimeTicks,SpecialEpisodeNumbers',
+        StartIndex: 0,
+        Limit: 1000,
+        EnableTotalRecordCount: false,
+        Recursive: true,
+        IsStandaloneSpecial: false,
+      }
+      result = await getEmbyList(embyObj, selectMedia.value)
+    } catch (error) {
+      showRehandleButton.value = true;
+      return;
+    }
+    tvList.value = result.Items
+      .map((i) => {
+        return {
+          id: i.Id,
+          name: i.Name,
+          // path: "/我的视频/电视剧",
+          provider: "Emby",
+        };
+      });
   }
   let res1 = {};
   if (!seasonData1) {
@@ -457,8 +482,8 @@ const getMovieTvDetail = async () => {
       title: res.title,
     };
   } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = imgData.value.img = routerParams.value.isEmby ? res.backdrop_path : CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path,
-      seasonFirst.value.overview = res.overview;
+    seasonFirst.value.img = imgData.value.img = routerParams.value.isEmby ? res.backdrop_path : CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
+    seasonFirst.value.overview = res.overview;
     imgData.value.score = res.vote_average.toFixed(1);
     imgData.value.genres = res.genres.map((i) => i.name).join(" ");
     imgData.value.releaseTime = res.first_air_date;

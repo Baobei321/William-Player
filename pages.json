@@ -132,6 +132,12 @@
       }
     },
     {
+      "path": "pages/mobile/video/emby/emby-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mobile/video/video-all",
       "style": {
         "navigationStyle": "custom"
