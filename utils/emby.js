@@ -146,9 +146,14 @@ const getEmbyMovieTv = async (data, selectMedia) => {
             let obj = classifyList.find(v => v.labelEn == item.Name || v.label == item.Name) || { label: item.Name, id: item.Id }
             return { name: obj.label, id: obj.id }
         }),
-        backdrop_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Backdrop?tag=${res.BackdropImageTags[0]}`,
+        backdrop_path: res.BackdropImageTags.length ? `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Backdrop?tag=${res.BackdropImageTags[0]}` : `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Primary?tag=${res.ImageTags.Primary}`,
         number_of_episodes: res.UserData.UnplayedItemCount + res.UserData.PlayCount,
         poster_path: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Primary?tag=${res.ImageTags.Primary}`,
+        tmdbId: res.ProviderIds.Tmdb,
+        production_companies: res.Studios.map(item => {
+            return { id: item.Id, name: item.Name }
+        }),
+        path: res.Path,
     }
 }
 
@@ -167,18 +172,53 @@ const getEmbySeasonList = (data, selectMedia) => {
 //获取视频播放链接
 const getEmbyPlayerUrl = (data, selectMedia) => {
     let params = {
-        UserId:selectMedia.userId,
-        StartTimeTicks:0,
-        IsPlayback:false,
-        AutoOpenLiveStream:false,
+        UserId: selectMedia.userId,
+        StartTimeTicks: 0,
+        IsPlayback: false,
+        AutoOpenLiveStream: false,
         ...data
     }
+    delete params.folderFileId
     const apiInfo = {
-        url: `Items/${data.movieTvId}/PlaybackInfo?${toStringfy(params)}`,
+        url: `/Items/${data.folderFileId}/PlaybackInfo?${toStringfy(params)}`,
         method: 'POST',
         ...selectMedia
     }
+    return getEmby({}, apiInfo)
+}
+
+//获取第几季下的剧集列表
+const getSeasonTvList = (data, selectMedia) => {
+    let params = {
+        UserId: selectMedia.userId,
+        ImageTypeLimit: 1,
+        Fields: 'Overview,PrimaryImageAspectRatio,PremiereDate,ProductionYear',
+        Limit: 1000,
+        ...data
+    }
+    delete params.folderFileId
+    const apiInfo = {
+        url: `/Shows/${data.folderFileId}/Episodes?${toStringfy(params)}`,
+        method: 'GET',
+        ...selectMedia
+    }
+    return getEmby({}, apiInfo)
+}
+
+//设置历史播放记录
+const setHistoryPlay = (data, selectMedia) => {
+    const apiInfo = {
+        url: `/Sessions/Playing/Stopped`,
+        method: 'POST',
+        ...selectMedia
+    }
+    console.log("去请求");
+    
+    return getEmby(data, apiInfo)
 }
 
 
-export { setEmbyImg, loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList, getGenresList, getEmbyMovieTv, getEmbySeasonList, getEmbyPlayerUrl }
+export {
+    setEmbyImg, loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList,
+    getGenresList, getEmbyMovieTv, getEmbySeasonList, getEmbyPlayerUrl, getSeasonTvList, setHistoryPlay
+}

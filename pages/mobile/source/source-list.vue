@@ -62,7 +62,7 @@ const wil_modal = ref(null);
 const showBottom = ref(false);
 const theme = ref(uni.getSystemInfoSync().theme);
 
-const operationList = [{ name: '设置电影目录' }, { name: '设置电视剧目录' }, { name: "修改" }, { name: "删除" }];
+const operationList = ref([{ name: '设置电影目录' }, { name: '设置电视剧目录' }, { name: "修改" }, { name: "删除" }])
 let selectType = {};
 
 const mapping = {
@@ -84,6 +84,10 @@ const mapping = {
       title: "夸克网盘",
     },
   },
+  "Emby": {
+    path: "/pages/mobile/source/add-emby",
+    query: { title: "修改Emby" },
+  }
 };
 
 const toAddFile = () => {
@@ -170,6 +174,9 @@ const handleSelect = (item, vitem) => {
 };
 
 const toShowMoreButton = (item, vitem) => {
+  if (item.type == 'Emby') {
+    operationList.value = [{ name: "修改" }, { name: "删除" }]
+  }
   selectType = item;
   selectMedia.value = vitem;
   showBottom.value = true;
@@ -186,6 +193,10 @@ const chooseOperation = (item) => {
     })
   } else if (item.name == "修改") {
     if (selectType.type == "WebDAV") {
+      uni.navigateTo({
+        url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}&isActive=${selectMedia.value.active ? "1" : "0"}`,
+      });
+    } else if (selectType.type == "Emby") {
       uni.navigateTo({
         url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}&isActive=${selectMedia.value.active ? "1" : "0"}`,
       });

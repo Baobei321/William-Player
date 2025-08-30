@@ -12,27 +12,30 @@
         <nut-icon name="search" custom-color="#000" @click="toVideoSearch"></nut-icon>
         <nut-icon name="uploader" custom-color="#000" @click="toAddMedia"></nut-icon>
         <div class="video-navbar-popover">
-          <nut-icon name="refresh2" custom-color="#000" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
+          <nut-icon name="refresh2" custom-color="#000" @click="showProgress"
+            class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
           <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
-          <div :class="['video-navbar-popover__arrow',showPopover?'show-animation':'hide-animation']" :style="{top:Number(navBarHeight.split('px')[0])-12+'px'}"
-            v-show="showPopover">
+          <div :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
+            :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }" v-show="showPopover">
             <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
           </div>
-          <div :class="['video-navbar-popover__container',showPopover?'show-animation':'hide-animation']" :style="{top:navBarHeight}" v-if="showPopover">
+          <div :class="['video-navbar-popover__container', showPopover ? 'show-animation' : 'hide-animation']"
+            :style="{ top: navBarHeight }" v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">
                 <span>{{ popoverData.title }}</span>
-                <span class="popover-title-left__button" v-if="popoverData.title=='正在扫描'&&showPause" @click="toCancel">暂停</span>
+                <span class="popover-title-left__button" v-if="popoverData.title == '正在扫描' && showPause"
+                  @click="toCancel">暂停</span>
               </div>
               <div class="popover-title-right" @click="closePopover">
                 <nut-icon name="close" custom-color="#fff" size="12"></nut-icon>
               </div>
             </div>
             <div class="popover-list" v-if="initTmdbKey">
-              <div class="popover-list-item" v-for="(item,index) in popoverData.list" :key="item.label">
+              <div class="popover-list-item" v-for="(item, index) in popoverData.list" :key="item.label">
                 <span>{{ item.label }}</span>
                 <span>{{ item.value }}</span>
-                <template v-if="index!=popoverData.list.length-1">，</template>
+                <template v-if="index != popoverData.list.length - 1">，</template>
               </div>
             </div>
             <div class="popover-input" v-else>
@@ -75,6 +78,8 @@ const popoverData = ref({
 const tmdbKey = ref("");
 
 const initTmdbKey = ref(uni.getStorageSync("settingData").tmdbKey || "");
+const selectType = ref({})
+const selectMedia = ref({})
 
 const loading = ref(false);
 
@@ -124,7 +129,7 @@ const toVideoSearch = () => {
     return;
   }
   uni.navigateTo({
-    url: "/pages/mobile/video/search",
+    url: `/pages/mobile/video/search`,
   });
 };
 
@@ -151,6 +156,20 @@ const toAddMedia = () => {
   // }
 };
 
+//判断选择的是webdav还是天翼云盘还是夸克还是Emby
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync("sourceList");
+  selectType.value = sourceList.find((item) => {
+    let select = item.list.find((i) => i.active);
+    if (select) {
+      selectMedia.value = select;
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
+
 const showProgress = () => {
   if (!uni.getStorageSync("settingData").tmdbKey) {
     popoverData.value.title = "api_key";
@@ -168,6 +187,10 @@ const showProgress = () => {
     { label: "已更新", value: 0 },
   ];
   showPopover.value = true;
+  judgeSelect()
+  if (selectType.value.type == 'Emby') {
+    showPopover.value = false;
+  }
   emits("refresh");
   timer.value = setTimeout(() => {
     showPause.value = true;
@@ -275,18 +298,22 @@ onMounted(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 @keyframes opacity2 {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
+
 .video-navbar {
   width: 100%;
   position: relative;
@@ -295,6 +322,7 @@ onMounted(() => {
   top: 0;
   border-bottom: 2rpx solid #f6f7f8;
   box-sizing: border-box;
+
   ::v-deep .nut-navbar {
     position: absolute;
     width: 100%;
@@ -305,9 +333,11 @@ onMounted(() => {
     box-shadow: none;
     z-index: 99;
     margin-bottom: 0;
+
     .nut-navbar__left {
       position: absolute;
       left: 0;
+
       .video-navbar-logo {
         width: 35px;
         height: 35px;
@@ -328,6 +358,7 @@ onMounted(() => {
 
     .nut-navbar__title {
       display: none;
+
       .title {
         color: #000;
         font-size: 34rpx;
@@ -338,10 +369,12 @@ onMounted(() => {
     .nut-navbar__right {
       right: 0;
       position: absolute;
+
       // padding: 0 32rpx;
       .nut-icon-uploader {
         margin-left: 15px;
       }
+
       // .nutui-iconfont {
       //   font-size: 16px;
       //   width: 20px;
@@ -349,18 +382,22 @@ onMounted(() => {
       // }
       .video-navbar-popover {
         margin-left: 15px;
+
         .video-navbar-popover__arrow {
           width: 16px;
           height: 16px;
           position: fixed;
           right: 18px;
         }
+
         .show-animation {
           animation: opacity1 0.2s ease;
         }
+
         .hide-animation {
           animation: opacity2 0.2s ease;
         }
+
         .video-navbar-popover__container {
           position: fixed;
           min-width: 100px;
@@ -369,13 +406,16 @@ onMounted(() => {
           padding: 12px;
           border-radius: 10px;
           right: 7.5px;
+
           .popover-title {
             display: flex;
             align-items: center;
             justify-content: space-between;
+
             .popover-title-left {
               font-size: 15px;
               color: #fff;
+
               .popover-title-left__button {
                 display: inline-block;
                 border: 1px solid #fff;
@@ -383,6 +423,7 @@ onMounted(() => {
                 padding: 0 2px;
               }
             }
+
             .popover-title-right {
               .nut-icon-close {
                 font-size: 15px;
@@ -392,17 +433,21 @@ onMounted(() => {
               }
             }
           }
+
           .popover-list {
             display: flex;
             align-items: center;
             margin-top: 10px;
+
             .popover-list-item {
               display: flex;
               align-items: baseline;
+
               span:first-child {
                 font-size: 14px;
                 color: #d0d0d0;
               }
+
               span:last-child {
                 font-size: 14px;
                 padding-left: 3px;
@@ -411,13 +456,16 @@ onMounted(() => {
               }
             }
           }
+
           .popover-input {
             margin-top: 12px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+
             .nut-input {
               padding: 10px 15px;
+
               .nut-input-value {
                 .nut-input-inner {
                   .nut-input-box {
@@ -428,18 +476,21 @@ onMounted(() => {
                 }
               }
             }
+
             .nut-button {
               margin-top: 24rpx;
             }
           }
         }
       }
+
       .nut-icon-refresh2 {
         display: block;
       }
     }
   }
 }
+
 // @media (prefers-color-scheme: dark) {
 //   .video-navbar {
 //     background: #1e1e20;
@@ -471,5 +522,4 @@ onMounted(() => {
 //       }
 //     }
 //   }
-// }
-</style>
+// }</style>

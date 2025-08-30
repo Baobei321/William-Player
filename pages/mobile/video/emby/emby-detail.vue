@@ -78,7 +78,7 @@
           </div>
         </div>
         <actor-list ref="actor_list" :routerParams="routerParams" :actorArr="actorArr" type="emby" v-if="showActor"
-          :selectSource="{ name: imgData.title, path: '无', sourceName: 'Emby', size: null, }"
+          :selectSource="{ name: imgData.title, path: imgData.path, sourceName: 'Emby', size: null, }"
           :imgData="{ ...imgData, overview: overview }"></actor-list>
       </div>
     </div>
@@ -90,7 +90,7 @@ import { ref, onBeforeMount, nextTick } from 'vue'
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import actorList from '../components/detail-component/actor-list.vue';
-import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg } from '@/utils/emby'
+import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTvList } from '@/utils/emby'
 import { parseTime, calTime, formatNanoseconds, handleSecond, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
 
 const imgData = ref({}); //图片内的信息
@@ -116,6 +116,8 @@ const showActor = ref(false) //显示演员列表组件
 const lineNumber = ref(2);
 const lineHeight = ref(0);
 
+const allDetail = ref({}) //如果电视剧有很多季,这个参数就存放总的电视剧的详情，用于初始化
+
 //判断选择的是哪个Emby
 const judgeSelect = () => {
   nowSourceList.value = uni.getStorageSync("sourceList");
@@ -131,7 +133,7 @@ const judgeSelect = () => {
 };
 
 //获取影片详情
-const getMovieTvDetail = async () => {
+const getMovieTvDetail = async (type = 'all') => {
   if (!routerParams.value.movieTvId) {
     imgData.value.title = routerParams.value.name;
     return false;
@@ -143,51 +145,89 @@ const getMovieTvDetail = async () => {
       imgData.value.title = routerParams.value.name;
     }
   }
-  let res = await getEmbyMovieTv({ movieTvId: routerParams.value.movieTvId }, selectMedia.value)
-  console.log(res, 'res');
-
-  overview.value = res.overview;
+  let res = {}
+  if (type == 'all') {
+    res = await getEmbyMovieTv({ movieTvId: routerParams.value.movieTvId }, selectMedia.value)
+    allDetail.value = res
+  } else if (type == 'season') {
+    res = await getEmbyMovieTv({ movieTvId: activeSeason.value.id }, selectMedia.value)
+  }
+  res.overview ? overview.value = res.overview : overview.value = allDetail.value.overview;
   actorArr.value = res.actors
   showActor.value = true
+  let copyImgData = imgData.value
   if (routerParams.value.type == "movie") {
-    imgData.value = {
-      title: res.name,
-      img: res.backdrop_path,
-      score: res.vote_average.toFixed(1),
-      releaseTime: res.release_date,
-      runtime: calTime(res.runtime),
-      runtimeEn: calTime(res.runtime, "en"),
-      genres: res.genres.map((i) => i.name).join(" "),
-      size: res.size,
+    imgData.value = { //如果季接口返回的值不存在，就用imgData原来的
+      title: res.name || copyImgData.title,
+      img: res.backdrop_path || copyImgData.img,
+      score: res.vote_average.toFixed(1) || copyImgData.score,
+      releaseTime: res.release_date || copyImgData.releaseTime,
+      runtime: calTime(res.runtime) || copyImgData.runtime,
+      runtimeEn: calTime(res.runtime, "en") || copyImgData.runtimeEn,
+      genres: res.genres.map((i) => i.name).join(" ") || copyImgData.genres,
+      size: res.size || copyImgData.size,
+      poster: res.poster_path || copyImgData.poster,
+      tmdbId: res.tmdbId || copyImgData.tmdbId,
+      production_companies: res.production_companies || copyImgData.production_companies,
+      overview: res.overview || copyImgData.overview,
+      path: res.path || copyImgData.path,
     };
   } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = imgData.value.img = res.backdrop_path;
+    seasonFirst.value.img = res.backdrop_path;
+    if ((type == 'all' && seasonArr.value.length == 1) || (type == 'season' && seasonArr.value.length > 1)) {
+      res.backdrop_path ? imgData.value.img = res.backdrop_path : ''
+    }
     seasonFirst.value.overview = res.overview;
-    imgData.value.score = res.vote_average.toFixed(1);
-    imgData.value.genres = res.genres.map((i) => i.name).join(" ");
-    imgData.value.releaseTime = res.release_date;
-    imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）`;
-
+    res.vote_average ? imgData.value.score = res.vote_average.toFixed(1) : '';
+    res.genres?.length ? imgData.value.genres = res.genres.map((i) => i.name).join(" ") : '';
+    res.release_date ? imgData.value.releaseTime = res.release_date : '';
+    res.poster_path ? imgData.value.poster = res.poster_path : '';
+    res.tmdbId ? imgData.value.tmdbId = res.tmdbId : '';
+    res.production_companies ? imgData.value.production_companies = res.production_companies : '';
+    res.overview ? imgData.value.overview = res.overview : '';
+    res.path ? imgData.value.path = res.path : '';
+    res.number_of_episodes ? imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）` : '';
   }
   return res;
 };
+
+//切换第几季
+const changeTvSeason = async (obj) => {
+  activeSeason.value = { ...seasonArr.value.find(v => v.name == obj.title) }
+  if (activeSeason.value.season != "1") {
+    imgData.value.title = routerParams.value.name + " " + activeSeason.value.name;
+  } else {
+    imgData.value.title = routerParams.value.name;
+  }
+  getMovieTvDetail('season')
+  handleTv()
+}
 
 //设置电视剧文件夹
 const handleTv = async () => {
   let result = {}
   try {
-    let embyObj = {
-      ParentId: routerParams.value.movieTvId,
-      IsFolder: false,
-      EnableImageTypes: 'Primary,Backdrop,Thumb',
-      Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,Overview,PremiereDate,ProductionYear,RunTimeTicks,SpecialEpisodeNumbers',
-      StartIndex: 0,
-      Limit: 1000,
-      EnableTotalRecordCount: false,
-      Recursive: true,
-      IsStandaloneSpecial: false,
+    if (seasonArr.value.length == 1) {
+      let embyObj = {
+        ParentId: routerParams.value.movieTvId,
+        IsFolder: false,
+        EnableImageTypes: 'Primary,Backdrop,Thumb',
+        Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,Overview,PremiereDate,ProductionYear,RunTimeTicks,SpecialEpisodeNumbers',
+        StartIndex: 0,
+        Limit: 1000,
+        EnableTotalRecordCount: false,
+        Recursive: true,
+        IsStandaloneSpecial: false,
+      }
+      result = await getEmbyList(embyObj, selectMedia.value)
+    } else if (seasonArr.value.length > 1) {
+      let embyObj = {
+        SeasonId: activeSeason.value.id,
+        folderFileId: routerParams.value.movieTvId
+      }
+      result = await getSeasonTvList(embyObj, selectMedia.value)
     }
-    result = await getEmbyList(embyObj, selectMedia.value)
+
   } catch (error) {
     showRehandleButton.value = true;
     return;
@@ -236,20 +276,35 @@ const setButtonText = () => {
 
 //点击播放按钮
 const clickPlayButton = () => {
+  uni.setStorageSync('overviewData', imgData.value)
   if (routerParams.value.type == "movie") {
     uni.navigateTo({
-      url: `/pages/mobile/video/video-player?folderFileId=${routerParams.value.movieTvId}&type=movie`,
+      url: `/pages/mobile/video/emby/emby-player?folderFileId=${routerParams.value.movieTvId}&type=movie&movieName=${imgData.value.title}`,
     });
   } else if (routerParams.value.type == "tv") {
     uni.setStorageSync("tvList", tvList.value);
     let openEndTime = {};
     routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
     uni.navigateTo({
-      url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
-        }`,
+      url: `/pages/mobile/video/emby/emby-player?folderFileId=${tvList.value[0].id}&type=tv`,
     });
   }
 };
+
+//电视剧点击某一集进行播放
+const toPlayVideo = (item, index) => {
+  uni.setStorageSync('overviewData', imgData.value)
+  if (routerParams.value.type == 'movie') {
+    uni.navigateTo({
+      url: `/pages/mobile/video/emby/emby-player?folderFileId=${routerParams.value.movieTvId}&type=movie&movieName=${imgData.value.title}`,
+    });
+  } else if (routerParams.value.type == 'tv') {
+    uni.setStorageSync("tvList", tvList.value);//用于给视频播放器页面显示集数
+    uni.navigateTo({
+      url: `/pages/mobile/video/emby/emby-player?folderFileId=${item.id}&type=tv`,
+    });
+  }
+}
 
 //从接口获取该剧集有多少个季
 const getSeasonArr = async () => {
@@ -257,16 +312,12 @@ const getSeasonArr = async () => {
     movieTvId: routerParams.value.movieTvId,
     UserId: selectMedia.value.userId,
     Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,Overview',
-    IsSpecialSeason: false,
-    EnableUserData: false,
-    EnableTotalRecordCount: false,
-    EnableImages: false
   }
   let res = await getEmbySeasonList(seasonInfo, selectMedia.value)
   seasonArr.value = res.Items.map(v => {
-    return { name: v.Name, season: String(v.IndexNumber) }
+    return { name: v.Name, season: String(v.IndexNumber), id: v.Id }
   })
-  activeSeason.value = seasonArr.value[0]
+  activeSeason.value = { ...seasonArr.value[0] }
 }
 const setItemWidth = () => {
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
@@ -287,11 +338,15 @@ onBeforeMount(async () => {
   if (routerParams.value.type == 'tv') {
     await getSeasonArr()
   }
-  getMovieTvDetail()
   if (routerParams.value.type == "tv") {
-    await handleTv();
+    handleTv();
   }
-
+  if (seasonArr.value.length > 1) {
+    await getMovieTvDetail()
+    getMovieTvDetail('season')
+  } else {
+    getMovieTvDetail()
+  }
 });
 
 onShow(() => {

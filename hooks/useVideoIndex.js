@@ -568,6 +568,7 @@ export function useVideoIndex({ wil_modal }) {
     //Emby的refresh
     const refreshEmby = async () => {
         const CollectionTypeArr = ['movies', 'tvshows', 'music', 'games', 'books', 'musicvideos', 'homevideos', 'livetv', 'channels']
+        refreshLoading.value = true
         let res1 = await getMainView(selectMedia.value)
         let embyMovieTvList = res1.Items.map(v => {
             return {
@@ -597,6 +598,7 @@ export function useVideoIndex({ wil_modal }) {
                 v.list = arr
             }
         }))
+        refreshLoading.value = false
         uni.setStorageSync('embyMovieTvList', embyMovieTvList)
     }
 

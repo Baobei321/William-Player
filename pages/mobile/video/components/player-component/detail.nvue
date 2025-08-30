@@ -1,68 +1,88 @@
 <template>
   <scroll-view :scroll-y="true" :enhanced="true" :showScrollbar="false" class="player-detail">
-    <view class="swiper-content" :style="{height:setSize('330rpx'),paddingTop:setSize('60rpx')}">
-      <view class="swiper-content-container" v-if="detailData.name||detailData.title" :style="{padding:`0 ${setSize('24rpx')}`}">
-        <view class="swiper-content-left" :style="{width:setSize('192.6rpx'),flex:`0 0 ${setSize('192.6rpx')}`,height:setSize('270rpx'),borderRadius:setSize('12rpx')}">
-          <image mode="aspectFill" :src="detailData.poster" :style="{width: setSize('192.6rpx'),height: setSize('270rpx'),borderRadius: setSize('12rpx')}"></image>
+    <view class="swiper-content" :style="{ height: setSize('330rpx'), paddingTop: setSize('60rpx') }">
+      <view class="swiper-content-container" v-if="detailData.name || detailData.title"
+        :style="{ padding: `0 ${setSize('24rpx')}` }">
+        <view class="swiper-content-left"
+          :style="{ width: setSize('192.6rpx'), flex: `0 0 ${setSize('192.6rpx')}`, height: setSize('270rpx'), borderRadius: setSize('12rpx') }">
+          <image mode="aspectFill" :src="detailData.poster"
+            :style="{ width: setSize('192.6rpx'), height: setSize('270rpx'), borderRadius: setSize('12rpx') }"></image>
         </view>
-        <view class="swiper-content-right" :style="{height:setSize('270rpx'),marginLeft:setSize('24rpx')}">
-          <text class="right-genres" :style="{fontSize:setSize('26rpx')}">{{ detailData.genres }}</text>
-          <text class="right-name" :style="{fontSize:setSize('32rpx')}">{{ detailData.name||detailData.title }}</text>
+        <view class="swiper-content-right" :style="{ height: setSize('270rpx'), marginLeft: setSize('24rpx') }">
+          <text class="right-genres" :style="{ fontSize: setSize('26rpx') }">{{ detailData.genres }}</text>
+          <text class="right-name" :style="{ fontSize: setSize('32rpx') }">{{ detailData.name || detailData.title
+          }}</text>
           <view class="right-info">
-            <text class="right-info-date" :style="{fontSize: setSize('24rpx')}">{{ detailData.first_air_date||detailData.release_date	 }}</text>
-            <view class="right-info-star" :style="{marginLeft:setSize('50rpx')}">
-              <image src="@/static/star-fill.png" :style="{width: setSize('30rpx'),height: setSize('30rpx')}"></image>
-              <text :style="{fontSize: setSize('24rpx')}">{{ detailData.vote_average?.toFixed(1) }}</text>
+            <text class="right-info-date" :style="{ fontSize: setSize('24rpx') }">{{
+              detailData.first_air_date || detailData.release_date }}</text>
+            <view class="right-info-star" :style="{ marginLeft: setSize('50rpx') }">
+              <image src="@/static/star-fill.png" :style="{ width: setSize('30rpx'), height: setSize('30rpx') }">
+              </image>
+              <text :style="{ fontSize: setSize('24rpx') }">{{ detailData?.vote_average }}</text>
             </view>
           </view>
-          <text class="right-desc" :style="{fontSize:setSize('28rpx')}">{{ detailData.overview }}</text>
+          <text class="right-desc" :style="{ fontSize: setSize('28rpx') }">{{ detailData.overview }}</text>
         </view>
       </view>
     </view>
-    <view class="now-play" v-if="type=='tv'" :style="{padding:setSize('24rpx')}">
-      <text class="now-play-title" :style="{fontSize:setSize('32rpx'),paddingBottom:setSize('20rpx')}">正在播放</text>
-      <view class="now-play-list" :style="{height:setSize('230rpx'),width:windowWidth>700?windowWidth-24+'px':'702rpx'}">
-        <scroll-view class="tv-version-scroll" :scroll-x="true" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx', height:setSize('230rpx')}" :enhanced="true"
-          :scroll-into-view="scrollIntoView" :scroll-with-animation="true" :showScrollbar="false" v-if="tvListData.length" ref="tv_scroll">
+    <view class="now-play" v-if="type == 'tv'" :style="{ padding: setSize('24rpx') }">
+      <text class="now-play-title" :style="{ fontSize: setSize('32rpx'), paddingBottom: setSize('20rpx') }">正在播放</text>
+      <view class="now-play-list"
+        :style="{ height: setSize('230rpx'), width: windowWidth > 700 ? windowWidth - 24 + 'px' : '702rpx' }">
+        <scroll-view class="tv-version-scroll" :scroll-x="true"
+          :style="{ width: windowWidth > 700 ? windowWidth - 24 + 'px' : '702rpx', height: setSize('230rpx') }"
+          :enhanced="true" :scroll-into-view="scrollIntoView" :scroll-with-animation="true" :showScrollbar="false"
+          v-if="tvListData.length" ref="tv_scroll">
           <view class="tv-version-list__item"
-            :style="{marginLeft:index==0 ? 0 : setSize('24rpx'),flex:`0 0 ${itemWidth?itemWidth+'px' :setSize('339rpx')}`,width:itemWidth?itemWidth+'px' :setSize('339rpx')}"
-            v-for="(item,index) in tvListData" :key="item.name" :id="'name'+(index+1)" @click="changeVideo(item,index)">
+            :style="{ marginLeft: index == 0 ? 0 : setSize('24rpx'), flex: `0 0 ${itemWidth ? itemWidth + 'px' : setSize('339rpx')}`, width: itemWidth ? itemWidth + 'px' : setSize('339rpx') }"
+            v-for="(item, index) in tvListData" :key="item.name" :id="'name' + (index + 1)"
+            @click="changeVideo(item, index)">
             <view class="item-img"
-              :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),height:itemWidth?itemWidth*170/339 :setSize('170rpx'),borderRadius:setSize('16rpx')}">
+              :style="{ width: itemWidth ? itemWidth + 'px' : setSize('339rpx'), height: itemWidth ? itemWidth * 170 / 339 : setSize('170rpx'), borderRadius: setSize('16rpx') }">
               <image :src="item.poster || posterEmpty" class="item-bgc" mode="aspectFill"
-                :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),height:itemWidth?itemWidth*170/339 :setSize('170rpx'),borderRadius:setSize('16rpx')}"></image>
-              <image src="@/static/playVideo-button.png" v-if="name!=item.name" class="item-img-pause"
-                :style="{width:setSize('60rpx'),height:setSize('60rpx'),left:setSize('139.5rpx'),top:setSize('55rpx')}" />
+                :style="{ width: itemWidth ? itemWidth + 'px' : setSize('339rpx'), height: itemWidth ? itemWidth * 170 / 339 : setSize('170rpx'), borderRadius: setSize('16rpx') }">
+              </image>
+              <image src="@/static/playVideo-button.png" v-if="name != item.name" class="item-img-pause"
+                :style="{ width: setSize('60rpx'), height: setSize('60rpx'), left: setSize('139.5rpx'), top: setSize('55rpx') }" />
               <!-- <image src="https://y.qq.com/mediastyle/yqq/img/wave.gif?max_age=2592000" class="item-img-run" v-else></image> -->
               <image src="https://img.alicdn.com/imgextra/i2/O1CN01PjwhOL1FfuzmXWggp_!!6000000000515-1-tps-72-72.gif"
-                :style="{width:setSize('30rpx'),height:setSize('30rpx'),left:setSize('154.5rpx'),top:setSize('70rpx')}" class="item-img-run" v-else></image>
+                :style="{ width: setSize('30rpx'), height: setSize('30rpx'), left: setSize('154.5rpx'), top: setSize('70rpx') }"
+                class="item-img-run" v-else></image>
               <text class="item-img-runtime"
-                :style="{right:setSize('10rpx'),bottom:setSize('10rpx'),fontSize:setSize('24rpx'),borderRadius:setSize('8rpx'),padding:`${setSize('4rpx')} ${setSize('8rpx')}`}">{{ item.runtime }}</text>
+                :style="{ right: setSize('10rpx'), bottom: setSize('10rpx'), fontSize: setSize('24rpx'), borderRadius: setSize('8rpx'), padding: `${setSize('4rpx')} ${setSize('8rpx')}` }">{{
+                  item.runtime }}</text>
             </view>
             <text class="item-title"
-              :style="{width:itemWidth?itemWidth+'px' :setSize('339rpx'),fontSize:setSize('28rpx'),paddingTop:setSize('12rpx')}">{{ index+1+'.'+(item.title||`第${index+1}集`) }}</text>
+              :style="{ width: itemWidth ? itemWidth + 'px' : setSize('339rpx'), fontSize: setSize('28rpx'), paddingTop: setSize('12rpx') }">{{
+                index + 1 + '.' + (item.title || `第${index + 1}集`) }}</text>
           </view>
         </scroll-view>
-        <view class="tv-version-empty" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx',height:setSize('230rpx')}" v-else>
+        <view class="tv-version-empty"
+          :style="{ width: windowWidth > 700 ? windowWidth - 24 + 'px' : '702rpx', height: setSize('230rpx') }" v-else>
           <button @click="reHandleTv" v-if="showRehandleButton"
-            :style="{backgroundColor:'#090909',borderColor:'#090909',padding: `${setSize('16rpx')} ${setSize('24rpx')}`}">
-            <text :style="{color: '#ffffff',fontSize:setSize('32rpx')}">重新加载</text>
+            :style="{ backgroundColor: '#090909', borderColor: '#090909', padding: `${setSize('16rpx')} ${setSize('24rpx')}` }">
+            <text :style="{ color: '#ffffff', fontSize: setSize('32rpx') }">重新加载</text>
           </button>
           <text v-else>加载中...</text>
         </view>
       </view>
 
     </view>
-    <view class="play-platform" :style="{padding:setSize('24rpx')}">
-      <text class="play-platform-title" :style="{fontSize:setSize('32rpx'),paddingBottom:setSize('20rpx')}">播出平台</text>
-      <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
-        <view v-for="(item,index) in detailData.networks" :key="item.id" class="container-item"
-          :style="{marginLeft:index==0 ? '0' : setSize('24rpx'),padding:`${setSize('10rpx')} ${setSize('16rpx')}`,borderRadius:setSize('16rpx')}">
-          <image :src="imgDomain+'/t/p/h30'+item.logo_path" v-if="item.logo_path" :style="{height:setSize('40rpx')}" class="container-item-img" mode="heightFix"
-            @load="loadImage"></image>
-          <text v-else :style="{fontSize: setSize('32rpx'),color: '#000'}">{{ item.name }}</text>
+    <view class="play-platform" :style="{ padding: setSize('24rpx') }">
+      <text class="play-platform-title"
+        :style="{ fontSize: setSize('32rpx'), paddingBottom: setSize('20rpx') }">播出平台</text>
+      <scroll-view class="play-platform-container" :scroll-x="true" style="width: 100%" :enhanced="true"
+        :showScrollbar="false">
+        <view v-for="(item, index) in detailData.networks" :key="item.id" class="container-item"
+          :style="{ marginLeft: index == 0 ? '0' : setSize('24rpx'), padding: `${setSize('10rpx')} ${setSize('16rpx')}`, borderRadius: setSize('16rpx') }">
+          <image :src="imgDomain + '/t/p/h30' + item.logo_path" v-if="item.logo_path"
+            :style="{ height: setSize('40rpx') }" class="container-item-img" mode="heightFix" @load="loadImage"></image>
+          <text v-else :style="{ fontSize: setSize('32rpx'), color: '#000' }">{{ item.name }}</text>
         </view>
-        <view class="container-empty" :style="{width:windowWidth>700?windowWidth-24+'px':'702rpx',height:setSize('60rpx')}" v-if="!showPlatformImg"></view>
+        <view class="container-empty"
+          :style="{ width: windowWidth > 700 ? windowWidth - 24 + 'px' : '702rpx', height: setSize('60rpx') }"
+          v-if="!showPlatformImg">
+        </view>
       </scroll-view>
     </view>
   </scroll-view>
@@ -109,24 +129,35 @@ export default {
   },
   methods: {
     async getMovieTvDetail() {
-      let res = await getMovieTvById(
-        {
-          movieTvId: this.movieTvId,
-        },
-        this.type
-      );
-      let genres = "";
-      res.genres.forEach((v, vindex) => {
-        if (vindex < res.genres.length - 1) {
-          genres += v.name + " ";
-        } else {
-          genres += v.name || "";
+      let overviewData = uni.getStorageSync('overviewData')//emby 会在emby-detail设置overviewData，不需要去请求tmdb接口
+      let res = {}
+      if (overviewData) {
+        res = overviewData
+        res.name = res.title
+        res.networks = res.production_companies
+        res.release_date = res.releaseTime
+        res.vote_average = res.score
+        this.showPlatformImg = true
+      } else {
+        res = await getMovieTvById(
+          {
+            movieTvId: this.movieTvId,
+          },
+          this.type
+        );
+        res.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
+        if (this.type == "movie") {
+          res.networks = res.production_companies;
         }
-      });
-      res.genres = genres;
-      res.poster = IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path;
-      if (this.type == "movie") {
-        res.networks = res.production_companies;
+        let genres = "";
+        res.genres.forEach((v, vindex) => {
+          if (vindex < res.genres.length - 1) {
+            genres += v.name + " ";
+          } else {
+            genres += v.name || "";
+          }
+        });
+        res.genres = genres;
       }
       this.detailData = res;
       if (this.seasonData.id) {
@@ -311,6 +342,7 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
       .right-genres {
         // font-size: 26rpx;
         color: #000;
@@ -326,9 +358,11 @@ export default {
         flex-direction: row;
         align-items: center;
         font-weight: bold;
+
         .right-info-date {
           color: #000;
         }
+
         .right-info-star {
           display: flex;
           flex-direction: row;
@@ -544,14 +578,17 @@ export default {
 @media (prefers-color-scheme: dark) {
   .player-detail {
     background: #1e1e20;
+
     .swiper-content {
       .swiper-content-left {
         background: rgb(212, 212, 212);
       }
+
       .swiper-content-right {
         .right-desc {
           color: rgb(182, 182, 182);
         }
+
         .right-genres {
           color: #fff;
         }
@@ -564,6 +601,7 @@ export default {
           .right-info-date {
             color: #fff;
           }
+
           .right-info-star {
             color: #fff;
           }

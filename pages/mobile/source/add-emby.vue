@@ -30,10 +30,6 @@ import { loginEmby, getEmbyInfo } from "@/utils/emby";
 const state = reactive({
     formData: {
         protocol: "https",
-        address: 'my2.yangxiangxiang.top',
-        port: 18099,
-        Username: 'cwl',
-        Pw: 'cwl@20252025'
     },
     oldData: {},
 });
@@ -205,9 +201,12 @@ onLoad((options) => {
     title.value = decodeURIComponent(routerParams.value.title);
     if (title.value == "修改Emby") {
         let sourceList = uni.getStorageSync("sourceList");
+        
         state.formData = sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == routerParams.value.address);
         state.formData.protocol ? "" : (state.formData.protocol = "http");
         state.oldData = JSON.parse(JSON.stringify(state.formData));
+        console.log(state.formData,'state.formDta');
+        
     }
 });
 </script>

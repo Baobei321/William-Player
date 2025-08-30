@@ -36,13 +36,13 @@
 
 <script>
 import wilNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
-import playerDetail from "./components/player-component/detail.nvue";
-import tvSelect from "./components/player-component/tv-select.nvue";
-import tvButton from "./components/player-component/tv-button.nvue";
+import playerDetail from "../components/player-component/detail.nvue";
+import tvSelect from "../components/player-component/tv-select.nvue";
+import tvButton from "../components/player-component/tv-button.nvue";
 import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
 import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
-import { getEmbyPlayerUrl } from '@/utils/emby'
+import { getEmbyPlayerUrl, setHistoryPlay } from '@/utils/emby'
 import { IMG_DOMAIN } from "@/utils/config";
 
 export default {
@@ -57,6 +57,7 @@ export default {
             historyPlay: [],
             historyObj: {
                 initialTime: "0",
+                PlaybackStartTimeTicks:0
             },
             sum: 0,
             routerParams: {},
@@ -66,8 +67,6 @@ export default {
             pipStatus: false,
             videoHeight: "580rpx",
             settingData: {},
-            emptyUrl:
-                "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
             config: {
                 url: "",
                 // 是否自动播放
@@ -100,6 +99,21 @@ export default {
     },
 
     methods: {
+        secondsTo100Nanoseconds(seconds) {
+            // 参数验证
+            if (typeof seconds !== 'number' || isNaN(seconds)) {
+                throw new Error('输入必须是一个有效的数字');
+            }
+            if (seconds < 0) {
+                throw new Error('输入不能为负数');
+            }
+
+            // 转换计算：秒数 × 10,000,000
+            const result = seconds * 10000000;
+
+            // 返回结果
+            return result;
+        },
         //判断选择的是webdav还是天翼云盘还是夸克
         judgeSelect() {
             this.sourceList = uni.getStorageSync("sourceList");
@@ -117,20 +131,26 @@ export default {
         async getVideoUrl() {
             this.judgeSelect();
             if (this.selectType.type == 'Emby') {
-                if (this.selectMedia.name) {
-                    let res = await getEmbyPlayerUrl(
-                        {
-                            folderFileId: this.routerParams.folderFileId,
-                        },
-                        this.selectMedia
-                    );
-                    // let res = await getQuarkVideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
-                    return res;
+                let res = await getEmbyPlayerUrl(
+                    {
+                        folderFileId: this.routerParams.folderFileId,
+                    },
+                    this.selectMedia
+                );
+                this.historyObj = {
+                    ItemId: res.MediaSources[0].ItemId,
+                    MediaSourceId: res.MediaSources[0].Id,
+                    PlaySessionId: res.PlaySessionId,
+                    initialTime: '0'
                 }
+                return res;
             }
         },
         setHistory(event) {
-
+            if (this.routerParams.noSetHistory == 0) return;
+            if (!this.routerParams.type) return;
+            this.historyObj.initialTime = Math.round(event.detail.currentTime);
+            this.historyObj.PositionTicks = Math.round(this.secondsTo100Nanoseconds(Number(event.detail.currentTime)))
         },
         //初始化进入的时候，设置从哪儿开始播放
         setInitialTime() {
@@ -141,27 +161,13 @@ export default {
         },
         async setUrl() {
             let res = await this.getVideoUrl();
-            if (this.selectType.type == "天翼云盘") {
-                // this.config.url = res.normal.url;
-                const NetworkModule = uni.requireNativePlugin("NetworkModule");
-                NetworkModule.request(
-                    {
-                        url: res.normal.url,
-                        timeout: 5000,
-                        method: "GET",
-                    },
-                    (res1) => {
-                        this.config.url = res1.location;
-                        addOperLog({
-                            title: this.config.title.slice(0, 30),
-                            businessType: 10,
-                            operatorType: 2,
-                            operUrl: this.config.url,
-                        });
-                    },
-                    (error) => { }
-                );
-            }
+            this.config.url = res.MediaSources[0].Path;
+            addOperLog({
+                title: this.config.title.slice(0, 30),
+                businessType: 10,
+                operatorType: 2,
+                operUrl: this.config.url,
+            });
         },
         getPipStatus(event) {
             this.pipStatus = event.detail.isPip;
@@ -173,9 +179,8 @@ export default {
         },
         pauseVideo() {
             if (this.routerParams.noSetHistory != 0 && this.routerParams.type) {
-                let historyArr = uni.getStorageSync("historyPlay");
-                historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);
-                uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
+                this.historyObj.PlaybackStartTimeTicks = secondsTo100Nanoseconds(Math.floor(Date.now() / 1000));
+                setHistoryPlay(this.historyObj,this.selectMedia)
             }
         },
         prevVideo() {
@@ -193,34 +198,16 @@ export default {
             this.changeVideo(nowIndex + 1);
         },
         async changeVideo(currentIndex) {
+            let overviewData = uni.getStorageSync('overviewData')//emby 会在emby-detail设置overviewData，不需要去请求tmdb接口
             this.showTvButton = false;
-            let initObj = JSON.parse(JSON.stringify(this.historyObj));
-            this.historyObj.initialTime = 0;
             this.tvList = uni.getStorageSync("tvList") || [];
-            const lastIndex = decodeURIComponent(this.routerParams.path).lastIndexOf("/");
             // this.$refs.video_view.release();
             this.config.url = "";
-            this.routerParams.openingTime ? (this.config.initialTime = +this.routerParams.openingTime) : (this.config.initialTime = 0);
-            this.routerParams.path = decodeURIComponent(this.routerParams.path).slice(0, lastIndex) + "/" + this.tvList[currentIndex].name;
-            if (this.selectType.type != "WebDAV") {
-                this.historyObj.folderFileId = this.routerParams.folderFileId = this.tvList[currentIndex].id;
-            }
             this.config.initialTime = this.routerParams.openingTime ? +this.routerParams.openingTime : 0;
-            //跳转下一集重新设置historyObj
-            this.historyObj.path = decodeURIComponent(this.routerParams.path);
-            this.historyObj.ji = String(currentIndex + 1);
-            this.historyObj.poster = this.tvList[currentIndex].poster || this.historyObj.poster;
-            this.historyObj.name = this.tvList[currentIndex].name;
-            this.historyObj.runtime = this.tvList[currentIndex].runtime;
-            this.historyObj.title = this.tvList[currentIndex].title;
-            this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
-            this.historyObj.initialTime = String(this.config.initialTime);
-            this.config.poster = this.historyObj.poster;
-            try {
-                await this.setUrl();
-            } catch (error) {
-                this.historyObj = initObj;
-            }
+            this.config.title = overviewData.title + " " + "第" + (currentIndex + 1) + "集 " + this.tvList[currentIndex].name;
+            this.config.poster = this.tvList[currentIndex].poster;
+            await this.setUrl();
+
         },
         getOrientation(event) {
             this.direction = event.detail.direction;
@@ -267,7 +254,7 @@ export default {
         },
 
         async handleTv(data) {
-       
+
         },
     },
     async onLoad(options) {
@@ -283,15 +270,17 @@ export default {
                 icon: "none",
             });
         }
-        this.historyPlay = uni.getStorageSync("historyPlay") || [];
-        this.historyPlay = this.historyPlay.filter((v) => v.sourceType == this.selectType.type && v.sourceName == this.selectMedia.name);
         this.routerParams = options;
-        this.setInitialTime();
         this.seasonData = uni.getStorageSync("seasonData") || {};
         this.tvList = uni.getStorageSync("tvList") || [];
-        if (this.routerParams.titlePlay) {
-            this.handleTv(this.routerParams);
+        if (options.type == 'tv') {
+            this.config.title = this.tvList.find(i => i.id == options.folderFileId).name
+        } else if (options.type == 'movie') {
+            this.config.title = options.movieName
         }
+        // if (this.routerParams.titlePlay) {
+        //     this.handleTv(this.routerParams);
+        // }
         // options.openingTime ? (this.config.initialTime = options.openingTime) : "";
         if (options.videoUrl) {
             this.config.url = decodeURIComponent(options.videoUrl);
@@ -307,6 +296,7 @@ export default {
         uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
         uni.removeStorageSync("tvList");
         uni.removeStorageSync("seasonData");
+        uni.removeStorageSync("overviewData");
     },
     onBackPress() {
         if (this.direction == 1) {

@@ -12,37 +12,20 @@
         </nut-searchbar>
       </template>
     </wil-navbar>
-    <div class="video-search-list" v-if="listData.length">
-      <div class="video-search-list__item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)">
-        <div class="item-left" :style="{ backgroundImage: `url(${setEmptyImg(item.poster)})` }">
-          <div :class="['item-left-logo', item.type == '1' ? 'item-left-tv' : '']">
-            <template v-if="item.type == '1'">
-              <image :src="tvLittle" />
-              <span>电视剧</span>
-            </template>
-            <template v-else>
-              <image :src="movieLittle" />
-              <span>电影</span>
-            </template>
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-right-name">
-            <span v-for="second in handleName(item.name)" :key="second" :style="{ color: second.color }">{{ second.label
-              }}</span>
-          </div>
-          <div class="item-right-content">
-            <div class="item-right-content__date">
-              <nut-icon name="date" size="14" custom-color="#7a787b"></nut-icon>
-              <span>{{ item.releaseTime }}</span>
-            </div>
-            <div class="item-right-content__line"></div>
-            <div class="item-right-content__type">{{ item.type == '1' ? '电视剧' : '电影' }}</div>
-          </div>
-        </div>
-      </div>
+    <div class="video-search-list" v-if="selectType.type == 'Emby'" v-show="listData.length">
+      <wil-list :requestFn="getSearchEmbyList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
+        idKey="id" listContainerClass="list-recent" :pageSize="50" 
+         @currentData="currentData">
+        <template #default="item">
+          <searchBox :data="item" :oldValue="oldValue" @click="toVideoDetail(item)" :isEmby="true"></searchBox>
+        </template>
+      </wil-list>
     </div>
-    <wil-empty v-else text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
+    <div class="video-search-list" v-if="listData.length && selectType.type != 'Emby'">
+      <searchBox :data="item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)"
+        :oldValue="oldValue" :isEmby="false"></searchBox>
+    </div>
+    <wil-empty v-if="!listData.length" text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
   </div>
 </template>
 
@@ -50,54 +33,104 @@
 import { ref } from "vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import wilEmpty from "@/components/mobile/wil-empty/index.vue";
-import movieLittle from "@/static/movie-little.png";
-import tvLittle from "@/static/tv-little.png";
+import wilList from '@/components/mobile/wil-list/index.vue'
 import { handleSeasonName } from "@/utils/scrape.js";
-import posterEmpty from "@/static/poster-empty.png";
-import * as CONFIG from "@/utils/config";
+import { onLoad } from "@dcloudio/uni-app";
+import searchBox from "./components/index-component/search-box.vue";
+import { getEmbyList, setEmbyImg } from '@/utils/emby'
+import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 
 const oldValue = ref("");
 const searchValue = ref("");
 const listData = ref([]);
 
+const selectType = ref({})
+const selectMedia = ref({})
+const wil_list = ref(null)
+const requestParams = ref(null)
+
 const toSearch = () => {
   if (oldValue.value == searchValue.value || !searchValue.value) return;
-  let data = uni.getStorageSync("localMovieTvData");
-  let movieArr = data.movie.filter((item) => item.name.indexOf(searchValue.value) > -1);
-  let tvArr = data.tv.filter((item) => item.name.indexOf(searchValue.value) > -1);
-  listData.value = [...movieArr, ...tvArr];
+  if (selectType.value.type == 'Emby') {
+    requestParams.value = {}
+    wil_list.value.reload()
+  } else {
+    let data = uni.getStorageSync("localMovieTvData");
+    let movieArr = data.movie.filter((item) => item.name.indexOf(searchValue.value) > -1);
+    let tvArr = data.tv.filter((item) => item.name.indexOf(searchValue.value) > -1);
+    listData.value = [...movieArr, ...tvArr];
+  }
   oldValue.value = searchValue.value;
 };
 
 const toCancel = () => {
-  searchValue.value = "";
-  oldValue.value = "";
-  listData.value = [];
-};
-
-const handleName = (name) => {
-  let arr = [];
-  name = handleSeasonName(name);
-  arr.push({ label: name.split(oldValue.value)[0] });
-  arr.push({ label: oldValue.value, color: "#315bfe" });
-  arr.push({ label: name.split(oldValue.value)[1] });
-  arr = arr.filter((i) => i.label);
-  return arr;
-};
-
-const setEmptyImg = (poster) => {
-  if (poster) {
-    return CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + poster;
+  if (selectType.value.type == 'Emby') {
+    wil_list.value.clearList()
   } else {
-    return posterEmpty;
+    searchValue.value = "";
+    oldValue.value = "";
+    listData.value = [];
   }
 };
 
+const currentData = (data) => {
+  listData.value = data.list
+}
+
+const typeMapping = {
+  "Movie": "movie",
+  "Series": "tv",
+};
+
 const toVideoDetail = (item) => {
-  uni.navigateTo({
-    url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+  if (selectType.value.type == 'Emby') {
+    uni.navigateTo({
+      url: `/pages/mobile/video/emby/emby-detail?name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&movieTvId=${item.id}`,
+    });
+  } else {
+    uni.navigateTo({
+      url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    });
+  }
+};
+
+//判断选择的是webdav还是天翼云盘还是夸克还是Emby
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync("sourceList");
+  selectType.value = sourceList.find((item) => {
+    let select = item.list.find((i) => i.active);
+    if (select) {
+      selectMedia.value = select;
+      return true;
+    } else {
+      return false;
+    }
   });
 };
+
+//emby分页查询影视
+const getSearchEmbyList = async (params) => {
+  let res = await getEmbyList({
+    IncludeItemTypes: 'Series,Movie', Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,ProductionYear,Status,EndDate',
+    StartIndex: (params.pageNum - 1) * params.pageSize,
+    Limit: params.pageSize,
+    SortBy: 'SortName',
+    SortOrder: 'Ascending',
+    EnableImageTypes: 'Primary,Backdrop,Thumb',
+    ImageTypeLimit: '1',
+    Recursive: true,
+    SearchTerm: searchValue.value,
+    IncludeSearchTypes: false,
+  }, selectMedia.value)
+  let rows = res.Items.map(item => {
+    return {
+      id: item.Id, type: item.Type == 'Series' ? '1' : '0', poster: setEmbyImg(item, selectMedia.value), name: item.Name,
+      releaseTime: item.ProductionYear + (item.EndDate ? `-${dayjs(item.EndDate).format('YYYY')}` : '')
+    }
+  })
+  return { total: res.TotalRecordCount, rows }
+}
+judgeSelect()
 </script>
 
 <style lang="scss" scoped>
@@ -152,92 +185,15 @@ page {
     }
   }
 
+  ::v-deep .wil-list {
+    flex: 1;
+    overflow: hidden;
+  }
+
   .video-search-list {
     padding: 24rpx 24rpx 68rpx 24rpx;
     flex: 1;
     overflow: auto;
-
-    .video-search-list__item {
-      display: flex;
-      align-items: center;
-      margin-top: 30rpx;
-
-      .item-left {
-        width: 140rpx;
-        height: 220rpx;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        border-radius: 16rpx;
-        position: relative;
-
-        .item-left-logo {
-          display: inline-flex;
-          align-items: center;
-          background: #031963;
-          border-radius: 16rpx 0 16rpx 0;
-          padding: 8rpx;
-          position: absolute;
-          top: 0;
-          left: 0;
-
-          image {
-            width: 24rpx;
-            height: 24rpx;
-          }
-
-          span {
-            font-size: 22rpx;
-            color: #fff;
-            padding-left: 4rpx;
-          }
-        }
-
-        .item-left-tv {
-          background: #315bfd;
-        }
-      }
-
-      .item-right {
-        margin-left: 20rpx;
-
-        .item-right-name {
-          display: flex;
-          align-items: baseline;
-          font-size: 30rpx;
-          color: #000;
-          font-weight: bold;
-        }
-
-        .item-right-content {
-          display: flex;
-          align-items: center;
-          color: #7a787b;
-          font-size: 28rpx;
-          margin-top: 20rpx;
-
-          .item-right-content__date {
-            display: flex;
-            align-items: center;
-
-            span {
-              padding-left: 10rpx;
-            }
-          }
-
-          .item-right-content__line {
-            height: 28rpx;
-            width: 2rpx;
-            background: #cecece;
-            margin: 0 20rpx;
-          }
-        }
-      }
-
-      &:first-child {
-        margin-top: 0;
-      }
-    }
   }
 }
 
