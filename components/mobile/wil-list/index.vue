@@ -10,7 +10,11 @@
       <slot name="empty" />
     </template>
   </normalList>
-  <virtualList v-if="props.type == 'virtual'" v-bind="$attrs"></virtualList>
+  <virtualList v-if="props.type == 'virtual'" v-bind="$attrs">
+    <template #default="data">
+      <slot v-bind="{ ...data }"></slot>
+    </template>
+  </virtualList>
 </template>
 
 <script setup>

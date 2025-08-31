@@ -1,11 +1,11 @@
 <template>
   <div class="video-list">
-    <wil-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="60" :responseAdapter="responseAdapter" @currentData="handleData"
-      :refresher-enabled="false">
+    <wil-list :requestFn="getFileList" ref="load_list" idKey="name" :pageSize="20" :responseAdapter="responseAdapter"
+      @currentData="handleData" :refresher-enabled="false" type="virtual">
       <template #default="item">
-        <nut-cell is-link :class="[item.$index==data.total-1 ? 'last-cell' : '']" @click="clickCell(item)">
+        <nut-cell is-link :class="[item.$index == data.total - 1 ? 'last-cell' : '']" @click="clickCell(item)">
           <template #title>
-            {{ item.name.length>12 ? item.name.slice(0,12)+'...' : item.name}}
+            {{ item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name }}
           </template>
           <template #icon>
             <image :src="setImg(item)" />
@@ -58,7 +58,11 @@ const setImg = (item) => {
     if (videoFormat.some((i) => item.name.includes(i))) {
       return videoPlayer;
     } else if (imgFormat.some((i) => item.name.includes(i))) {
-      return photoIcon;
+      if (item.thumbnail) {
+        return item.thumbnail
+      } else {
+        return photoIcon;
+      }
     }
   }
 };
@@ -204,6 +208,7 @@ page {
   width: 100%;
   height: 100%;
 }
+
 .video-list {
   width: 100%;
   height: 100%;
@@ -212,30 +217,42 @@ page {
   margin-top: 0;
   display: flex;
   flex-direction: column;
-  ::v-deep .load-list {
-    flex: 1;
+
+  ::v-deep .wil-virtual-list {
     padding: 0 24rpx;
     padding-top: 24rpx;
     box-sizing: border-box;
     overflow: hidden;
-    .list-item {
-      &:first-child {
-        .nut-cell {
-          // border-radius: 24rpx 24rpx 0 0;
-          border-top-left-radius: 24rpx;
-          border-top-right-radius: 24rpx;
-        }
-      }
-      .nut-cell {
-        margin: 0;
-        padding: 24rpx;
-        background: #fff;
-        align-items: center;
-        box-shadow: none;
-        border-radius: 0;
-        &::after {
-          border-bottom: 2rpx solid #f5f6f7 !important;
-          /* position: absolute !important;
+
+    .nut-list {
+      height: 100% !important;
+
+      .uni-scroll-view {
+        .uni-scroll-view {
+          .uni-scroll-view-content {
+            .nut-list-container {
+              .nut-list-item {
+                height: auto !important;
+
+                &:first-child {
+                  .nut-cell {
+                    // border-radius: 24rpx 24rpx 0 0;
+                    border-top-left-radius: 24rpx;
+                    border-top-right-radius: 24rpx;
+                  }
+                }
+
+                .nut-cell {
+                  margin: 0;
+                  padding: 24rpx;
+                  background: #fff;
+                  align-items: center;
+                  box-shadow: none;
+                  border-radius: 0;
+
+                  &::after {
+                    border-bottom: 2rpx solid #f5f6f7 !important;
+                    /* position: absolute !important;
           box-sizing: border-box !important;
           content: " " !important;
           pointer-events: none !important;
@@ -245,76 +262,96 @@ page {
           -webkit-transform: scaleY(0.5) !important;
           -ms-transform: scaleY(0.5) !important;
           transform: scaleY(0.5) !important; */
-        }
-        .nut-cell__icon {
-          margin-right: 16rpx;
-          uni-image {
-            div {
-              background-size: cover !important;
-            }
-          }
-          image {
-            width: 60rpx;
-            height: 60rpx;
-            object-fit: cover;
-          }
-          img {
-            width: 60rpx;
-            height: 60rpx;
-            object-fit: cover;
-          }
-        }
-        .nut-cell__title {
-          justify-content: center;
-          font-size: 30rpx;
-          color: #353a45;
-          line-height: normal;
+                  }
 
-          .base-cell__title {
-            display: flex;
-            align-items: center;
-            span:last-child {
-              padding-left: 24rpx;
+                  .nut-cell__icon {
+                    margin-right: 16rpx;
+
+                    uni-image {
+                      div {
+                        background-size: cover !important;
+                      }
+                    }
+
+                    image {
+                      width: 60rpx;
+                      height: 60rpx;
+                      object-fit: cover;
+                    }
+
+                    img {
+                      width: 60rpx;
+                      height: 60rpx;
+                      object-fit: cover;
+                    }
+                  }
+
+                  .nut-cell__title {
+                    justify-content: center;
+                    font-size: 30rpx;
+                    color: #353a45;
+                    line-height: normal;
+
+                    .base-cell__title {
+                      display: flex;
+                      align-items: center;
+
+                      span:last-child {
+                        padding-left: 24rpx;
+                      }
+                    }
+
+                    // font-weight: bold;
+                  }
+                }
+
+                .last-cell {
+                  // border-radius: 0 0 24rpx 24rpx;
+                  border-bottom-right-radius: 24rpx;
+                  border-bottom-left-radius: 24rpx;
+
+                  &::after {
+                    display: none;
+                  }
+                }
+              }
             }
           }
-          // font-weight: bold;
-        }
-      }
-      .last-cell {
-        // border-radius: 0 0 24rpx 24rpx;
-        border-bottom-right-radius: 24rpx;
-        border-bottom-left-radius: 24rpx;
-        &::after {
-          display: none;
         }
       }
     }
+
+
     .load-list__finished-text {
       margin-top: 24rpx;
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .video-list {
-    background: #1e1e20;
-    ::v-deep .load-list {
-      .list-item {
-        .nut-cell {
-          background-color: #2f2f2f;
-          align-items: center;
-          box-shadow: none;
-          &::after {
-            border-bottom: 2rpx solid rgb(73, 73, 73) !important;
-          }
-          .nut-cell__title {
-            color: #fff;
-          }
-          span {
-            color: rgb(154, 154, 154);
-          }
-        }
-      }
-    }
-  }
-}
-</style>
+
+// @media (prefers-color-scheme: dark) {
+//   .video-list {
+//     background: #1e1e20;
+
+//     ::v-deep .load-list {
+//       .list-item {
+//         .nut-cell {
+//           background-color: #2f2f2f;
+//           align-items: center;
+//           box-shadow: none;
+
+//           &::after {
+//             border-bottom: 2rpx solid rgb(73, 73, 73) !important;
+//           }
+
+//           .nut-cell__title {
+//             color: #fff;
+//           }
+
+//           span {
+//             color: rgb(154, 154, 154);
+//           }
+//         }
+//       }
+//     }
+//   }
+// }</style>

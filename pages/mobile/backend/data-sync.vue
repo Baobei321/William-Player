@@ -16,12 +16,12 @@ import { onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from '@/utils/config'
 
 const wilQrcodeRef = ref(null);
-let port = "";
+const port = ref("");
 let timer = null;
 let init = true
 // #ifdef APP-PLUS
 let TcpModule = uni.requireNativePlugin("TcpModule");
-const lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+let lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
 // #endif
 
 const scanCode = () => {
@@ -36,8 +36,16 @@ const scanCode = () => {
           historyPlay: uni.getStorageSync("historyPlay"),
         };
         if (init) {
+          uni.showToast({
+            title: "开始连接",
+            icon: 'none'
+          })
           TcpModule.connectAsClient(result.port.split(':')[0], 1025, async (res) => {
             let result = JSON.parse(res)
+            uni.showToast({
+              title: res,
+              icon: 'none'
+            })
             if (result.code == 500) { //本地局域网同步失败，走后端接口同步
               await setShareData({ port: result.port.split(':')[1], data: obj });
               uni.showToast({
@@ -63,6 +71,10 @@ const scanCode = () => {
             }
           })
         } else {
+          uni.showToast({
+            title: "发送给",
+            icon: 'none'
+          })
           TcpModule.send(JSON.stringify(obj), (res1) => {
             let res2 = JSON.parse(res1)
             if (res2.code == 500) {
@@ -93,18 +105,24 @@ const setQrcode = () => {
   // #ifdef APP-PLUS
   lyzmlDLNA.getIpAddress(val => {
     ipAddress = val
+    port.value = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
+    // let obj = { type: "dataSync", port: port };
+    let obj = { type: "dataSync", port: port.value };
+    wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
   })
   // #endif
-  port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
-  // let obj = { type: "dataSync", port: port };
-  let obj = { type: "dataSync", port: port };
+
+  // #ifndef APP-PLUS
+  port.value = ':' + String(Math.floor(Math.random() * 90000) + 10000);
+  let obj = { type: "dataSync", port: port.value };
   wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
+  // #endif
 };
 
 //10s刷新一次同步状态
 const refreshStatus = () => {
   timer = setInterval(async () => {
-    await getShareData({ port: port.split(':')[1] })
+    await getShareData({ port: port.value.split(':')[1] })
       .then((res) => {
         if (res.data) {
           uni.setStorageSync("localMovieTvData", res.data.localMovieTvData);
@@ -112,7 +130,7 @@ const refreshStatus = () => {
           uni.setStorageSync("historyPlay", res.data.historyPlay);
           clearInterval(timer);
           timer = null;
-          deleteShareData({ port: port.split(':')[1] });
+          deleteShareData({ port: port.value.split(':')[1] });
           uni.showToast({
             title: "同步成功",
             icon: "none",
@@ -136,11 +154,6 @@ refreshStatus();
 const startServer = () => {
   TcpModule.startServer(1025, (res) => { //接收别的设备发过来的数据
     let result = JSON.parse(res)
-    uni.showToast({
-      title:result,
-      icon:'none',
-      duration:7000
-    })
     if (result.code == 500) {
       uni.showToast({
         title: '出错了',
@@ -151,7 +164,7 @@ const startServer = () => {
       uni.setStorageSync('historyPlay', result.historyPlay)
       uni.setStorageSync('isreload', true)
       uni.switchTab({
-        url:'/pages/mobile/video/index'
+        url: '/pages/mobile/video/index'
       })
     }
   });
@@ -166,7 +179,7 @@ onMounted(() => {
 onUnload(() => {
   clearInterval(timer);
   timer = null;
-  deleteShareData({ port: port.split(':')[1] });
+  deleteShareData({ port: port.value.split(':')[1] });
   TcpModule ? TcpModule.closeAllConnections() : ''
   TcpModule = null
 });

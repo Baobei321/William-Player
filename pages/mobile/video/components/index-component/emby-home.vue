@@ -8,10 +8,10 @@
                     </image>
                     <span>我的媒体</span>
                 </div>
-                <div class="emby-home-media__title-right" @click="toVideoAll">
+                <!-- <div class="emby-home-media__title-right" @click="toVideoAll">
                     <span>全部</span>
                     <nut-icon name="rect-right" size="10" custom-color="#52b54b"></nut-icon>
-                </div>
+                </div> -->
             </div>
             <div class="emby-home-media__list">
                 <scroll-view class="emby-home-media__list-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
@@ -58,6 +58,16 @@ const setEmptyImg = (poster) => {
 };
 
 const clickAll = (item) => {
+    const typeMapping = {
+        'tvshows': 'Series',
+        'movies': 'Movie'
+    }
+    uni.navigateTo({
+        url: `/pages/mobile/video/video-all?title=${item.name}&type=emby&embyParentId=${item.id}&embyIncludeItemTypes=${typeMapping[item.collectionType]}&isConnected1=true`,
+    });
+}
+
+const toVideoAll = (item) => {
     const typeMapping = {
         'tvshows': 'Series',
         'movies': 'Movie'

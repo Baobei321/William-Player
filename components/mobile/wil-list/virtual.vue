@@ -1,21 +1,21 @@
 <template>
     <div class="wil-virtual-list">
         <nut-list :height="50" :listData="list" @scroll="execLoad">
-            <template #template="{ item, index }">
-                <slot></slot>
+            <template #default="{ item, index }">
+                <slot v-bind="{ ...item, $index: index }"></slot>
             </template>
         </nut-list>
-        <div class="virtual-list__loading-text" v-show="loading">
+        <!-- <div class="virtual-list__loading-text" v-show="loading">
             <nut-icon name="loading"></nut-icon><span>加载中...</span>
         </div>
         <div class="virtual-list__finished-text" v-show="finished">
             {{ paginationData.total == 0 ? (!$slots.empty ? noDataText : '') : finishedText }}
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script setup>
-import { reactive, computed, watch, onBeforeMount } from 'vue';
+import { reactive, computed, watch, onBeforeMount, ref, unref } from 'vue';
 const props = defineProps({
     requestFn: { type: Function, required: true },
     requestParams: { type: Object, default: {} },
@@ -30,6 +30,11 @@ const list = ref([]);
 const loading = ref(false);
 const loaded = ref(false);
 
+let promiseData = null; //请求接口的函数，已经执行了的
+let promiseId = 0; //每个请求的唯一id
+
+const emit = defineEmits(['currentData'])
+
 const paginationData = reactive({
     total: 0,
     currentPage: 1,
@@ -41,7 +46,6 @@ const refreshData = reactive({
 const finished = computed(() => {
     return unref(loaded) && unref(list).length >= paginationData.total;
 });
-let promiseData = null; //请求接口的函数，已经执行了的
 //接口适配器，默认的接口返回格式，可通过传入responseAdapter自定义
 const wilResponseAdapter = (result, pageSize) => {
     const _data = result;
@@ -83,7 +87,6 @@ const setPromise = (params) => {
     promiseData = promiseData1();
 };
 const load = async () => { //从接口分页加载数据
-    deletePage.value = paginationData.currentPage;
     await promiseData.then((result) => {
         if (promiseId != result.promiseId) {
             return;
@@ -158,6 +161,28 @@ defineExpose({
 
 <style lang="scss" scoped>
 .wil-virtual-list {
+    width: 100%;
+    height: 100%;
+
+    :deep(.nut-list) {
+        .uni-scroll-view {
+            .uni-scroll-view {
+                .uni-scroll-view-content {
+                    .nut-list-container {
+                        .nut-list-item {
+                            height: auto !important;
+                            margin-bottom: 0;
+
+                            &:last-child {
+                                margin-bottom: 20rpx;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     .virtual-list__finished-text {
         line-height: 40rpx;
         font-size: 28rpx;

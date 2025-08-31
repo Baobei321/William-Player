@@ -15,7 +15,11 @@
     <div class="tv-navbar-right">
       <div :class="['tv-navbar-right__icon', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']"
         @click="openSetting">
-        <image class="tv-navbar-right__icon-img" src="@/static/chilun-icon.png"></image>
+        <image class="tv-navbar-right__icon-refresh" src="@/static/xuanzhuan-icon.png"></image>
+      </div>
+      <div :class="['tv-navbar-right__icon', tabIndex === 4 ? 'tv-navbar-right__icon-active' : '']"
+        @click="openSetting">
+        <image class="tv-navbar-right__icon-setting" src="@/static/chilun-icon.png"></image>
       </div>
       <span>{{ nowTime }}</span>
     </div>
@@ -42,7 +46,7 @@ const timer = ref(null);
 
 const evtMove = (keyCode) => {
   if (keyCode === "KeyRight") {
-    if (tabIndex.value != 3) {
+    if (tabIndex.value != 4) {
       tabIndex.value++;
     }
   } else if (keyCode === "KeyLeft") {
@@ -55,6 +59,8 @@ const evtMove = (keyCode) => {
     if (tabIndex.value === 0) { //点击搜索
 
     } else if (tabIndex.value === 3) {//点击设置
+
+    } else if (tabIndex.value === 4) {
       openSetting()
     }
   }
@@ -177,8 +183,17 @@ defineExpose({
       border: 4rpx solid transparent;
       display: flex;
       cursor: pointer;
+      margin-left: 0;
+      &:first-child{
+        margin-left: 0;
+      }
 
-      .tv-navbar-right__icon-img {
+      .tv-navbar-right__icon-refresh {
+        width: 50rpx;
+        height: 50rpx;
+      }
+
+      .tv-navbar-right__icon-setting {
         width: 50rpx;
         height: 50rpx;
       }

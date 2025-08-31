@@ -20,6 +20,7 @@
         :offsetTop="scrollTop" @setFocus="setFocus"></video-classify>
     </tv-page>
     <settings-popup v-model:visible="showSettings" ref="settings_popup" @changeSetting="changeSetting"></settings-popup>
+    <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
@@ -36,8 +37,9 @@ import settingsPopup from "./components/index-component/settings-popup.vue";
 import * as CONFIG from "@/utils/config";
 import { useVideoIndex } from "@/hooks/useVideoIndex.js";
 import { debounce } from "@/utils/scrape";
+const wil_modal = ref(null)
 
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex();
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex({ wil_modal });
 
 const tv_navbar = ref(null);
 const star_recommend = ref(null);

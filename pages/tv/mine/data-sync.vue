@@ -29,12 +29,18 @@ const setQrcode = () => {
     // #ifdef APP-PLUS
     lyzmlDLNA.getIpAddress(val => {
         ipAddress = val
+        port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
+        let obj = { type: "dataSync", port: port };
+        wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
     })
     // #endif
-    port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
-    // let obj = { type: "dataSync", port: port };
+
+    // #ifndef APP-PLUS
+    port = ':' + String(Math.floor(Math.random() * 90000) + 10000);
     let obj = { type: "dataSync", port: port };
     wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
+    // #endif
+
 };
 
 //10s刷新一次同步状态
@@ -47,7 +53,6 @@ const refreshStatus = () => {
                     uni.setStorageSync(CONFIG.USER_ID, res.data.userInfo.userId)
                     uni.setStorageSync('userPassword', res.data.userInfo.userPassword)
                     uni.setStorageSync('Authorization', res.data.userInfo.Authorization)
-                    uni.setStorageSync("localMovieTvData", res.data.localMovieTvData);
                     uni.setStorageSync("sourceList", res.data.sourceList);
                     uni.setStorageSync("historyPlay", res.data.historyPlay);
                     clearInterval(timer);
@@ -80,6 +85,13 @@ const startServer = () => {
             uni.showToast({
                 title: '出错了',
                 icon: 'none',
+            })
+        } else {
+            uni.setStorageSync('sourceList', result.sourceList)
+            uni.setStorageSync('historyPlay', result.historyPlay)
+            uni.setStorageSync('isreload', true)
+            uni.switchTab({
+                url: '/pages/mobile/video/index'
             })
         }
     });

@@ -35,7 +35,7 @@ const getEmby = (data, apiInfo) => {
             data: data || {},
             header: {
                 "Content-Type": 'application/json',
-                'X-Emby-Authorization': `Emby UserId="${apiInfo.userId}" Client="William Player", Device="Android", DeviceId="123456789", Version="1.4.2"`,
+                'X-Emby-Authorization': `Emby UserId="${apiInfo.userId}" Client="William Player", Device="Android", DeviceId="123456789", Version="1.4."`,
                 'X-Emby-Token': apiInfo.token
             },
             success: (res) => {
@@ -58,7 +58,7 @@ const loginEmby = (selectMedia) => {
             data: JSON.stringify({ Username: selectMedia.Username, Pw: selectMedia.Pw }),
             header: {
                 "Content-Type": 'application/json',
-                'X-Emby-Authorization': `Emby Client="William Player", Device="Android", DeviceId="123456789", Version="1.4.2"`,
+                'X-Emby-Authorization': `Emby Client="William Player", Device="Android", DeviceId="123456789", Version="1.4.3"`,
             },
             success: (res) => {
                 resolve(res.data);
