@@ -46,11 +46,11 @@
 
 ## 安装
 
-[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.4.3/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
+[Releases](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.4.4/app-release.apk) 根据设备的架构自行选择安装包，安装包选择见下表
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
-| arm64-v8a   | app-mobile.apk   | 适合大部分设备，手机和平板多数为此架构     |
+| arm64-v8a   | app-phone.apk   | 适合大部分设备，手机和平板多数为此架构     |
 
 ## 版本适配
 

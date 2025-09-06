@@ -15,13 +15,29 @@
     <div class="tv-navbar-right">
       <div :class="['tv-navbar-right__icon', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']"
         @click="openSetting">
-        <image class="tv-navbar-right__icon-refresh" src="@/static/xuanzhuan-icon.png"></image>
+        <image :class="['tv-navbar-right__icon-refresh', loading ? 'refresh-rotate' : '']"
+          src="@/static/xuanzhuan-icon.png">
+        </image>
       </div>
       <div :class="['tv-navbar-right__icon', tabIndex === 4 ? 'tv-navbar-right__icon-active' : '']"
         @click="openSetting">
         <image class="tv-navbar-right__icon-setting" src="@/static/chilun-icon.png"></image>
       </div>
       <span>{{ nowTime }}</span>
+    </div>
+    <div class="tv-navbar-popover">
+      <div class="popover-title">
+        <div class="popover-title-left">
+          <span>{{ popoverData.title }}</span>
+        </div>
+      </div>
+      <div class="popover-list">
+        <div class="popover-list-item" v-for="(item, index) in popoverData.list" :key="item.label">
+          <span>{{ item.label }}</span>
+          <span>{{ item.value }}</span>
+          <template v-if="index != popoverData.list.length - 1">，</template>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -32,17 +48,25 @@ import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { onUnload } from "@dcloudio/uni-app";
 
 const props = defineProps({
+  refreshData: { type: Object, default: {} },
   isFocus: { type: Boolean, default: false },
   focusModel: { type: String, default: "" },
+  loading: { type: Boolean, default: false },
 });
-const emits = defineEmits(["setFocus", "changeSetting"]);
+const emits = defineEmits(["setFocus", "changeSetting", 'refresh']);
 
 const tabsArr = ref(["影视", "直播"]);
 const activeTab = ref("影视");
 const nowTime = ref("");
 const tabIndex = ref(-1)
+const loading = ref(false) //是否正在旋转，刮削中
+const showPopover = ref(false) //是否显示蓝色的框，用来显示刮削到多少部影片
+const popoverData = ref({}) //用于存储蓝色框显示的数据
+const selectType = ref({}) //被选中资源的type
+const selectMedia = ref({}) //被选中资源的media
 
 const timer = ref(null);
+const timer1 = ref(null)
 
 const evtMove = (keyCode) => {
   if (keyCode === "KeyRight") {
@@ -70,6 +94,47 @@ const evtMove = (keyCode) => {
     activeTab.value = '直播'
   }
 };
+
+//判断选择的是webdav还是天翼云盘还是夸克
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync("sourceList");
+  selectType.value = sourceList.find((item) => {
+    let select = item.list.find((i) => i.active);
+    if (select) {
+      selectMedia.value = select;
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
+
+//父组件调用此方法旋转刷新按钮，触发刮削
+const showProgress = () => {
+  if (loading.value) {
+    showPopover.value = true;
+    return;
+  }
+  popoverData.value.title = "正在扫描";
+  popoverData.value.list = [
+    { label: "已找到", value: 0 },
+    { label: "待更新", value: 0 },
+    { label: "已更新", value: 0 },
+  ];
+  showPopover.value = true;
+  judgeSelect()
+  if (selectType.value.type == 'Emby') {
+    showPopover.value = false;
+  }
+  emits("refresh");
+  timer1.value = setTimeout(() => { //刮削时间到了60s那就自动暂停
+    showPopover.value = false;
+    clearTimeout(timer1.value);
+    timer1.value = null;
+    emits("pause");
+  }, 60000);
+};
+
 const openSetting = () => {
   emits('changeSetting', true)
 }
@@ -97,15 +162,60 @@ watch(
     }
   }
 );
-
+watch(
+  () => props.refreshData,
+  (val) => {
+    if (props.loading) {
+      popoverData.value.list = [
+        { label: "已找到", value: 0 },
+        { label: "待更新", value: 0 },
+        { label: "已更新", value: 0 },
+      ];
+      popoverData.value.list.find((i) => i.label == "待更新").value = val.toupdate || 0;
+    } else {
+      popoverData.value.list = [
+        { label: "已找到", value: 0 },
+        { label: "已失败", value: 0 },
+        { label: "已更新", value: 0 },
+      ];
+      popoverData.value.list.find((i) => i.label == "已失败").value = val.fail || 0;
+    }
+    popoverData.value.list.find((i) => i.label == "已找到").value = val.found || 0;
+    popoverData.value.list.find((i) => i.label == "已更新").value = val.updated || 0;
+  },
+  { deep: true }
+);
+watch(
+  () => props.loading,
+  (val) => {
+    loading.value = val;
+    if (!val) {
+      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`;
+      clearTimeout(timer.value);
+      timer1.value = null;
+    }
+  },
+  { deep: true }
+);
 defineExpose({
   evtMove,
   getScrollTop,
-  tabIndex
+  tabIndex,
+  showProgress
 })
 </script>
 
 <style lang="scss" scoped>
+@keyframes spin-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .tv-navbar {
   padding: 40rpx 80rpx;
   display: flex;
@@ -184,13 +294,18 @@ defineExpose({
       display: flex;
       cursor: pointer;
       margin-left: 0;
-      &:first-child{
+
+      &:first-child {
         margin-left: 0;
       }
 
       .tv-navbar-right__icon-refresh {
         width: 50rpx;
         height: 50rpx;
+      }
+
+      .refresh-rotate {
+        animation: spin-reverse 1s linear infinite reverse;
       }
 
       .tv-navbar-right__icon-setting {
@@ -209,6 +324,9 @@ defineExpose({
       color: #fff;
       font-weight: bold;
     }
+  }
+  .tv-navbar-popover{
+    position: fixed;
   }
 }
 </style>

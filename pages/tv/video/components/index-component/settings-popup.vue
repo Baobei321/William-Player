@@ -1,7 +1,8 @@
 <template>
     <div class="settings-popup">
         <nut-popup position="right" v-bind="$attrs">
-            <div class="popup">
+            <div :class="['popup', openAnimation ? 'settings-leave' : 'settings-enter']"
+                v-show="showType == 'settings'">
                 <div class="popup-title">设置</div>
                 <div class="popup-container">
                     <div class="popup-container-list" v-for="(litem, lindex) in settings" :key="lindex">
@@ -13,26 +14,36 @@
                     </div>
                 </div>
             </div>
+            <source-list v-if="showType == 'source'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
+                ref="source_list" @changeShowType="changeShowType" @openModal="openModal"></source-list>
         </nut-popup>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
+import ziyuankuGray from '@/static/ziyuanku-gray.png'
+import ziyuankuBlack from '@/static/ziyuanku-black.png'
 import datasyncGray from '@/static/datasync-gray.png'
 import datasyncBlack from '@/static/datasync-black.png'
 import guanyuGray from '@/static/guanyu-gray.png'
 import guanyuBlack from '@/static/guanyu-black.png'
+import sourceList from './source-list.vue'
 const settings = [
     [
-        { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 0, path: '/pages/tv/mine/data-sync' },
-        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 1, path: '/pages/tv/mine/about-version' },
+        { icon: ziyuankuGray, activeIcon: ziyuankuBlack, title: '资源库', index: 0, type: 'source' },
+        { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 1, path: '/pages/tv/mine/data-sync' },
+        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 2, path: '/pages/tv/mine/about-version' },
     ]
 ]
 const tabIndex = ref(0)
+const showType = ref('settings')//在popup中展示的模块
+const openAnimation = ref(false) //true就是点击跳转，false就是返回
+
+const source_list = ref(null)
 
 const lengthValue = ref(0)
-const emits = defineEmits('changeSetting')
+const emits = defineEmits(['changeSetting', 'openModal'])
 
 //获取settings的长度
 const getLength = () => {
@@ -42,31 +53,66 @@ const getLength = () => {
 }
 
 const evtMove = (keyCode) => {
-    if (keyCode === "KeyUp") {
-        if (tabIndex.value > 0) {
-            tabIndex.value--;
+    if (showType.value === 'settings') {
+        if (keyCode === "KeyUp") {
+            if (tabIndex.value > 0) {
+                tabIndex.value--;
+            }
+        } else if (keyCode === "KeyDown") {
+            if (tabIndex.value < lengthValue.value - 1) {
+                tabIndex.value++;
+            }
+        } else if (keyCode === 'KeyLeft') {
+            emits('changeSetting', false)
+        } else if (keyCode === 'KeyEnter') {
+            let targetObject = null;
+            for (const innerArray of settings) { // 遍历外层数组
+                targetObject = innerArray.find(item => item.index === tabIndex.value); // 在内层数组中查找
+                if (targetObject) break; // 找到后立即终止循环
+            }
+            clickItem(targetObject)
         }
-    } else if (keyCode === "KeyDown") {
-        if (tabIndex.value < lengthValue.value - 1) {
-            tabIndex.value++;
-        }
-    } else if (keyCode === 'KeyLeft') {
-        emits('changeSetting', false)
-    } else if (keyCode === 'KeyEnter') {
-        let targetObject = null;
-        for (const innerArray of settings) { // 遍历外层数组
-            targetObject = innerArray.find(item => item.index === tabIndex.value); // 在内层数组中查找
-            if (targetObject) break; // 找到后立即终止循环
-        }
-        clickItem(targetObject)
+    } else if (showType.value === 'source') {
+        source_list.value.evtMove(keyCode)
     }
 };
 
 //跳转页面
 const clickItem = (item) => {
-    uni.navigateTo({
-        url: item.path
-    })
+    if (item.path) {
+        uni.navigateTo({
+            url: item.path
+        })
+        return
+    }
+    if (item.type) {
+        openAnimation.value = true
+        setTimeout(() => {
+            showType.value = item.type
+            openAnimation.value = false
+            setTimeout(() => {
+                openAnimation.value = true
+            }, 0);
+        }, 150);
+    }
+}
+
+//二级popup返回settings
+const changeShowType = (val) => {
+    if (val === 'settings') {
+        openAnimation.value = false
+        setTimeout(() => {
+            showType.value = val
+            openAnimation.value = true
+            setTimeout(() => {
+                openAnimation.value = false
+            }, 0);
+        }, 150);
+    }
+}
+
+const openModal = (obj) => {
+    emits('openModal', obj)
 }
 
 getLength()
@@ -89,10 +135,12 @@ defineExpose({
         width: 33%;
         height: 100%;
         background: #191c20;
+        overflow: hidden;
 
         .popup {
             width: 100%;
             height: 100%;
+            transition: transform 0.15s ease-in-out, opacity 0.15s ease;
 
             .popup-title {
                 background: #272a2f;
@@ -142,6 +190,27 @@ defineExpose({
                     }
                 }
             }
+        }
+
+        .settings-leave {
+            transform: translateX(-50rpx);
+            opacity: 0;
+        }
+
+        .source-list {
+            transform: translateX(50rpx);
+            opacity: 0;
+            transition: transform 0.15s ease-in-out, opacity 0.15s ease;
+        }
+
+        .source-leave {
+            transform: translateX(50rpx);
+            opacity: 0;
+        }
+
+        .source-enter {
+            transform: translateX(0);
+            opacity: 1;
         }
     }
 }

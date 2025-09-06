@@ -49,10 +49,11 @@ const getEmby = (data, apiInfo) => {
 }
 
 //用户登录
-const loginEmby = (selectMedia) => {
+const loginEmby = (selectMedia, type = 'small') => {
+    let url = type == 'big' ? selectMedia.protocol + "://" + selectMedia.address + ":" + selectMedia.port + '/emby/Users/AuthenticateByName' : selectMedia.protocol + "://" + selectMedia.address + ":" + selectMedia.port + '/emby/Users/authenticateByName'
     return new Promise((resolve, reject) => {
         uni.request({
-            url: selectMedia.protocol + "://" + selectMedia.address + ":" + selectMedia.port + '/emby/Users/AuthenticateByName',
+            url: url,
             timeout: 10000,
             method: 'POST',
             data: JSON.stringify({ Username: selectMedia.Username, Pw: selectMedia.Pw }),
@@ -213,7 +214,7 @@ const setHistoryPlay = (data, selectMedia) => {
         ...selectMedia
     }
     console.log("去请求");
-    
+
     return getEmby(data, apiInfo)
 }
 
