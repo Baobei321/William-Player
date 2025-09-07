@@ -1,7 +1,7 @@
 <template>
   <div class="tv-index" ref="tv_index" :tabindex="-1">
-    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :focusModel="focusModel" @setFocus="setFocus"
-      @changeSetting="changeSetting" @refresh="refreshVideo"></tv-navbar>
+    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :loading="refreshLoading" :refreshData="refreshData"
+      :focusModel="focusModel" @setFocus="setFocus" @changeSetting="changeSetting" @refresh="refreshVideo"></tv-navbar>
     <!-- <span style="font-size: 38rpx;color: #fff;">{{ scrollTop }}</span> -->
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
     <tv-page @keyCodeClick="keyCodeClick" style="width: 100%;height: 100%;z-index: 999;position: relative;"

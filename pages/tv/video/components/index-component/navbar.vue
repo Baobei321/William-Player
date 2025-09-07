@@ -13,7 +13,8 @@
       </div>
     </div>
     <div class="tv-navbar-right">
-      <div :class="['tv-navbar-right__icon', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']"
+      <div
+        :class="['tv-navbar-right__icon', 'tv-navbar-right__refresh', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']"
         @click="openSetting">
         <image :class="['tv-navbar-right__icon-refresh', loading ? 'refresh-rotate' : '']"
           src="@/static/xuanzhuan-icon.png">
@@ -25,25 +26,33 @@
       </div>
       <span>{{ nowTime }}</span>
     </div>
-    <div class="tv-navbar-popover">
-      <div class="popover-title">
-        <div class="popover-title-left">
-          <span>{{ popoverData.title }}</span>
+    <template v-if="showPopover">
+      <div :class="['tv-navbar-arrow', isShowPopover ? 'popover-in' : 'popover-out']"
+        :style="{ left: popoverStyle.left, top: popoverStyle.top }">
+        <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
+      </div>
+      <div :class="['tv-navbar-popover', , isShowPopover ? 'popover-in' : 'popover-out']"
+        :style="{ left: popoverStyle.left, top: +popoverStyle?.top?.split('px')[0] + 12 + 'px' }">
+        <div class="popover-title">
+          <div class="popover-title-left">
+            <span>{{ popoverData.title }}</span>
+          </div>
+        </div>
+        <div class="popover-list">
+          <div class="popover-list-item" v-for="(item, index) in popoverData.list" :key="item.label">
+            <span>{{ item.label }}</span>
+            <span>{{ item.value }}</span>
+            <template v-if="index != popoverData.list.length - 1">，</template>
+          </div>
         </div>
       </div>
-      <div class="popover-list">
-        <div class="popover-list-item" v-for="(item, index) in popoverData.list" :key="item.label">
-          <span>{{ item.label }}</span>
-          <span>{{ item.value }}</span>
-          <template v-if="index != popoverData.list.length - 1">，</template>
-        </div>
-      </div>
-    </div>
+    </template>
+
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { dayjs } from "@/uni_modules/iRainna-dayjs/js_sdk/dayjs.min.js";
 import { onUnload } from "@dcloudio/uni-app";
 
@@ -67,6 +76,10 @@ const selectMedia = ref({}) //被选中资源的media
 
 const timer = ref(null);
 const timer1 = ref(null)
+const timer2 = ref(null)
+
+const popoverStyle = ref({})
+const isShowPopover = ref(false)
 
 const evtMove = (keyCode) => {
   if (keyCode === "KeyRight") {
@@ -82,9 +95,9 @@ const evtMove = (keyCode) => {
   } else if (keyCode === 'KeyEnter') {
     if (tabIndex.value === 0) { //点击搜索
 
-    } else if (tabIndex.value === 3) {//点击设置
-
-    } else if (tabIndex.value === 4) {
+    } else if (tabIndex.value === 3) {
+      showProgress()
+    } else if (tabIndex.value === 4) {//点击设置
       openSetting()
     }
   }
@@ -111,6 +124,10 @@ const judgeSelect = () => {
 
 //父组件调用此方法旋转刷新按钮，触发刮削
 const showProgress = () => {
+  clearTimeout(timer1.value);
+  timer1.value = null;
+  clearTimeout(timer2.value)
+  timer2.value = null
   if (loading.value) {
     showPopover.value = true;
     return;
@@ -122,13 +139,18 @@ const showProgress = () => {
     { label: "已更新", value: 0 },
   ];
   showPopover.value = true;
+  isShowPopover.value = true
   judgeSelect()
   if (selectType.value.type == 'Emby') {
     showPopover.value = false;
+    isShowPopover.value = false
   }
   emits("refresh");
   timer1.value = setTimeout(() => { //刮削时间到了60s那就自动暂停
-    showPopover.value = false;
+    isShowPopover.value = false
+    setTimeout(() => {
+      showPopover.value = false;
+    }, 300);
     clearTimeout(timer1.value);
     timer1.value = null;
     emits("pause");
@@ -191,12 +213,32 @@ watch(
     loading.value = val;
     if (!val) {
       popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`;
-      clearTimeout(timer.value);
+      timer2.value = setTimeout(() => {
+        isShowPopover.value = false
+        setTimeout(() => {
+          showPopover.value = false
+        }, 300);
+      }, 6000);
+      clearTimeout(timer1.value);
       timer1.value = null;
     }
   },
   { deep: true }
 );
+
+onMounted(() => {
+  const query = uni.createSelectorQuery();
+  query.select(".tv-navbar-right__refresh").fields(
+    {
+      rect: true,
+      size: true,
+    },
+    (res) => {
+      popoverStyle.value = { left: res.left + res.width / 2 + 'px', top: res.top + res.height + 'px' }
+
+    }
+  ).exec();
+})
 defineExpose({
   evtMove,
   getScrollTop,
@@ -213,6 +255,26 @@ defineExpose({
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }
 
@@ -325,8 +387,79 @@ defineExpose({
       font-weight: bold;
     }
   }
-  .tv-navbar-popover{
+
+  .tv-navbar-arrow {
+    width: 16px;
+    height: 16px;
     position: fixed;
+    transform: translateX(-50%);
+  }
+
+  .tv-navbar-popover {
+    position: fixed;
+    transform: translateX(-70%);
+    background: #315ffd;
+    padding: 12px;
+    border-radius: 10px;
+
+    .popover-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .popover-title-left {
+        font-size: 15px;
+        color: #fff;
+
+        .popover-title-left__button {
+          display: inline-block;
+          border: 1px solid #fff;
+          margin-left: 5px;
+          padding: 0 2px;
+        }
+      }
+
+      .popover-title-right {
+        .nut-icon-close {
+          font-size: 15px;
+          width: 15px;
+          height: 15px;
+          display: block;
+        }
+      }
+    }
+
+    .popover-list {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+
+      .popover-list-item {
+        display: flex;
+        align-items: baseline;
+
+        span:first-child {
+          font-size: 14px;
+          color: #d0d0d0;
+          white-space: nowrap;
+        }
+
+        span:last-child {
+          font-size: 14px;
+          padding-left: 3px;
+          color: #fff;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .popover-in {
+    animation: fadeIn 0.3s ease-in-out forwards;
+  }
+
+  .popover-out {
+    animation: fadeOut 0.3s ease-in-out forwards;
   }
 }
 </style>
