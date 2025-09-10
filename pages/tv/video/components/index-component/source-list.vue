@@ -2,7 +2,8 @@
     <div class="source-list">
         <div class="source-list-title">资源库</div>
         <div class="source-list-container" v-if="show">
-            <div class="source-list-container__classify" v-for="(item, index) in sourceList" :key="item.type">
+            <div class="source-list-container__classify" :style="{ paddingBottom: item?.list?.length ? '16rpx' : '0' }"
+                v-for="(item, index) in sourceList" :key="item.type">
                 <template v-if="item?.list?.length">
                     <div class="classify-title">{{ item.type }}</div>
                     <div class="classify-list">
@@ -34,6 +35,9 @@
                 </template>
             </div>
         </div>
+        <div :class="['source-list-add', tabIndex === lengthValue ? 'source-list-add_active' : '']">
+            <image src="@/static/jia-hao.png"></image>
+        </div>
     </div>
 </template>
 
@@ -61,19 +65,20 @@ const setRefs = (el, index) => {
 const evtMove = (keyCode) => {
     if (keyCode === "KeyUp") {
         if (tabIndex.value > 0) {
-            itemRefs.value[tabIndex.value].close()
+            tabIndex.value < lengthValue.value ? itemRefs.value[tabIndex.value].close() : ''
             tabIndex.value--;
             isSwipe.value = false
             iconIndex.value = -1
         }
     } else if (keyCode === "KeyDown") {
-        if (tabIndex.value < lengthValue.value - 1) {
+        if (tabIndex.value < lengthValue.value) {
             itemRefs.value[tabIndex.value].close()
             tabIndex.value++;
             isSwipe.value = false
             iconIndex.value = -1
         }
     } else if (keyCode === 'KeyLeft') {
+        if (tabIndex.value === lengthValue.value) return
         if (isSwipe.value) {
             if (iconIndex.value > 0) {
                 iconIndex.value--
@@ -87,6 +92,7 @@ const evtMove = (keyCode) => {
             emits('changeShowType', 'settings')
         }
     } else if (keyCode === 'KeyRight') {
+        if (tabIndex.value === lengthValue.value) return
         if (!isSwipe.value) {
             isSwipe.value = true
             itemRefs.value[tabIndex.value].open('left')
@@ -95,24 +101,30 @@ const evtMove = (keyCode) => {
         }
 
     } else if (keyCode === 'KeyEnter') {
-        let targetObject = null;
-        for (const innerObj of sourceList.value) {
-            targetObject = innerObj.list.find(item => item.index === tabIndex.value);
-            if (targetObject) break; // 找到后立即终止循环
-        }
-        if (iconIndex.value == -1) { //选中当前资源
-            let { item, vitem } = getItemAndVitem()
-            selectSource(item, vitem)
-        } else if (iconIndex.value == 0) {//编辑当前资源
-            uni.showToast({
-                title: '功能开发中',
-                icon: 'none'
+        if (tabIndex.value === lengthValue.value) {
+            uni.navigateTo({
+                url:'/pages/tv/source/code-input'
             })
-            // let { item, vitem } = getItemAndVitem()
-            // editSource()
-        } else if (iconIndex.value == 1) {//点击删除
-            let { item, vitem } = getItemAndVitem()
-            deleteSource(item, vitem)
+        } else {
+            let targetObject = null;
+            for (const innerObj of sourceList.value) {
+                targetObject = innerObj.list.find(item => item.index === tabIndex.value);
+                if (targetObject) break; // 找到后立即终止循环
+            }
+            if (iconIndex.value == -1) { //选中当前资源
+                let { item, vitem } = getItemAndVitem()
+                selectSource(item, vitem)
+            } else if (iconIndex.value == 0) {//编辑当前资源
+                uni.showToast({
+                    title: '功能开发中',
+                    icon: 'none'
+                })
+                // let { item, vitem } = getItemAndVitem()
+                // editSource()
+            } else if (iconIndex.value == 1) {//点击删除
+                let { item, vitem } = getItemAndVitem()
+                deleteSource(item, vitem)
+            }
         }
     }
 };
@@ -272,6 +284,9 @@ defineExpose({
     width: 100%;
     height: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     .source-list-title {
         background: #272a2f;
@@ -281,10 +296,12 @@ defineExpose({
         font-weight: bold;
         padding-left: 40rpx;
         padding-top: 60rpx;
+        width: 100%;
     }
 
     .source-list-container {
         padding: 24rpx;
+        width: 100%;
 
         .source-list-container__classify {
             // border-bottom: 2rpx solid #c5c6d0;
@@ -399,6 +416,27 @@ defineExpose({
 
             }
         }
+    }
+
+    .source-list-add {
+        background: #3d4758;
+        border-radius: 50%;
+        width: 80rpx;
+        height: 80rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 4rpx solid transparent;
+
+        image {
+            width: 30rpx;
+            height: 30rpx;
+        }
+    }
+
+    .source-list-add_active {
+        border: 4rpx solid #e5e6ec;
     }
 }
 </style>

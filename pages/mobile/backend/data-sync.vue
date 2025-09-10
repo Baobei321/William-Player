@@ -71,10 +71,6 @@ const scanCode = () => {
             }
           })
         } else {
-          uni.showToast({
-            title: "发送给",
-            icon: 'none'
-          })
           TcpModule.send(JSON.stringify(obj), (res1) => {
             let res2 = JSON.parse(res1)
             if (res2.code == 500) {
@@ -90,6 +86,8 @@ const scanCode = () => {
             }
           })
         }
+      } else if (result.type == 'sourceInput') { //手机扫码输入资源传到电视
+
       } else {
         uni.showToast({
           title: "扫描此二维码无效",

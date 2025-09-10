@@ -69,6 +69,14 @@ Android 8+
 <img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/bea9d2e3f9500a447821d40d230c59a1.png" alt="Mobile Screenshot 6" width="24%"/>
 </div>
 
+### Android TV 截图
+<div style="display: flex;">
+<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/5C8DD7E_427A_tv-picture_20250910113615103newMediaImage.png" alt="Mobile Screenshot 1" width="48%"/>
+<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/27E4A39_427A_tv-asd_20250910113919701newMediaImage.png" alt="Mobile Screenshot 2" width="48%"/>
+<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/482B34F_427A_tv-picture1_20250910114207926newMediaImage.png" alt="Mobile Screenshot 3" width="48%"/>
+<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1CCF3D0_427A_tv-picture2_20250910114231848newMediaImage.png" alt="Mobile Screenshot 4" width="48%"/>
+</div>
+
 [^3]: 预览中的影视媒体仅作为展示用
 
 ## 其他说明

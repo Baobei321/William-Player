@@ -78,8 +78,11 @@ export default {
 			onKeydown(evt){
 				evt = evt || window.event;
 				var KeyCode = evt.which || evt.keyCode;
+				let preventArr = ['KeyUp','KeyDown','KeyLeft','KeyRight','KeyEnter']
 				code = KeyName[KeyCode];		
-				evt.preventDefault();
+				if(preventArr.includes(code)){
+				    evt.preventDefault();
+				}
 				if (code != undefined) {
 					document.getElementById("onClick").click();
 				}

@@ -2,7 +2,7 @@
     <nut-transition :show="showPopover" name="fade" :duration="200" style="z-index: 9999;">
         <div class="popover" :style="{ left: positionObj.left, top: positionObj.top }">
             <div class="popover-item" v-for="item in props.options" :key="item.label" @click="clickItem(item)">
-                <image :src="item.icon"></image>
+                <image :src="item.icon" v-if="item.icon"></image>
                 <span :style="{ color: item.color }">{{ item.label }}</span>
             </div>
         </div>
@@ -10,7 +10,7 @@
     <div class="popover-overlay" v-show="showPopover" @click="closePopover"></div>
     <div class="seat-popover" ref="seat_popover">
         <div class="popover-item" v-for="item in props.options" :key="item.label">
-            <image :src="item.icon"></image>
+            <image :src="item.icon" v-if="item.icon"></image>
             <span :style="{ color: item.color }">{{ item.label }}</span>
         </div>
     </div>
@@ -25,7 +25,7 @@ const props = defineProps({
     position: { type: Object, default: {} },
 })
 
-const emits = defineEmits(['update:visible'])
+const emits = defineEmits(['update:visible', 'close'])
 
 const showPopover = ref(false)
 
@@ -101,6 +101,7 @@ const adjustMenuPosition = () => {
 
 const closePopover = () => {
     showPopover.value = false
+    emits('close')
     emits('update:visible', false)
 }
 
@@ -108,7 +109,7 @@ const closePopover = () => {
 const clickItem = (item) => {
     showPopover.value = false
     emits('update:visible', false)
-    item.func()
+    item.func() ? item.func() : ''
 }
 
 watch(

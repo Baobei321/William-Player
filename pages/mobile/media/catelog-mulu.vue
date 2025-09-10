@@ -72,7 +72,7 @@ const handleDelete = () => {
 }
 
 const popoverOptions = ref([
-    { icon: tongbuIcon, label: '刮削', color: '#1B1B1B', func: handleGx },
+    // { icon: tongbuIcon, label: '刮削', color: '#1B1B1B', func: handleGx },
     // { icon: editIcon, label: '修改', color: '#1B1B1B', func: handleEdit },
     { icon: deleteIcon, label: '删除', color: '#FE4344', func: handleDelete }
 ])
