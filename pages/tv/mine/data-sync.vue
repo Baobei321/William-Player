@@ -1,6 +1,7 @@
 <template>
     <div class="info-sync">
         <div class="info-sync-title">手机扫码同步William Player</div>
+        <!-- <span style="color:#fff">{{ port }}</span> -->
         <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
         <div class="scan-text">每隔10秒刷新一次同步状态</div>
         <div class="info-sync-tip">
@@ -18,7 +19,7 @@ import { onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from '@/utils/config'
 
 const wilQrcodeRef = ref(null);
-let port = "";
+const port = ref("");
 let timer = null;
 // #ifdef APP-PLUS
 let TcpModule = uni.requireNativePlugin("TcpModule");
@@ -29,15 +30,15 @@ const setQrcode = () => {
     // #ifdef APP-PLUS
     lyzmlDLNA.getIpAddress(val => {
         ipAddress = val
-        port = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
-        let obj = { type: "dataSync", port: port };
+        port.value = ipAddress + ':' + String(Math.floor(Math.random() * 90000) + 10000);
+        let obj = { type: "dataSync", port: port.value };
         wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
     })
     // #endif
 
     // #ifndef APP-PLUS
-    port = ':' + String(Math.floor(Math.random() * 90000) + 10000);
-    let obj = { type: "dataSync", port: port };
+    port.value = ':' + String(Math.floor(Math.random() * 90000) + 10000);
+    let obj = { type: "dataSync", port: port.value };
     wilQrcodeRef.value.getQRcode(JSON.stringify(obj));
     // #endif
 
@@ -46,7 +47,7 @@ const setQrcode = () => {
 //10s刷新一次同步状态
 const refreshStatus = () => {
     timer = setInterval(async () => {
-        await getShareData({ port: port })
+        await getShareData({ port: port.value })
             .then((res) => {
                 if (res.data) {
                     uni.setStorageSync(CONFIG.USER_KEY, res.data.userInfo.userKey)
@@ -57,7 +58,7 @@ const refreshStatus = () => {
                     uni.setStorageSync("historyPlay", res.data.historyPlay);
                     clearInterval(timer);
                     timer = null;
-                    deleteShareData({ port: port });
+                    deleteShareData({ port: port.value });
                     uni.showToast({
                         title: "同步成功",
                         icon: "none",
@@ -105,7 +106,7 @@ onMounted(() => {
 onUnload(() => {
     clearInterval(timer);
     timer = null;
-    deleteShareData({ port: port.split(':')[1] });
+    deleteShareData({ port: port.value.split(':')[1] });
     TcpModule ? TcpModule.closeAllConnections() : ''
     TcpModule = null
 });

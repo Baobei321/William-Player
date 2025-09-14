@@ -9,7 +9,7 @@
                 </template>
             </wil-form>
             <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title == '添加Emby' ? '添加' : '修改'
-            }}</nut-button>
+                }}</nut-button>
             <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
             <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
                 <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker"
@@ -25,8 +25,7 @@ import { onBeforeMount, reactive, ref } from "vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { loginEmby, getEmbyInfo } from "@/utils/emby";
-
+import { validateEmby } from "@/utils/validate";
 const state = reactive({
     formData: {
         protocol: "https",
@@ -81,108 +80,7 @@ const editMulu = () => {
 const confirmSubmit = () => {
     base_form.value.confirmCommit().then(async (valid) => {
         if (valid) {
-            let sourceList = uni.getStorageSync("sourceList");
-            if (!sourceList.find((i) => i.type == "Emby")) {
-                sourceList.push({ type: "Emby", list: [], img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc" })
-            }
-            if (title.value == "添加Emby") {
-                if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == state.formData.address)) {
-                    uni.showToast({
-                        title: "存在重复的Emby地址，请修改",
-                        icon: "none",
-                    });
-                    return;
-                }
-                if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == state.formData.name)) {
-                    uni.showToast({
-                        title: "存在同名的Emby，请修改",
-                        icon: "none",
-                    });
-                    return;
-                }
-                uni.showLoading({
-                    title: '加载中'
-                })
-                await loginEmby(state.formData)
-                    .then(async (res) => {
-                        uni.hideLoading()
-                        let isHaveData = !sourceList.every((item) => {
-                            return !item.list.length;
-                        });
-                        let obj1 = {}
-                        if (!isHaveData) {
-                            obj1 = { ...state.formData, userId: res.User.Id, token: res.AccessToken, active: true }
-                            let embyInfo = await getEmbyInfo(obj1)
-                            obj1.name = embyInfo.ServerName
-                            sourceList.find((i) => i.type == "Emby").list.push(obj1);
-                            uni.setStorageSync("isreload", true);
-                        } else {
-                            obj1 = { ...state.formData, userId: res.User.Id, token: res.AccessToken }
-                            let embyInfo = await getEmbyInfo(obj1)
-                            obj1.name = embyInfo.ServerName
-                            sourceList.find((i) => i.type == "Emby").list.push(obj1);
-                        }
-                        uni.setStorageSync("sourceList", sourceList);
-                        uni.navigateBack({
-                            delta: 2,
-                        });
-                    })
-                    .catch(() => {
-                        uni.hideLoading()
-                        uni.showToast({
-                            title: "权限校验失败，请检查",
-                            icon: "none",
-                        });
-                    });
-            } else if (title.value == "修改Emby") {
-                if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == state.formData.address) && state.oldData.address != state.formData.address) {
-                    uni.showToast({
-                        title: "存在重复的Emby地址，请修改",
-                        icon: "none",
-                    });
-                    return;
-                }
-                if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == state.formData.name) && state.oldData.name != state.formData.name) {
-                    uni.showToast({
-                        title: "存在同名的Emby，请修改",
-                        icon: "none",
-                    });
-                    return;
-                }
-                uni.showLoading({
-                    title: '加载中'
-                })
-                await loginEmby(state.formData)
-                    .then((res) => {
-                        uni.hideLoading()
-                        let historyArr = uni.getStorageSync("historyPlay") || [];
-                        historyArr = historyArr.filter((v) => v.sourceType != "Emby" || v.sourceName != state.oldData.name);
-                        uni.setStorageSync("historyPlay", historyArr);
-                        state.formData.token = res.AccessToken;
-                        state.formData.userId = res.User.Id;
-                        let obj = sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == routerParams.value.address);
-                        Object.keys(state.formData).forEach((v) => {
-                            obj[v] = state.formData[v];
-                        });
-                        editMulu()
-                        uni.setStorageSync("sourceList", sourceList);
-                        if (routerParams.value.isActive == "1") {
-                            uni.setStorageSync("isreload", true);
-                            uni.navigateBack({
-                                delta: 2,
-                            });
-                            return;
-                        }
-                        uni.navigateBack();
-                    })
-                    .catch(() => {
-                        uni.hideLoading()
-                        uni.showToast({
-                            title: "权限校验失败，请检查",
-                            icon: "none",
-                        });
-                    });
-            }
+            validateEmby(title.value,state.formData,routerParams.value) //校验，抽成一个方法了
         }
     });
 };
@@ -204,8 +102,8 @@ onLoad((options) => {
         state.formData = sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == routerParams.value.address);
         state.formData.protocol ? "" : (state.formData.protocol = "http");
         state.oldData = JSON.parse(JSON.stringify(state.formData));
-        console.log(state.formData,'state.formDta');
-        
+        console.log(state.formData, 'state.formDta');
+
     }
 });
 </script>

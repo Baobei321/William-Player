@@ -1,5 +1,5 @@
 <template>
-	<scroll-view scroll-y="true" :style="{ height: '100%' }" ref="page" :scroll-top="scrollTop"
+	<scroll-view :scroll-y="true" :style="{ height: '100%' }" ref="page" :scroll-top="scrollTop"
 		:scroll-with-animation="true" class="tv-page">
 		<view @click="whole.onClick" id="onClick"></view>
 		<slot></slot>
@@ -45,7 +45,8 @@ export default {
 };
 </script>
 <script module="whole" lang="renderjs">
-	let code=null;
+import { PLATFORM } from '../../../utils/config.js'
+	let code = null;
 	let KeyName = {
 		19: 'KeyUp',
 		38: 'KeyUp', //Keyboard
@@ -67,7 +68,11 @@ export default {
 	export default {
 		mounted() {
 			console.log("监听");
-			
+			//动态计算电视端的html标签的font-size，用于适配，720p，1080p，2k，4k
+			if (PLATFORM === 'TV') {
+				let fontSize = window.innerWidth / 1280 * 16 + 'px'
+				document.documentElement.style.setProperty('--tv-fontsize', fontSize);
+			}
 			//全局监听按键输入
 			window.document.onkeydown = this.onKeydown
 		},
@@ -75,13 +80,13 @@ export default {
 			window.document.onkeydown = null;
 		},
 		methods: {
-			onKeydown(evt){
+			onKeydown(evt) {
 				evt = evt || window.event;
 				var KeyCode = evt.which || evt.keyCode;
-				let preventArr = ['KeyUp','KeyDown','KeyLeft','KeyRight','KeyEnter']
-				code = KeyName[KeyCode];		
-				if(preventArr.includes(code)){
-				    evt.preventDefault();
+				let preventArr = ['KeyUp', 'KeyDown', 'KeyLeft', 'KeyRight', 'KeyEnter']
+				code = KeyName[KeyCode];
+				if (preventArr.includes(code)) {
+					evt.preventDefault();
 				}
 				if (code != undefined) {
 					document.getElementById("onClick").click();
@@ -89,8 +94,8 @@ export default {
 			},
 			onClick(event, ownerInstance) {
 				// event.preventDefault();
-				console.log(ownerInstance,'ownerInstance');
-		        		
+				console.log(ownerInstance, 'ownerInstance');
+
 				ownerInstance.callMethod('keyCodeClick', code);
 			}
 		}

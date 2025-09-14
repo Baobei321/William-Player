@@ -1,6 +1,6 @@
 <template>
     <div class="settings-popup">
-        <nut-popup position="right" v-bind="$attrs">
+        <nut-popup position="right" v-bind="$attrs" @closed="closedPopup">
             <div :class="['popup', openAnimation ? 'settings-leave' : 'settings-enter']"
                 v-show="showType == 'settings'">
                 <div class="popup-title">设置</div>
@@ -15,7 +15,11 @@
                 </div>
             </div>
             <source-list v-if="showType == 'source'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
-                ref="source_list" @changeShowType="changeShowType" @openModal="openModal"></source-list>
+                ref="source_list" @changeShowType="changeShowType" @openModal="openModal">
+            </source-list>
+            <catelog-mulu v-if="showType == 'catelogMulu'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
+                ref="catelog_mulu" @changeShowType="changeShowType">
+            </catelog-mulu>
         </nut-popup>
     </div>
 </template>
@@ -28,12 +32,27 @@ import datasyncGray from '@/static/datasync-gray.png'
 import datasyncBlack from '@/static/datasync-black.png'
 import guanyuGray from '@/static/guanyu-gray.png'
 import guanyuBlack from '@/static/guanyu-black.png'
+import xspGray from '@/static/xsp-gray.png'
+import xspBlack from '@/static/xsp-black.png'
+import dyGray from '@/static/dy-gray.png'
+import dyBlack from '@/static/dy-black.png'
+import fankuiGray from '@/static/fankui-gray.png'
+import fankuiBlack from '@/static/fankui-black.png'
+import zanshangGray from '@/static/zanshang-gray.png'
+import zanshangBlack from '@/static/zanshang-black.png'
 import sourceList from './source-list.vue'
+import catelogMulu from './catelog-mulu.vue'
 const settings = [
     [
         { icon: ziyuankuGray, activeIcon: ziyuankuBlack, title: '资源库', index: 0, type: 'source' },
         { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 1, path: '/pages/tv/mine/data-sync' },
-        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 2, path: '/pages/tv/mine/about-version' },
+        { icon: xspGray, activeIcon: xspBlack, title: '电视剧目录设置', index: 2, type: 'catelogMulu' },
+        { icon: dyGray, activeIcon: dyBlack, title: '电影目录设置', index: 3, path: '/pages/tv/mine/data-sync' },
+    ],
+    [
+        { icon: fankuiGray, activeIcon: fankuiBlack, title: '问题与反馈', index: 4, path: '/pages/tv/mine/data-sync' },
+        { icon: zanshangGray, activeIcon: zanshangBlack, title: '赞赏', index: 5, path: '/pages/tv/mine/about-version' },
+        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 6, path: '/pages/tv/mine/about-version' },
     ]
 ]
 const tabIndex = ref(0)
@@ -41,6 +60,7 @@ const showType = ref('settings')//在popup中展示的模块
 const openAnimation = ref(false) //true就是点击跳转，false就是返回
 
 const source_list = ref(null)
+const catelog_mulu = ref(null)
 
 const lengthValue = ref(0)
 const emits = defineEmits(['changeSetting', 'openModal'])
@@ -74,6 +94,8 @@ const evtMove = (keyCode) => {
         }
     } else if (showType.value === 'source') {
         source_list.value.evtMove(keyCode)
+    } else if (showType.value === 'catelogMulu') {
+        catelog_mulu.value.evtMove(keyCode)
     }
 };
 
@@ -109,6 +131,13 @@ const changeShowType = (val) => {
             }, 0);
         }, 150);
     }
+}
+
+//关闭popup之后
+const closedPopup = () => {
+    showType.value = 'settings'
+    openAnimation.value = false
+    emits('closed')
 }
 
 const openModal = (obj) => {
@@ -156,8 +185,12 @@ defineExpose({
                 padding: 24rpx;
 
                 .popup-container-list {
-                    border-bottom: 2rpx solid #c5c6d0;
-                    padding-bottom: 16rpx;
+                    border-bottom: 2rpx solid #747474;
+                    padding: 16rpx 0;
+
+                    &:first-child {
+                        padding-top: 0;
+                    }
 
                     .list-item {
                         display: flex;
@@ -198,6 +231,12 @@ defineExpose({
         }
 
         .source-list {
+            transform: translateX(50rpx);
+            opacity: 0;
+            transition: transform 0.15s ease-in-out, opacity 0.15s ease;
+        }
+
+        .catelog-mulu {
             transform: translateX(50rpx);
             opacity: 0;
             transition: transform 0.15s ease-in-out, opacity 0.15s ease;

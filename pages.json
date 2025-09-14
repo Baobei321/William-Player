@@ -225,6 +225,28 @@
     {
       "path": "pages/tv/source/code-input",
       "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "subNVues": [
+            {
+              "id": "cloud189_subnvue", // 唯一标识  
+              "path": "pages/mobile/backend/cloud189-webview", // 页面路径  
+              /*"type": "popup",  这里不需要*/
+              "style": {
+                "position": "absolute",
+                "dock": "right",
+                "width": "100rpx",
+                "height": "150rpx",
+                "background": "transparent"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "pages/tv/source/catelog-settings",
+      "style": {
         "navigationStyle": "custom"
       }
     }

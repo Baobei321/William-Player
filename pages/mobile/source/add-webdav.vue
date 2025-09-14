@@ -24,8 +24,7 @@ import { onBeforeMount, reactive, ref } from "vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { loginUser } from "@/utils/common";
-
+import { validateWebdav } from "@/utils/validate";
 const state = reactive({
   formData: {
     protocol: "http",
@@ -81,92 +80,7 @@ const editMulu = () => {
 const confirmSubmit = () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
-      let sourceList = uni.getStorageSync("sourceList");
-      if (title.value == "添加WebDAV") {
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address)) {
-          uni.showToast({
-            title: "存在重复的WebDAV地址，请修改",
-            icon: "none",
-          });
-          return;
-        }
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name)) {
-          uni.showToast({
-            title: "存在同名的WebDAV，请修改",
-            icon: "none",
-          });
-          return;
-        }
-        await loginUser(state.formData)
-          .then((res) => {
-            let isHaveData = !sourceList.every((item) => {
-              return !item.list.length;
-            });
-            if (!isHaveData) {
-              sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token, active: true });
-              uni.setStorageSync("isreload", true);
-            } else {
-              sourceList.find((i) => i.type == "WebDAV").list.push({ ...state.formData, token: res.data.token });
-            }
-            uni.setStorageSync("sourceList", sourceList);
-            uni.navigateBack({
-              delta: 2,
-            });
-            setTimeout(() => {
-              uni.navigateTo({
-                url: '/pages/mobile/media/catelog-setting'
-              })
-            }, 300);
-          })
-          .catch(() => {
-            uni.showToast({
-              title: "权限校验失败，请检查",
-              icon: "none",
-            });
-          });
-      } else if (title.value == "修改WebDAV") {
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == state.formData.address) && state.oldData.address != state.formData.address) {
-          uni.showToast({
-            title: "存在重复的WebDAV地址，请修改",
-            icon: "none",
-          });
-          return;
-        }
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == state.formData.name) && state.oldData.name != state.formData.name) {
-          uni.showToast({
-            title: "存在同名的WebDAV，请修改",
-            icon: "none",
-          });
-          return;
-        }
-        await loginUser(state.formData)
-          .then((res) => {
-            let historyArr = uni.getStorageSync("historyPlay") || [];
-            historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != state.oldData.name);
-            uni.setStorageSync("historyPlay", historyArr);
-            state.formData.token = res.data.token;
-            let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
-            Object.keys(state.formData).forEach((v) => {
-              obj[v] = state.formData[v];
-            });
-            editMulu()
-            uni.setStorageSync("sourceList", sourceList);
-            if (routerParams.value.isActive == "1") {
-              uni.setStorageSync("isreload", true);
-              uni.navigateBack({
-                delta: 2,
-              });
-              return;
-            }
-            uni.navigateBack();
-          })
-          .catch(() => {
-            uni.showToast({
-              title: "权限校验失败，请检查",
-              icon: "none",
-            });
-          });
-      }
+      validateWebdav(title.value,state.formData,routerParams.value) //校验，抽成一个方法了
     }
   });
 };

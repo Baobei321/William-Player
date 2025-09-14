@@ -1,13 +1,14 @@
 <template>
     <div class="source-list">
-        <div class="source-list-title">资源库</div>
+        <div class="source-list-title">{{ props.title }}</div>
         <div class="source-list-container" v-if="show">
             <div class="source-list-container__classify" :style="{ paddingBottom: item?.list?.length ? '16rpx' : '0' }"
                 v-for="(item, index) in sourceList" :key="item.type">
                 <template v-if="item?.list?.length">
                     <div class="classify-title">{{ item.type }}</div>
                     <div class="classify-list">
-                        <nut-swipe v-for="vitem in item.list" :key="vitem.name" :ref="(el) => setRefs(el, vitem.index)">
+                        <nut-swipe v-for="vitem in item.list" :key="vitem.name" :ref="(el) => setRefs(el, vitem.index)"
+                            :disabled="props.type === 'list' ? false : true">
                             <div
                                 :class="['classify-list-item', vitem.index === tabIndex ? 'classify-list-active' : '']">
                                 <div class="item-left">
@@ -45,10 +46,14 @@
 import { ref } from 'vue';
 import { loginUser, get189Folder, getQuarkFolder } from "@/utils/common";
 
-const emits = defineEmits(['changeShowType', 'openModal'])
+const props = defineProps({
+    title: { type: String, default: '资源库' },
+    type: { type: String, default: 'list' },//可选值list、menu，list就是在settings-popup中显示，menu就是在选择目录的页面使用
+})
+const emits = defineEmits(['changeShowType', 'openModal', 'getSelectType'])
 
 const tabIndex = ref(0)
-const iconIndex = ref(-1)
+const iconIndex = ref(-1) //表示swipe右侧的那些图标的索引
 const sourceList = ref(uni.getStorageSync("sourceList"));
 const show = ref(false)
 const lengthValue = ref(0)
@@ -69,6 +74,11 @@ const evtMove = (keyCode) => {
             tabIndex.value--;
             isSwipe.value = false
             iconIndex.value = -1
+            //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
+            if (props.type === 'menu') {
+                let { item, vitem } = getItemAndVitem()
+                emits('getSelectType', item, vitem)
+            }
         }
     } else if (keyCode === "KeyDown") {
         if (tabIndex.value < lengthValue.value) {
@@ -76,9 +86,14 @@ const evtMove = (keyCode) => {
             tabIndex.value++;
             isSwipe.value = false
             iconIndex.value = -1
+            //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
+            if (props.type === 'menu') {
+                let { item, vitem } = getItemAndVitem()
+                emits('getSelectType', item, vitem)
+            }
         }
     } else if (keyCode === 'KeyLeft') {
-        if (tabIndex.value === lengthValue.value) return
+        // if (tabIndex.value === lengthValue.value) return
         if (isSwipe.value) {
             if (iconIndex.value > 0) {
                 iconIndex.value--
@@ -95,7 +110,7 @@ const evtMove = (keyCode) => {
         if (tabIndex.value === lengthValue.value) return
         if (!isSwipe.value) {
             isSwipe.value = true
-            itemRefs.value[tabIndex.value].open('left')
+            props.type == 'list' ? itemRefs.value[tabIndex.value].open('left') : ''
         } else {
             iconIndex.value < 1 ? iconIndex.value++ : ''
         }
@@ -103,7 +118,7 @@ const evtMove = (keyCode) => {
     } else if (keyCode === 'KeyEnter') {
         if (tabIndex.value === lengthValue.value) {
             uni.navigateTo({
-                url:'/pages/tv/source/code-input'
+                url: '/pages/tv/source/code-input'
             })
         } else {
             let targetObject = null;
@@ -423,6 +438,7 @@ defineExpose({
         border-radius: 50%;
         width: 80rpx;
         height: 80rpx;
+        flex: 0 0 80rpx;
         display: flex;
         align-items: center;
         justify-content: center;

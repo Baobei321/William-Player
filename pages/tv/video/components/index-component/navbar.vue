@@ -323,6 +323,7 @@ defineExpose({
             .nut-tabs__titles-item {
               .nut-tabs__titles-item__text {
                 color: #d3d3d3;
+                font-size: 28rpx;
               }
 
               .nut-tabs__titles-item__line {
