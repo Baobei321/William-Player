@@ -43,6 +43,9 @@ const routerParams = ref({})
 
 let port = "";
 let timer = null;
+let sub189Nvue = null;
+let subQuarkNvue = null;
+
 const tabIndex = ref(0)//默认选中的索引
 const tabsList = ref([
     { name: 'WebDAV', active: true },
@@ -157,6 +160,16 @@ const changeTab = (item, index) => {
     activeTab.value = item.name
     tabIndex.value = index
     item.active = true
+    if (activeTab.value === '天翼云盘') {
+        subQuarkNvue ? subQuarkNvue.hide('slide-out-left', 200) : ''
+        open189Webview()
+    } else if (activeTab.value === '夸克网盘') {
+        sub189Nvue ? sub189Nvue.hide('slide-out-left', 200) : ''
+        openQuarkWebview()
+    } else {
+        sub189Nvue ? sub189Nvue.hide('slide-out-left', 200) : ''
+        subQuarkNvue ? subQuarkNvue.hide('slide-out-left', 200) : ''
+    }
 }
 
 const keyCodeClick = (keyCode) => {
@@ -213,21 +226,40 @@ const triggerBoundary = (direction) => {
     }
 }
 
+//打开天翼云盘的webview
+const open189Webview = () => {
+    // 打开 nvue 子窗体  
+    sub189Nvue.show('slide-in-left', 200, function () {
+        uni.$emit('update189SubNvue', {
+            platform: 'TV',
+            url: 'https://cloud.189.cn'
+        });
+    });
+}
+
+//打开夸克网盘的webview
+const openQuarkWebview = () => {
+    // 打开 nvue 子窗体  
+    subQuarkNvue.show('slide-in-left', 200, function () {
+        uni.$emit('updateQuarkSubNvue', {
+            platform: 'TV',
+            url: 'https://pan.quark.cn'
+        });
+    });
+}
+
 onMounted(() => {
     setQrcode();
     // #ifdef APP-PLUS
     startServer()
     // #endif
-
     // 通过 id 获取 nvue 子窗体  
-    const subNVue = uni.getSubNVueById('cloud189_subnvue')
-    // 打开 nvue 子窗体  
-    subNVue.show('slide-in-left', 3000, function () {
-        // 打开后进行一些操作...  
-        //   
-    });
-    // 关闭 nvue 子窗体  
-    subNVue.hide('fade-out', 300)
+    sub189Nvue = uni.getSubNVueById('cloud189_subnvue')
+    // 通过 id 获取 nvue 子窗体  
+    subQuarkNvue = uni.getSubNVueById('cloudquark_subnvue')
+    sub189Nvue ? sub189Nvue.hide('slide-out-left', 200) : ''
+    subQuarkNvue ? subQuarkNvue.hide('slide-out-left', 200) : ''
+
 });
 
 onLoad((options) => {

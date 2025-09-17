@@ -50,8 +50,8 @@ const settings = [
         { icon: dyGray, activeIcon: dyBlack, title: '电影目录设置', index: 3, path: '/pages/tv/mine/data-sync' },
     ],
     [
-        { icon: fankuiGray, activeIcon: fankuiBlack, title: '问题与反馈', index: 4, path: '/pages/tv/mine/data-sync' },
-        { icon: zanshangGray, activeIcon: zanshangBlack, title: '赞赏', index: 5, path: '/pages/tv/mine/about-version' },
+        { icon: fankuiGray, activeIcon: fankuiBlack, title: '问题与反馈', index: 4, path: '/pages/tv/mine/enter-qqgroup' },
+        { icon: zanshangGray, activeIcon: zanshangBlack, title: '赞赏', index: 5, path: '/pages/tv/mine/appreciate' },
         { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 6, path: '/pages/tv/mine/about-version' },
     ]
 ]

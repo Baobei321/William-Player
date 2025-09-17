@@ -1,7 +1,8 @@
 <template>
   <view class="cloud-drive">
-    <wil-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm"></wil-navbar>
-    <wil-webview type="web" :src="url" style="width: 750rpx;flex: 1;" @getcookies="getCookies" class="wil-webview" />
+    <wil-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm" v-if="platform!='TV'"></wil-navbar>
+    <wil-webview type="web" :platform="platform" :src="url" style="flex: 1;" @getcookies="getCookies"
+      class="wil-webview" v-if="url" />
   </view>
 </template>
 
@@ -23,7 +24,8 @@ export default {
       sourceList: [],
       cookieObj: {},
       routerParams: {},
-      oldName: ''
+      oldName: '',
+      platform: ''
     };
   },
   methods: {
@@ -154,15 +156,22 @@ export default {
     uni.setNavigationBarTitle({
       title: decodeURIComponent(options.title),
     });
-    this.url = decodeURIComponent(options.url);
+    // this.url = decodeURIComponent(options.url);
+    this.url = options.url ? decodeURIComponent(options.url) : '';
+    uni.$on('update189SubNvue', data => {
+      this.platform = data.platform
+      this.url = data.url
+    })
     this.debounceCookie = this.debounce(this.getCookieData, 8000);
   },
+  onUnload() {
+    uni.$off('update189SubNvue')
+  }
 };
 </script>
 
 <style lang="scss">
 .cloud-drive {
-  width: 750rpx;
   flex: 1;
   display: flex;
   flex-direction: column;

@@ -234,9 +234,23 @@
               /*"type": "popup",  这里不需要*/
               "style": {
                 "position": "absolute",
-                "dock": "right",
-                "width": "100rpx",
-                "height": "150rpx",
+                "right": "0",
+                "bottom": "0",
+                "width": "68%",
+                "height": "93%",
+                "background": "transparent"
+              }
+            },
+            {
+              "id": "cloudquark_subnvue", // 唯一标识  
+              "path": "pages/mobile/backend/quark-webview", // 页面路径  
+              /*"type": "popup",  这里不需要*/
+              "style": {
+                "position": "absolute",
+                "right": "0",
+                "bottom": "0",
+                "width": "68%",
+                "height": "93%",
                 "background": "transparent"
               }
             }
@@ -246,6 +260,18 @@
     },
     {
       "path": "pages/tv/source/catelog-settings",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/appreciate",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/enter-qqgroup",
       "style": {
         "navigationStyle": "custom"
       }

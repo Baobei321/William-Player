@@ -36,7 +36,7 @@
                 </template>
             </div>
         </div>
-        <div :class="['source-list-add', tabIndex === lengthValue ? 'source-list-add_active' : '']">
+        <div :class="['source-list-add', tabIndex === lengthValue ? 'source-list-add_active' : '']" @click="toAdd">
             <image src="@/static/jia-hao.png"></image>
         </div>
     </div>
@@ -143,6 +143,12 @@ const evtMove = (keyCode) => {
         }
     }
 };
+
+const toAdd = () => {
+    uni.navigateTo({
+        url: '/pages/tv/source/code-input'
+    })
+}
 
 //根据tabIndex索引获取当前的item和vitem
 const getItemAndVitem = () => {

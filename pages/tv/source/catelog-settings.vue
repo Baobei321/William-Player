@@ -18,17 +18,19 @@ import tvPage from '@/components/tv/tv-page/index'
 import sourceList from '../video/components/index-component/source-list.vue';
 import wilList from '@/components/mobile/wil-list/index.vue'
 import { useSelectFolder } from '@/hooks/useSelectFolder';
+import { onLoad } from "@dcloudio/uni-app";
 
 const focusModel = ref('menu')
 const source_list = ref(null)
 const result = ref({})
+const routerParams = ref({})
 let selectType = {}
 let selectMedia = {}
 
 const emits = defineEmits(['openSource', 'confirm'])
 
 const { data, key, selectName, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
-    = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result.value, title: , emits: emits })
+    = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result.value, title: routerParams.value.title, emits: emits })
 
 
 const keyCodeClick = (keyCode) => {
@@ -104,6 +106,10 @@ const getSelectType = (item, vitem) => {
     selectMedia = vitem
     handleSelect(selectType, selectMedia)
 }
+
+onLoad((options)=>{
+    routerParams.value = options
+})
 
 </script>
 
