@@ -2,7 +2,7 @@
   <div class="wil-navbar" :style="{'height':navBarHeight}">
     <nut-navbar :title="$slots.content?'':props.title" :left-show="props.leftShow" :style="{'--content-height':contentHeight}" @on-click-back="clickBack"
       :title-icon="$slots['title-icon']?true:false">
-      <template #left-show v-if="props.leftShow">
+      <template #leftShow v-if="props.leftShow">
         <nut-icon name="rect-left" :custom-color="props.arrowColor"></nut-icon>
       </template>
       <template #left>

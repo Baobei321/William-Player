@@ -224,7 +224,7 @@ export function useVideoAll({ wil_list }) {
                     total: arr.length,
                 };
             } else {
-                res = uni.getStorageSync("localMovieTvData");
+                let res = uni.getStorageSync("localMovieTvData");
                 let arr = [];
                 arr.push(...res.movie.filter((i) => i.genre_ids?.indexOf(+routerParams.value.genreId) > -1));
                 arr.push(...res.tv.filter((i) => i.genre_ids?.indexOf(+routerParams.value.genreId) > -1));
