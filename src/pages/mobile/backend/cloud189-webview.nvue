@@ -1,19 +1,19 @@
 <template>
   <view class="cloud-drive">
-    <wil-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm" v-if="platform!='TV'"></wil-navbar>
+    <nvue-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm" v-if="platform!='TV'"></nvue-navbar>
     <wil-webview type="web" :platform="platform" :src="url" style="flex: 1;" @getcookies="getCookies"
       class="wil-webview" v-if="url" />
   </view>
 </template>
 
 <script>
-import wilNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
+import NvueNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
 import { get189Folder, get189User } from "@/utils/common";
 import { addOperLog } from "@/network/apis";
 
 export default {
   components: {
-    wilNavbar,
+    NvueNavbar,
   },
   data() {
     return {

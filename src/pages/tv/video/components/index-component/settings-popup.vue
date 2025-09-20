@@ -15,10 +15,10 @@
                 </div>
             </div>
             <source-list v-if="showType == 'source'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
-                ref="source_list" @changeShowType="changeShowType" @openModal="openModal">
+                ref="source_list" @changeShowType="changeShowType" @openModal="openModal" :title="typeTitle">
             </source-list>
             <catelog-mulu v-if="showType == 'catelogMulu'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
-                ref="catelog_mulu" @changeShowType="changeShowType">
+                ref="catelog_mulu" @changeShowType="changeShowType" :title="typeTitle">
             </catelog-mulu>
         </nut-popup>
     </div>
@@ -47,7 +47,7 @@ const settings = [
         { icon: ziyuankuGray, activeIcon: ziyuankuBlack, title: '资源库', index: 0, type: 'source' },
         { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 1, path: '/pages/tv/mine/data-sync' },
         { icon: xspGray, activeIcon: xspBlack, title: '电视剧目录设置', index: 2, type: 'catelogMulu' },
-        { icon: dyGray, activeIcon: dyBlack, title: '电影目录设置', index: 3, path: '/pages/tv/mine/data-sync' },
+        { icon: dyGray, activeIcon: dyBlack, title: '电影目录设置', index: 3, type: 'catelogMulu' },
     ],
     [
         { icon: fankuiGray, activeIcon: fankuiBlack, title: '问题与反馈', index: 4, path: '/pages/tv/mine/enter-qqgroup' },
@@ -61,6 +61,7 @@ const openAnimation = ref(false) //true就是点击跳转，false就是返回
 
 const source_list = ref(null)
 const catelog_mulu = ref(null)
+const typeTitle = ref('')
 
 const lengthValue = ref(0)
 const emits = defineEmits(['changeSetting', 'openModal'])
@@ -108,6 +109,7 @@ const clickItem = (item) => {
         return
     }
     if (item.type) {
+        typeTitle.value = item.title
         openAnimation.value = true
         setTimeout(() => {
             showType.value = item.type

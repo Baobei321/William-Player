@@ -1,5 +1,11 @@
 {
   "pages": [
+    // {
+    //   "path": "layout/entry",
+    //   "style": {
+    //     "navigationStyle": "custom"
+    //   }
+    // },
     {
       "path": "pages/mobile/mine/entry",
       "style": {
@@ -284,7 +290,7 @@
     "backgroundColor": "@backgroundColor",
     "rpxCalcMaxDeviceWidth": 700
   },
-  "uniIdRouter": {},
+  "uniIdRouter": {}
   "tabBar": { //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
     "color": "#86909C",
     "selectedColor": "#ff6701",

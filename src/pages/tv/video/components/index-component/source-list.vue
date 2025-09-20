@@ -74,11 +74,6 @@ const evtMove = (keyCode) => {
             tabIndex.value--;
             isSwipe.value = false
             iconIndex.value = -1
-            //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
-            if (props.type === 'menu') {
-                let { item, vitem } = getItemAndVitem()
-                emits('getSelectType', item, vitem)
-            }
         }
     } else if (keyCode === "KeyDown") {
         if (tabIndex.value < lengthValue.value) {
@@ -86,11 +81,6 @@ const evtMove = (keyCode) => {
             tabIndex.value++;
             isSwipe.value = false
             iconIndex.value = -1
-            //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
-            if (props.type === 'menu') {
-                let { item, vitem } = getItemAndVitem()
-                emits('getSelectType', item, vitem)
-            }
         }
     } else if (keyCode === 'KeyLeft') {
         // if (tabIndex.value === lengthValue.value) return
@@ -114,7 +104,6 @@ const evtMove = (keyCode) => {
         } else {
             iconIndex.value < 1 ? iconIndex.value++ : ''
         }
-
     } else if (keyCode === 'KeyEnter') {
         if (tabIndex.value === lengthValue.value) {
             uni.navigateTo({
@@ -140,6 +129,11 @@ const evtMove = (keyCode) => {
                 let { item, vitem } = getItemAndVitem()
                 deleteSource(item, vitem)
             }
+            //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
+            if (props.type === 'menu') {
+                let { item, vitem } = getItemAndVitem()
+                emits('getSelectType', item, vitem)
+            }
         }
     }
 };
@@ -154,6 +148,7 @@ const toAdd = () => {
 const getItemAndVitem = () => {
     let index = 0
     sourceList.value = uni.getStorageSync('sourceList')
+    lengthValue.value = 0
     sourceList.value.forEach(item => {
         if (item?.list?.length) {
             lengthValue.value += item.list.length
@@ -292,6 +287,19 @@ const judegeShow = () => {
     show.value = !sourceList.value.every((item) => {
         return !item.list.length;
     });
+    // if (show.value) {
+    //     let vitem = {}
+    //     let item = sourceList.value.find((v) => {
+    //         if (v.list?.length) {
+    //             vitem = v.list[0]
+    //             return true
+    //         } else {
+    //             return false
+    //         }
+
+    //     });
+    //     emits('getSelectType', item, vitem)
+    // }
 };
 judegeShow()
 
@@ -322,6 +330,7 @@ defineExpose({
 
     .source-list-container {
         padding: 24rpx;
+        padding-bottom: 0;
         width: 100%;
 
         .source-list-container__classify {
@@ -358,6 +367,7 @@ defineExpose({
                                         width: 80rpx;
                                         height: 80rpx;
                                         border-radius: 50%;
+                                        display: block;
                                     }
                                 }
 
@@ -450,6 +460,7 @@ defineExpose({
         justify-content: center;
         cursor: pointer;
         border: 4rpx solid transparent;
+        margin-top: 24rpx;
 
         image {
             width: 30rpx;

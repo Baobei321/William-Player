@@ -1,4 +1,10 @@
+<template>
+  <div id="app1" v-if="PLATFORM==='PC'">
+    <router-view></router-view>
+  </div>
+</template>
 <script>
+import { PLATFORM } from './utils/config'
 export default {
   onLaunch: function () {
     console.log('App Launch')

@@ -1,6 +1,6 @@
 <template>
     <view class="video-player">
-        <wil-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></wil-navbar>
+        <nvue-navbar title="视频播放" :showRightIcon="false" v-if="!pipStatus"></nvue-navbar>
         <view class="video-player-container" :style="{ height: videoHeight, flex: `0 0 ${videoHeight}` }">
             <view :style="{ width: '750rpx', height: videoHeight, background: '#000', position: 'relative' }"
                 v-if="plateForm == 'android' && uniPlatform == 'app'">
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import wilNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
+import NvueNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
 import playerDetail from "../components/player-component/detail.nvue";
 import tvSelect from "../components/player-component/tv-select.nvue";
 import tvButton from "../components/player-component/tv-button.nvue";
@@ -47,7 +47,7 @@ import { IMG_DOMAIN } from "@/utils/config";
 
 export default {
     components: {
-        wilNavbar,
+        NvueNavbar,
         playerDetail,
         tvSelect,
         tvButton,

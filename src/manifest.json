@@ -119,7 +119,7 @@
         "nativePlugins" : {}
     },
     "h5" : {
-        "darkmode" : true,
+        "darkmode" : false,
         "themeLocation" : "theme.json"
     },
     /* 快应用特有相关 */

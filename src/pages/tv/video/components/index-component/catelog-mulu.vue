@@ -1,6 +1,6 @@
 <template>
     <div class="catelog-mulu">
-        <div class="catelog-mulu-title">{{ props.title + '目录' }}</div>
+        <div class="catelog-mulu-title">{{ title + '目录' }}</div>
         <div class="catelog-mulu-container">
             <nut-swipe v-for="(item, index) in listData" :key="item.name" :ref="(el) => setRefs(el, index)">
                 <div :class="['list-item', index === tabIndex ? 'list-active' : '']">
@@ -26,7 +26,8 @@
                 </template>
             </nut-swipe>
         </div>
-        <div :class="['catelog-mulu-add', tabIndex === listData.length ? 'catelog-mulu-add_active' : '']">
+        <div :class="['catelog-mulu-add', tabIndex === listData.length ? 'catelog-mulu-add_active' : '']"
+            @click="toSelectMulu">
             <image src="@/static/jia-hao.png"></image>
         </div>
     </div>
@@ -37,10 +38,10 @@ import { ref } from 'vue'
 import webdavFileIcon from "@/static/webdav-fileIcon.png";
 
 const props = defineProps({
-    title: { type: String, default: '电视剧' }
+    title: { type: String, default: '电视剧目录设置' }
 })
 
-const emits =defineEmits(['changeShowType'])
+const emits = defineEmits(['changeShowType'])
 
 const mapping = {
     'WebDAV': webdavFileIcon,
@@ -59,18 +60,27 @@ const itemRefs = ref([])
 const isSwipe = ref(false) //标识当前是否有swipe被打开
 const iconIndex = ref(-1) //表示swipe右侧的那些图标的索引
 
+const title = ref(props.title.split('目录设置')[0])
 
 //获取存在本地的目录数据
 const getMuluData = () => {
     muluData.value = uni.getStorageSync('muluData') || {}
     muluData.value?.tv ? '' : muluData.value.tv = []
     muluData.value?.movie ? '' : muluData.value.movie = []
-    listData.value = muluData.value[mapping1[props.title]]
+    console.log(muluData.value,'asd');
+    
+    listData.value = muluData.value[mapping1[title.value]]
 }
 
 //为每个swipe设置ref
 const setRefs = (el, index) => {
     itemRefs.value[index] = el
+}
+
+const toSelectMulu = () => {
+    uni.navigateTo({
+        url: `/pages/tv/source/catelog-settings?title=${title.value}`
+    })
 }
 
 //遥控器按键事件
@@ -114,9 +124,7 @@ const evtMove = (keyCode) => {
 
     } else if (keyCode === 'KeyEnter') {
         if (tabIndex.value === listData.value.length) {
-            uni.navigateTo({
-                url: '/pages/tv/source/code-input'
-            })
+            toSelectMulu()
         } else {
             let targetObject = null;
             for (const innerObj of sourceList.value) {
@@ -140,6 +148,7 @@ const evtMove = (keyCode) => {
         }
     }
 };
+
 
 getMuluData()
 
