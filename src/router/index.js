@@ -12,7 +12,13 @@ const constantRoutes = [
         path: 'home',
         component: () => import('@/pages/electron/home/index'),
         name: 'Home',
-        meta: { title: '首页', icon: 'user' }
+        meta: { title: '首页' }
+      },
+      {
+        path: 'detail',
+        component: () => import('@/pages/electron/home/detail'),
+        name: 'Detail',
+        meta: { title: '详情页' }
       }
     ]
   },

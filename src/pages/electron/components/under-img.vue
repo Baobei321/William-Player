@@ -48,7 +48,7 @@ const props = defineProps({
     height: 100%;
     top: 0;
     z-index: 4;
-    background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0.2) 100%);
+    background: linear-gradient(to right, #fff 0%,rgba(255, 255, 255, 0.8) 10%, rgba(255, 255, 255, 0.2) 100%);
   }
   .swiper-image-now {
     z-index: 1;

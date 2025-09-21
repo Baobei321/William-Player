@@ -4,8 +4,11 @@
         <div class="home-container">
             <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"></star-recommend>
             <div class="home-container-list">
-                <recent-played v-if="historyPlay.length" :listData="historyPlay"
-                    :isConnected="isConnected"></recent-played>
+                <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
+                <hx-list title="电影" :listData="localMovieTvData?.movie"
+                    v-if="localMovieTvData?.movie?.length"></hx-list>
+                <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
+                <Classify></Classify>
             </div>
         </div>
         <wil-modal ref="wil_modal"></wil-modal>
@@ -16,18 +19,25 @@
 import underImg from "../components/under-img.vue";
 import starRecommend from "../components/star-recommend.vue";
 import recentPlayed from "./components/recent-played.vue";
+import hxList from "./components/hx-list.vue";
+import Classify from "./components/classify.vue";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import { ipc } from "@/utils/ipcRenderer";
 import { ipcApiRoute } from "@/utils/ipcApiRoute";
-import { ref } from "vue";
+import { onActivated, onDeactivated, ref } from "vue";
 import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex'
+import { defineOptions } from 'vue';
+defineOptions({
+    name: 'Home'
+})
 
 const underImgArr = ref([])
 const swipeIndex = ref(0)
 const leave = ref(false)
 
 const wil_modal = ref(null)
+let scrollTop = 0
 
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex({ wil_modal });
 
@@ -58,6 +68,14 @@ const openVideo = () => {
     });
 }
 
+onActivated(() => {
+    let element = document.querySelector('.home-container')
+    element.scrollTop = scrollTop
+})
+onDeactivated(() => {
+    let element = document.querySelector('.home-container')
+    scrollTop = element.scrollTop
+})
 </script>
 
 <style lang="scss" scoped>
@@ -72,9 +90,12 @@ const openVideo = () => {
         width: 100%;
         height: 100%;
         overflow: auto;
+        position: relative;
+        z-index: 999;
 
         .home-container-list {
-            padding: 0 24rpx;
+            padding: 0 100rpx;
+            padding-bottom: 100rpx;
         }
     }
 

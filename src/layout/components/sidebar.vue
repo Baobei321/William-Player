@@ -16,6 +16,7 @@
 
 <script setup>
 import homeBlack from '@/static/home-black.png'
+// import homeGray from '@/static/home-gray.png'
 import homeOrange from '@/static/home-orange.png'
 import liveBlack from '@/static/live-black.png'
 import liveOrange from '@/static/live-orange.png'
@@ -44,8 +45,6 @@ const setActiveStyle = () => {
             top += item.height
         }
     })
-    console.log(activeItem.height, 'asd');
-
     return { height: activeItem.height + 'px', top: top + 'px' }
 }
 
