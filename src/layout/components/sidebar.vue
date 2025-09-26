@@ -25,14 +25,16 @@ import chilunOrange from '@/static/chilun-orange.png'
 import embyBlack from '@/static/emby-black.png'
 import embyOrange from '@/static/emby-orange.png'
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const sidebar_list = ref(null)
 const activeTab = ref('首页')
 const sidebarList = ref([
-    { name: '首页', icon: homeBlack, activeIcon: homeOrange, active: true, },
-    { name: 'Emby', icon: embyBlack, activeIcon: embyOrange, active: false, },
-    { name: '直播', icon: liveBlack, activeIcon: liveOrange, active: false, },
-    { name: '设置', icon: chilunBlack, activeIcon: chilunOrange, active: false, },
+    { name: '首页', icon: homeBlack, activeIcon: homeOrange, active: true, path: '/home' },
+    { name: 'Emby', icon: embyBlack, activeIcon: embyOrange, active: false, path: '/emby' },
+    { name: '直播', icon: liveBlack, activeIcon: liveOrange, active: false, path: '/live' },
+    { name: '设置', icon: chilunBlack, activeIcon: chilunOrange, active: false, path: '/settings' },
 ])
 
 // 设置active背景的style
@@ -53,6 +55,9 @@ const changeTab = (item) => {
     sidebarList.value.find(v => v.active).active = false
     item.active = true
     activeTab.value = item.name
+    router.replace({
+        path: item.path
+    })
 }
 
 onMounted(() => {
@@ -82,6 +87,7 @@ onMounted(() => {
 
     &-list {
         position: relative;
+        width: 70px;
 
         &-item {
             display: flex;

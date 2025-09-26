@@ -2,7 +2,7 @@ import { loginUser } from "@/utils/common";
 import { loginEmby, getEmbyInfo } from "@/utils/emby";
 
 //校验webdav
-export const validateWebdav = async (title, formData, routerParams) => {
+export const validateWebdav = async (title, formData, routerParams, back = true) => {
     let sourceList = uni.getStorageSync("sourceList");
     if (title == "添加WebDAV") {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address)) {
@@ -19,18 +19,19 @@ export const validateWebdav = async (title, formData, routerParams) => {
             });
             return;
         }
-        await loginUser(formData)
-            .then((res) => {
-                let isHaveData = !sourceList.every((item) => {
-                    return !item.list.length;
-                });
-                if (!isHaveData) {
-                    sourceList.find((i) => i.type == "WebDAV").list.push({ ...formData, token: res.data.token, active: true });
-                    uni.setStorageSync("isreload", true);
-                } else {
-                    sourceList.find((i) => i.type == "WebDAV").list.push({ ...formData, token: res.data.token });
-                }
-                uni.setStorageSync("sourceList", sourceList);
+        try {
+            const res = await loginUser(formData)
+            let isHaveData = !sourceList.every((item) => {
+                return !item.list.length;
+            });
+            if (!isHaveData) {
+                sourceList.find((i) => i.type == "WebDAV").list.push({ ...formData, token: res.data.token, active: true });
+                uni.setStorageSync("isreload", true);
+            } else {
+                sourceList.find((i) => i.type == "WebDAV").list.push({ ...formData, token: res.data.token });
+            }
+            uni.setStorageSync("sourceList", sourceList);
+            if (back) {
                 uni.navigateBack({
                     delta: 2,
                 });
@@ -39,13 +40,14 @@ export const validateWebdav = async (title, formData, routerParams) => {
                         url: '/pages/mobile/media/catelog-setting'
                     })
                 }, 300);
-            })
-            .catch(() => {
-                uni.showToast({
-                    title: "权限校验失败，请检查",
-                    icon: "none",
-                });
+            }
+            return res
+        } catch (error) {
+            uni.showToast({
+                title: "权限校验失败，请检查",
+                icon: "none",
             });
+        }
     } else if (title == "修改WebDAV") {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address) && state.oldData.address != formData.address) {
             uni.showToast({
@@ -61,33 +63,36 @@ export const validateWebdav = async (title, formData, routerParams) => {
             });
             return;
         }
-        await loginUser(formData)
-            .then((res) => {
-                let historyArr = uni.getStorageSync("historyPlay") || [];
-                historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != state.oldData.name);
-                uni.setStorageSync("historyPlay", historyArr);
-                formData.token = res.data.token;
-                let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.address);
-                Object.keys(formData).forEach((v) => {
-                    obj[v] = formData[v];
-                });
-                editMulu()
-                uni.setStorageSync("sourceList", sourceList);
-                if (routerParams.isActive == "1") {
-                    uni.setStorageSync("isreload", true);
+
+        try {
+            const res = await loginUser(formData)
+            let historyArr = uni.getStorageSync("historyPlay") || [];
+            historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != state.oldData.name);
+            uni.setStorageSync("historyPlay", historyArr);
+            formData.token = res.data.token;
+            let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.address);
+            Object.keys(formData).forEach((v) => {
+                obj[v] = formData[v];
+            });
+            editMulu()
+            uni.setStorageSync("sourceList", sourceList);
+            if (routerParams.isActive == "1") {
+                uni.setStorageSync("isreload", true);
+                if (back) {
                     uni.navigateBack({
                         delta: 2,
                     });
-                    return;
                 }
-                uni.navigateBack();
-            })
-            .catch(() => {
-                uni.showToast({
-                    title: "权限校验失败，请检查",
-                    icon: "none",
-                });
+                return res;
+            }
+            back ? uni.navigateBack() : '';
+            return res
+        } catch (error) {
+            uni.showToast({
+                title: "权限校验失败，请检查",
+                icon: "none",
             });
+        }
     }
 }
 

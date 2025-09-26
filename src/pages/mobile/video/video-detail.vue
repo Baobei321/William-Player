@@ -42,7 +42,7 @@
       <div class="video-detail-container__content">
         <nut-button custom-color="#090909" @click="clickPlayButton">
           <template #icon>
-            <image src="/static/play.png" />
+            <image src="@/static/play.png" />
           </template>
           <span>{{ buttonText }}</span>
         </nut-button>

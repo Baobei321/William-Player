@@ -280,6 +280,8 @@ export function useVideoDetail({ route, router }) {
             imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
             overview.value = res1.overview;
         } else {
+            console.log(seasonFirst.value.img, 'asdsad');
+
             imgData.value.img = seasonFirst.value.img;
             overview.value = seasonFirst.value.overview;
         }
@@ -781,6 +783,7 @@ export function useVideoDetail({ route, router }) {
     });
 
     onLoad((options) => {
+        judgeSelect();
         routerParams.value = options;
         if (options.movieTvId == "undefined") {
             routerParams.value.movieTvId = undefined;

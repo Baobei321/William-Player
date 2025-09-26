@@ -328,7 +328,7 @@ const handleTv = async (seasonData1 = null) => {
                 return {
                     id: i.fid,
                     name: i.file_name,
-                    path: "/我的视频/电视剧",
+                    // path: "/我的视频/电视剧",
                     provider: "Quark",
                 };
             });

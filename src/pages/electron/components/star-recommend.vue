@@ -1,7 +1,7 @@
 <template>
     <div class="star-recommend">
         <wil-swiper :options="listData" :auto-play="5000" :pagination-visible="true" imgMode="aspectFill"
-            @change="changeSwiper" ref="wil_swiper">
+            @change="changeSwiper" ref="wil_swiper" v-if="props.showSwiper" :initPage="props.initPage">
             <template #item="data">
                 <div class="swiper-content" @click="toVideoDetail(data)">
                     <div class="swiper-content-container">
@@ -37,6 +37,8 @@ import * as CONFIG from "@/utils/config";
 const props = defineProps({
     isFocus: { type: Boolean, default: true },
     historyPlay: { type: Array, default: [] },
+    initPage: { type: [Number, String], default: 0 },
+    showSwiper: { type: Boolean, default: true },
 });
 const emits = defineEmits(["getStarList", "change", "setFocus"]);
 const wil_swiper = ref(null);

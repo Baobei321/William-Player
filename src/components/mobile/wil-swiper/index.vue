@@ -3,19 +3,19 @@
     <nut-swiper @change="changeItem" v-bind="$attrs" ref="nut_swiper">
       <nut-swiper-item v-for="item in props.options" :key="item.img">
         <slot name="item" v-bind="item" v-if="$slots.item"></slot>
-        <image :src="item.img" style="width:100%" :mode="props.imgMode" v-if="!$slots.item&&item.img" />
+        <image :src="item.img" style="width:100%" :mode="props.imgMode" v-if="!$slots.item && item.img" />
       </nut-swiper-item>
     </nut-swiper>
     <template v-if="isAllUnder">
       <template v-for="(bgc, index) in props.options" :key="bgc.underImg">
-        <image :class="['swiper-image-now',swipeIndex == index ? leave ? 'leave' : 'enter' : '']" :src="bgc.underImg" :mode="props.imgMode"
-          :style="{zIndex: swipeIndex == index ? '2' : '1'}">
+        <image :class="['swiper-image-now', swipeIndex == index ? leave ? 'leave' : 'enter' : '']" :src="bgc.underImg"
+          :mode="props.imgMode" :style="{ zIndex: swipeIndex == index ? '2' : '1' }">
         </image>
       </template>
     </template>
   </div>
 </template>
-  
+
 <script setup>
 import { computed, onMounted, ref, nextTick, onBeforeMount } from "vue";
 const emits = defineEmits(["change"]);
@@ -64,37 +64,44 @@ defineExpose({
   to,
 });
 </script>
-  
-  <style lang="scss" scoped>
+
+<style lang="scss" scoped>
 @keyframes move0 {
   from {
     transform: translateX(0);
     opacity: 1;
   }
+
   to {
     transform: translateX(-40rpx);
     opacity: 0;
   }
 }
+
 @keyframes move1 {
   from {
     transform: translateX(40rpx);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
   }
 }
+
 .wil-swiper {
   width: 100%;
   position: relative;
   height: 100%;
+
   .nut-swiper {
     z-index: 3;
     height: 100%;
+
     .nut-swiper-inner {
       height: 100% !important;
+
       .nut-swiper-item {
         image {
           display: block;
@@ -105,6 +112,7 @@ defineExpose({
       }
     }
   }
+
   .swiper-image-now {
     width: 100%;
     position: absolute;
@@ -116,9 +124,11 @@ defineExpose({
     z-index: 1;
     opacity: 0;
   }
+
   .leave {
     animation: move0 0.35s ease forwards;
   }
+
   .enter {
     animation: move1 0.35s ease forwards;
   }

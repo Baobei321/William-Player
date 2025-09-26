@@ -15,11 +15,65 @@ const constantRoutes = [
         meta: { title: '首页' }
       },
       {
-        path: 'detail',
+        path: 'emby',
+        component: () => import('@/pages/electron/emby/index'),
+        name: 'Emby',
+        meta: { title: 'Emby' }
+      },
+      {
+        path: 'live',
+        component: () => import('@/pages/electron/live/index'),
+        name: 'Live',
+        meta: { title: '直播' }
+      },
+      {
+        path: 'settings',
+        component: () => import('@/pages/electron/settings/index'),
+        name: 'Settings',
+        meta: { title: '设置' },
+      },
+      {
+        path: 'homeDetail',
         component: () => import('@/pages/electron/home/detail'),
-        name: 'Detail',
+        name: 'HomeDetail',
         meta: { title: '详情页' }
-      }
+      },
+      {
+        path: 'sourceList',
+        component: () => import('@/pages/electron/source/source-list'),
+        name: 'SourceList',
+        meta: { title: '资源库' }
+      },
+        {
+        path: 'mediaList',
+        component: () => import('@/pages/electron/media/list'),
+        name: 'MediaList',
+        meta: { title: '媒体库列表' }
+      },
+      {
+        path: 'appreciate',
+        component: () => import('@/pages/electron/settings/appreciate'),
+        name: 'Appreciate',
+        meta: { title: '赞赏' }
+      },
+      {
+        path: 'iframe',
+        component: () => import('@/pages/electron/settings/iframe'),
+        name: 'Iframe',
+        meta: { title: 'iframe页面' }
+      },
+      {
+        path: 'qqTalk',
+        component: () => import('@/pages/electron/settings/qq-talk'),
+        name: 'QqTalk',
+        meta: { title: 'QQ甲流' }
+      },
+      {
+        path: 'about-version',
+        component: () => import('@/pages/electron/settings/about-version'),
+        name: 'AboutVersion',
+        meta: { title: '关于' }
+      },
     ]
   },
   {

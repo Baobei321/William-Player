@@ -190,16 +190,35 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             })
             return
         }
-        if (unref(selectType).type == 'WebDAV') {
-            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
-            //已存在就替换，不存在就新增
-            exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
-        } else {
-            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
-            //已存在就替换，不存在就新增
+        if (unref(selectType).type == 'WebDAV') {//这块逻辑有问题，不能存在就替换，像webdav可能挂载多个网盘
+            // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
+            // //已存在就替换，不存在就新增
+            // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
+            let exit = muluData.value[mapping[unref(title)]].find(v = v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value)
             if (exit) {
-                exit.path = path.value + '/' + selectName.value || '/'
-                exit.folderFileId = folderFileId.value
+                uni.showToast({
+                    title: '已存在该目录',
+                    icon: 'none'
+                })
+            } else {
+                muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
+            }
+        } else {
+            // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
+            // //已存在就替换，不存在就新增
+            // if (exit) {
+            //     exit.path = path.value + '/' + selectName.value || '/'
+            //     exit.folderFileId = folderFileId.value
+            // } else {
+            //     let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
+            //     muluData.value[mapping[unref(title)]].push(obj)
+            // }
+            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value && v.folderFileId == folderFileId.value)
+            if (exit) {
+                uni.showToast({
+                    title: '已存在该目录',
+                    icon: 'none'
+                })
             } else {
                 let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
                 muluData.value[mapping[unref(title)]].push(obj)

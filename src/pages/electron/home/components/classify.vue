@@ -107,7 +107,9 @@ onShow(() => {
             padding: 30rpx;
             box-sizing: border-box;
             margin-left: 24rpx;
-            &:nth-child(6n+1){
+            cursor: pointer;
+
+            &:nth-child(6n+1) {
                 margin-left: 0;
             }
 
@@ -128,8 +130,8 @@ onShow(() => {
                 .img-one {
                     background: rgba(255, 255, 255, 0.4);
                     border-radius: 16rpx;
-                    width: 140rpx;
-                    height: 240rpx;
+                    width: 40%;
+                    aspect-ratio: 7/12;
                     position: absolute;
                     right: 40rpx;
                     top: 40rpx;
@@ -139,8 +141,8 @@ onShow(() => {
                 .img-two {
                     background: rgba(255, 255, 255, 0.4);
                     border-radius: 16rpx;
-                    width: 140rpx;
-                    height: 240rpx;
+                    width: 40%;
+                    aspect-ratio: 7 /12;
                     position: absolute;
                     right: 30rpx;
                     top: 30rpx;
@@ -150,8 +152,8 @@ onShow(() => {
                 .img-three {
                     background: rgba(255, 255, 255, 0.4);
                     border-radius: 16rpx;
-                    width: 140rpx;
-                    height: 240rpx;
+                    width: 40%;
+                    aspect-ratio: 7 /12;
                     position: absolute;
                     right: 16rpx;
                     top: 20rpx;

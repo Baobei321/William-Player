@@ -239,6 +239,7 @@ watch(
                 .recent-played-list-movie__item {
                     margin-left: 24rpx;
                     flex: 0 0 calc((100% - 72rpx) / 4);
+                    cursor: pointer;
 
                     .recent-played-list-movie__item-img {
                         background-position: center;

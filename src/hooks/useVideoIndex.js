@@ -204,43 +204,51 @@ export function useVideoIndex({ wil_modal }) {
         }
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
-        if (movieMulu) {
-            let movieResult = await getFolder({ path: movieMulu.path }, selectMedia.value);
-            movieResult.data.content ? "" : (movieResult.data.content = []);
+        let movieMulu = muluData.movie?.filter(v => v.name == selectMedia.value.name)
+        if (movieMulu?.length) {
             await Promise.allSettled(
-                movieResult.data.content.map(async (v) => {
-                    v.path = movieMulu.path + '/' + v.name;
-                    v.provider = movieResult.data.provider;
-                    if (v.type == "1") {
-                        await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
-                    } else {
-                        if (videoFormat.some((i) => v.name.includes(i))) {
-                            movieTvData.value.movie.push(v);
-                            refreshData.value.found++;
-                        }
-                    }
+                movieMulu.map(async h => {
+                    let movieResult = await getFolder({ path: h.path }, selectMedia.value);
+                    movieResult.data.content ? "" : (movieResult.data.content = []);
+                    await Promise.allSettled(
+                        movieResult.data.content.map(async (v) => {
+                            v.path = h.path + '/' + v.name;
+                            v.provider = movieResult.data.provider;
+                            if (v.type == "1") {
+                                await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+                            } else {
+                                if (videoFormat.some((i) => v.name.includes(i))) {
+                                    movieTvData.value.movie.push(v);
+                                    refreshData.value.found++;
+                                }
+                            }
+                        })
+                    );
                 })
-            );
+            )
         } else {
             uni.showToast({
                 title: '请设置电影目录',
                 icon: 'none'
             })
         }
-        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
-        if (tvMulu) {
-            let tvResult = await getFolder({ path: tvMulu.path }, selectMedia.value);
-            tvResult.data.content ? "" : (tvResult.data.content = []);
+        let tvMulu = muluData.tv?.filter(v => v.name == selectMedia.value.name)
+        if (tvMulu?.length) {
             await Promise.allSettled(
-                tvResult.data.content.map(async (v) => {
-                    v.path = tvMulu.path + "/" + v.name;
-                    v.provider = tvResult.data.provider;
-                    if (v.type == "1") {
-                        await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
-                    }
+                tvMulu.map(async h => {
+                    let tvResult = await getFolder({ path: h.path }, selectMedia.value);
+                    tvResult.data.content ? "" : (tvResult.data.content = []);
+                    await Promise.allSettled(
+                        tvResult.data.content.map(async (v) => {
+                            v.path = h.path + "/" + v.name;
+                            v.provider = tvResult.data.provider;
+                            if (v.type == "1") {
+                                await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+                            }
+                        })
+                    );
                 })
-            );
+            )
         } else {
             uni.showToast({
                 title: '请设置电视剧目录',
@@ -408,9 +416,9 @@ export function useVideoIndex({ wil_modal }) {
     //根据设定好的文件路径进行查找天翼云盘的文件
     const get189MovieTv = async () => {
         let muluData = uni.getStorageSync('muluData') || {}
-        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
-        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
-        if (!movieMulu && !tvMulu) {
+        let movieMulu = muluData.movie?.filter(v => v.name == selectMedia.value.name)
+        let tvMulu = muluData.tv?.filter(v => v.name == selectMedia.value.name)
+        if (!movieMulu?.length && !tvMulu?.length) {
             uni.showToast({
                 title: '请设置电影电视剧目录',
                 icon: 'none'
@@ -419,38 +427,47 @@ export function useVideoIndex({ wil_modal }) {
         }
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        if (movieMulu) {
-            let movieResult = await get189Folder({ folderId: movieMulu.folderFileId }, selectMedia.value);
-            let movieArr = movieResult.fileListAO.fileList.filter((v) => {
-                v.path = movieMulu.path + '/' + v.name;
-                v.provider = "189CloudPC";
-                return videoFormat.some((i) => v.name.includes(i));
-            });
-            refreshData.value.found += movieArr.length;
-            movieTvData.value.movie.push(...movieArr);
+        if (movieMulu?.length) {
             await Promise.allSettled(
-                movieResult.fileListAO.folderList.map(async (v) => {
-                    v.path = movieMulu.path + '/' + v.name;
-                    v.provider = "189CloudPC";
-                    await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+                movieMulu.map(async h => {
+                    let movieResult = await get189Folder({ folderId: h.folderFileId }, selectMedia.value);
+                    let movieArr = movieResult.fileListAO.fileList.filter((v) => {
+                        v.path = h.path + '/' + v.name;
+                        v.provider = "189CloudPC";
+                        return videoFormat.some((i) => v.name.includes(i));
+                    });
+                    refreshData.value.found += movieArr.length;
+                    movieTvData.value.movie.push(...movieArr);
+                    await Promise.allSettled(
+                        movieResult.fileListAO.folderList.map(async (v) => {
+                            v.path = h.path + '/' + v.name;
+                            v.provider = "189CloudPC";
+                            await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+                        })
+                    );
                 })
-            );
+            )
+
         } else {
             uni.showToast({
                 title: '请设置电影目录',
                 icon: 'none'
             })
         }
-        if (tvMulu) {
-            let tvResult = await get189Folder({ folderId: tvMulu.folderFileId }, selectMedia.value);
-            tvResult.fileListAO.folderList ? "" : (tvResult.fileListAO.folderList = []);
+        if (tvMulu?.length) {
             await Promise.allSettled(
-                tvResult.fileListAO.folderList.map(async (v) => {
-                    v.path = tvMulu.path + '/' + v.name;
-                    v.provider = "189CloudPC";
-                    await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+                tvMulu.map(async h => {
+                    let tvResult = await get189Folder({ folderId: h.folderFileId }, selectMedia.value);
+                    tvResult.fileListAO.folderList ? "" : (tvResult.fileListAO.folderList = []);
+                    await Promise.allSettled(
+                        tvResult.fileListAO.folderList.map(async (v) => {
+                            v.path = h.path + '/' + v.name;
+                            v.provider = "189CloudPC";
+                            await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+                        })
+                    );
                 })
-            );
+            )
         } else {
             uni.showToast({
                 title: '请设置电视剧目录',
@@ -509,9 +526,9 @@ export function useVideoIndex({ wil_modal }) {
     //查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
     const getQuarkMovieTv = async () => {
         let muluData = uni.getStorageSync('muluData') || {}
-        let movieMulu = muluData.movie?.find(v => v.name == selectMedia.value.name)
-        let tvMulu = muluData.tv?.find(v => v.name == selectMedia.value.name)
-        if (!movieMulu && !tvMulu) {
+        let movieMulu = muluData.movie?.filter(v => v.name == selectMedia.value.name)
+        let tvMulu = muluData.tv?.filter(v => v.name == selectMedia.value.name)
+        if (!movieMulu?.length && !tvMulu?.length) {
             uni.showToast({
                 title: '请设置电影电视剧目录',
                 icon: 'none'
@@ -520,43 +537,50 @@ export function useVideoIndex({ wil_modal }) {
         }
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        if (movieMulu) {
-            let movieResult = await getQuarkFolder({ fid: movieMulu.folderFileId }, selectMedia.value);
+        if (movieMulu?.length) {
             await Promise.allSettled(
-                movieResult.data.list.map(async (v) => {
-                    v.id = v.fid;
-                    v.name = v.file_name;
-                    v.path = movieMulu.path + "/" + v.file_name;
-                    v.provider = "Quark";
-                    if (v.file_type == "0") {
-                        await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
-                    } else {
-                        if (videoFormat.some((i) => v.name.includes(i))) {
-                            movieTvData.value.movie.push(v);
-                            refreshData.value.found++;
-                        }
-                    }
+                movieMulu.map(async h => {
+                    let movieResult = await getQuarkFolder({ fid: h.folderFileId }, selectMedia.value);
+                    await Promise.allSettled(
+                        movieResult.data.list.map(async (v) => {
+                            v.id = v.fid;
+                            v.name = v.file_name;
+                            v.path = h.path + "/" + v.file_name;
+                            v.provider = "Quark";
+                            if (v.file_type == "0") {
+                                await recursionMovie(v, movieTvData.value.movie, selectType.value, selectMedia.value, refreshData.value);
+                            } else {
+                                if (videoFormat.some((i) => v.name.includes(i))) {
+                                    movieTvData.value.movie.push(v);
+                                    refreshData.value.found++;
+                                }
+                            }
+                        })
+                    );
                 })
-            );
+            )
         } else {
             uni.showToast({
                 title: '请设置电影目录',
                 icon: 'none'
             })
         }
-        if (tvMulu) {
-            let tvResult = await getQuarkFolder({ fid: tvMulu.folderFileId }, selectMedia.value);
-            tvResult.data.list ? "" : (tvResult.data.list = []);
-            tvResult.data.list = tvResult.data.list.map((v) => {
-                return { id: v.fid, name: v.file_name, path: tvMulu.path + "/" + v.file_name, provider: "Quark", size: v.size, file_type: v.file_type };
-            });
+        if (tvMulu?.length) {
             await Promise.allSettled(
-                tvResult.data.list.map(async (v) => {
-                    if (v.file_type == "0") {
-                        await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
-                    }
-                })
-            );
+                tvMulu.map(async h => {
+                    let tvResult = await getQuarkFolder({ fid: h.folderFileId }, selectMedia.value);
+                    tvResult.data.list ? "" : (tvResult.data.list = []);
+                    tvResult.data.list = tvResult.data.list.map((v) => {
+                        return { id: v.fid, name: v.file_name, path: h.path + "/" + v.file_name, provider: "Quark", size: v.size, file_type: v.file_type };
+                    });
+                    await Promise.allSettled(
+                        tvResult.data.list.map(async (v) => {
+                            if (v.file_type == "0") {
+                                await recursionTv(v, {}, movieTvData.value.tv, selectType.value, selectMedia.value, refreshData.value);
+                            }
+                        })
+                    );
+                }))
         } else {
             uni.showToast({
                 title: '请设置电视剧目录',

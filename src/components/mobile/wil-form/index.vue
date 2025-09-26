@@ -9,12 +9,17 @@
     </div>
     <div class="base-form-content" :style="{ paddingTop: props.title ? '' : '0' }">
       <nut-form :model-value="formData" :labelPosition="labelPosition" ref="formRef" :rules="rules">
-        <nut-form-item :label="item.label" v-for="item in props.options" :key="item.prop" :prop="item.prop" :required="item.required">
+        <nut-form-item :label="item.label" v-for="item in props.options" :key="item.prop" :prop="item.prop"
+          :required="item.required">
           <input :value="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type == 'input'"
-            @blur="customBlurValidate(item.prop)" @input="(val) => changeInput(val, item.prop)" @click="clickInput(item)"
-            :border="false" />
+            @blur="customBlurValidate(item.prop)" @input="(val) => changeInput(val, item.prop)"
+            @click="clickInput(item)" :border="false" />
           <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type == 'textarea'"
             :disableDefaultPadding="true" @blur="customBlurValidate(item.prop)" @change="change" />
+          <nut-radio-group v-model="formData[item.prop]" direction="horizontal" v-if="item.type == 'radio'">
+            <nut-radio :label="vitem.value" v-for="vitem in item.columns">{{ vitem.label
+            }}</nut-radio>
+          </nut-radio-group>
           <slot :name="item.prop" v-if="$slots[item.prop] && !item.type"
             v-bind="{ ...item.formItemProps, customBlurValidate }" @blur="customBlurValidate(item.prop)"></slot>
         </nut-form-item>
@@ -23,7 +28,7 @@
     </div>
     <div class="base-form-bottom" v-if="showButton">
       <nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText
-        }}</nut-button>
+      }}</nut-button>
       <slot name="bottom" v-if="$slots.bottom"></slot>
     </div>
   </div>
@@ -300,39 +305,38 @@ watch(
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .base-form {
-    background-color: #2f2f2f;
+// @media (prefers-color-scheme: dark) {
+//   .base-form {
+//     background-color: #2f2f2f;
 
-    .base-form-content {
-      ::v-deep .nut-form {
-        .nut-cell-group {
-          &__wrap {
-            background-color: #2f2f2f;
+//     .base-form-content {
+//       ::v-deep .nut-form {
+//         .nut-cell-group {
+//           &__wrap {
+//             background-color: #2f2f2f;
 
-            .nut-form-item {
-              background-color: #2f2f2f;
+//             .nut-form-item {
+//               background-color: #2f2f2f;
 
-              .nut-form-item__label {
-                color: #fff;
-              }
+//               .nut-form-item__label {
+//                 color: #fff;
+//               }
 
-              &__body {
-                &__slots {
-                  .uni-input-input {
-                    color: #fff;
-                  }
-                }
-              }
+//               &__body {
+//                 &__slots {
+//                   .uni-input-input {
+//                     color: #fff;
+//                   }
+//                 }
+//               }
 
-              &::after {
-                border-color: rgb(73, 73, 73);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-</style>
+//               &::after {
+//                 border-color: rgb(73, 73, 73);
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }</style>

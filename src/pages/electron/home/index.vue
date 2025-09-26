@@ -1,8 +1,14 @@
 <template>
     <div class="home">
+        <div class="home-seach">
+            <img src="@/static/search-black.png">
+            <img src="@/static/jia-black.png" @click="toSourceList">
+            <img src="@/static/refresh-black.png">
+        </div>
         <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
         <div class="home-container">
-            <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"></star-recommend>
+            <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"
+                :initPage="swipeIndex" :showSwiper="showSwiper"></star-recommend>
             <div class="home-container-list">
                 <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
                 <hx-list title="电影" :listData="localMovieTvData?.movie"
@@ -24,19 +30,22 @@ import Classify from "./components/classify.vue";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import { ipc } from "@/utils/ipcRenderer";
 import { ipcApiRoute } from "@/utils/ipcApiRoute";
-import { onActivated, onDeactivated, ref } from "vue";
+import { nextTick, onActivated, onDeactivated, onMounted, onUnmounted, ref } from "vue";
 import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex'
 import { defineOptions } from 'vue';
+import { useRouter } from "vue-router";
 defineOptions({
     name: 'Home'
 })
 
+const router = useRouter()
 const underImgArr = ref([])
 const swipeIndex = ref(0)
 const leave = ref(false)
-
 const wil_modal = ref(null)
+const showSwiper = ref(true)
+
 let scrollTop = 0
 
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex({ wil_modal });
@@ -68,6 +77,27 @@ const openVideo = () => {
     });
 }
 
+const handleResize = () => {
+    showSwiper.value = false
+    nextTick(() => {
+        showSwiper.value = true
+    })
+}
+
+const toSourceList = () => {
+    router.push({
+        path: '/sourceList'
+    })
+}
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+})
+
 onActivated(() => {
     let element = document.querySelector('.home-container')
     element.scrollTop = scrollTop
@@ -85,6 +115,29 @@ onDeactivated(() => {
     overflow: hidden;
     position: relative;
     z-index: 1;
+
+    .home-seach {
+        position: absolute;
+        width: 100%;
+        z-index: 1000;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 50rpx;
+        top: 50rpx;
+
+        img {
+            width: 40rpx;
+            height: 40rpx;
+            cursor: pointer;
+            margin-left: 24rpx;
+
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+    }
 
     .home-container {
         width: 100%;

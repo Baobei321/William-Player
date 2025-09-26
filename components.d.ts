@@ -45,7 +45,7 @@ declare module 'vue' {
     Virtual: typeof import('./src/components/mobile/wil-list/virtual.vue')['default']
     WilBox: typeof import('./src/components/mobile/wil-box/index.vue')['default']
     WilCategoryList: typeof import('./src/components/mobile/wil-category-list/index.vue')['default']
-    WilCell: typeof import('./src/components/mobile/wil-cell/index.vue')['default']
+    WilCell: typeof import('./src/components/electron/wil-cell/index.vue')['default']
     WilEmpty: typeof import('./src/components/mobile/wil-empty/index.vue')['default']
     WilForm: typeof import('./src/components/mobile/wil-form/index.vue')['default']
     WilImage: typeof import('./src/components/mobile/wil-image/index.vue')['default']
