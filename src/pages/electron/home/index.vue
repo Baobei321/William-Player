@@ -1,10 +1,8 @@
 <template>
     <div class="home">
-        <div class="home-seach">
-            <img src="@/static/search-black.png">
-            <img src="@/static/jia-black.png" @click="toSourceList">
-            <img src="@/static/refresh-black.png">
-        </div>
+        <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading"
+            ref="video_navbar">
+        </home-navbar>
         <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
         <div class="home-container">
             <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"
@@ -17,12 +15,14 @@
                 <Classify></Classify>
             </div>
         </div>
+        <!-- 使用teleport挂载到body去 -->
         <wil-modal ref="wil_modal"></wil-modal>
     </div>
 </template>
 
 <script setup>
 import underImg from "../components/under-img.vue";
+import homeNavbar from "./components/navbar.vue"
 import starRecommend from "../components/star-recommend.vue";
 import recentPlayed from "./components/recent-played.vue";
 import hxList from "./components/hx-list.vue";
@@ -48,7 +48,7 @@ const showSwiper = ref(true)
 
 let scrollTop = 0
 
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex({ wil_modal });
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, showPage } = useVideoIndex({ wil_modal });
 
 
 const getStarList = (arr) => {
@@ -62,6 +62,15 @@ const changeSwiper = (index) => {
         swipeIndex.value = index;
         leave.value = false;
     }, 350);
+};
+
+const pauseRefresh = () => {
+    refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
+    movieTvData.value = { movie: [], tv: [] };
+    localMovieTvData.value.tv = [];
+    localMovieTvData.value.movie = [];
+    uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+    refreshLoading.value = false;
 };
 
 const openVideo = () => {
@@ -84,12 +93,6 @@ const handleResize = () => {
     })
 }
 
-const toSourceList = () => {
-    router.push({
-        path: '/sourceList'
-    })
-}
-
 onMounted(() => {
     window.addEventListener('resize', handleResize);
 })
@@ -101,6 +104,9 @@ onUnmounted(() => {
 onActivated(() => {
     let element = document.querySelector('.home-container')
     element.scrollTop = scrollTop
+    // setTimeout(() => {
+        showPage()
+    // }, 300);
 })
 onDeactivated(() => {
     let element = document.querySelector('.home-container')
@@ -115,29 +121,6 @@ onDeactivated(() => {
     overflow: hidden;
     position: relative;
     z-index: 1;
-
-    .home-seach {
-        position: absolute;
-        width: 100%;
-        z-index: 1000;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding-right: 50rpx;
-        top: 50rpx;
-
-        img {
-            width: 40rpx;
-            height: 40rpx;
-            cursor: pointer;
-            margin-left: 24rpx;
-
-            &:first-child {
-                margin-left: 0;
-            }
-        }
-    }
 
     .home-container {
         width: 100%;

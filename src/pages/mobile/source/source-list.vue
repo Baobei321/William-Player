@@ -219,13 +219,13 @@ const chooseOperation = (item) => {
         let historyPlay = uni.getStorageSync("historyPlay");
         historyPlay = historyPlay.filter((v) => v.sourceType != selectType.type || v.sourceName != selectMedia.value.name);
         uni.setStorageSync("historyPlay", historyPlay);
-        judegeShow();
+        judgeShow();
       },
     });
   }
 };
 
-const judegeShow = () => {
+const judgeShow = () => {
   sourceList.value = uni.getStorageSync("sourceList");
   show.value = !sourceList.value.every((item) => {
     return !item.list.length;
@@ -234,7 +234,7 @@ const judegeShow = () => {
 
 onShow(() => {
   sourceList.value = uni.getStorageSync("sourceList");
-  judegeShow();
+  judgeShow();
 });
 const changeTheme = () => {
   theme.value = uni.getSystemInfoSync().theme;

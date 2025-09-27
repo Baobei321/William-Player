@@ -1,7 +1,7 @@
 <template>
     <div class="source-list">
-        <div class="source-list-title" @click="back">
-            <div class="source-list-title__left">
+        <div class="source-list-title">
+            <div class="source-list-title__left" @click="backRouter">
                 <img src="@/static/rect-leftblack.png">
                 <span>资源库</span>
             </div>
@@ -23,10 +23,18 @@
                                 vitem.name }}
                             </div>
                             <div class="list-item-button">
-                                <img src="@/static/bianji-black.png">
-                                <img src="@/static/xsp-black.png">
-                                <img src="@/static/dy-black.png">
-                                <img src="@/static/delete-icon.png">
+                                <wil-tooltip content="修改" placement="top" trigger="hover">
+                                    <img src="@/static/bianji-black.png" @click.stop="editSource(item, vitem)">
+                                </wil-tooltip>
+                                <wil-tooltip content="电视剧目录" placement="top" trigger="hover">
+                                    <img src="@/static/xsp-black.png" @click.stop="setTvMulu(item, vitem)">
+                                </wil-tooltip>
+                                <wil-tooltip content="电影目录" placement="top" trigger="hover">
+                                    <img src="@/static/dy-black.png" @click.stop="setMovieMulu(item, vitem)">
+                                </wil-tooltip>
+                                <wil-tooltip content="删除" placement="top" trigger="hover">
+                                    <img src="@/static/delete-icon.png" @click.stop="deleteSource(item, vitem)">
+                                </wil-tooltip>
                             </div>
                         </div>
                     </div>
@@ -43,10 +51,11 @@
                 <span>添加新资源</span>
             </nut-button>
         </div>
-        <nut-dialog v-model:visible="showDialog">
+        <nut-dialog v-model:visible="showDialog" @closed="closedDialog">
             <template #header>
                 <div class="header-left" @click="back">
-                    <img src="@/static/rect-leftblack.png" v-if="showType !== 'fileSource'">
+                    <img src="@/static/rect-leftblack.png"
+                        v-if="showType !== 'fileSource' && !dialogTitle.includes('修改')">
                     <span> {{ dialogTitle }}</span>
                 </div>
                 <div class="header-right" @click="cancel">
@@ -57,7 +66,7 @@
                 <div class="dialog-content">
                     <transition :name="transitionName">
                         <file-source v-if="showType === 'fileSource'" @click-item="changeFileSource"></file-source>
-                        <wil-form :options="options1" v-model="state.formData" v-else ref="wil_form"></wil-form>
+                        <wil-form :options="state.options" v-model="state.formData" v-else ref="wil_form"></wil-form>
                     </transition>
                 </div>
             </template>
@@ -68,19 +77,28 @@
                 </div>
             </template>
         </nut-dialog>
+        <wil-modal ref="wil_modal"></wil-modal>
     </div>
 </template>
 
 <script setup>
 import { nextTick, reactive, ref } from 'vue';
 import wilForm from '@/components/mobile/wil-form/index.vue'
+import wilTooltip from '@/components/electron/wil-tooltip/index.vue'
+import wilModal from "@/components/mobile/wil-modal/index.vue";
 import fileSource from './components/file-source.vue';
-import { validateWebdav } from "@/utils/validate";
-import { useRoute } from 'vue-router';
+import { validateWebdav, validateEmby } from "@/utils/validate";
+import { useRoute, useRouter } from 'vue-router';
+import { toParse, toStringfy } from "@/pages/mobile/mine/common";
+import { loginUser, get189Folder, getQuarkFolder, get189User } from "@/utils/common";
+import * as CONFIG from '@/utils/config'
 
 const route = useRoute()
+const router = useRouter()
+
 const sourceList = ref([])
 const show = ref(false)
+const wil_modal = ref(null)
 
 const showDialog = ref(false)
 const dialogTitle = ref('添加新文件源')
@@ -93,7 +111,9 @@ const state = reactive({
         protocol: "http",
     },
     oldData: {},
-    history: ['fileSource']
+    history: ['fileSource'],
+    options: [],
+    editObj: {},
 })
 const options1 = [
     { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
@@ -116,6 +136,35 @@ const options1 = [
     { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "alist密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
 ]
 
+const options2 = [
+    { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "选填（自动获取）", type: "text" } },
+    {
+        label: "协议", prop: "protocol", type: 'radio', formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请选择协议" }], columns: [
+            { label: 'HTTP', value: 'http' },
+            { label: 'HTTPS', value: 'https' }
+        ]
+    },
+
+    { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
+    { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "选填,例如:443", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
+    {
+        label: "用户名",
+        prop: "Username",
+        type: "input",
+        formItemProps: { placeholder: "必填", type: "text" },
+        rule: [{ required: true, message: "请输入用户名" }],
+    },
+    { label: "密码", prop: "Pw", type: "input", formItemProps: { placeholder: "选填", type: "password" } },
+]
+
+const options3 = [
+    { label: 'Cookie', prop: 'cookie', type: 'textarea', formItemProps: { placeholder: "请输入天翼云盘的Cookie", type: 'text' }, rule: [{ required: true, message: "请输入Cookie" }] }
+]
+
+const backRouter = () => {
+    router.go(-1)
+}
+
 const openDialog = () => {
     showDialog.value = true
     dialogTitle.value = '添加新文件源'
@@ -128,6 +177,13 @@ const changeFileSource = (item) => {
     showType.value = item.name
     dialogTitle.value = '添加' + item.name
     state.history.push(item.name)
+    if (item.name === 'WebDAV') {
+        state.options = options1
+    } else if (item.name === 'Emby') {
+        state.options = options2
+    } else if (item.name === '天翼云盘') {
+        state.options = options3
+    }
 }
 
 const back = () => {
@@ -141,42 +197,229 @@ const back = () => {
 }
 
 const cancel = () => {
+    transitionName.value = ''
     showDialog.value = false
-    dialogTitle.value = '添加新文件源'
+}
+
+const closedDialog = () => {
     showType.value = 'fileSource'
+    dialogTitle.value = '添加新文件源'
     transitionName.value = 'slide-left'
+    state.history = ['fileSource']
 }
 
 const confirm = () => {
     if (showType.value === 'WebDAV') {
         wil_form.value.confirmCommit().then(async (valid) => {
             if (valid) {
-                validateWebdav(dialogTitle.value, state.formData, routerParams.value, false) //校验，抽成一个方法了
+                validateWebdav(dialogTitle.value, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(() => {
+                    judgeShow()
+                }) //校验，抽成一个方法了
                 showDialog.value = false
+                cancel()
+                sourceList.value = uni.getStorageSync('sourceList')
+            }
+        });
+    } else if (showType.value === 'Emby') {
+        wil_form.value.confirmCommit().then(async (valid) => {
+            if (valid) {
+                validateEmby(dialogTitle.value, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(() => {
+                    judgeShow()
+                }) //校验，抽成一个方法了
+                showDialog.value = false
+                cancel()
+                sourceList.value = uni.getStorageSync('sourceList')
+            }
+        });
+    } else if (showType.value === '天翼云盘') {
+        wil_form.value.confirmCommit().then(async (valid) => {
+            if (valid) {
+                let obj = getCookieObject(state.formData.cookie)
+                let cloud189 = sourceList.value.find(i => i.type === '天翼云盘')
+                let randomDigits = "";
+                for (let i = 0; i < 16; i++) {
+                    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
+                }
+                let res = await get189User(obj)
+                if (dialogTitle.value === '添加天翼云盘') {
+                    let isHaveData = !sourceList.value.every((item) => {
+                        return !item.list.length;
+                    });
+                    let tyObj = { name: res.loginName, JSESSIONID: obj.JSESSIONID, COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER }
+                    if (!isHaveData) {
+                        cloud189.list.push({ ...tyObj, active: true });
+                        uni.setStorageSync("isreload", true);
+                    } else {
+                        cloud189.list.push(tyObj);
+                    }
+                } else if (dialogTitle.value === '修改天翼云盘') {
+                    let same = cloud189.list.find(i => i.name === state.editObj.name)
+                    same.name = res.loginName
+                    same.JSESSIONID = obj.JSESSIONID
+                    same.COOKIE_LOGIN_USER = obj.COOKIE_LOGIN_USER
+                    if (state.editObj.active) {
+                        uni.setStorageSync("isreload", true);
+                    }
+                }
+                uni.setStorageSync('sourceList', sourceList.value)
+                judgeShow()
             }
         });
     }
+    cancel()
 }
 
-//如果是修改的话，需要初始化
-const initRouterParams = () => {
-    routerParams.value = route.query
-    routerParams.value.title ? dialogTitle.value = decodeURIComponent(routerParams.value.title) : '';
-    if (dialogTitle.value == "修改WebDAV") {
-        let sourceList = uni.getStorageSync("sourceList");
-        state.formData = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
+const getCookieObject = (cookie) => {
+    const cookieString = cookie;
+    const cookieArray = cookieString.split('; ');
+    const cookieObj = {};
+
+    cookieArray.forEach(cookie => {
+        // 将每个Cookie分割成名称和值
+        const [name, value] = cookie.split('=');
+        // 将解码后的值存入对象
+        cookieObj[name] = decodeURIComponent(value);
+    });
+
+    return cookieObj;
+}
+
+const clearAcitve = () => {
+    sourceList.value.forEach((item) => {
+        item.list.forEach((v) => {
+            v.active = false;
+        });
+    });
+};
+
+const resetSelect = (vitem) => {
+    clearAcitve();
+    vitem.active = true;
+    uni.setStorageSync("isreload", true);
+    uni.setStorageSync("sourceList", sourceList.value);
+    router.go(-1)
+};
+
+const handleSelect = (item, vitem) => {
+    wil_modal.value.showModal({
+        title: "温馨提示",
+        content: "是否确认选择此资源？",
+        confirmColor: "#ff6701",
+        confirm: async () => {
+            if (item.type == "WebDAV") {
+                await loginUser(vitem)
+                    .then((res) => {
+                        vitem.token = res.data.token;
+                        resetSelect(vitem);
+                    })
+                    .catch((error) => {
+                        uni.showToast({
+                            title: "请先开启Alist",
+                            icon: "none",
+                        });
+                    });
+            } else if (item.type == "天翼云盘") {
+                await get189Folder({ folderId: "-11" }, { JSESSIONID: vitem.JSESSIONID, COOKIE_LOGIN_USER: vitem.COOKIE_LOGIN_USER })
+                    .then((res) => {
+                        if (res.res_code == 0) {
+                            resetSelect(vitem);
+                        } else {
+                            uni.showToast({
+                                title: "请重新登录天翼云盘",
+                                icon: "none",
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        uni.showToast({
+                            title: "请重新登录天翼云盘",
+                            icon: "none",
+                        });
+                    });
+            } else if (item.type == "夸克网盘") {
+                await getQuarkFolder({ fid: "0" }, vitem)
+                    .then((res) => {
+                        if (res.status == 200) {
+                            resetSelect(vitem);
+                        } else {
+                            uni.showToast({
+                                title: "请重新登录夸克网盘",
+                                icon: "none",
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        uni.showToast({
+                            title: "请重新登录夸克网盘",
+                            icon: "none",
+                        });
+                    });
+            } else if (item.type == 'Emby') {
+                resetSelect(vitem)
+            }
+        },
+    });
+};
+
+//修改资源
+const editSource = (item, vitem) => {
+    state.editObj = vitem
+    showType.value = item.type
+    dialogTitle.value = '修改' + item.type
+    state.history = [item.type]
+    state.formData = vitem
+    if (item.type === 'WebDAV') {
+        state.options = options1
         state.formData.protocol ? "" : state.formData.protocol = "http";
         state.oldData = JSON.parse(JSON.stringify(state.formData));
+    } else if (item.type === 'Emby') {
+        state.options = options2
+        state.formData.protocol ? "" : state.formData.protocol = "http";
+        state.oldData = JSON.parse(JSON.stringify(state.formData));
+    } else if (item.type === '天翼云盘') {
+        state.options = options3
+        state.formData.cookie = `JSESSIONID=${vitem.JSESSIONID};COOKIE_LOGIN_USER=${vitem.COOKIE_LOGIN_USER}`
     }
+    showDialog.value = true
 }
-const judegeShow = () => {
+
+//设置电视剧目录
+const setTvMulu = async (item, vitem) => {
+    //后续写完目录设置页面加上路由跳转，跳转到目录设置页面，可以设置所有资源的目录
+}
+
+//设置电影目录
+const setMovieMulu = async (item, vitem) => {
+    //后续写完目录设置页面加上路由跳转，跳转到目录设置页面，可以设置所有资源的目录
+}
+
+//删除资源
+const deleteSource = (item, vitem) => {
+    wil_modal.value.showModal({
+        title: "温馨提示",
+        content: "是否确认删除该文件源？，此操作将一并删除海报墙",
+        confirmColor: "#ff6701",
+        confirm: async () => {
+            item.list = item.list.filter((i) => i.name != vitem.name);
+            uni.setStorageSync("sourceList", sourceList.value);
+            if (vitem.active) {
+                uni.removeStorageSync("localMovieTvData");
+            }
+            let historyPlay = uni.getStorageSync("historyPlay");
+            historyPlay = historyPlay.filter((v) => v.sourceType != item.type || v.sourceName != vitem.name);
+            uni.setStorageSync("historyPlay", historyPlay);
+            judgeShow();
+        },
+    });
+}
+
+const judgeShow = () => {
     sourceList.value = uni.getStorageSync("sourceList");
     show.value = !sourceList.value.every((item) => {
         return !item.list.length;
     });
 };
-initRouterParams()
-judegeShow()
+judgeShow()
 </script>
 
 <style lang="scss" scoped>
@@ -260,8 +503,12 @@ page {
                         top: 0;
                     }
 
-                    &:active {
+                    &:hover {
                         background: rgb(241, 241, 241);
+                    }
+
+                    &:active {
+                        background: rgb(223, 223, 223);
                     }
 
                     &:first-child {
@@ -314,9 +561,22 @@ page {
                         transform: translateY(-50%);
                         display: flex;
                         align-items: center;
-                        img{
+                        cursor: auto;
+
+                        :deep(.wil-tooltip-container) {
+                            margin-left: 24rpx;
+
+                            &:first-child {
+                                margin-left: 0;
+                            }
+                        }
+
+                        img {
                             width: 40rpx;
                             height: 40rpx;
+                            display: block;
+                            // margin-left: 24rpx;
+                            cursor: pointer;
                         }
                     }
                 }
@@ -408,6 +668,28 @@ page {
                     height: 100%;
                     display: flex;
                     overflow: hidden;
+
+                    .base-form {
+                        .base-form-content {
+                            .nut-form {
+                                .nut-cell-group {
+                                    .nut-cell-group__wrap {
+                                        .nut-form-item {
+                                            .nut-form-item__body {
+                                                .nut-form-item__body__slots {
+                                                    .nut-textarea {
+                                                        .nut-textarea__textarea {
+                                                            height: 700rpx;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 .slide-left-leave-active,
@@ -467,5 +749,8 @@ page {
         }
     }
 
+    :deep(.wil-modal) {
+        width: 600rpx;
+    }
 }
 </style>

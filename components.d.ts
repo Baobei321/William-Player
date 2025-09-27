@@ -55,6 +55,7 @@ declare module 'vue' {
     WilQrcode: typeof import('./src/components/mobile/wil-qrcode/index.vue')['default']
     WilSwiper: typeof import('./src/components/mobile/wil-swiper/index.vue')['default']
     WilTabs: typeof import('./src/components/mobile/wil-tabs/index.vue')['default']
+    WilTooltip: typeof import('./src/components/electron/wil-tooltip/index.vue')['default']
     WilUpgrade: typeof import('./src/components/mobile/wil-upgrade/index.vue')['default']
   }
 }

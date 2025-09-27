@@ -670,7 +670,9 @@ export function useVideoIndex({ wil_modal }) {
             }) || {};
     };
 
-    onShow(async () => {
+
+    //页面显示执行的方法
+    const showPage = async () => {
         sourceList.value = uni.getStorageSync("sourceList");
         settingData.value = uni.getStorageSync("settingData");
         if (!sourceList.value) {
@@ -770,6 +772,10 @@ export function useVideoIndex({ wil_modal }) {
             }
         }
         //初始化资源库列表
+    }
+
+    onShow(() => {
+        showPage()
     });
 
     onBeforeMount(async () => {
@@ -821,6 +827,6 @@ export function useVideoIndex({ wil_modal }) {
     });
     return {
         video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, selectType,
-        historyPlay, settingData, refreshVideo
+        historyPlay, settingData, refreshVideo, showPage
     }
 }

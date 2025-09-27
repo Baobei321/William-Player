@@ -11,6 +11,7 @@ const ipcApiRoute = {
   createWindow: 'controller.window.createWindow',
   createMpv: 'controller.window.createMpv',
   closeMpv: 'controller.window.closeMpv',
+  httpRequest:'controller.http.request'
 }
 
 export {

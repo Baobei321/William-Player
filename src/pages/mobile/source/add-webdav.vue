@@ -80,7 +80,7 @@ const editMulu = () => {
 const confirmSubmit = () => {
   base_form.value.confirmCommit().then(async (valid) => {
     if (valid) {
-      validateWebdav(title.value,state.formData,routerParams.value) //校验，抽成一个方法了
+      validateWebdav(title.value, state.formData, state.oldData, routerParams.value) //校验，抽成一个方法了
     }
   });
 };

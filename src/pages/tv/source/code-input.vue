@@ -60,6 +60,7 @@ const focusModel = ref('tabs')//当前键盘控制器在哪个组件上
 const state = reactive({
     //webdav的表单配置
     webdavFormData: { protocol: 'http' },
+    webdavOldData:{},
     webdavFormOptions: [
         { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
         {
@@ -98,7 +99,8 @@ const state = reactive({
             rule: [{ required: true, message: "请输入用户名" }],
         },
         { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "emby密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
-    ]
+    ],
+    embyOldData:{}
 })
 
 
@@ -207,13 +209,13 @@ const confirmSubmit = () => {
     if (activeTab.value === 'WebDAV') {
         webdav_form.value.submitForm(valid => {
             if (valid) {
-                validateWebdav(routerParams.value.type ? '修改WebDAV' : '添加WebDAV', state.webdavFormData, {})
+                validateWebdav(routerParams.value.type ? '修改WebDAV' : '添加WebDAV', state.webdavFormData,state.webdavOldData, {})
             }
         })
     } else if (activeTab.value === 'Emby') {
         emby_form.value.submitForm(valid => {
             if (valid) {
-                validateEmby(routerParams.value.type ? '修改Emby' : '添加Emby', state.embyFormData, {})
+                validateEmby(routerParams.value.type ? '修改Emby' : '添加Emby', state.embyFormData,state.embyOldData, {})
             }
         })
     }

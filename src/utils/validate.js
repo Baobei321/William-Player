@@ -2,8 +2,8 @@ import { loginUser } from "@/utils/common";
 import { loginEmby, getEmbyInfo } from "@/utils/emby";
 
 //校验webdav
-export const validateWebdav = async (title, formData, routerParams, back = true) => {
-    let sourceList = uni.getStorageSync("sourceList");
+export const validateWebdav = async (title, formData, oldData, routerParams, back = true) => {
+    let sourceList = uni.getStorageSync("sourceList");    
     if (title == "添加WebDAV") {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address)) {
             uni.showToast({
@@ -49,14 +49,14 @@ export const validateWebdav = async (title, formData, routerParams, back = true)
             });
         }
     } else if (title == "修改WebDAV") {
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address) && state.oldData.address != formData.address) {
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address) && oldData.address != formData.address) {
             uni.showToast({
                 title: "存在重复的WebDAV地址，请修改",
                 icon: "none",
             });
             return;
         }
-        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == formData.name) && state.oldData.name != formData.name) {
+        if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == formData.name) && oldData.name != formData.name) {
             uni.showToast({
                 title: "存在同名的WebDAV，请修改",
                 icon: "none",
@@ -67,7 +67,7 @@ export const validateWebdav = async (title, formData, routerParams, back = true)
         try {
             const res = await loginUser(formData)
             let historyArr = uni.getStorageSync("historyPlay") || [];
-            historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != state.oldData.name);
+            historyArr = historyArr.filter((v) => v.sourceType != "WebDAV" || v.sourceName != oldData.name);
             uni.setStorageSync("historyPlay", historyArr);
             formData.token = res.data.token;
             let obj = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.address);
@@ -97,7 +97,7 @@ export const validateWebdav = async (title, formData, routerParams, back = true)
 }
 
 //校验emby
-export const validateEmby = async (title, formData, routerParams) => {
+export const validateEmby = async (title, formData, oldData, routerParams) => {
     let sourceList = uni.getStorageSync("sourceList");
     if (!sourceList.find((i) => i.type == "Emby")) {
         sourceList.push({ type: "Emby", list: [], img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc" })
@@ -152,14 +152,14 @@ export const validateEmby = async (title, formData, routerParams) => {
                 });
             });
     } else if (title == "修改Emby") {
-        if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == formData.address) && state.oldData.address != formData.address) {
+        if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == formData.address) && oldData.address != formData.address) {
             uni.showToast({
                 title: "存在重复的Emby地址，请修改",
                 icon: "none",
             });
             return;
         }
-        if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == formData.name) && state.oldData.name != formData.name) {
+        if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == formData.name) && oldData.name != formData.name) {
             uni.showToast({
                 title: "存在同名的Emby，请修改",
                 icon: "none",
@@ -173,7 +173,7 @@ export const validateEmby = async (title, formData, routerParams) => {
             .then((res) => {
                 uni.hideLoading()
                 let historyArr = uni.getStorageSync("historyPlay") || [];
-                historyArr = historyArr.filter((v) => v.sourceType != "Emby" || v.sourceName != state.oldData.name);
+                historyArr = historyArr.filter((v) => v.sourceType != "Emby" || v.sourceName != oldData.name);
                 uni.setStorageSync("historyPlay", historyArr);
                 formData.token = res.AccessToken;
                 formData.userId = res.User.Id;

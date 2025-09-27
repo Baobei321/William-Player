@@ -162,6 +162,7 @@ defineExpose({
       border-right: 2rpx solid #e9e9e9;
       border-radius: 0 0 0 30rpx;
       font-size: 32rpx;
+      cursor: pointer;
       font-weight: bold;
       &:active {
         background: rgba(0, 0, 0, 0.2);
@@ -176,6 +177,7 @@ defineExpose({
       border-radius: 0 0 30rpx 0;
       font-size: 32rpx;
       font-weight: bold;
+      cursor: pointer;
       &:active {
         background: rgba(0, 0, 0, 0.2);
       }

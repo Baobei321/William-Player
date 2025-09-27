@@ -1,0 +1,313 @@
+{
+  "pages": [
+    {
+      "path": "pages/mobile/mine/entry",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/index",
+      "style": {}
+    },
+    {
+      "path": "pages/mobile/backend/data-sync",
+      "style": {
+        "navigationBarTitleText": "数据同步"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/about-version",
+      "style": {
+        "navigationBarTitleText": "关于"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/appreciate",
+      "style": {
+        "navigationBarTitleText": "赞赏"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/cloud189-webview",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/quark-webview",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/backend/operation-guide",
+      "style": {
+        "navigationBarTitleText": "操作指引"
+      }
+    },
+    {
+      "path": "pages/mobile/live/index",
+      "style": {
+        "navigationBarTitleText": "直播"
+      }
+    },
+    {
+      "path": "pages/mobile/live/list",
+      "style": {
+        "navigationBarTitleText": "直播列表"
+      }
+    },
+    {
+      "path": "pages/mobile/media/list",
+      "style": {
+        "navigationBarTitleText": "媒体库"
+      }
+    },
+    {
+      "path": "pages/mobile/media/catelog-list",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/mobile/media/catelog-setting",
+      "style": {
+        "navigationBarTitleText": "目录设置"
+      }
+    },
+    {
+      "path": "pages/mobile/media/catelog-mulu",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/mobile/source/source-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/source/file-source",
+      "style": {
+        "navigationBarTitleText": "添加新文件源"
+      }
+    },
+    {
+      "path": "pages/mobile/source/add-webdav",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/source/add-emby",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/search",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/search-match",
+      "style": {
+        "navigationBarTitleText": "编辑信息",
+        "navigationBarBackgroundColor": "@navigationBarBackgroundColor1"
+      }
+    },
+    {
+      "path": "pages/mobile/video/video-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/emby/emby-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/emby/emby-player",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/video-all",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/history-played",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/video/video-player",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/mine/settings",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    },
+    {
+      "path": "pages/mobile/mine/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/mine/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/mine/register",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    //TV端页面
+    {
+      "path": "pages/tv/video/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/video/video-all",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/video/video-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/video/video-player",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/data-sync",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/about-version",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/source/code-input",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "subNVues": [
+            {
+              "id": "cloud189_subnvue", // 唯一标识  
+              "path": "pages/mobile/backend/cloud189-webview", // 页面路径  
+              /*"type": "popup",  这里不需要*/
+              "style": {
+                "position": "absolute",
+                "right": "0",
+                "bottom": "0",
+                "width": "68%",
+                "height": "93%",
+                "background": "transparent"
+              }
+            },
+            {
+              "id": "cloudquark_subnvue", // 唯一标识  
+              "path": "pages/mobile/backend/quark-webview", // 页面路径  
+              /*"type": "popup",  这里不需要*/
+              "style": {
+                "position": "absolute",
+                "right": "0",
+                "bottom": "0",
+                "width": "68%",
+                "height": "93%",
+                "background": "transparent"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "pages/tv/source/catelog-settings",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/appreciate",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tv/mine/enter-qqgroup",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "@navigationBarTextStyle",
+    "navigationBarTitleText": "William Player",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "backgroundColor": "@backgroundColor",
+    "rpxCalcMaxDeviceWidth": 700
+  },
+  "uniIdRouter": {}
+  "tabBar": { //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
+    "color": "#86909C",
+    "selectedColor": "#ff6701",
+    "backgroundColor": "@tabBarBackgroundColor",
+    "list": [
+      {
+        "pagePath": "pages/mobile/video/index",
+        "text": "媒体库",
+        "iconPath": "static/video.png",
+        "selectedIconPath": "static/video-active.png"
+      },
+      {
+        "pagePath": "pages/mobile/live/index",
+        "text": "直播",
+        "iconPath": "static/live.png",
+        "selectedIconPath": "static/live-active.png"
+      },
+      {
+        "pagePath": "pages/mobile/mine/index",
+        "text": "我的",
+        "iconPath": "static/mine.png",
+        "selectedIconPath": "static/mine-active.png"
+      }
+    ]
+  }
+}
