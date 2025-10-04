@@ -21,10 +21,10 @@ import * as CONFIG from '@/utils/config'
 
 const router = useRouter()
 const options1 = [
-    { title: '媒体库列表', icon: ziyuankuBlack,path:'/mediaList' },
+    { title: '媒体库列表', icon: ziyuankuBlack, path: '/mediaList' },
     { title: '数据同步', icon: datasyncBlack },
-    { title: '电视剧目录设置', icon: xspBlack },
-    { title: '电影目录设置', icon: dyBlack },
+    { title: '电视剧目录设置', icon: xspBlack, path: '/catelog-mulu', query: { title: '电视剧' } },
+    { title: '电影目录设置', icon: dyBlack, query: { title: '电影' } },
 ]
 const options2 = [
     { title: '问题与反馈', icon: fankuiBlack, path: '/iframe', query: { title: '问题与反馈', url: CONFIG.BASE_URL.split(":4040")[0] + ':8443/app-webview' } },

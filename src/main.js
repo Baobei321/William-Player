@@ -13,8 +13,8 @@ export function createApp() {
 	app.use(pinia)
 	if (CONFIG.PLATFORM === 'PC') {
 		app.use(router)
+		app.mount('#app1')
 	}
-	app.mount('#app1')
 	return {
 		app,
 	};

@@ -161,37 +161,63 @@ const openUrl = () => {
         if (result.type == "dataSync") {
           let obj = {
             userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
-            localMovieTvData: uni.getStorageSync("localMovieTvData"),
+            // localMovieTvData: uni.getStorageSync("localMovieTvData"),
+            muluData: uni.getStorageSync('muluData') || {},
             sourceList: uni.getStorageSync("sourceList"),
             historyPlay: uni.getStorageSync("historyPlay"),
           };
-          TcpModule.connectAsClient(result.port.split(':')[0], 1025, async (res) => {
-            let result = JSON.parse(res)
-            if (result.code == 500) {
-              await setShareData({ port: result.port.split(':')[1], data: obj });
+          if (init) {
+            uni.showToast({
+              title: "开始连接",
+              icon: 'none'
+            })
+            TcpModule.connectAsClient(result.port.split(':')[0], 1025, (res) => {
               uni.showToast({
-                title: "同步成功",
-                icon: "none",
-              });
-            } else {
-              TcpModule.send(JSON.stringify(obj), (res1) => {
-                let res2 = JSON.parse(res1)
-                if (res2.code == 500) {
-                  uni.showToast({
-                    title: '同步失败请重新扫描',
-                    icon: 'none'
-                  })
-                } else {
+                title: res,
+                icon: 'none'
+              })
+              let result = JSON.parse(res)
+              if (result.code == 500) { //本地局域网同步失败，走后端接口同步
+                setShareData({ port: result.port.split(':')[1], data: obj }).then(() => {
                   uni.showToast({
                     title: "同步成功",
                     icon: "none",
                   });
-                }
-              })
-            }
-            TcpModule ? TcpModule.closeAllConnections() : ''
-            TcpModule = null
-          })
+                })
+              } else { //本机局域网同步成功
+                init = false
+                TcpModule.send(JSON.stringify(obj), (res1) => {
+                  let res2 = JSON.parse(res1)
+                  if (res2.code == 500) {
+                    uni.showToast({
+                      title: '同步失败请重新扫描',
+                      icon: 'none'
+                    })
+                  } else {
+                    uni.showToast({
+                      title: "同步成功",
+                      icon: "none",
+                    });
+                  }
+                })
+              }
+            })
+          } else {
+            TcpModule.send(JSON.stringify(obj), (res1) => {
+              let res2 = JSON.parse(res1)
+              if (res2.code == 500) {
+                uni.showToast({
+                  title: '同步失败请重新扫描',
+                  icon: 'none'
+                })
+              } else {
+                uni.showToast({
+                  title: "同步成功",
+                  icon: "none",
+                });
+              }
+            })
+          }
         } else {
           uni.showToast({
             title: "扫描此二维码无效",

@@ -59,13 +59,20 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
         folderFileId.value = item.folderFileId
     }
 
-    const toBack = () => {
+    const toBack = (isTip = false) => {
         if (unref(selectType).type == 'WebDAV') {
             if (path.value) {
                 path.value = removeLastSegment(path.value)
                 key.value === '1' ? key.value = '2' : key.value = '1'
             } else {
-                emits('openSource')
+                if (isTip) {
+                    uni.showToast({
+                        title: "已到顶层目录",
+                        icon: "none"
+                    })
+                } else {
+                    emits('openSource')
+                }
             }
         } else { //如果是天翼或者夸克
             if (folderFileIdArr.value.length > 1) {
@@ -74,14 +81,19 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
                 folderFileId.value = folderFileIdArr.value[folderFileIdArr.value.length - 1]
                 key.value === '1' ? key.value = '2' : key.value = '1'
             } else {
-                emits('openSource')
+                if (isTip) {
+                    uni.showToast({
+                        title: "已到顶层目录",
+                        icon: "none"
+                    })
+                } else {
+                    emits('openSource')
+                }
             }
         }
     }
 
     const getFileList = async (data) => {
-        console.log(unref(selectType), 'selectType');
-
         if (unref(selectType).type == "WebDAV") {
             isInit.value ? isInit.value = false : '' //webdav需要请求接口，其他两个直接从那边传值过来
             return new Promise((resolve) => {
@@ -99,7 +111,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             if (isInit.value) {//初始化用传过来的res
                 isInit.value = false
                 folderFileIdArr.value.push('-11')
-                let result1 = JSON.parse(JSON.stringify(result))
+                let result1 = JSON.parse(JSON.stringify(unref(result)))
                 result1.fileListAO.fileList.forEach((v) => {
                     v?.icon?.largeUrl ? (v.thumb = v.icon.largeUrl) : "";
                     v.type = 0;
@@ -126,7 +138,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             if (isInit.value) {//初始化用传过来的res
                 isInit.value = false
                 folderFileIdArr.value.push('0')
-                let result1 = JSON.parse(JSON.stringify(result))
+                let result1 = JSON.parse(JSON.stringify(unref(result)))
                 result1.data.list.forEach((v) => {
                     v.file_type == 0 ? (v.type = 1) : (v.type = 0);
                     v.name = v.file_name;
@@ -194,7 +206,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
             // //已存在就替换，不存在就新增
             // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
-            let exit = muluData.value[mapping[unref(title)]].find(v = v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value)
+            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value)
             if (exit) {
                 uni.showToast({
                     title: '已存在该目录',

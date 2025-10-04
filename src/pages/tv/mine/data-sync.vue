@@ -23,7 +23,8 @@ const port = ref("");
 let timer = null;
 // #ifdef APP-PLUS
 let TcpModule = uni.requireNativePlugin("TcpModule");
-const lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+let lyzmlDLNA = uni.requireNativePlugin("LyzmlDLNAModule");
+
 // #endif
 const setQrcode = () => {
     let ipAddress = ''
@@ -88,12 +89,15 @@ const startServer = () => {
                 icon: 'none',
             })
         } else {
-            uni.setStorageSync('sourceList', result.sourceList)
-            uni.setStorageSync('historyPlay', result.historyPlay)
-            uni.setStorageSync('isreload', true)
-            uni.switchTab({
-                url: '/pages/mobile/video/index'
-            })
+            if (result?.code != 501) {//过滤掉发送完消息成功之后中止连接的501报错
+                uni.setStorageSync('sourceList', result.sourceList)
+                uni.setStorageSync('historyPlay', result.historyPlay)
+                uni.setStorageSync('muluData', result.muluData)
+                uni.setStorageSync('isreload', true)
+                uni.reLaunch({
+                    url: '/pages/tv/video/index'
+                })
+            }
         }
     });
 }

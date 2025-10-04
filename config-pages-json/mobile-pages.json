@@ -184,97 +184,6 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },
-    //TV端页面
-    {
-      "path": "pages/tv/video/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/video/video-all",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/video/video-detail",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/video/video-player",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/mine/data-sync",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/mine/about-version",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/source/code-input",
-      "style": {
-        "navigationStyle": "custom",
-        "app-plus": {
-          "subNVues": [
-            {
-              "id": "cloud189_subnvue", // 唯一标识  
-              "path": "pages/mobile/backend/cloud189-webview", // 页面路径  
-              /*"type": "popup",  这里不需要*/
-              "style": {
-                "position": "absolute",
-                "right": "0",
-                "bottom": "0",
-                "width": "68%",
-                "height": "93%",
-                "background": "transparent"
-              }
-            },
-            {
-              "id": "cloudquark_subnvue", // 唯一标识  
-              "path": "pages/mobile/backend/quark-webview", // 页面路径  
-              /*"type": "popup",  这里不需要*/
-              "style": {
-                "position": "absolute",
-                "right": "0",
-                "bottom": "0",
-                "width": "68%",
-                "height": "93%",
-                "background": "transparent"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "path": "pages/tv/source/catelog-settings",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/mine/appreciate",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/tv/mine/enter-qqgroup",
-      "style": {
-        "navigationStyle": "custom"
-      }
     }
   ],
   "globalStyle": {
@@ -284,7 +193,7 @@
     "backgroundColor": "@backgroundColor",
     "rpxCalcMaxDeviceWidth": 700
   },
-  "uniIdRouter": {}
+  "uniIdRouter": {},
   "tabBar": { //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
     "color": "#86909C",
     "selectedColor": "#ff6701",

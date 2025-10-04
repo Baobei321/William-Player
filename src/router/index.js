@@ -44,7 +44,7 @@ const constantRoutes = [
         name: 'SourceList',
         meta: { title: '资源库' }
       },
-        {
+      {
         path: 'mediaList',
         component: () => import('@/pages/electron/media/list'),
         name: 'MediaList',
@@ -73,6 +73,12 @@ const constantRoutes = [
         component: () => import('@/pages/electron/settings/about-version'),
         name: 'AboutVersion',
         meta: { title: '关于' }
+      },
+      {
+        path: 'catelog-mulu',
+        component: () => import('@/pages/electron/media/catelog-mulu'),
+        name: 'CatelogMulu',
+        meta: { title: '目录设置' }
       },
     ]
   },

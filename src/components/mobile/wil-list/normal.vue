@@ -134,6 +134,7 @@ const load = async () => {
 
 const execLoad = async () => {
   if (props.requestParams === null) {
+    // loaded.value = true
     return;
   }
 

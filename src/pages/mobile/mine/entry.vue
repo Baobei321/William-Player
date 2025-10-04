@@ -15,15 +15,22 @@ onBeforeMount(async () => {
   }
   if (CONFIG.PLATFORM === 'TV') { //tv端跳转到tv的首页
     let localMovieTvData = uni.getStorageSync('localMovieTvData')
-    // if (!localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length) {
-    //   uni.reLaunch({
-    //     url: "/pages/tv/mine/data-sync",
-    //   });
-    // } else {
+    let settingData = uni.getStorageSync("settingData");
+    if (settingData) {
+      settingData.tmdbKey = "9e0add7c02b66868ab0a368df820a335";
+      uni.setStorageSync("settingData", settingData);
+    } else {
+      uni.setStorageSync("settingData", { tmdbKey: "9e0add7c02b66868ab0a368df820a335", showProgress: true, playercodec: "exoplayer", showRecommend: true });
+    }
+    if (!localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length) {
+      uni.reLaunch({
+        url: "/pages/tv/mine/data-sync",
+      });
+    } else {
       uni.reLaunch({
         url: "/pages/tv/video/index",
       });
-    // }
+    }
   } else {//手机端跳转到手机端首页
     if (uni.getStorageSync("Authorization")) {
       uni.reLaunch({
@@ -48,7 +55,7 @@ onBeforeMount(async () => {
             settingData.tmdbKey = "9e0add7c02b66868ab0a368df820a335";
             uni.setStorageSync("settingData", settingData);
           } else {
-            uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
+            uni.setStorageSync("settingData", { tmdbKey: "9e0add7c02b66868ab0a368df820a335", showProgress: true, playercodec: "exoplayer", showRecommend: true });
           }
         });
       // uni.reLaunch({

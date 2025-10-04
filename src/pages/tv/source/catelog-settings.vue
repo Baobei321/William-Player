@@ -63,7 +63,7 @@ let nowTime = 0
 const emits = defineEmits(['openSource', 'confirm'])
 
 const { data, key, path, folderFileId, folderFileIdArr, removeLastSegment, selectName, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
-    = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result.value, title: toRef(() => routerParams.value.title), emits: emits })
+    = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => routerParams.value.title), emits: emits })
 
 
 //选择当前目录作为影片目录

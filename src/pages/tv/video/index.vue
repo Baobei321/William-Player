@@ -1,6 +1,6 @@
 <template>
   <div class="tv-index" ref="tv_index" :tabindex="-1">
-    <tv-navbar ref="tv_navbar" :isFocus="focusModel == 'tvNavbar'" :loading="refreshLoading" :refreshData="refreshData"
+    <tv-navbar ref="video_navbar" :isFocus="focusModel == 'tvNavbar'" :loading="refreshLoading" :refreshData="refreshData"
       :focusModel="focusModel" @setFocus="setFocus" @changeSetting="changeSetting" @refresh="refreshVideo"></tv-navbar>
     <!-- <span style="font-size: 38rpx;color: #fff;">{{ scrollTop }}</span> -->
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
@@ -43,7 +43,8 @@ import { debounce } from "@/utils/scrape";
 
 const wil_modal = ref(null)
 
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex({ wil_modal });
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData,
+  tmdbKey, historyPlay, settingData, refreshVideo } = useVideoIndex({ wil_modal });
 
 const tv_navbar = ref(null);
 const star_recommend = ref(null);

@@ -1,7 +1,7 @@
 <template>
     <div class="select-folder">
         <div class="select-folder-title">
-            <nut-icon name="rect-left" :custom-color="props.arrowColor" @click="toBack"></nut-icon>
+            <nut-icon name="rect-left" custom-color="#000" @click="toBack"></nut-icon>
             <span>添加{{ props.title }}目录</span>
             <span class="title-right" @click="confirm">确认</span>
         </div>
