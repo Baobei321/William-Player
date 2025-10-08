@@ -91,7 +91,7 @@ const constantRoutes = [
         path: 'video',
         component: () => import('@/pages/electron/video/video-player'),
         name: 'Video',
-        meta: { title: '播放器', icon: 'user' }
+        meta: { title: '播放器', icon: 'user', hideSidebar: true }
       }
     ]
   },

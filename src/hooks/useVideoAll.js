@@ -277,8 +277,8 @@ export function useVideoAll({ wil_list }) {
 
     const changeItemFn = ref(() => { });
     const imgError = (item) => {
-        changeItemFn.value = (item) => {
-            item.loadImg = false;
+        changeItemFn.value = (v) => {
+            v.loadImg = false;
         };
         nextTick(() => {
             wil_list.value.handleEdit(item.path);
@@ -287,9 +287,9 @@ export function useVideoAll({ wil_list }) {
 
     const imgLoad = (item) => {
         if (!routerParams.value.isConnected && !item.loadImg) return;
-        changeItemFn.value = (item) => {
-            item.loadImg = true;
-        };
+        // changeItemFn.value = (v) => {
+        //     v.loadImg = true;
+        // };
         nextTick(() => {
             wil_list.value.handleEdit(item.path);
         });

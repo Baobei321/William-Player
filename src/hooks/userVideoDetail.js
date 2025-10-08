@@ -6,6 +6,8 @@ import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
 import { toStringfy } from "@/pages/mobile/mine/common";
 import * as CONFIG from "@/utils/config";
+import { ipc } from "@/utils/ipcRenderer";
+import { ipcApiRoute } from "@/utils/ipcApiRoute";
 
 export function useVideoDetail({ route, router }) {
     const showPopover = ref(false);
@@ -496,7 +498,7 @@ export function useVideoDetail({ route, router }) {
 
     //播放电视
     const toPlayVideo = (item, index) => {
-        uni.setStorageSync("tvList", tvList.value);
+        CONFIG.PLATFORM === 'PC' ? '' : uni.setStorageSync("tvList", tvList.value);
         let localMovieTvData = uni.getStorageSync("localMovieTvData");
         let nowTv = {};
         if (routerParams.value.movieTvId) {
@@ -511,14 +513,27 @@ export function useVideoDetail({ route, router }) {
             routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
             nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
-            if (selectType.value.type == "WebDAV") {
-                uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+            if (CONFIG.PLATFORM === 'PC') {
+                let args = {
+                    type: 'vue',
+                    content: '/video',
+                    windowName: 'Video',
+                    windowTitle: `正在播放：`,
+                    opusId: '1'
+                };
+                ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+                    console.log('[createWindow] id:', id);
                 });
             } else {
-                uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
-                });
+                if (selectType.value.type == "WebDAV") {
+                    uni.navigateTo({
+                        url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    });
+                } else {
+                    uni.navigateTo({
+                        url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    });
+                }
             }
         } else {
             let historyItem = {
@@ -541,16 +556,29 @@ export function useVideoDetail({ route, router }) {
             routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
             nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
-            if (selectType.value.type == "WebDAV") {
-                uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+            if (CONFIG.PLATFORM === 'PC') {
+                let args = {
+                    type: 'vue',
+                    content: '/video',
+                    windowName: 'Video',
+                    windowTitle: `正在播放：`,
+                    opusId: '1'
+                };
+                ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+                    console.log('[createWindow] id:', id);
                 });
             } else {
-                historyItem.folderFileId = item.id;
-                uni.navigateTo({
-                    url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
-                        }`,
-                });
+                if (selectType.value.type == "WebDAV") {
+                    uni.navigateTo({
+                        url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""}`,
+                    });
+                } else {
+                    historyItem.folderFileId = item.id;
+                    uni.navigateTo({
+                        url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${toStringfy(openEndTime) ? "&" + toStringfy(openEndTime) : ""
+                            }`,
+                    });
+                }
             }
         }
     };

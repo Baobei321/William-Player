@@ -1,13 +1,14 @@
 <template>
-    <div ref="playerRef"  class="mpv-player">
-        <embed ref="mpvRef" id="mpvjs" type="application/x-mpvjs" wmode="transparent" />
-
+    <div ref="playerRef" class="mpv-player">
+        <embed ref="mpvRef" id="mpvjs" type="application/x-mpvjs" wmode="transparent" class="mpv-player-embed" />
+        <player-control></player-control>
     </div>
 </template>
 
 <script setup>
-import { ref, watch ,nextTick} from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import Mpv from "./mpv.js";
+import playerControl from './player-control.vue';
 
 const props = defineProps({
     videoUrl: { type: String, default: '' }
@@ -47,4 +48,14 @@ watch(
 )
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.mpv-player {
+    width: 100%;
+    height: 100%;
+
+    .mpv-player-embed {
+        width: 100%;
+        height: 100%;
+    }
+}
+</style>

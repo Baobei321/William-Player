@@ -1,5 +1,8 @@
-const Renderer = (window.require && window.require('electron')) || window.electron || {};
-
+import * as CONFIG from './config.js'
+let Renderer = {}
+if (CONFIG.PLATFORM === 'PC') {
+  Renderer = (window.require && window.require('electron')) || window.electron || {};
+}
 /**
  * ipc
  * 官方api说明：https://www.electronjs.org/zh/docs/latest/api/ipc-renderer
@@ -20,12 +23,18 @@ const Renderer = (window.require && window.require('electron')) || window.electr
 /**
  * ipc
  */
-const ipc = Renderer.ipcRenderer || undefined;
+let ipc = undefined
+if (CONFIG.PLATFORM === 'PC') {
+  ipc = Renderer.ipcRenderer || undefined;
+}
 
 /**
  * 是否为EE环境
  */
-const isEE = ipc ? true : false;
+let isEE = false
+if (CONFIG.PLATFORM === 'PC') {
+  isEE = ipc ? true : false;
+}
 
 export {
   Renderer, ipc, isEE

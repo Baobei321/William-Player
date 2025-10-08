@@ -2,7 +2,8 @@
     <div class="home-navbar">
         <div class="home-navbar-container">
             <img src="@/static/search-black.png">
-            <img src="@/static/refresh-black.png" class="home-navbar-container__refresh">
+            <img src="@/static/refresh-black.png"
+                :class="['home-navbar-container__refresh', loading ? 'refresh-rotate' : '']" @click="showProgress">
             <img src="@/static/jia-black.png" @click="toSourceList">
         </div>
         <!-- 使用teleport挂载到body去 -->
@@ -175,6 +176,15 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+@keyframes spin-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
 .home-navbar {
     position: absolute;
     width: 100%;
@@ -196,6 +206,9 @@ defineExpose({
             &:first-child {
                 margin-left: 0;
             }
+        }
+        .refresh-rotate {
+            animation: spin-reverse 1s linear infinite reverse;
         }
     }
 

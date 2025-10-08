@@ -1,24 +1,31 @@
 <template>
     <div class="catelog-mulu">
-        <div class="catelog-mulu-item" v-for="item in listData" :key="item.name"
-            @click="(event) => clickItem(event, item)">
-            <div class="item-top">
-                <img :src="routerParams.title == '电视剧' ? xspBlack : dyBlack">
-                <span>{{ routerParams.title }}</span>
+        <div class="catelog-mulu-title" @click="back">
+            <img src="@/static/rect-leftblack.png">
+            <span>{{ route.query.title }}目录设置</span>
+        </div>
+        <div class="catelog-mulu-container">
+            <div class="catelog-mulu-item" v-for="item in listData" :key="item.name"
+                @click="(event) => clickItem(event, item)">
+                <div class="item-top">
+                    <img :src="routerParams.title == '电视剧' ? xspBlack : dyBlack">
+                    <span>{{ routerParams.title }}</span>
+                </div>
+                <div class="item-bottom">
+                    <img :src="mapping[item.type]">
+                    <div class="item-bottom-right">
+                        <div class="right-name">{{ item.name }}</div>
+                        <div class="right-path">{{ item.path }}</div>
+                    </div>
+                </div>
             </div>
-            <div class="item-bottom">
-                <img :src="mapping[item.type]">
-                <div class="item-bottom-right">
-                    <div class="right-name">{{ item.name }}</div>
-                    <div class="right-path">{{ item.path }}</div>
+            <div class="catelog-mulu-add catelog-mulu-item" @click="toSelectSource">
+                <div class="catelog-mulu-add__icon">
+                    <nut-icon name="uploader" custom-color="#94939a"></nut-icon>
                 </div>
             </div>
         </div>
-        <div class="catelog-mulu-add catelog-mulu-item" @click="toSelectSource">
-            <div class="catelog-mulu-add__icon">
-                <nut-icon name="uploader" custom-color="#94939a"></nut-icon>
-            </div>
-        </div>
+
         <nut-dialog v-model:visible="showDialog" @closed="closedDialog">
             <template #header>
                 <div class="header-left" @click="back">
@@ -49,7 +56,7 @@
                         </div>
                     </div>
                     <div class="dialog-content-right">
-                        <div class="right-title"  @click="toBack">
+                        <div class="right-title" @click="toBack" v-if="path || folderFileIdArr.length">
                             <nut-icon name="rect-left" custom-color="#000"></nut-icon>
                             <span>返回</span>
                         </div>
@@ -89,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, toRef } from 'vue'
+import { onBeforeMount, ref, toRef } from 'vue'
 import { onLoad } from "@dcloudio/uni-app";
 import xspBlack from '@/static/xsp-black.png'
 import dyBlack from '@/static/dy-black.png'
@@ -101,11 +108,12 @@ import editIcon from '@/static/edit_icon.png'
 import checkIcon from '@/static/check.png'
 import checkActive from '@/static/check-active.png'
 import deleteIcon from '@/static/delete-icon.png'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useSelectFolder } from '@/hooks/useSelectFolder.js'
 import { loginUser, get189Folder, getQuarkFolder, getWebDAVUrl, get189DownloadUrl, getQuarkVideoUrl } from "@/utils/common.js";
 
 const route = useRoute()
+const router = useRouter()
 const selectType = ref({})
 const selectMedia = ref({})
 const result = ref({})
@@ -222,6 +230,10 @@ const mapping = {
     '夸克网盘': 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?'
 }
 
+const cancel = () => {
+    showDialog.value = false
+}
+
 const clickItem = (event, item) => {
     selectItem.value = item
     showPopover.value = true
@@ -233,9 +245,8 @@ const toSelectSource = () => {
     showDialog.value = true
     showBottom.value = true
 }
-
-const openSource = () => {
-    showModel.value = 'source'
+const back = () => {
+    router.go(-1)
 }
 
 // const confirm = (data) => {
@@ -245,18 +256,12 @@ const openSource = () => {
 //     listData.value = muluData.value[mapping1[route.query.title]]
 // }
 
-onLoad((options) => {
+onBeforeMount(() => {
     muluData.value = uni.getStorageSync('muluData') || {}
     muluData.value?.tv ? '' : muluData.value.tv = []
     muluData.value?.movie ? '' : muluData.value.movie = []
-    route.query = options
     listData.value = muluData.value[mapping1[route.query.title]]
-    setTimeout(() => {
-        uni.setNavigationBarTitle({
-            title: options.title + '目录设置',
-        });
-    }, 40);
-});
+})
 
 const judgeShow = () => {
     sourceList.value = uni.getStorageSync("sourceList");
@@ -275,122 +280,151 @@ page {
 
 .catelog-mulu {
     display: flex;
-    flex-wrap: wrap;
-    // align-items: flex-start;
-    align-content: flex-start;
+    flex-direction: column;
     padding: 24rpx;
     width: 100%;
     height: 100%;
     overflow: hidden;
 
-    .catelog-mulu-item {
-        flex: 0 0 400rpx;
-        overflow: hidden;
-        background: #f9f8ff;
-        border-radius: 16rpx;
-        height: 278rpx;
+    .catelog-mulu-title {
         display: flex;
-        flex-direction: column;
-        margin-top: 24rpx;
-        margin-left: 24rpx;
+        align-items: center;
         cursor: pointer;
+        padding: 24rpx;
 
-        .item-top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 150rpx;
-            background: #eae9f0;
-            border-radius: 16rpx 16rpx 0 0;
-
-            img {
-                width: 70rpx;
-                height: 70rpx;
-            }
-
-            span {
-                font-size: 40rpx;
-                font-weight: bold;
-                padding-left: 20rpx;
-            }
+        img {
+            width: 40rpx;
+            height: 40rpx;
         }
 
-        .item-bottom {
-            display: flex;
-            align-items: center;
-            flex: 1;
-            padding-left: 24rpx;
-            padding-right: 12rpx;
-            overflow: hidden;
+        span {
+            margin-left: 12rpx;
+            font-weight: bold;
+        }
+    }
 
-            img {
-                flex: 0 0 70rpx;
-                width: 70rpx;
-                height: 70rpx;
-                border-radius: 16rpx;
+
+    .catelog-mulu-container {
+        display: flex;
+        flex-wrap: wrap;
+        // align-items: flex-start;
+        align-content: flex-start;
+        padding: 24rpx;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        .catelog-mulu-item {
+            flex: 0 0 400rpx;
+            overflow: hidden;
+            background: #f9f8ff;
+            border-radius: 16rpx;
+            height: 278rpx;
+            display: flex;
+            flex-direction: column;
+            margin-top: 24rpx;
+            margin-left: 24rpx;
+            cursor: pointer;
+
+            .item-top {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 150rpx;
+                background: #eae9f0;
+                border-radius: 16rpx 16rpx 0 0;
+
+                img {
+                    width: 70rpx;
+                    height: 70rpx;
+                }
+
+                span {
+                    font-size: 40rpx;
+                    font-weight: bold;
+                    padding-left: 20rpx;
+                }
             }
 
-            .item-bottom-right {
+            .item-bottom {
+                display: flex;
+                align-items: center;
                 flex: 1;
-                margin-left: 24rpx;
+                padding-left: 24rpx;
+                padding-right: 12rpx;
                 overflow: hidden;
 
-                .right-name {
-                    font-size: 28rpx;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 1;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    width: 100%;
-                    word-break: break-all;
+                img {
+                    flex: 0 0 70rpx;
+                    width: 70rpx;
+                    height: 70rpx;
+                    border-radius: 16rpx;
                 }
 
-                .right-path {
-                    font-size: 24rpx;
-                    margin-top: 8rpx;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 1;
-                    -webkit-box-orient: vertical;
+                .item-bottom-right {
+                    flex: 1;
+                    margin-left: 24rpx;
                     overflow: hidden;
-                    text-overflow: ellipsis;
-                    width: 100%;
-                    word-break: break-all;
+
+                    .right-name {
+                        font-size: 28rpx;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        width: 100%;
+                        word-break: break-all;
+                    }
+
+                    .right-path {
+                        font-size: 24rpx;
+                        margin-top: 8rpx;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        width: 100%;
+                        word-break: break-all;
+                    }
                 }
+            }
+
+            &:first-child {
+                margin-top: 0;
+            }
+
+            &:nth-child(2) {
+                margin-top: 0;
+            }
+
+            &:nth-child(2n+1) {
+                margin-left: 0;
             }
         }
 
-        &:first-child {
-            margin-top: 0;
-        }
-
-        &:nth-child(2) {
-            margin-top: 0;
-        }
-
-        &:nth-child(2n+1) {
-            margin-left: 0;
-        }
-    }
-
-    .catelog-mulu-add {
-        align-items: center;
-        justify-content: center;
-
-        &:active {
-            background: #ebe9f0;
-        }
-
-        .catelog-mulu-add__icon {
-            border-radius: 50%;
-            background: #dedde4;
-            width: 70rpx;
-            height: 70rpx;
-            display: flex;
+        .catelog-mulu-add {
             align-items: center;
             justify-content: center;
+
+            &:active {
+                background: #ebe9f0;
+            }
+
+            .catelog-mulu-add__icon {
+                border-radius: 50%;
+                background: #dedde4;
+                width: 70rpx;
+                height: 70rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
     }
+
+
 
     :deep(.nut-overlay) {
         z-index: 98 !important;
@@ -581,17 +615,20 @@ page {
                     .dialog-content-right {
                         flex: 1;
                         padding: 0 24rpx;
-                        .right-title{
+
+                        .right-title {
                             width: 100%;
                             display: flex;
                             align-items: center;
                             justify-content: flex-start;
                             cursor: pointer;
-                            span{
+
+                            span {
                                 font-size: 30rpx;
                                 color: #000;
                             }
                         }
+
                         .mulu-item {
                             display: flex;
                             align-items: center;

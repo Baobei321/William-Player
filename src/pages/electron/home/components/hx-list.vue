@@ -179,6 +179,7 @@ onShow(() => {
                     margin-left: 24rpx;
                     flex: 0 0 calc((100% - 168rpx) / 8);
                     cursor: pointer;
+                    overflow: hidden;
 
                     img {
                         width: 100%;
@@ -193,6 +194,10 @@ onShow(() => {
                         font-weight: bold;
                         color: #000;
                         display: block;
+                        width: 100%;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
 
                     &-time {

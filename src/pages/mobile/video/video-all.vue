@@ -40,10 +40,9 @@ import posterEmpty from "@/static/poster-empty.png";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import sortPopover from "./components/index-component/sort-popover.vue";
 import wilTabs from "@/components/mobile/wil-tabs/index.vue"
-import { ref } from 'vue'
+import { ref,onBeforeUnmount } from 'vue'
 import { useVideoAll } from "@/hooks/useVideoAll";
 import { onUnload } from "@dcloudio/uni-app";
-import { onBeforeUnmount } from "vue";
 
 const wil_list = ref(null);
 
@@ -136,6 +135,7 @@ page {
               height: var(--line-height);
               border-radius: 20rpx;
               position: relative;
+              display: inline-block;
 
               .item-poster-image {
                 width: 100% !important;
