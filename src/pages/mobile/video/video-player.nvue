@@ -85,7 +85,6 @@ export default {
         codec: "hardware",
         title: "",
         playStrategy: 0,
-
         cookieStr: "",
       },
       sourceList: [],

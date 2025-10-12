@@ -307,6 +307,8 @@ export function useVideoDetail({ route, router }) {
 
     const getMovieTvDetail = async () => {
         if (!routerParams.value.movieTvId) {
+            console.log("到这");
+
             imgData.value.title = routerParams.value.name;
             return false;
         }
@@ -317,6 +319,7 @@ export function useVideoDetail({ route, router }) {
                 imgData.value.title = routerParams.value.name;
             }
         }
+
         let res = await getMovieTvById(
             {
                 movieTvId: routerParams.value.movieTvId,
@@ -514,12 +517,26 @@ export function useVideoDetail({ route, router }) {
             nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
             if (CONFIG.PLATFORM === 'PC') {
+                let query = {}
+                if (selectType.value.type == "WebDAV") {
+                    query = {
+                        path: `${activeSeason.value.path.slice(1)}/${item.name}`,
+                        type: 'tv'
+                    }
+                } else {
+                    query = {
+                        path: `${activeSeason.value.path.slice(1)}/${item.name}`,
+                        wjjId: activeSeason.value.folderFileId,
+                        folderFileId: item.id,
+                        type: 'tv'
+                    }
+                }
                 let args = {
                     type: 'vue',
                     content: '/video',
                     windowName: 'Video',
                     windowTitle: `正在播放：`,
-                    opusId: '1'
+                    query: query
                 };
                 ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
                     console.log('[createWindow] id:', id);
@@ -557,12 +574,28 @@ export function useVideoDetail({ route, router }) {
             nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : "";
             nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : "";
             if (CONFIG.PLATFORM === 'PC') {
+                let query = {}
+                if (selectType.value.type == "WebDAV") {
+                    query = {
+                        path: activeSeason.value.path.slice(1),
+                        item: encodeURIComponent(JSON.stringify(historyItem)),
+                        type: 'tv'
+                    }
+                } else {
+                    query = {
+                        path: `${activeSeason.value.path.slice(1)}/${item.name}`,
+                        wjjId: activeSeason.value.folderFileId,
+                        folderFileId: item.id,
+                        item: JSON.stringify(historyItem),
+                        type: 'tv'
+                    }
+                }
                 let args = {
                     type: 'vue',
                     content: '/video',
                     windowName: 'Video',
-                    windowTitle: `正在播放：`,
-                    opusId: '1'
+                    windowTitle: `William Player`,
+                    query: query
                 };
                 ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
                     console.log('[createWindow] id:', id);

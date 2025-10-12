@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/chenweiliang6/William-Player)](https://github.com/chenweiliang6/William-Player/releases/latest)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/chenweiliang6/William-Player/total)
 # William Player
-一款适配📱 Android Phone和Android Pad 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
+一款适配📱 Android Phone、Android TV和Windows 的视频播放器，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，播放视频等功能。界面简洁纯净，操作简单。
 
 ---
 
@@ -76,6 +76,9 @@ Android 8+
 <img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/482B34F_427A_tv-picture1_20250910114207926newMediaImage.png" alt="Mobile Screenshot 3" width="48%"/>
 <img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1CCF3D0_427A_tv-picture2_20250910114231848newMediaImage.png" alt="Mobile Screenshot 4" width="48%"/>
 </div>
+
+### Windows 截图
+
 
 [^3]: 预览中的影视媒体仅作为展示用
 

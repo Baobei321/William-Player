@@ -1,5 +1,4 @@
 <template>
-  <transition name="fade-transform" mode="out-in" appear>
     <div class="video-all">
       <wil-navbar :title="routerParams.title" :leftShow="true">
         <template #right>
@@ -30,7 +29,6 @@
         </wil-list>
       </div>
     </div>
-  </transition>
 </template>
 
 <script setup>
@@ -55,27 +53,6 @@ const { routerParams, showPopover, mapping, changeSort, tabList, changeTab,
 </script>
 
 <style lang="scss" scoped>
-.fade-transform--move,
-.fade-transform-leave-active,
-.fade-transform-enter-active {
-  transition: all 0.5s;
-}
-
-.fade-transform-enter {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.fade-transform-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.fade-transform-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
 page {
   width: 100%;
   height: 100%;

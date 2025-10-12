@@ -123,7 +123,7 @@ const { getUntokenDict } = useDict();
 
 const { showPopover, popoverArr, showTimePicker, pickerTitle, pickerVal, pickerColumns, imgData, overview, sourceList, selectSource, activeSeason, tvList, buttonText,
   routerParams, showRehandleButton, historyTv, scrollIntoView, lineNumber, lineHeight, toSelect, confirmPicker, changeSource, changeTvSource, changeTvSeason, disabledTip,
-  clickPlayButton, toPlayVideo, reHandleTv } = useVideoDetail()
+  clickPlayButton, toPlayVideo, reHandleTv } = useVideoDetail({})
 
 </script>
 
