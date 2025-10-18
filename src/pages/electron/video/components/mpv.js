@@ -1,6 +1,9 @@
 export default class Mpv {
   constructor(element) {
     this.mpv = element
+    this.socketPath = process.platform === 'win32'
+      ? '\\\\.\\pipe\\mpvsocket'
+      : require('path').join(require('os').tmpdir(), 'mpvsocket');
   }
 
   playerReady() {
@@ -12,10 +15,14 @@ export default class Mpv {
       'filename',
       'volume',
       'mpv-version',
-      'ffmpeg-version'
+      'ffmpeg-version',
+      'track-list',
+      'cache-buffering-state',
     ]
     observable.forEach(v => this._setObserve(v))
     this._sendProperty('hwdec', 'auto')
+    // 启用 IPC 服务器
+    this._sendProperty('input-ipc-server', this.socketPath);
   }
   loadFile(filePath) {
     this._sendCommand('loadfile', filePath)
@@ -41,6 +48,12 @@ export default class Mpv {
   setTimePos(seconds) {
     this._sendProperty('time-pos', seconds.toString())
   }
+  setSubtitleTrack(trackId) {
+    this._sendProperty('sid', trackId.toString())
+  }
+  setAudioTrack(trackId) {
+    this._sendProperty('aid', trackId.toString())
+  }
   screenshot(includeSubtitles = true) {
     this._sendCommand('screenshot', includeSubtitles ? 'subtitles' : 'video', 'single')
   }
@@ -53,7 +66,10 @@ export default class Mpv {
   getFFMPEGVersion() {
     this._getPropertyAsync('ffmpeg-version')
   }
-
+  getTrackList() {
+    console.log("点击获取轨道");
+    this._getPropertyAsync('track-list');
+  }
   _sendCommand(cmd, ...args) {
     args = args.map(arg => arg.toString())
     this.mpv.postMessage({

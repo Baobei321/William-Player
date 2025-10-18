@@ -90,7 +90,6 @@
                 </div>
             </template>
         </nut-dialog>
-
         <Popover v-model:visible="showPopover" :options="popoverOptions" :position="position"></Popover>
     </div>
 </template>
@@ -238,7 +237,7 @@ const clickItem = (event, item) => {
     selectItem.value = item
     showPopover.value = true
     position.value.clientX = event.clientX || event.touches[0].clientX
-    position.value.clientY = event.clientY - 44 || event.touches[0].clientY
+    position.value.clientY = event.clientY || event.touches[0].clientY
 }
 
 const toSelectSource = () => {

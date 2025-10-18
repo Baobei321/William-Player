@@ -2,9 +2,9 @@
     <div ref="playerRef" class="mpv-player">
         <embed ref="mpvRef" id="mpvjs" type="application/x-mpvjs" wmode="transparent" class="mpv-player-embed" />
         <player-control :nowTime="mpvData.timePos" :time-length="mpvData.duration" :paused="mpvData.paused"
-            :fullScreen="mpvData.fullScreen" @onPause="onPause" @onFullscreen="onFullscreen"
-            v-if="!mpvData.loading"></player-control>
-        <div class="mpv-player-loading" v-else>
+            :audioTrack="audioTrack" :subTitleTrack="subTitleTrack" :fullScreen="mpvData.fullScreen" @onPause="onPause"
+            @onFullscreen="onFullscreen" @change="changeSlide" @getTrackList="getTrackList"></player-control>
+        <div class="mpv-player-loading" v-if="mpvData.loading">
             <img src="@/static/loading-white.png">
         </div>
     </div>
@@ -15,6 +15,8 @@ import { ref, watch, nextTick, onBeforeUnmount, reactive, onMounted } from 'vue'
 import Mpv from "./mpv.js";
 import playerControl from './player-control.vue';
 import NoSleep from "nosleep.js"
+import { ipc } from "@/utils/ipcRenderer";
+import { ipcApiRoute } from "@/utils/ipcApiRoute";
 
 const props = defineProps({
     videoUrl: { type: String, default: '' },
@@ -24,16 +26,30 @@ const props = defineProps({
 let noSleep = new NoSleep();
 const mpvRef = ref(null);
 const playerRef = ref(null);
+const audioTrack = ref(null)
+const subTitleTrack = ref(null)
 const mpvData = reactive({
     timePos: 0,
     duration: 0,
     paused: false,
-    loading: true,
+    loading: false,
     fullScreen: false,
 })
 let timer;
 let mpv;
 let isInit = true;
+
+const langMapping = {
+    chi: '汉语',
+    eng: '英语',
+    kor: '韩语',
+    jap: '日语',
+    fre: '法语',
+    spa: '西班牙语',
+    rus: '俄语',
+    por: '葡萄牙语',
+    ara: '阿拉伯语',
+}
 
 const playFile = (src) => {
     mpvData.loading = true
@@ -54,6 +70,13 @@ const onMessage = (e) => {
         switch (data.name) {
             case 'time-pos':
                 // autoTime();
+                if (mpvData.loading) {
+                    if (isInit) {
+                        isInit = false
+                    } else {
+                        mpvData.loading = false
+                    }
+                }
                 mpvData.timePos = Math.round(data.value);
                 break;
             case 'duration':
@@ -90,6 +113,7 @@ const onPause = () => {
         mpv.goPlay(false);
         noSleep.disable();
     }
+    mpv.setSubtitleTrack('2')
     mpvData.paused = !mpvData.paused;
 }
 
@@ -102,11 +126,45 @@ const onFullscreen = () => {
         document.exitFullscreen();
     }
 }
+
+//获取音轨列表
+const getTrackList = async () => {
+    await ipc.invoke(ipcApiRoute.mpvConnect, {})
+    await ipc.invoke(ipcApiRoute.mpvTrackList)
+}
+
+//拖动进度条
+const changeSlide = (val) => {
+    isInit = true
+    mpvData.loading = true
+    mpv.seek(val)
+}
+
 onBeforeUnmount(() => {
     mpvRef.value.removeEventListener('message', onMessage, false);
+    ipc.removeAllListeners()
 })
 
 onMounted(() => {
+    // 监听 MPV 数据
+    ipc.on('mpv-track-list', (event, res) => {
+        console.log(res, 'audioTrack.value');
+        if (res.data.request_id) {
+            if (res.data.data) {
+                audioTrack.value = res.data.data.filter(v => v.type === 'audio')
+                subTitleTrack.value = res.data.data.filter(v => v.type === 'sub')
+            } else {
+                audioTrack.value = []
+                subTitleTrack.value = []
+            }
+            audioTrack.value.forEach((item, index) => {
+                item.language = langMapping[item.lang] || '音频轨道' + index
+            })
+            subTitleTrack.value.forEach((item, index) => {
+                item.language = langMapping[item.lang] || '字幕轨道' + index
+            })
+        }
+    });
     setTimeout(() => {
         mpv = new Mpv(document.getElementById("mpvjs"));
         mpv.playerReady();
@@ -117,7 +175,7 @@ onMounted(() => {
 watch(
     () => props.videoUrl,
     (val) => {
-        onVideoSrcChange(val)
+        // onVideoSrcChange(val)
     }, { immediate: true }
 )
 </script>

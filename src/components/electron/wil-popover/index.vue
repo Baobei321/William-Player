@@ -1,13 +1,13 @@
 <template>
-    <nut-transition :show="showPopover" name="fade" :duration="200" style="z-index: 9999;width: 0;">
-        <div class="popover"
+    <transition name="tooltip-fade">
+        <div class="popover" v-show="showPopover"
             :style="{ left: positionObj.left, top: positionObj.top, background: props.background, width: props.width }">
             <div class="popover-item" v-for="item in props.options" :key="item.label" @click="clickItem(item)">
                 <image :src="item.icon" v-if="item.icon"></image>
                 <span :style="{ color: item.color }">{{ item.label }}</span>
             </div>
         </div>
-    </nut-transition>
+    </transition>
     <div class="popover-overlay" v-show="showPopover" @click="closePopover"></div>
     <div class="seat-popover" ref="seat_popover">
         <div class="popover-item" v-for="item in props.options" :key="item.label">
@@ -170,6 +170,17 @@ onBeforeUnmount(() => {
             border-radius: 6px 6px 6px 6px;
         }
     }
+}
+
+/* 淡入淡出过渡效果 */
+.tooltip-fade-enter-active,
+.tooltip-fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.tooltip-fade-enter-from,
+.tooltip-fade-leave-to {
+    opacity: 0;
 }
 
 .popover-overlay {
