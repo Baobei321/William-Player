@@ -75,9 +75,10 @@ const toVideoAll = () => {
     if (props.type == 'emby') {
         emits('clickAll')
     } else {
-        uni.navigateTo({
-            url: `/pages/mobile/video/video-all?title=${props.title}&isConnected1=${props.isConnected}`,
-        });
+        router.push({
+            path: `/homeAll`,
+            query: { title: props.title }
+        })
     }
 };
 
@@ -151,6 +152,7 @@ onShow(() => {
         .hxList-title-right {
             display: flex;
             align-items: center;
+            cursor: pointer;
 
             span {
                 font-size: 30rpx;

@@ -1,14 +1,10 @@
 <template>
     <div class="source-list">
-        <div class="source-list-title">
-            <div class="source-list-title__left" @click="backRouter">
-                <img src="@/static/rect-leftblack.png">
-                <span>资源库</span>
-            </div>
-            <div class="source-list-title__right" @click="openDialog">
-                <img src="@/static/jia-black.png">
-            </div>
-        </div>
+        <wil-title title="资源库">
+            <template #right>
+                <img src="@/static/jia-black.png" @click="openDialog">
+            </template>
+        </wil-title>
         <div class="source-list-container" v-if="show">
             <div class="source-list-item" v-for="item in sourceList" :key="item.type">
                 <template v-if="item.list.length">
@@ -92,6 +88,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { toParse, toStringfy } from "@/pages/mobile/mine/common";
 import { loginUser, get189Folder, getQuarkFolder, get189User } from "@/utils/common";
 import * as CONFIG from '@/utils/config'
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -434,36 +431,14 @@ page {
     display: flex;
     flex-direction: column;
 
-    .source-list-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        padding: 24rpx;
-
-        .source-list-title__left {
-            display: flex;
-            align-items: center;
-
-            img {
-                width: 40rpx;
-                height: 40rpx;
-            }
-
-            span {
-                margin-left: 12rpx;
-                font-weight: bold;
-            }
-        }
-
-        .source-list-title__right {
+    :deep(.wil-title) {
+        .wil-title-right {
             img {
                 display: block;
                 width: 40rpx;
                 height: 40rpx;
             }
         }
-
     }
 
     .source-list-container {

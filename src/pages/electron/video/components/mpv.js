@@ -17,7 +17,6 @@ export default class Mpv {
       'mpv-version',
       'ffmpeg-version',
       'track-list',
-      'cache-buffering-state',
     ]
     observable.forEach(v => this._setObserve(v))
     this._sendProperty('hwdec', 'auto')

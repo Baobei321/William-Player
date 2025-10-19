@@ -120,7 +120,11 @@
     },
     "h5" : {
         "darkmode" : false,
-        "themeLocation" : "theme.json"
+        "themeLocation" : "theme.json",
+        "router" : {
+            "mode" : "hash",
+            "base" : "./"
+        }
     },
     /* 快应用特有相关 */
     "quickapp" : {},

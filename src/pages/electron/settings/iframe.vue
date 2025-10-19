@@ -1,9 +1,6 @@
 <template>
     <div class="question">
-        <div class="question-title" @click="back">
-            <img src="@/static/rect-leftblack.png">
-            <span>{{ route.query.title }}</span>
-        </div>
+        <wil-title :title="route.query.title"></wil-title>
         <div class="question-container">
             <iframe :src="route.query.url"></iframe>
         </div>
@@ -12,13 +9,9 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
-const route= useRoute()
-const router =useRouter()
-
-const back = ()=>{
-    router.go(-1)
-}
+const route = useRoute()
 
 </script>
 
@@ -30,28 +23,11 @@ const back = ()=>{
     flex-direction: column;
     align-items: center;
 
-    .question-title {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        padding: 24rpx;
-        width: 100%;
-
-        img {
-            width: 40rpx;
-            height: 40rpx;
-        }
-
-        span {
-            margin-left: 12rpx;
-            font-weight: bold;
-        }
-    }
-
     .question-container {
         overflow: hidden;
         flex: 1;
         width: 100%;
+
         iframe {
             // aspect-ratio: 375/812;
             width: 100%;

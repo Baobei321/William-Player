@@ -1,9 +1,6 @@
 <template>
     <div class="about-version">
-        <div class="about-version-title" @click="back">
-            <img src="@/static/rect-leftblack.png">
-            <span>问题与反馈</span>
-        </div>
+        <wil-title title="问题与反馈"></wil-title>
         <div class="about-version-container">
             <div class="about-version-container__main">
                 <image src="@/static/app-logo1.png"></image>
@@ -51,6 +48,7 @@ import appLogo from "@/static/app-logo1.png";
 import * as CONFIG from "@/utils/config";
 import { toParse, toStringfy } from "@/pages/mobile/mine/common";
 import { useRouter } from "vue-router";
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
 const router = useRouter()
 
@@ -77,10 +75,6 @@ const upgradeInfo = ref({
     logo: appLogo,
     appName: "William Player",
 });
-
-const back = () => {
-    router.go(-1)
-}
 
 const checkUpdate = async () => {
     isLoading.value = true;
@@ -167,7 +161,7 @@ page {
     // background: #1b1b20;
     background: #f7f7f7;
 
-    .about-version-title {
+    :deep(.wil-title) {
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -175,16 +169,6 @@ page {
         position: absolute;
         top: 0;
         left: 0;
-
-        img {
-            width: 40rpx;
-            height: 40rpx;
-        }
-
-        span {
-            margin-left: 12rpx;
-            font-weight: bold;
-        }
     }
 
     .about-version-container {

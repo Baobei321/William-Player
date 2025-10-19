@@ -34,12 +34,15 @@ import { ref, onBeforeMount } from "vue";
 import { classifyList, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
+import { useRouter } from "vue-router";
 const props = defineProps({
     isFocus: { type: Boolean, default: true },
     historyPlay: { type: Array, default: [] },
     initPage: { type: [Number, String], default: 0 },
     showSwiper: { type: Boolean, default: true },
 });
+
+const router = useRouter()
 const emits = defineEmits(["getStarList", "change", "setFocus"]);
 const wil_swiper = ref(null);
 
@@ -54,9 +57,16 @@ const removeExtension = (filename) => {
 };
 
 const toVideoDetail = (item) => {
-    uni.navigateTo({
-        url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
-    });
+    router.push({
+        path:'/homeDetail',
+        query:{
+            path:item.path,
+            name:handleSeasonName(item.name,true),
+            type:item.type,
+            source:JSON.stringify(item.source),
+            movieTvId:item.movieTvId
+        }
+    })
 };
 
 const changeSwiper = (index) => {

@@ -1,6 +1,6 @@
 <template>
     <div class="video-player">
-        <mpv-player :video-url="url1"></mpv-player>
+        <mpv-player :video-url="config.url"></mpv-player>
     </div>
 </template>
 
@@ -14,7 +14,6 @@ import { addOperLog } from "@/network/apis";
 import { IMG_DOMAIN } from "@/utils/config";
 
 const route = useRoute()
-const url1 = 'https://media-qhxn-fj-person.qh6oss.ctyunxs.cn/PERSONCLOUD/6bb99b13-fc8d-4d78-ad16-2b346fe70e79.mkv?response-content-disposition=attachment%3Bfilename%3D%22%E8%8B%A6%E5%B0%BD%E6%9F%91%E6%9D%A5%E9%81%87%E8%A7%81%E4%BD%A0%20-%20S01E01%20-%20%E7%AC%AC%201%20%E9%9B%86.mkv%22%3Bfilename*%3DUTF-8%27%27%25E8%258B%25A6%25E5%25B0%25BD%25E6%259F%2591%25E6%259D%25A5%25E9%2581%2587%25E8%25A7%2581%25E4%25BD%25A0%2B-%2BS01E01%2B-%2B%25E7%25AC%25AC%2B1%2B%25E9%259B%2586.mkv&x-amz-CLIENTNETWORK=UNKNOWN&x-amz-CLOUDTYPEIN=PERSON&x-amz-CLIENTTYPEIN=PC&Signature=Hw5TP9zkwOjx%2BN%2B8fbSLoRV2aho%3D&AWSAccessKeyId=yPySeUDW6JolLinanQ0A&x-amz-userLevel=0&Expires=1760787870&x-amz-limitrate=51200&x-amz-FSIZE=2309895841&x-amz-UID=64784934&x-amz-UFID=324853187677138444'
 
 const config = reactive({
     url: "",

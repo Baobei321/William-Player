@@ -537,7 +537,7 @@ export function useVideoDetail({ route, router }) {
                     windowName: 'Video',
                     windowTitle: `正在播放：`,
                     query: query
-                };
+                };                
                 ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
                     console.log('[createWindow] id:', id);
                 });
@@ -577,7 +577,7 @@ export function useVideoDetail({ route, router }) {
                 let query = {}
                 if (selectType.value.type == "WebDAV") {
                     query = {
-                        path: activeSeason.value.path.slice(1),
+                        path: `${activeSeason.value.path.slice(1)}/${item.name}`,
                         item: encodeURIComponent(JSON.stringify(historyItem)),
                         type: 'tv'
                     }
@@ -590,6 +590,7 @@ export function useVideoDetail({ route, router }) {
                         type: 'tv'
                     }
                 }
+                
                 let args = {
                     type: 'vue',
                     content: '/video',

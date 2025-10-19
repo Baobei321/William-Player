@@ -8,7 +8,8 @@ import * as CONFIG from "@/utils/config";
 import { getEmbyList, getGenresList } from "../utils/emby";
 import dayjs from 'dayjs';
 
-export function useVideoAll({ wil_list }) {
+export function useVideoAll({ wil_list, route = null }) {
+
     const requestParams = ref({});
     const mapping = {
         "电影": "movie",
@@ -241,7 +242,6 @@ export function useVideoAll({ wil_list }) {
     };
 
     const toVideoDetail = async (item) => {
-        console.log(item, 'item111');
         if (routerParams.value.type == 'emby') {
             if (item.type == 'Genre') {
                 uni.navigateTo({
@@ -331,14 +331,17 @@ export function useVideoAll({ wil_list }) {
         judgeSelect();
         routerParams.value = options;
         routerParams.value.isConnected = routerParams.value.isConnected1 == "true" ? true : false;
-        if (options.embyIncludeItemTypes == 'Series') {
+        if (CONFIG.PLATFORM === 'PC') {
+            routerParams.value = route.query
+        }
+        if (routerParams.value.embyIncludeItemTypes == 'Series') {
             embyActiveTab.value = '剧集'
             tabList.value = [
                 { title: '剧集' },
                 { title: '流派' },
                 { title: '文件夹' }
             ]
-        } else if (options.embyIncludeItemTypes == 'Movie') {
+        } else if (routerParams.value.embyIncludeItemTypes == 'Movie') {
             embyActiveTab.value = '电影'
             tabList.value = [
                 { title: '电影' },

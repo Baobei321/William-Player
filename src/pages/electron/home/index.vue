@@ -3,18 +3,21 @@
         <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading"
             ref="video_navbar">
         </home-navbar>
-        <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
-        <div class="home-container">
-            <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"
-                :initPage="swipeIndex" :showSwiper="showSwiper"></star-recommend>
-            <div class="home-container-list">
-                <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
-                <hx-list title="电影" :listData="localMovieTvData?.movie"
-                    v-if="localMovieTvData?.movie?.length"></hx-list>
-                <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
-                <Classify></Classify>
+        <template v-if="!refreshLoading">
+            <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
+            <div class="home-container">
+                <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend"
+                    :initPage="swipeIndex" :showSwiper="showSwiper"></star-recommend>
+                <div class="home-container-list">
+                    <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
+                    <hx-list title="电影" :listData="localMovieTvData?.movie"
+                        v-if="localMovieTvData?.movie?.length"></hx-list>
+                    <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
+                    <Classify></Classify>
+                </div>
             </div>
-        </div>
+        </template>
+        <Skeleton v-else></Skeleton>
         <!-- 使用teleport挂载到body去 -->
         <wil-modal ref="wil_modal"></wil-modal>
     </div>
@@ -35,6 +38,7 @@ import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex'
 import { defineOptions } from 'vue';
 import { useRouter } from "vue-router";
+import Skeleton from "./components/skeleton.vue";
 defineOptions({
     name: 'Home'
 })
@@ -105,7 +109,7 @@ onActivated(() => {
     let element = document.querySelector('.home-container')
     element.scrollTop = scrollTop
     // setTimeout(() => {
-        showPage()
+    showPage()
     // }, 300);
 })
 onDeactivated(() => {

@@ -37,7 +37,6 @@ const mpvData = reactive({
 })
 let timer;
 let mpv;
-let isInit = true;
 
 const langMapping = {
     chi: '汉语',
@@ -49,6 +48,15 @@ const langMapping = {
     rus: '俄语',
     por: '葡萄牙语',
     ara: '阿拉伯语',
+}
+
+//在视频开始播放之后获取音轨列表和字幕列表
+const getTrackListData = async () => {
+    if (!audioTrack.value) {
+        audioTrack.value = []
+        await ipc.invoke(ipcApiRoute.mpvConnect, {})
+        await ipc.invoke(ipcApiRoute.mpvTrackList)
+    }
 }
 
 const playFile = (src) => {
@@ -63,19 +71,14 @@ const playFile = (src) => {
 const onMessage = (e) => {
     const msg = e.data;
     const { type, data } = msg;
-    if (mpvData.loading) {
-        mpvData.loading = false
-    }
+    // console.log(msg, 'msg');
+
     if (data?.name) {
         switch (data.name) {
             case 'time-pos':
                 // autoTime();
-                if (mpvData.loading) {
-                    if (isInit) {
-                        isInit = false
-                    } else {
-                        mpvData.loading = false
-                    }
+                if (data.value > 0 && data.value < 1) {
+                    getTrackListData()
                 }
                 mpvData.timePos = Math.round(data.value);
                 break;
@@ -113,7 +116,6 @@ const onPause = () => {
         mpv.goPlay(false);
         noSleep.disable();
     }
-    mpv.setSubtitleTrack('2')
     mpvData.paused = !mpvData.paused;
 }
 
@@ -135,7 +137,6 @@ const getTrackList = async () => {
 
 //拖动进度条
 const changeSlide = (val) => {
-    isInit = true
     mpvData.loading = true
     mpv.seek(val)
 }
@@ -150,9 +151,22 @@ onMounted(() => {
     ipc.on('mpv-track-list', (event, res) => {
         console.log(res, 'audioTrack.value');
         if (res.data.request_id) {
+            mpvData.loading = false
             if (res.data.data) {
                 audioTrack.value = res.data.data.filter(v => v.type === 'audio')
                 subTitleTrack.value = res.data.data.filter(v => v.type === 'sub')
+                //初始化的时候设置音轨为第一个，字幕为中午轨道，不保证一定是简体，因为简体繁体都是chi
+                if (audioTrack.value.length) {
+                    mpv.setAudioTrack(audioTrack.value[0].id)
+                }
+                if (subTitleTrack.value.length) {
+                    let hanyu = subTitleTrack.value.find(i => i.language === '汉语')
+                    if (hanyu) {
+                        mpv.setSubtitleTrack(hanyu.id)
+                    } else {
+                        mpv.setSubtitleTrack(subTitleTrack.value[0].id)
+                    }
+                }
             } else {
                 audioTrack.value = []
                 subTitleTrack.value = []
@@ -163,20 +177,30 @@ onMounted(() => {
             subTitleTrack.value.forEach((item, index) => {
                 item.language = langMapping[item.lang] || '字幕轨道' + index
             })
+        } else {
+            switch (res.data.event) {
+                case 'playback-restart'://跳转进度之后重新开始播放
+                    mpvData.loading = false
+                    break;
+                default:
+                    break;
+            }
         }
     });
     setTimeout(() => {
         mpv = new Mpv(document.getElementById("mpvjs"));
         mpv.playerReady();
-        onVideoSrcChange(props.videoUrl)
+        if (props.videoUrl) {
+            onVideoSrcChange(props.videoUrl)
+        }
     }, 0);
 })
 
 watch(
     () => props.videoUrl,
     (val) => {
-        // onVideoSrcChange(val)
-    }, { immediate: true }
+        onVideoSrcChange(val)
+    }, { immediate: false }
 )
 </script>
 

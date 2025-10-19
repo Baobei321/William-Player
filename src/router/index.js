@@ -39,6 +39,12 @@ const constantRoutes = [
         meta: { title: '详情页' }
       },
       {
+        path: 'homeAll',
+        component: () => import('@/pages/electron/home/all'),
+        name: 'HomeAll',
+        meta: { title: '所有' }
+      },
+      {
         path: 'sourceList',
         component: () => import('@/pages/electron/source/source-list'),
         name: 'SourceList',

@@ -1,18 +1,11 @@
 <template>
     <div class="detail">
-        <div class="detail-background" :style="{ backgroundImage: `url(${imgData.img})` }">
+        <div class="detail-background">
+            <img :src="imgData.img">
             <div class="detail-background-overlay"></div>
         </div>
         <div class="detail-content">
-            <div class="detail-header">
-                <div class="detail-header-left" @click="back">
-                    <img src="@/static/rect-leftblack.png">
-                    <span>{{ route.query.name }}</span>
-                </div>
-                <!-- <div class="detail-header-right">
-                <img src="@/static/chilun-black.png">
-            </div> -->
-            </div>
+            <wil-title :title="route.query.title"></wil-title>
             <div class="detail-info">
                 <div class="detail-info-img">
                     <img :src="CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + nowMovieTv.poster">
@@ -113,6 +106,7 @@ import * as CONFIG from '@/utils/config'
 import { ref } from 'vue'
 import { debounce, parseTime } from "@/utils/scrape";
 import actorList from './components/actor-list.vue';
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,9 +117,6 @@ const { showPopover, popoverArr, showTimePicker, pickerTitle, pickerVal, pickerC
     routerParams, showRehandleButton, historyTv, scrollIntoView, lineNumber, lineHeight, toSelect, confirmPicker, changeSource, changeTvSource, changeTvSeason, disabledTip,
     clickPlayButton, toPlayVideo, reHandleTv } = useVideoDetail({ route, router })
 
-const back = () => {
-    router.go(-1)
-}
 
 const setScrollIntoView = debounce((direction) => {
     handleSilde(direction)
@@ -191,11 +182,25 @@ onBeforeMount(() => {
         background-repeat: no-repeat;
         background-size: cover;
 
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+        }
+
         .detail-background-overlay {
             width: 100%;
             height: 100%;
             // background: rgba(0, 0, 0, 0.8);
             background: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 2;
         }
     }
 
@@ -206,35 +211,6 @@ onBeforeMount(() => {
         position: relative;
         z-index: 2;
         padding-bottom: 60rpx;
-
-        .detail-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 24rpx;
-            position: relative;
-            z-index: 2;
-
-            .detail-header-left {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-            }
-
-            .detail-header-right {
-                cursor: pointer;
-            }
-
-            img {
-                width: 40rpx;
-                height: 40rpx;
-            }
-
-            span {
-                margin-left: 12rpx;
-                font-weight: bold;
-            }
-        }
 
         .detail-info {
             z-index: 2;
@@ -504,6 +480,7 @@ onBeforeMount(() => {
                         margin-left: 24rpx;
                         flex: 0 0 calc((100% - 96rpx) / 5);
                         overflow: hidden;
+                        cursor: pointer;
 
                         &:first-child {
                             margin-left: 0;

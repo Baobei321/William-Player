@@ -1,9 +1,6 @@
 <template>
     <div class="appreciate">
-        <div class="appreciate-title" @click="back">
-            <img src="@/static/rect-leftblack.png">
-            <span>赞赏</span>
-        </div>
+        <wil-title title="赞赏"></wil-title>
         <div class="appreciate-container">
             <div class="appreciate-container-left">
                 <img src="@/static/zanshang.jpg">
@@ -15,7 +12,8 @@
                     <span>若有遗漏请在qq交流群联系我补充，qq群：477326591</span>
                 </div>
                 <div class="appreciate-container-right__list">
-                    <div class="appreciate-container-right__list-item" v-for="item in appreciateList" :key="item.dictValue">
+                    <div class="appreciate-container-right__list-item" v-for="item in appreciateList"
+                        :key="item.dictValue">
                         {{ `${item.dictLabel}（${item.cssClass}元）` }}
                     </div>
                 </div>
@@ -27,13 +25,9 @@
 <script setup>import { ref } from "vue";
 import { getUntokenDicts } from "@/network/apis";
 import { useRouter } from "vue-router";
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
-const router =useRouter()
 const appreciateList = ref([]);
-
-const back = () => {
-    router.go(-1)
-}
 
 const getAppreciateUser = async () => {
     let res = await getUntokenDicts("appreciate_user");
@@ -53,24 +47,7 @@ page {
     height: 100%;
     display: flex;
     flex-direction: column;
-
-    .appreciate-title {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        padding: 24rpx;
-
-        img {
-            width: 40rpx;
-            height: 40rpx;
-        }
-
-        span {
-            margin-left: 12rpx;
-            font-weight: bold;
-        }
-    }
-    .appreciate-container{
+    .appreciate-container {
         display: flex;
         flex: 1;
     }

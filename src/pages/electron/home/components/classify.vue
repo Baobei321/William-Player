@@ -23,11 +23,13 @@ import { ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { classifyList } from "@/utils/scrape.js";
 import emptyBg from "@/static/empty_bg.png";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
     isConnected: { type: Boolean, default: false }, //手机是否连接网络
 });
 
+const router = useRouter()
 const listData = ref([]);
 
 const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
@@ -61,9 +63,13 @@ const getGenre = () => {
 
 //跳转到videoAll
 const toVideoAll = (item) => {
-    uni.navigateTo({
-        url: `/pages/mobile/video/video-all?title=${item.label}&genreId=${item.id}&isConnected=${props.isConnected}`,
-    });
+    router.push({
+        path: "homeAll",
+        query: {
+            title: item.label,
+            genreId: item.id
+        }
+    })
 };
 const imgError = (item) => {
     item.loadImg = false;
@@ -170,11 +176,10 @@ onShow(() => {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .video-classify {
-        .video-classify-title {
-            color: #fff;
-        }
-    }
-}
-</style>
+// @media (prefers-color-scheme: dark) {
+//     .video-classify {
+//         .video-classify-title {
+//             color: #fff;
+//         }
+//     }
+// }</style>

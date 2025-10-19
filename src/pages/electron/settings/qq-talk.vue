@@ -1,9 +1,6 @@
 <template>
     <div class="qq">
-        <div class="qq-title" @click="back">
-            <img src="@/static/rect-leftblack.png">
-            <span>QQ交流</span>
-        </div>
+        <wil-title title="QQ交流"></wil-title>
         <div class="qq-container">
             <iframe :src="url"></iframe>
         </div>
@@ -13,6 +10,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import * as CONFIG from '@/utils/config'
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
 const route = useRoute()
 const router = useRouter()

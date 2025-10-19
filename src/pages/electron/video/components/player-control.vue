@@ -72,8 +72,6 @@ const timePos = ref('00:00')//当前时间
 const duration = ref('00:00')//总的时间
 const player_control = ref(null)
 const controlVisible = ref(true) //控制条初始化显示
-const audioTrackList = ref(null) //音轨列表
-const subtitleTrackList = ref(null) //字幕列表
 const hideTimer = ref(null)
 const showPopover = ref(false)
 
@@ -155,58 +153,46 @@ const onFullscreen = () => {
 
 //点击获取音轨列表
 const getAudioTrack = () => {
-    isInit ? '' : isInit = 'audio'
     if (hideTimer.value) {
         clearTimeout(hideTimer.value); // 清除之前的定时器
         hideTimer.value = null
     }
-    if (audioTrackList.value) {
-        if (audioTrackList.value.length) {
-            popoverPosition.value = positionObj.audioPosition
-            popoverOptions.value = props.audioTrack.map(item => {
-                item.label = item.language
-                return item
-            })
-            showPopover.value = true
-        } else {
-            uni.showToast({
-                title: "当前视频没有音轨",
-                icon: "none"
-            })
-        }
-
+    if (props.audioTrack.length) {
+        popoverPosition.value = positionObj.audioPosition
+        popoverOptions.value = props.audioTrack.map(item => {
+            item.label = item.language
+            return item
+        })
+        showPopover.value = true
     } else {
-        emits('getTrackList')
-        // getAudioTrack()
+        uni.showToast({
+            title: "当前视频没有音轨",
+            icon: "none"
+        })
     }
 }
 
 //点击获取字幕列表
 const getSubTitleTrack = () => {
-    isInit ? '' : isInit = 'subtitle'
     if (hideTimer.value) {
         clearTimeout(hideTimer.value); // 清除之前的定时器
         hideTimer.value = null
     }
-    if (subtitleTrackList.value) {
-        if (subtitleTrackList.value.length) {
-            popoverPosition.value = positionObj.subtitlePosition
-            popoverOptions.value = props.subTitleTrack.map(item => {
-                item.label = item.language
-                return item
-            })
-            showPopover.value = true
-        } else {
-            uni.showToast({
-                title: "当前视频没有内嵌字幕",
-                icon: "none"
-            })
-        }
+    console.log(props.subTitleTrack,'props.subTitleTrack');
+    
+    if (props.subTitleTrack.length) {
+        popoverPosition.value = positionObj.subtitlePosition
+        popoverOptions.value = props.subTitleTrack.map(item => {
+            item.label = item.language
+            return item
+        })
+        showPopover.value = true
     } else {
-        emits('getTrackList')
-        // getSubTitleTrack()
+        uni.showToast({
+            title: "当前视频没有内嵌字幕",
+            icon: "none"
+        })
     }
-
 }
 
 const closePopover = () => {
@@ -216,7 +202,6 @@ const closePopover = () => {
 }
 
 const clickPopover = (item) => {
-
     hideTimer.value = setTimeout(() => {
         controlVisible.value = false
     }, 5000);
@@ -235,24 +220,6 @@ watch(
     (val) => {
         duration.value = handleSecond(val)
     }, { immediate: true }
-)
-watch(
-    () => props.audioTrack,
-    (val) => {
-        audioTrackList.value = val
-        if (val.length && isInit === 'audio') {
-            getAudioTrack()
-        }
-    }, { deep: true }
-)
-watch(
-    () => props.subTitleTrack,
-    (val) => {
-        subtitleTrackList.value = val
-        if (val.length && isInit === 'subtitle') {
-            getSubTitleTrack()
-        }
-    }, { deep: true }
 )
 
 onMounted(() => {
