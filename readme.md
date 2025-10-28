@@ -61,20 +61,20 @@ Android 8+
 ### Android Phone 截图
 
 <div style="display: flex;">
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143400_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 1" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143523_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 2" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143545_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 3" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143607_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 4" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/Screenshot_20250416_143622_com_android_williamplayer_PandoraEntryActivity.jpg" alt="Mobile Screenshot 5" width="24%"/>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/bea9d2e3f9500a447821d40d230c59a1.png" alt="Mobile Screenshot 6" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone1.jpg?raw=true" alt="Mobile Screenshot 1" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone2.jpg?raw=true" alt="Mobile Screenshot 2" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone3.jpg?raw=true" alt="Mobile Screenshot 3" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone4.jpg?raw=true" alt="Mobile Screenshot 4" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone5.jpg?raw=true" alt="Mobile Screenshot 5" width="24%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/phone6.jpg?raw=true" alt="Mobile Screenshot 6" width="24%"/>
 </div>
 
 ### Android TV 截图
 <div style="display: flex;">
-<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/5C8DD7E_427A_tv-picture_20250910113615103newMediaImage.png" alt="Mobile Screenshot 1" width="48%"/>
-<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/27E4A39_427A_tv-asd_20250910113919701newMediaImage.png" alt="Mobile Screenshot 2" width="48%"/>
-<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/482B34F_427A_tv-picture1_20250910114207926newMediaImage.png" alt="Mobile Screenshot 3" width="48%"/>
-<img src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1CCF3D0_427A_tv-picture2_20250910114231848newMediaImage.png" alt="Mobile Screenshot 4" width="48%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/tv1.png?raw=true" alt="Mobile Screenshot 1" width="48%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/tv2.png?raw=true" alt="Mobile Screenshot 2" width="48%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/tv3.png?raw=true" alt="Mobile Screenshot 3" width="48%"/>
+<img src="https://github.com/chenweiliang6/blog-img/blob/main/tv4.png?raw=true" alt="Mobile Screenshot 4" width="48%"/>
 </div>
 
 ### Windows 截图
@@ -84,7 +84,7 @@ Android 8+
 
 ## 其他说明
 
-如果遇到Bug或者有应用优化建议，欢迎提 [Issue](https://gitee.com/CWLcwl0219/webdav-video-player/issues)，我会在第一时间回复 😊
+如果遇到Bug或者有应用优化建议，欢迎提 [Issue](https://github.com/chenweiliang6/William-Player/issues)，我会在第一时间回复 😊
 
 ## 后续要增加的新功能
 
@@ -96,6 +96,7 @@ Android 8+
 - [x] 支持电视剧播放切换上下集
 - [x] 增加首页高分影视推荐
 - [x] 增加数据同步功能
+- [x] 支持Windows
 - [ ] 支持视频下载管理
 - [x] 支持视频播放倍速设置
 - [x] 增加命名格式支持
