@@ -6,10 +6,10 @@
         <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list"
           :key="vitem.name" @click="toPath(vitem)">
           <div class="list-item-img">
-            <image :src="vitem.img"></image>
+            <img :src="vitem.img">
           </div>
           <div class="list-item-name">{{ vitem.name }}</div>
-          <image :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button" />
+          <img :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button">
         </div>
       </div>
     </div>
@@ -129,7 +129,7 @@ page {
           height: 90rpx;
           position: relative;
 
-          image {
+          img {
             width: 90rpx;
             height: 90rpx;
             border-radius: 50%;
@@ -186,5 +186,4 @@ page {
 //       }
 //     }
 //   }
-// }
-</style>
+// }</style>

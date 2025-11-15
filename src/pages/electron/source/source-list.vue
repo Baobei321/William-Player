@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="source-list-empty" v-else>
-            <image src="@/static/no-data.png" class="source-list-empty__img"></image>
+            <img src="@/static/no-data.png" class="source-list-empty__img">
             <span class="source-list-empty__tip">添加完资源之后，请为此资源添加电影、电视剧目录！！！</span>
             <nut-button custom-color="#090909" @click="openDialog">
                 <template #icon>

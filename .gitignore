@@ -12,7 +12,8 @@ node_modules
 dist
 *.local
 /src/utils/config.js
-
+/src/unpackage
+unpackage
 # Editor directories and files
 .idea
 *.suo
