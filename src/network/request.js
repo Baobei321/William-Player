@@ -8,7 +8,8 @@ const base_url = CONFIG.BASE_URL
 // 请求超出时间
 const timeout = 3000
 
-const noToastUrl = ['/phone/login']
+// const noToastUrl = ['/phone/login']
+const noToastUrl = []
 
 // 需要修改token，和根据实际修改请求头
 export default (params) => {

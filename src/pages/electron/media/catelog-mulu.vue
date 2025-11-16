@@ -86,7 +86,7 @@
             <template #footer>
                 <div class="footer-button">
                     <nut-button type="default" @click="cancel">取消</nut-button>
-                    <nut-button type="info" @click="confirm">确认</nut-button>
+                    <nut-button type="info" @click="confirmDialog">确认</nut-button>
                 </div>
             </template>
         </nut-dialog>
@@ -118,11 +118,10 @@ const selectMedia = ref({})
 const result = ref({})
 const emits = defineEmits(['confirm', 'openSource'])
 
-const { data, key, path, folderFileId, folderFileIdArr, removeLastSegment, selectName, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
+const { data, key, path, folderFileId, folderFileIdArr, muluData, removeLastSegment, selectName, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
     = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => route.query.title), emits: emits })
 
 
-const muluData = ref(uni.getStorageSync('muluData') || {})
 const listData = ref([])
 const showBottom = ref(false)
 const showModel = ref('source')
@@ -215,6 +214,12 @@ const handleDelete = () => {
     listData.value = listData.value.filter(item => item.name != selectItem.value.name)
     muluData.value[mapping1[route.query.title]] = listData.value
     uni.setStorageSync('muluData', muluData.value)
+}
+
+const confirmDialog = () => {
+    confirm()
+    listData.value = muluData.value[mapping1[route.query.title]]
+    showDialog.value = false
 }
 
 const popoverOptions = ref([

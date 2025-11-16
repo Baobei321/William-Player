@@ -202,6 +202,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             })
             return
         }
+        muluData.value = uni.getStorageSync('muluData') || {}
         if (unref(selectType).type == 'WebDAV') {//这块逻辑有问题，不能存在就替换，像webdav可能挂载多个网盘
             // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
             // //已存在就替换，不存在就新增
@@ -245,5 +246,5 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
         muluData.value?.tv ? '' : muluData.value.tv = []
         muluData.value?.movie ? '' : muluData.value.movie = []
     })
-    return { data, key, selectName, path, folderFileId, folderFileIdArr, removeLastSegment, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
+    return { data, key, selectName, path, folderFileId, folderFileIdArr, muluData, removeLastSegment, responseAdapter, handleData, handleSize, chooseName, toBack, getFileList, clickCell, setImg, confirm }
 }

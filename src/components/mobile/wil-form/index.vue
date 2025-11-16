@@ -17,7 +17,7 @@
           <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps" v-if="item.type == 'textarea'"
             :disableDefaultPadding="true" @blur="customBlurValidate(item.prop)" @change="change" />
           <nut-radio-group v-model="formData[item.prop]" direction="horizontal" v-if="item.type == 'radio'">
-            <nut-radio :label="vitem.value" v-for="vitem in item.columns">{{ vitem.label
+            <nut-radio :label="vitem.value" v-for="vitem in item.columns" :key="vitem.value">{{ vitem.label
             }}</nut-radio>
           </nut-radio-group>
           <slot :name="item.prop" v-if="$slots[item.prop] && !item.type"
