@@ -24,9 +24,9 @@ pc:npm run dev:pc
 
 ### 第二步：如何使视频能够播放
 此时，各位开发者同学会发现，怎么刮削出来之后，播放视频跟安卓应用怎么不一样的。
-<font color="red">因为当前阶段还没有打包为安卓apk，无法使用原生的视频播放器插件。</font>
-在开发者开发完自己的功能之后，想要生成安卓apk，安装在安卓手机上，那么此时就需要用到**Android Studio编译器**以及**Android SDK原生代码**，<font color="red">sdk安卓原生代码请在github点了star之后，进群联系群主或者管理员获取</font>
-![在这里插入图片描述](https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg)
+<span color="red">因为当前阶段还没有打包为安卓apk，无法使用原生的视频播放器插件。</span>
+在开发者开发完自己的功能之后，想要生成安卓apk，安装在安卓手机上，那么此时就需要用到**Android Studio编译器**以及**Android SDK原生代码**，<span color="red">sdk安卓原生代码请在github点了star之后，进群联系群主或者管理员获取</span>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 
 ### 第三步：运行Android Studio
 因为各个开发的同学肯定都是以前端为主，对于Android Studio运行安卓项目肯定会比较陌生，大家可以去往上找一下如何安装Android Studio以及相应的环境，我这里就不多做介绍了。
@@ -38,19 +38,19 @@ pc:npm run dev:pc
 首先请大家前往[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)创建应用
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/413d182876ab4ac9ac13878fdac965b6.png)
 创建好应用之后会生成一个Appid，此Appid将会作为唯一标识，标识当前的项目。这个Appid很重要！！！！！！
-<font color="red">获取到这个Appid之后，vscode全局搜索__UNI__0C3D8A9将其替换掉。</font>
+<span color="red">获取到这个Appid之后，vscode全局搜索__UNI__0C3D8A9将其替换掉。</span>
 
 
 **2、创建证书**
 然后从下图红圈处点击进入新建的应用，并且在**Android云端证书**处创建证书，
-<font color="green">此证书用于打包安卓apk使用，没有这个证书的话，是无法在Android Studio打包的。</font>
+<span color="green">此证书用于打包安卓apk使用，没有这个证书的话，是无法在Android Studio打包的。</span>
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/1cdef0842755410595af869ee7a809b9.png)
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/a067bd75856143a7b337a04574cacf47.png)
 **3、生成安卓离线打包Key**
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/92ca2e8dca424cc1a815995b69644d02.png)
 此时就需要用到第2个步骤中生成的证书，点击查看证书详情，获取SHA1和SHA256填写进去，生成安卓离线打包Key。
 
-做完以上的操作之后，那么将转到安卓原生UniPlugin-Hello-AS代码的修改，也就是帮我点好star进群之后获取到的安卓原生UniPlugin-Hello-AS代码，此代码内置了原生的视频播放器，<font color="red">支持4k高码率播放，切换字幕和音轨。</font>
+做完以上的操作之后，那么将转到安卓原生UniPlugin-Hello-AS代码的修改，也就是帮我点好star进群之后获取到的安卓原生UniPlugin-Hello-AS代码，此代码内置了原生的视频播放器，<span color="red">支持4k高码率播放，切换字幕和音轨。</span>
 **一、填写离线打包Key**
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/0bebf40370ea4dcfb806da55f1949678.png)将生成安卓离线打包Key填写在此处。
 
@@ -62,7 +62,7 @@ pc:npm run dev:pc
 众所周知，安卓打包apk是需要证书的，此步骤将告知开发者如何引入证书。
 首先将[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)的云端证书下载下来。
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/85ac7b660a6b4ae99300472f94f29270.png)
-下载下来之后，将证书重命名为<font color="green">william-player.keystore</font> ，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示
+下载下来之后，将证书重命名为<span color="green">william-player.keystore</span> ，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/30275171db2241168df5db68f0e370c0.png)
 
 然后修改build.gradle
