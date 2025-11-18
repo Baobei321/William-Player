@@ -17,15 +17,18 @@ tv:npm run dev:tv
 pc:npm run dev:pc
 ```
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/1e87c0e97071450f9a57fbf583fa5cfb.png)
+<img src="https://i-blog.csdnimg.cn/direct/1e87c0e97071450f9a57fbf583fa5cfb.png" alt="Sponsor" width="100%" style="display:block"/>
 此时项目跑起来之后，恭喜你完成了第一步，各位前端不需要我提醒大家npm install安装依赖吧。
 
 
 
 ### 第二步：如何使视频能够播放
 此时，各位开发者同学会发现，怎么刮削出来之后，播放视频跟安卓应用怎么不一样的。
-<div color="red">因为当前阶段还没有打包为安卓apk，无法使用原生的视频播放器插件。</div>
-在开发者开发完自己的功能之后，想要生成安卓apk，安装在安卓手机上，那么此时就需要用到**Android Studio编译器**以及**Android SDK原生代码**，<div color="red">sdk安卓原生代码请在github点了star之后，进群联系群主或者管理员获取</div>
+<div style="color:red">因为当前阶段还没有打包为安卓apk，无法使用原生的视频播放器插件。</div>
+
+在开发者开发完自己的功能之后，想要生成安卓apk，安装在安卓手机上，那么此时就需要用到**Android Studio编译器**以及**Android SDK原生代码**，
+
+<div style="color:red">sdk安卓原生代码请在github点了star之后，进群联系群主或者管理员获取</div>
 <img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 
 ### 第三步：运行Android Studio
@@ -36,23 +39,25 @@ pc:npm run dev:pc
 **1、dcloud创建应用**
 大家肯定都已经从github上拉取了我的代码。
 首先请大家前往[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)创建应用
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/413d182876ab4ac9ac13878fdac965b6.png)
+<img src="https://i-blog.csdnimg.cn/direct/413d182876ab4ac9ac13878fdac965b6.png" alt="Sponsor" width="100%"/>
 创建好应用之后会生成一个Appid，此Appid将会作为唯一标识，标识当前的项目。这个Appid很重要！！！！！！
-<div color="red">获取到这个Appid之后，vscode全局搜索__UNI__0C3D8A9将其替换掉。</div>
+<div style="color:red">获取到这个Appid之后，vscode全局搜索__UNI__0C3D8A9将其替换掉。</div>
 
 
 **2、创建证书**
 然后从下图红圈处点击进入新建的应用，并且在**Android云端证书**处创建证书，
-<div color="green">此证书用于打包安卓apk使用，没有这个证书的话，是无法在Android Studio打包的。</div>
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/1cdef0842755410595af869ee7a809b9.png)
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/a067bd75856143a7b337a04574cacf47.png)
+<div style="color: rgb(0, 224, 0);">此证书用于打包安卓apk使用，没有这个证书的话，是无法在Android Studio打包的。</div>
+<img src="https://i-blog.csdnimg.cn/direct/1cdef0842755410595af869ee7a809b9.png" alt="Sponsor" width="100%"/>
+<img src="https://i-blog.csdnimg.cn/direct/a067bd75856143a7b337a04574cacf47.png" alt="Sponsor" width="100%"/>
+
 **3、生成安卓离线打包Key**
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/92ca2e8dca424cc1a815995b69644d02.png)
+<img src="https://i-blog.csdnimg.cn/direct/92ca2e8dca424cc1a815995b69644d02.png" alt="Sponsor" width="100%"/>
 此时就需要用到第2个步骤中生成的证书，点击查看证书详情，获取SHA1和SHA256填写进去，生成安卓离线打包Key。
 
-做完以上的操作之后，那么将转到安卓原生UniPlugin-Hello-AS代码的修改，也就是帮我点好star进群之后获取到的安卓原生UniPlugin-Hello-AS代码，此代码内置了原生的视频播放器，<div color="red">支持4k高码率播放，切换字幕和音轨。</div>
+做完以上的操作之后，那么将转到安卓原生UniPlugin-Hello-AS代码的修改，也就是帮我点好star进群之后获取到的安卓原生UniPlugin-Hello-AS代码，此代码内置了原生的视频播放器，<div style="color:red">支持4k高码率播放，切换字幕和音轨。</div>
 **一、填写离线打包Key**
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/0bebf40370ea4dcfb806da55f1949678.png)将生成安卓离线打包Key填写在此处。
+<img src="https://i-blog.csdnimg.cn/direct/0bebf40370ea4dcfb806da55f1949678.png" alt="Sponsor" width="100%"/>
+将生成安卓离线打包Key填写在此处。
 
 **二、填写Appid**
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/2692982b63c045f58f76022fcd4b1d4a.png)
@@ -62,7 +67,7 @@ pc:npm run dev:pc
 众所周知，安卓打包apk是需要证书的，此步骤将告知开发者如何引入证书。
 首先将[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)的云端证书下载下来。
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/85ac7b660a6b4ae99300472f94f29270.png)
-下载下来之后，将证书重命名为<div color="green">william-player.keystore</div> ，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示
+下载下来之后，将证书重命名为<div style="color: rgb(0, 224, 0);>william-player.keystore</div> ，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示
 ![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/30275171db2241168df5db68f0e370c0.png)
 
 然后修改build.gradle
