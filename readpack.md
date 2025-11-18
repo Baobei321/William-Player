@@ -60,21 +60,21 @@ pc:npm run dev:pc
 将生成安卓离线打包Key填写在此处。
 
 **二、填写Appid**
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/2692982b63c045f58f76022fcd4b1d4a.png)
+<img src="https://i-blog.csdnimg.cn/direct/2692982b63c045f58f76022fcd4b1d4a.png" alt="Sponsor" width="100%"/>
 将你在dcloud创建应用生成的appid填写在此处。
 
 **三、项目中引入证书**
 众所周知，安卓打包apk是需要证书的，此步骤将告知开发者如何引入证书。
 首先将[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)的云端证书下载下来。
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/85ac7b660a6b4ae99300472f94f29270.png)
-下载下来之后，将证书重命名为<div style="color: rgb(0, 224, 0);>william-player.keystore</div> ，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/30275171db2241168df5db68f0e370c0.png)
+<img src="https://i-blog.csdnimg.cn/direct/85ac7b660a6b4ae99300472f94f29270.png" alt="Sponsor" width="100%"/>
+<div>下载下来之后，将证书重命名为william-player.keystore，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示</div>
+<img src="https://i-blog.csdnimg.cn/direct/30275171db2241168df5db68f0e370c0.png" alt="Sponsor"/>
 
 然后修改build.gradle
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/d4ab419b2bc141e4b13d4be5b77264b8.png)
+<img src="https://i-blog.csdnimg.cn/direct/d4ab419b2bc141e4b13d4be5b77264b8.png" alt="Sponsor" width="100%"/>
 storePassword和keyPassword为同一个，请前往[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)Android云端证书中查看证书详情获取密码。keyPassword也就是证书详情中的别名，如下图所示：
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/0a61c37623024ec0b28fb5887b1cdbf7.png)
+<img src="https://i-blog.csdnimg.cn/direct/0a61c37623024ec0b28fb5887b1cdbf7.png" alt="Sponsor" width="100%"/>
 
 此时所有修改都已经完成，可以开始构建安装项目了，Ctrl+Shift+O将安卓原生UniPlugin-Hello-AS项目跑起来。
 
@@ -82,16 +82,19 @@ storePassword和keyPassword为同一个，请前往[dcoud开发者中心](https:
 **1、打包生成资源**
 使用vscode将uniapp项目跑起来，使用命令行npm run build:mobile打包生成手机端的资源包，或者使用命令行npm run build:tv打包生成电视端的资源包，具体用哪个命令看你要生成什么app。
 
-打包完成之后你将会看到资源包在哪个目录下：dist/build/app![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/90302ff4f705448fa48c6adf90b25161.png)
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/e9c639cc9c7e406683de459c7ed40fb8.png)
+打包完成之后你将会看到资源包在哪个目录下：dist/build/
+<img src="https://i-blog.csdnimg.cn/direct/90302ff4f705448fa48c6adf90b25161.png" alt="Sponsor"/>
+<img src="https://i-blog.csdnimg.cn/direct/e9c639cc9c7e406683de459c7ed40fb8.png" alt="Sponsor" width="100%"/>
 
 将此文件夹下的内容全部复制到UniPlugin-Hello-AS\app\src\main\assets\apps\此处为你的appid\www下，随后进行打包
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/28c147a1d7e14857abc9f917d47f419c.png)
+<img src="https://i-blog.csdnimg.cn/direct/28c147a1d7e14857abc9f917d47f419c.png" alt="Sponsor" width="100%"/>
+
 打包的时候只需填入UniPlugin-Hello-AS\app\build.gradle下刚才配置的别名和密码即可。
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/37d9e415b3a24abc85e51f22719b2d1a.png)
+<img src="https://i-blog.csdnimg.cn/direct/37d9e415b3a24abc85e51f22719b2d1a.png" alt="Sponsor"/>
 
 大家肯定会碰到问题，打包之后无法在电视端安装，那是因为手机和电视的架构是不一样的，原生代码中提供了三个选择给大家，默认是手机端的架构，第二个是常用的电视端架构，再不行，就注释掉前两个，放开三个
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/7ab567d52b44455f8fab4834e3c9c1e0.png)
+<img src="https://i-blog.csdnimg.cn/direct/7ab567d52b44455f8fab4834e3c9c1e0.png" alt="Sponsor" width="100%"/>
+
 # **3.打包windows软件**
 vscode编译命令npm run build:pc，生成打包后的文件，然后大家再去参考[electron-egg](https://www.kaka996.com/pages/909757/)是怎么使用的，我这里就不做过多阐述了。
