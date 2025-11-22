@@ -67,7 +67,7 @@ pc:npm run dev:pc
 众所周知，安卓打包apk是需要证书的，此步骤将告知开发者如何引入证书。
 首先将[dcoud开发者中心](https://dev.dcloud.net.cn/pages/app/list)的云端证书下载下来。
 <img src="https://i-blog.csdnimg.cn/direct/85ac7b660a6b4ae99300472f94f29270.png" alt="Sponsor" width="100%"/>
-<div>下载下来之后，将证书重命名为william-player.keystore，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示</div>
+<div>下载下来之后，将证书重命名为william-player.keystore，然后复制到Android SDK原生项目根目录下的app文件夹下，如下图所示：</div>
 <img src="https://i-blog.csdnimg.cn/direct/30275171db2241168df5db68f0e370c0.png" alt="Sponsor"/>
 
 然后修改build.gradle

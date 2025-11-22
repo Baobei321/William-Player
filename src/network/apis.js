@@ -117,3 +117,12 @@ export const addOperLog = data => {
     data: data
   })
 }
+
+//发送邮箱验证码
+export const sendEmail = data => {
+  return request({
+    url: `/william/send-verification-code`,
+    method: 'post',
+    data: data
+  })
+}
