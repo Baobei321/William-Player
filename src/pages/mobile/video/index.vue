@@ -2,12 +2,13 @@
   <div class="video">
     <!-- <div style="background: #efefef;width: 375px;height: 812px;"></div> -->
     <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading"
-      ref="video_navbar" :tmdbKey1="tmdbKey" class="navbar-transparent"></video-navbar>
+      ref="video_navbar" :tmdbKey1="tmdbKey" @getHeight="getNavbarHeight"
+      :class="['navbar-transparent', refreshLoading ? 'navbar-white' : '']"></video-navbar>
     <Skeleton v-if="refreshLoading"></Skeleton>
     <template v-else>
       <div class="video-container"
         v-if="selectType.type == 'Emby' ? embyMovieTvList?.length : (localMovieTvData?.movie?.length || localMovieTvData?.tv?.length)">
-        <scroll-view :scroll-y="true" class="video-container-scroll">
+        <scroll-view :scroll-y="true" class="video-container-scroll" @scroll="handlePageScroll">
           <template v-if="selectType.type != 'Emby'">
             <star-recommend v-if="settingData.showRecommend"></star-recommend>
             <div class="scroll-list">
@@ -82,6 +83,13 @@ const upgradeInfo = ref({
   logo: appLogo,
   appName: "William Player",
 });
+const navbarStyle = ref({
+  background: `rgba(255,255,255,0)`,
+  color: `rgb(255,255,255)`,
+  borderColor: `rgba(246, 247, 248, 0)`
+})//动态设置标题栏的样式
+let navbarHeight = 0//标题栏加状态栏的高度
+let startCommandHeight = 0//轮播海报的高度，在手机端和pad端表现不同
 
 const isConnected = ref(false); //手机是否连接网络
 
@@ -125,6 +133,28 @@ const getAppUpdateInfo = async () => {
   let res = await getUntokenDicts("app_version");
   return res;
 };
+
+//获取标题加状态栏的高度
+const getNavbarHeight = (val) => {
+  navbarHeight = +val.split('px')[0]
+  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth; // 获取状态栏高度
+  if (windowWidth >= 700) { //pad端
+    startCommandHeight = uni.upx2px(800) + navbarHeight
+  } else { //手机端
+    startCommandHeight = uni.upx2px(500) + navbarHeight
+  }
+}
+//页面滚动，更改标题的背景色
+const handlePageScroll = (event) => {
+  let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
+  let cval = (255 - opacity * 255).toFixed(2)
+  navbarStyle.value = {
+    background: `rgba(255,255,255,${opacity.toFixed(2)})`,
+    color: `rgb(${cval},${cval},${cval})`,
+    borderColor: `rgba(246, 247, 248, ${opacity})`
+  }
+}
 onShow(async () => {
   let shareUrl1 = await getCutContent();
   if (shareUrl1) {
@@ -165,6 +195,51 @@ page {
   align-items: center;
   background: #f6f7f8;
   box-sizing: border-box;
+
+  :deep(.video-navbar) {
+    background: v-bind('navbarStyle.background');
+    border-bottom: 2rpx solid v-bind('navbarStyle.borderColor');
+
+    .nut-navbar--placeholder {
+      .nut-navbar {
+        // background: v-bind('navbarStyle.background');
+
+        .nut-navbar__left {
+          span {
+            color: v-bind('navbarStyle.color') !important;
+          }
+        }
+
+        .nut-navbar__right {
+          .nut-icon {
+            color: v-bind('navbarStyle.color') !important;
+          }
+        }
+      }
+    }
+  }
+
+  :deep(.navbar-white) {
+    background: #fff;
+
+    .nut-navbar--placeholder {
+      .nut-navbar {
+        background: #fff;
+
+        .nut-navbar__left {
+          span {
+            color: #000 !important;
+          }
+        }
+
+        .nut-navbar__right {
+          .nut-icon {
+            color: #000 !important;
+          }
+        }
+      }
+    }
+  }
 
   .video-container {
     flex: 1;

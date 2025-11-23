@@ -9,12 +9,12 @@
         <span>William Player</span>
       </template>
       <template #right>
-        <nut-icon name="search" custom-color="#000" @click="toVideoSearch"></nut-icon>
-        <nut-icon name="uploader" custom-color="#000" @click="toAddMedia"></nut-icon>
+        <nut-icon name="search" custom-color="#fff" @click="toVideoSearch"></nut-icon>
+        <nut-icon name="uploader" custom-color="#fff" @click="toAddMedia"></nut-icon>
         <div class="video-navbar-popover">
-          <nut-icon name="refresh2" custom-color="#000" @click="showProgress"
+          <nut-icon name="refresh2" custom-color="#fff" @click="showProgress"
             class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
-          <nut-icon name="refresh2" custom-color="#000" @click="showProgress" v-show="!loading"></nut-icon>
+          <nut-icon name="refresh2" custom-color="#fff" @click="showProgress" v-show="!loading"></nut-icon>
           <div :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
             :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }" v-show="showPopover">
             <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
@@ -83,7 +83,7 @@ const selectMedia = ref({})
 
 const loading = ref(false);
 
-const emits = defineEmits(["refresh", "pause"]);
+const emits = defineEmits(["refresh", "pause", "getHeight"]);
 
 const showPause = ref(false);
 
@@ -102,6 +102,7 @@ const getNavHeight = () => {
   let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
   navBarHeight.value = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
   contentHeight.value = "44px";
+  emits("getHeight", navBarHeight.value);
 };
 
 //计算h5的navBar高度
@@ -110,6 +111,7 @@ const getH5NavbarHeight = () => {
   windowWidth.value = sysinfo.windowWidth;
   navBarHeight.value = "44px";
   contentHeight.value = "44px";
+  emits("getHeight", navBarHeight.value);
 };
 
 // #ifdef APP-PLUS
@@ -316,11 +318,12 @@ onMounted(() => {
 
 .video-navbar {
   width: 100%;
-  position: relative;
-  background: #fff;
+  position: fixed;
+  background: transparent;
   z-index: 99;
   top: 0;
-  border-bottom: 2rpx solid #f6f7f8;
+  // border-bottom: 2rpx solid #f6f7f8;
+  border-bottom: 2rpx solid transparent;
   box-sizing: border-box;
 
   ::v-deep .nut-navbar {
@@ -328,7 +331,7 @@ onMounted(() => {
     width: 100%;
     bottom: 0;
     height: var(--content-height);
-    background: #fff;
+    background: transparent;
     border: none;
     box-shadow: none;
     z-index: 99;
@@ -351,7 +354,7 @@ onMounted(() => {
       span {
         font-size: 20px;
         font-weight: bold;
-        color: #000;
+        color: #fff;
         padding-left: 5px;
       }
     }

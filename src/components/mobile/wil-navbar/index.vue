@@ -105,27 +105,27 @@ const clickBack = () => {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .wil-navbar {
-    ::v-deep .nut-navbar {
-      background-color: #1e1e20;
-      .nut-navbar__left {
-        .nut-icon-rect-left {
-          color: #fff !important;
-        }
-      }
-      .nut-navbar__title {
-        min-width: 60%;
-        .text {
-          color: #fff !important;
-          font-size: 17px;
-          font-weight: bold;
-        }
-      }
-      .nut-navbar__right {
-        display: none;
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .wil-navbar {
+//     ::v-deep .nut-navbar {
+//       background-color: #1e1e20;
+//       .nut-navbar__left {
+//         .nut-icon-rect-left {
+//           color: #fff !important;
+//         }
+//       }
+//       .nut-navbar__title {
+//         min-width: 60%;
+//         .text {
+//           color: #fff !important;
+//           font-size: 17px;
+//           font-weight: bold;
+//         }
+//       }
+//       .nut-navbar__right {
+//         display: none;
+//       }
+//     }
+//   }
+// }
 </style>

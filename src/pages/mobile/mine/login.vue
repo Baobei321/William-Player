@@ -1,17 +1,35 @@
 <template>
   <div class="login">
-    <div class="login-title">用户登录</div>
-    <base-form :options="settings" :show-button="true" ref="base_form" v-model="formData">
-      <template #bottom>
-        <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
-        <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
-        <div class="register-button">
-          <div @click="touristEnter">游客进入</div>
-          <div class="register-button-line"></div>
-          <div @click="toRegister">注册</div>
-        </div>
-      </template>
-    </base-form>
+    <div class="login-title">
+      <div class="login-title-top">
+        <span>HI</span>
+        <div>请登录</div>
+      </div>
+      <div class="login-title-bottom">欢迎使用William Player</div>
+    </div>
+    <div class="login-tabs">
+      <nut-tabs v-model="tabValue">
+        <nut-tab-pane title="手机登录" pane-key="1">
+          <base-form :options="settings1" :show-button="false" ref="base_form" v-model="formData">
+          </base-form>
+          <div class="forget">忘记密码?</div>
+        </nut-tab-pane>
+        <nut-tab-pane title="邮箱登录" pane-key="2">
+          <base-form :options="settings2" :show-button="false" ref="base_form" v-model="formData">
+          </base-form>
+          <div class="forget">忘记密码?</div>
+        </nut-tab-pane>
+      </nut-tabs>
+    </div>
+    <div class="login-button">
+      <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
+      <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
+      <div class="register-button">
+        <div @click="touristEnter">游客进入</div>
+        <div class="register-button-line"></div>
+        <div @click="toRegister">注册</div>
+      </div>
+    </div>
     <div class="user-agreement" @click="checkAgree">
       <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon" />
       <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon" />
@@ -26,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import baseForm from "@/components/mobile/wil-form/index.vue";
 import checkIcon from "@/static/check.png";
 import checkActiveIcon from "@/static/check-active.png";
@@ -34,6 +52,18 @@ import { loginByPhone, getWeUserByopenId } from "@/network/apis";
 import { encrypt } from "@/utils/jsencrypt.js";
 import * as CONFIG from "@/utils/config";
 import { getUserByopenId } from "./common.js";
+import tabsLeft from '@/static/tabs-left.png'
+import tabsRight from '@/static/tabs-right.png'
+
+const tabValue = ref('1')
+
+const tabBg = computed(() => {
+  if (tabValue.value === '1') {
+    return `url(${tabsLeft})`
+  } else {
+    return `url(${tabsRight})`
+  }
+})
 
 //手机号校验
 const validatorPhone = (val) => {
@@ -48,8 +78,12 @@ const validatorPhone = (val) => {
     }
   }
 };
-const settings = ref([
+const settings1 = ref([
   { label: "手机号", type: "input", prop: "phone", formItemProps: { placeholder: "请输入手机号", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone, message: "请输入正确的手机号" }] },
+  { label: "密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
+]);
+const settings2 = ref([
+  { label: "邮箱", type: "input", prop: "email", formItemProps: { placeholder: "请输入邮箱", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone, message: "请输入正确的手机号" }] },
   { label: "密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
 ]);
 
@@ -119,6 +153,7 @@ page {
   width: 100%;
   height: 100%;
 }
+
 .login {
   width: 100%;
   height: 100%;
@@ -131,85 +166,153 @@ page {
   background-size: 100% 100%;
   padding: 200rpx 48rpx 68rpx 48rpx;
   position: relative;
+
   &-title {
     font-weight: bold;
-    font-size: 48rpx;
+    // font-size: 48rpx;
     color: #262424;
     margin-bottom: 64rpx;
+
+    &-top {
+      display: flex;
+      align-items: center;
+
+      span {
+        font-size: 72rpx;
+        color: #fff;
+      }
+
+      div {
+        width: 160rpx;
+        height: 80rpx;
+        background: url('@/static/zk-qp.png') center no-repeat;
+        background-size: 100% 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32rpx;
+        color: #fff;
+        padding-left: 14rpx;
+      }
+    }
+
+    &-bottom {
+      font-size: 48rpx;
+      color: #FFFFFF;
+      margin-top: 18rpx;
+    }
   }
-  ::v-deep .base-form {
-    background: transparent;
-    padding: 0;
-    .nut-cell-group {
-      .nut-cell-group__wrap {
+
+  &-tabs {
+    :deep(.nut-tabs) {
+      .nut-tabs__titles {
+        background: v-bind(tabBg) center no-repeat;
+        background-size: 100% 100%;
+      }
+
+      .nut-tabs__content {
         background: transparent;
-        border-radius: 20rpx;
-        .nut-form-item {
-          padding: 28rpx;
-          padding-right: 36rpx;
-          border-radius: 20rpx !important;
-          margin-bottom: 24rpx;
-          align-items: center;
-          &__label {
-            min-width: 160rpx;
-            &::before {
-              display: none;
-            }
-          }
-          &__body {
-            &__slots {
-              .nut-input {
-                &-value {
-                  .nut-input-inner {
-                    .nut-input-right-box {
-                      img {
-                        height: 50rpx;
-                        width: 150rpx;
+
+        .nut-tab-pane {
+          background: rgba(255, 255, 255, 0.6);
+          border-radius: 0 0 30rpx 30rpx;
+          padding-bottom: 32rpx;
+
+          .base-form {
+            background: transparent;
+            padding: 0;
+
+            .nut-cell-group {
+              .nut-cell-group__wrap {
+                background: transparent;
+                border-radius: 20rpx;
+
+                .nut-form-item {
+                  padding: 28rpx;
+                  padding-right: 36rpx;
+                  border-radius: 20rpx !important;
+                  margin-bottom: 24rpx;
+                  align-items: center;
+
+                  &__label {
+                    min-width: 160rpx;
+
+                    &::before {
+                      display: none;
+                    }
+                  }
+
+                  &__body {
+                    &__slots {
+                      .nut-input {
+                        &-value {
+                          .nut-input-inner {
+                            .nut-input-right-box {
+                              img {
+                                height: 50rpx;
+                                width: 150rpx;
+                              }
+                            }
+                          }
+                        }
                       }
                     }
+                  }
+                }
+
+                .remember-password {
+                  display: flex;
+                  align-items: center;
+                  justify-content: flex-start;
+
+                  span {
+                    color: #353a45;
+                    font-size: 28rpx;
+                    padding-left: 20rpx;
                   }
                 }
               }
             }
           }
-        }
-        .remember-password {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          span {
-            color: #353a45;
-            font-size: 28rpx;
-            padding-left: 20rpx;
+
+          .forget {
+            font-size: 26rpx;
+            color: #1492FF;
+            text-align: right;
           }
         }
       }
     }
-    .base-form-bottom {
-      margin-top: 166rpx;
+  }
+
+  &-button {
+    margin-top: 100rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .register-button {
+      font-size: 28rpx;
+      color: #4080ff;
+      display: inline;
+      margin-top: 30rpx;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      .register-button {
-        font-size: 28rpx;
-        color: #4080ff;
-        display: inline;
-        margin-top: 30rpx;
-        display: flex;
-        align-items: center;
-        .register-button-line {
-          width: 2rpx;
-          height: 34rpx;
-          margin: 0 24rpx;
-          background: #4080ff;
-        }
-      }
-      .nut-button {
-        width: 100%;
-        height: 80rpx;
+
+      .register-button-line {
+        width: 2rpx;
+        height: 34rpx;
+        margin: 0 24rpx;
+        background: #4080ff;
       }
     }
+
+    .nut-button {
+      width: 100%;
+      height: 80rpx;
+    }
   }
+
   .user-agreement {
     display: flex;
     width: 100%;
@@ -227,18 +330,22 @@ page {
       height: 28rpx;
       display: block;
     }
+
     &-word {
       padding-left: 4rpx;
       display: flex;
       align-items: center;
+
       span {
         display: inline;
         color: #86909c;
         font-size: 26rpx;
       }
+
       span:nth-child(2) {
         color: #4080ff;
       }
+
       span:nth-child(4) {
         color: #4080ff;
       }
@@ -273,5 +380,4 @@ page {
 //       }
 //     }
 //   }
-// }
-</style>
+// }</style>
