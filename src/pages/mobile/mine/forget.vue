@@ -1,5 +1,6 @@
 <template>
     <div class="forget">
+        <wil-navbar @getHeight="getHeight"></wil-navbar>
         <div class="forget-title">
             <div class="forget-title-top">
                 <span>HI</span>
@@ -29,26 +30,28 @@
 
 <script setup>
 import baseForm from "@/components/mobile/wil-form/index.vue";
+import wilNavbar from "@/components/mobile/wil-navbar/index.vue"
 import { ref } from "vue";
 import { sendEmail } from "@/network/apis";
 
+const navbarHeight = ref('')
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
 let timer = null
 const formData = ref({})
 //手机号校验
 const validatorPhone = (val) => {
-  return new Promise((resolve, reject) => {
-    if (!val) {
-      reject('手机号码不能为空')
-    } else {
-      const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
-      if (!reg.test(val)) {
-        reject('手机号码格式错误')
-      } else {
-        resolve(); // 所有验证都通过
-      }
-    }
-  })
+    return new Promise((resolve, reject) => {
+        if (!val) {
+            reject('手机号码不能为空')
+        } else {
+            const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
+            if (!reg.test(val)) {
+                reject('手机号码格式错误')
+            } else {
+                resolve(); // 所有验证都通过
+            }
+        }
+    })
 };
 //校验邮箱
 const validatorEmail = (val) => {
@@ -71,6 +74,10 @@ const settings = ref([
     { label: "新密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入新密码", type: "password" }, rule: [{ required: true, message: "请输入新密码" }] },
     { label: "验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" }, rule: [{ required: true, message: "请输入验证码" }] },
 ]);
+
+const getHeight = (val) => {
+    navbarHeight.value = val
+}
 
 //发送邮箱验证码
 const toSendEmail = async () => {
@@ -117,13 +124,14 @@ page {
     flex-direction: column;
     background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 100%);
     background-size: 100% 100%;
+
     &-title {
         font-weight: bold;
         // font-size: 48rpx;
         color: #262424;
         margin-bottom: 64rpx;
         padding: 0 48rpx;
-        padding-top: 200rpx;
+        padding-top: calc(200rpx - v-bind(navbarHeight));
 
         &-top {
             display: flex;
