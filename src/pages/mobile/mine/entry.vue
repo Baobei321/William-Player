@@ -37,10 +37,11 @@ onBeforeMount(async () => {
         url: "/pages/mobile/video/index",
       });
     } else {
-      uni.setStorageSync("userPassword", { phone: "19994658532", password: "123456789" });
       await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
         .then((res) => {
           uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+          uni.setStorageSync("Authorization", res.accessToken);
+          uni.setStorageSync("refreshToken", res.refreshToken);
           getUserByopenId();
           uni.reLaunch({
             url: "/pages/mobile/video/index",

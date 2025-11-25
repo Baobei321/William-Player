@@ -10,14 +10,14 @@
     <div class="login-tabs">
       <nut-tabs v-model="tabValue">
         <nut-tab-pane title="手机登录" pane-key="1">
-          <base-form :options="settings1" :show-button="false" ref="base_form" v-model="formData">
+          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData">
           </base-form>
-          <div class="forget">忘记密码?</div>
+          <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
         <nut-tab-pane title="邮箱登录" pane-key="2">
-          <base-form :options="settings2" :show-button="false" ref="base_form" v-model="formData">
+          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData">
           </base-form>
-          <div class="forget">忘记密码?</div>
+          <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
       </nut-tabs>
     </div>
@@ -67,27 +67,45 @@ const tabBg = computed(() => {
 
 //手机号校验
 const validatorPhone = (val) => {
-  if (!val) {
-    return false;
-  } else {
-    const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
-    if (!reg.test(val)) {
-      return false;
+  return new Promise((resolve, reject) => {
+    if (!val) {
+      reject('手机号码不能为空')
     } else {
-      return true;
+      const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
+      if (!reg.test(val)) {
+        reject('手机号码格式错误')
+      } else {
+        resolve(); // 所有验证都通过
+      }
     }
-  }
+  })
+};
+//校验邮箱
+const validatorEmail = (val) => {
+  return new Promise((resolve, reject) => {
+    if (!val) {
+      reject('邮箱不能为空')
+    } else {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(val)) {
+        reject('请输入有效的邮箱地址')
+      } else {
+        resolve(); // 所有验证都通过
+      }
+    }
+  })
 };
 const settings1 = ref([
-  { label: "手机号", type: "input", prop: "phone", formItemProps: { placeholder: "请输入手机号", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone, message: "请输入正确的手机号" }] },
+  { label: "手机号", type: "input", prop: "phone", formItemProps: { placeholder: "请输入手机号", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone }] },
   { label: "密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
 ]);
 const settings2 = ref([
-  { label: "邮箱", type: "input", prop: "email", formItemProps: { placeholder: "请输入邮箱", type: "number", inputmode: "numeric" }, rule: [{ validator: validatorPhone, message: "请输入正确的手机号" }] },
+  { label: "邮箱", type: "input", prop: "email", formItemProps: { placeholder: "请输入邮箱", type: "text", inputmode: "numeric" }, rule: [{ validator: validatorEmail }] },
   { label: "密码", type: "input", prop: "password", formItemProps: { placeholder: "请输入密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
 ]);
 
-const base_form = ref(null);
+const base_form1 = ref(null);
+const base_form2 = ref(null);
 const formData = ref({});
 const userAgree = ref(false);
 
@@ -96,24 +114,30 @@ const checkAgree = () => {
 };
 
 const confirmCommit = async () => {
-  base_form.value.confirmCommit().then(async (valid) => {
-    if (valid) {
-      let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) });
-      uni.setStorageSync("userPassword", { phone: formData.value.phone, password: formData.value.password });
-      uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
-      getUserByopenId();
-      uni.reLaunch({
-        url: "/pages/mobile/video/index",
-      });
-    }
-  });
+  if (tabValue.value === '1') {//手机号登录
+    base_form1.value.confirmCommit().then(async (valid) => {
+      if (valid) {
+        let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) });
+        uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+        uni.setStorageSync("Authorization", res.accessToken);
+        uni.setStorageSync("refreshToken", res.refreshToken);
+        getUserByopenId();
+        uni.reLaunch({
+          url: "/pages/mobile/video/index",
+        });
+      }
+    });
+  } else if (tabValue.value === '2') {//邮箱登录
+
+  }
 };
 
 const touristEnter = async () => {
-  uni.setStorageSync("userPassword", { phone: "19994658532", password: "123456789" });
   await loginByPhone({ phone: "19994658532", password: encrypt("123456789") })
     .then((res) => {
       uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+      uni.setStorageSync("Authorization", res.accessToken);
+      uni.setStorageSync("refreshToken", res.refreshToken);
       getUserByopenId();
       uni.reLaunch({
         url: "/pages/mobile/video/index",
@@ -132,6 +156,12 @@ const touristEnter = async () => {
       }
     });
 };
+
+const toForget = () => {
+  uni.navigateTo({
+    url: "/pages/mobile/mine/forget",
+  });
+}
 
 const toRegister = () => {
   uni.navigateTo({
@@ -162,7 +192,7 @@ page {
   flex-direction: column;
   // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
   //   center no-repeat;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
+  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
   background-size: 100% 100%;
   padding: 200rpx 48rpx 68rpx 48rpx;
   position: relative;
@@ -216,6 +246,7 @@ page {
         .nut-tab-pane {
           background: rgba(255, 255, 255, 0.6);
           border-radius: 0 0 30rpx 30rpx;
+          padding: 48rpx 40rpx;
           padding-bottom: 32rpx;
 
           .base-form {
@@ -293,7 +324,7 @@ page {
 
     .register-button {
       font-size: 28rpx;
-      color: #4080ff;
+      color: #1492FF;
       display: inline;
       margin-top: 30rpx;
       display: flex;
@@ -303,7 +334,7 @@ page {
         width: 2rpx;
         height: 34rpx;
         margin: 0 24rpx;
-        background: #4080ff;
+        background: #1492FF;
       }
     }
 
@@ -343,11 +374,11 @@ page {
       }
 
       span:nth-child(2) {
-        color: #4080ff;
+        color: #1492FF;
       }
 
       span:nth-child(4) {
-        color: #4080ff;
+        color: #1492FF;
       }
     }
   }

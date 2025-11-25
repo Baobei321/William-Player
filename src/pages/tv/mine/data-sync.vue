@@ -53,7 +53,6 @@ const refreshStatus = () => {
                 if (res.data) {
                     uni.setStorageSync(CONFIG.USER_KEY, res.data.userInfo.userKey)
                     uni.setStorageSync(CONFIG.USER_ID, res.data.userInfo.userId)
-                    uni.setStorageSync('userPassword', res.data.userInfo.userPassword)
                     uni.setStorageSync('Authorization', res.data.userInfo.Authorization)
                     uni.setStorageSync("sourceList", res.data.sourceList);
                     uni.setStorageSync("historyPlay", res.data.historyPlay);

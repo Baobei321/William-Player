@@ -30,7 +30,10 @@ const scanCode = () => {
       let result = JSON.parse(res.result);
       if (result.type == "dataSync") {
         let obj = {
-          userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
+          userInfo: {
+            userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID),
+            Authorization: uni.getStorageSync("Authorization"), refreshToken: uni.getStorageSync('refreshToken')
+          },
           // localMovieTvData: uni.getStorageSync("localMovieTvData"),
           muluData: uni.getStorageSync('muluData') || {},
           sourceList: uni.getStorageSync("sourceList"),

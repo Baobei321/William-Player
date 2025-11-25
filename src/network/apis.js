@@ -126,3 +126,11 @@ export const sendEmail = data => {
     data: data
   })
 }
+
+//登出
+export const doLogout = () => {
+  return request({
+    url: `/logout`,
+    method: 'post',
+  })
+}

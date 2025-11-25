@@ -68,7 +68,7 @@ import { getCutContent } from "@/utils/common";
 import showModal from "@/components/mobile/wil-modal/modal.js";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import wilImage from "@/components/mobile/wil-image/index.vue";
-import { setShareData } from "@/network/apis";
+import { setShareData, doLogout } from "@/network/apis";
 
 // const { getUntokenDict } = useDict()
 
@@ -160,7 +160,10 @@ const openUrl = () => {
         let result = JSON.parse(res.result);
         if (result.type == "dataSync") {
           let obj = {
-            userInfo: { userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID), userPassword: uni.getStorageSync('userPassword'), Authorization: uni.getStorageSync("Authorization") },
+            userInfo: {
+              userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID),
+              Authorization: uni.getStorageSync("Authorization"), refreshToken: uni.getStorageSync("refreshToken")
+            },
             // localMovieTvData: uni.getStorageSync("localMovieTvData"),
             muluData: uni.getStorageSync('muluData') || {},
             sourceList: uni.getStorageSync("sourceList"),
@@ -239,6 +242,8 @@ const toLogout = () => {
       uni.removeStorageSync(CONFIG.USER_ID);
       uni.removeStorageSync(CONFIG.OPEN_ID);
       uni.removeStorageSync(CONFIG.USER_KEY);
+      uni.removeStorageSync("refreshToken");
+      doLogout();
       uni.removeStorageSync("Authorization");
       uni.reLaunch({
         url: "/pages/mobile/mine/login",

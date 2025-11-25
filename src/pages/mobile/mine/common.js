@@ -22,7 +22,6 @@ const getUserByopenId = async () => {
   let res = await getWeUserByopenId({ openId: uni.getStorageSync(CONFIG.OPEN_ID) });
   uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
   uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
-  uni.setStorageSync("Authorization", res.data.token);
   let settingData = uni.getStorageSync("settingData");
   if (settingData) {
     settingData.tmdbKey = res.data.wuser.tmdbKey;

@@ -20,10 +20,10 @@
 
 <script setup>
 import { ref } from "vue";
-import { getUntokenDicts } from "@/network/apis";
+import { getUntokenDicts,getDicts } from "@/network/apis";
 const appreciateList = ref([]);
 const getAppreciateUser = async () => {
-  let res = await getUntokenDicts("appreciate_user");
+  let res = await getDicts("appreciate_user");
   appreciateList.value = res.data;
 };
 getAppreciateUser();
