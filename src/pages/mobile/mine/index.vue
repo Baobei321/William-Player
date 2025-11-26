@@ -58,6 +58,7 @@ import iconTb from "@/static/icon-tb.png";
 // import iconDownload from "@/static/icon-download.png";
 import iconMulu from "@/static/icon-mulu.png"
 import iconDeepseek from "@/static/icon-deepseek.png";
+import iconToolbox from "@/static/icon-toolbox.png";
 import iconFeedback from "@/static/icon-feedback.png";
 import iconGift from "@/static/icon-gift.png";
 import iconSetting from "@/static/icon-setting.png";
@@ -109,13 +110,9 @@ const cellOptions = ref([
       tip: "敬请期待...",
     },
     {
-      title: "深度求索",
-      leftIcon: iconDeepseek,
-      path: "/pages/mobile/backend/index",
-      query: {
-        url: "https://yuanbao.tencent.com",
-        title: "腾讯元宝",
-      },
+      title: "工具箱",
+      leftIcon: iconToolbox,
+      path: "/pages/mobile/toolbox/index",
     },
   ],
   [

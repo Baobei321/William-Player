@@ -162,6 +162,18 @@
       }
     },
     {
+      "path": "pages/mobile/toolbox/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mobile/toolbox/express/search",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mobile/mine/settings",
       "style": {
         "navigationBarTitleText": "设置"

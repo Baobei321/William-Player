@@ -23,7 +23,7 @@
             </base-form>
         </div>
         <div class="forget-button">
-            <nut-button custom-color="#ff6701" @click="clickNoAgree">确认修改</nut-button>
+            <nut-button custom-color="#ff6701" @click="confirmEdit">确认修改</nut-button>
         </div>
     </div>
 </template>
@@ -32,7 +32,7 @@
 import baseForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue"
 import { ref } from "vue";
-import { sendEmail } from "@/network/apis";
+import { sendEmail, editPwd } from "@/network/apis";
 
 const navbarHeight = ref('')
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
@@ -90,6 +90,7 @@ const toSendEmail = async () => {
                 icon: 'none'
             })
         } else {
+            let res = await sendEmail({ email: formData.value.email, type: 'editPwd' })
             timer = setInterval(() => {
                 countDown.value--
                 if (countDown.value === -1) {
@@ -98,7 +99,6 @@ const toSendEmail = async () => {
                     timer = null
                 }
             }, 1000);
-            let res = await sendEmail({ email: formData.value.email })
             codeEncrypt.value = res.codeEncrypt
         }
     } else {
@@ -107,6 +107,11 @@ const toSendEmail = async () => {
             icon: 'none'
         })
     }
+}
+
+const confirmEdit = async () => {
+    await editPwd(formData.value)
+    uni.navigateBack()
 }
 </script>
 

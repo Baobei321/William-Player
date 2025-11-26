@@ -134,3 +134,12 @@ export const doLogout = () => {
     method: 'post',
   })
 }
+
+//修改密码
+export const editPwd = data => {
+  return request({
+    url: `/william/editPwd`,
+    method: 'post',
+    data: data
+  })
+}
