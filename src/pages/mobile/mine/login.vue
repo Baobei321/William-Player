@@ -10,12 +10,12 @@
     <div class="login-tabs">
       <nut-tabs v-model="tabValue">
         <nut-tab-pane title="手机登录" pane-key="1">
-          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData">
+          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1">
           </base-form>
           <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
         <nut-tab-pane title="邮箱登录" pane-key="2">
-          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData">
+          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2">
           </base-form>
           <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
@@ -48,7 +48,7 @@ import { computed, ref } from "vue";
 import baseForm from "@/components/mobile/wil-form/index.vue";
 import checkIcon from "@/static/check.png";
 import checkActiveIcon from "@/static/check-active.png";
-import { loginByPhone, getWeUserByopenId } from "@/network/apis";
+import { loginByPhone, loginByEmail, getWeUserByopenId } from "@/network/apis";
 import { encrypt } from "@/utils/jsencrypt.js";
 import * as CONFIG from "@/utils/config";
 import { getUserByopenId } from "./common.js";
@@ -106,7 +106,8 @@ const settings2 = ref([
 
 const base_form1 = ref(null);
 const base_form2 = ref(null);
-const formData = ref({});
+const formData1 = ref({});
+const formData2 = ref({});
 const userAgree = ref(false);
 
 const checkAgree = () => {
@@ -117,7 +118,7 @@ const confirmCommit = async () => {
   if (tabValue.value === '1') {//手机号登录
     base_form1.value.confirmCommit().then(async (valid) => {
       if (valid) {
-        let res = await loginByPhone({ phone: formData.value.phone, password: encrypt(formData.value.password) });
+        let res = await loginByPhone({ phone: formData1.value.phone, password: encrypt(formData1.value.password) });
         uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
         uni.setStorageSync("Authorization", res.accessToken);
         uni.setStorageSync("refreshToken", res.refreshToken);
@@ -128,7 +129,18 @@ const confirmCommit = async () => {
       }
     });
   } else if (tabValue.value === '2') {//邮箱登录
-
+    base_form2.value.confirmCommit().then(async (valid) => {
+      if (valid) {
+        let res = await loginByEmail({ email: formData2.value.email, password: encrypt(formData2.value.password) });
+        uni.setStorageSync(CONFIG.OPEN_ID, res.openId);
+        uni.setStorageSync("Authorization", res.accessToken);
+        uni.setStorageSync("refreshToken", res.refreshToken);
+        getUserByopenId();
+        uni.reLaunch({
+          url: "/pages/mobile/video/index",
+        });
+      }
+    });
   }
 };
 

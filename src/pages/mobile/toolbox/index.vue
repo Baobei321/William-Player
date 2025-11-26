@@ -38,7 +38,7 @@ const toolboxArr = [
         title: '天气预报', icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/77/a8/3e/77a83e97-f088-b8f9-71cc-9cf395deae1c/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/350x350.png',
         path: '/pages/mobile/backend/index',
         query: {
-            url: 'https://qq.weather.com.cn/mweather15d/101300501.shtml',
+            url: 'https://html5.moji.com/tpd/mojiweatheraggr/index.html#/home',
             title: "天气预报",
         }
     },

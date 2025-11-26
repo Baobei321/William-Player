@@ -24,6 +24,15 @@ export const loginByPhone = data => {
     header: { 'Content-Type': 'application/json' },
   })
 }
+//邮箱密码登录
+export const loginByEmail = data => {
+  return request({
+    url: '/email/login',
+    method: 'post',
+    data: data,
+    header: { 'Content-Type': 'application/json' },
+  })
+}
 
 //注册
 export const registerUser = data => {
