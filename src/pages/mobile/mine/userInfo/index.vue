@@ -1,6 +1,8 @@
 <template>
 <div class="userInfo">
-
+    <div class="userInfo-avatar">
+        
+    </div>
 </div>
 </template>
 

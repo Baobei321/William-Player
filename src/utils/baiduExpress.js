@@ -21,11 +21,11 @@ export const getTokenV2 = async () => {
                 'User-Agent': getRandomUserAgent()
             },
             success: response => {
-                console.log(response, '1111res');
                 // 正则提取tokenV2（与PHP正则规则一致）
                 const pattern = /tokenV2=(.*?)"/i;
                 const match = response.data.match(pattern);
                 if (match && match[1]) {
+                    // console.log(response, '1111res', match[1]);
                     resolve(match[1]);
                 }
             },
