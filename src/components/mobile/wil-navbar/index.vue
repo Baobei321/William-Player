@@ -1,7 +1,8 @@
 <template>
-  <div class="wil-navbar" :style="{'height':navBarHeight}">
-    <nut-navbar :title="$slots.content?'':props.title" :left-show="props.leftShow" :style="{'--content-height':contentHeight}" @on-click-back="clickBack"
-      :title-icon="$slots['title-icon']?true:false">
+  <div class="wil-navbar" :style="{ 'height': navBarHeight }">
+    <nut-navbar :title="$slots.content ? '' : props.title" :left-show="props.leftShow"
+      :style="{ '--content-height': contentHeight, '--right-show': props.rightShow ? 'block' : 'none' }"
+      @on-click-back="clickBack" :title-icon="$slots['title-icon'] ? true : false">
       <template #leftShow v-if="props.leftShow">
         <slot v-if="$slots.leftShow" name="leftShow"></slot>
         <nut-icon name="rect-left" :custom-color="props.arrowColor" v-else></nut-icon>
@@ -29,6 +30,7 @@ const props = defineProps({
   title: { type: String, default: "" },
   leftShow: { type: Boolean, default: process.env.uni_ENV === "alipay" ? false : true },
   arrowColor: { type: String, default: "#000" },
+  rightShow: { type: Boolean, default: false },
 });
 
 const navBarHeight = ref("");
@@ -74,6 +76,7 @@ const clickBack = () => {
   background: transparent;
   z-index: 99;
   top: 0;
+
   ::v-deep .nut-navbar {
     position: absolute;
     width: 100%;
@@ -84,28 +87,34 @@ const clickBack = () => {
     border: none;
     box-shadow: none;
     margin-bottom: 0;
+
     .nut-navbar__left {
       position: absolute;
       left: 0;
+
       .nut-icon-rect-left {
         font-size: 17px;
         width: 17px;
         height: 17px;
       }
     }
+
     .nut-navbar__title {
       min-width: 60%;
+
       .text {
         color: #000 !important;
         font-size: 17px;
         font-weight: bold;
       }
     }
+
     .nut-navbar__right {
-      display: none;
+      display: var(--right-show);
     }
   }
 }
+
 // @media (prefers-color-scheme: dark) {
 //   .wil-navbar {
 //     ::v-deep .nut-navbar {
@@ -128,5 +137,4 @@ const clickBack = () => {
 //       }
 //     }
 //   }
-// }
-</style>
+// }</style>

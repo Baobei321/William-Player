@@ -49,7 +49,22 @@
     {
       "path": "pages/mobile/live/index",
       "style": {
-        "navigationBarTitleText": "直播"
+        "navigationBarTitleText": "直播",
+        "app-plus": {
+          "subNVues": [
+            {
+              "id": "live_video", // 唯一标识  
+              "path": "pages/mobile/video/video-player", // 页面路径  
+              "style": {
+                "position": "absolute",
+                "left": "0",
+                "top": "0",
+                "width": "100%",
+                "background": "transparent"
+              }
+            }
+          ]
+        }
       }
     },
     {

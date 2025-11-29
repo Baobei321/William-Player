@@ -1,0 +1,190 @@
+<template>
+  <view class="video-player">
+    <view class="video-player-container" :style="{ height: videoHeight, flex: `0 0 ${videoHeight}` }">
+      <view :style="{ width: '750rpx', height: videoHeight, background: '#000', position: 'relative' }"
+        v-if="plateForm == 'android' && uniPlatform == 'app'">
+        <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type == 'tv'" :title="config.title"
+          :url="config.url" :showProgress="settingData.showProgress" :showPre="this.historyObj.ji > 1"
+          :showNext="this.historyObj.ji < tvList.length" :initialFullScreen="false" @timeupdate="setHistory"
+          @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo"
+          @getorientation="getOrientation" @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }"
+          ref="video_view">
+        </video-view>
+        <tv-button v-if="showTvButton" :style="{ width: '750rpx', height: videoHeight }" @setTvButton="setTvButton"
+          @changeTv="castTv"></tv-button>
+      </view>
+      <view v-else>
+        <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
+          :initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
+          :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory"
+          @pause="pauseVideo" v-if="config.url && !showReload">
+        </video>
+        <button class="video-button" v-if="showReload" @click="reloadVideo">
+          <text style="color:#fff">重新加载</text>
+        </button>
+      </view>
+    </view>
+    <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton"
+      @playOrPause="playOrPauseVideo"></tv-select>
+  </view>
+</template>
+
+<script>
+import nvueNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
+import playerDetail from "./components/player-component/detail.nvue";
+import tvSelect from "./components/player-component/tv-select.nvue";
+import tvButton from "./components/player-component/tv-button.nvue";
+import { addOperLog } from "@/network/apis";
+import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
+import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
+import { getEmbyPlayerUrl } from '@/utils/emby'
+import { IMG_DOMAIN } from "@/utils/config";
+
+export default {
+  components: {
+    nvueNavbar,
+    playerDetail,
+    tvSelect,
+    tvButton,
+  },
+  data() {
+    return {
+      routerParams: {},
+      plateForm: "",
+      uniPlatform: "",
+      videoHeight: "580rpx",
+      settingData: {},
+      config: {
+        url: "",
+        // 是否自动播放
+        autoplay: true,
+        //播放器预览背景图片，支持网络地址
+        poster: "",
+        //是否循环播放
+        loop: false,
+        //开始播放位置，单位：秒
+        initialTime: 0,
+        //是否是直播
+        isLive: false,
+        //是否静音播放
+        muted: false,
+        codec: "hardware",
+        title: "",
+        playStrategy: 0,
+        cookieStr: "",
+      },
+      direction: 0,
+      showTvButton: false,
+    };
+  },
+
+  methods: {
+    getPipStatus(event) {
+      this.pipStatus = event.detail.isPip;
+      if (this.pipStatus) {
+        this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + "rpx";
+      } else {
+        this.videoHeight = "580rpx";
+      }
+    },
+    pauseVideo() {
+      if (this.routerParams.noSetHistory != 0 && this.routerParams.type) {
+        let historyArr = uni.getStorageSync("historyPlay");
+        historyArr = historyArr.filter((v) => v.sourceType != this.selectType.type || v.sourceName != this.selectMedia.name);
+        uni.setStorageSync("historyPlay", [...historyArr, ...this.historyPlay]);
+      }
+    },
+    getOrientation(event) {
+      this.direction = event.detail.direction;
+    },
+    castTv() {
+      this.$refs.tv_select.showPopup();
+    },
+    setTvButton(val) {
+      if (val) {
+        this.$refs.video_view.onPause();
+      } else {
+        this.$refs.video_view.onPlay();
+        this.$refs.tv_select.stopVideo();
+        this.$refs.selectUdn = "";
+      }
+      this.showTvButton = val;
+    },
+    playOrPauseVideo(val) {
+      if (val) {
+        this.$refs.video_view.onPlay();
+      } else {
+        this.$refs.video_view.onPause();
+      }
+    },
+  },
+  async onLoad(options) {
+    let systemInfo = uni.getSystemInfoSync();
+    this.plateForm = systemInfo.platform;
+    this.uniPlatform = systemInfo.uniPlatform;
+    this.settingData = uni.getStorageSync("settingData");
+    if (this.uniPlatform != "app") {
+      uni.showToast({
+        title: "目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕",
+        duration: 3000,
+        icon: "none",
+      });
+    }
+    this.routerParams = options;
+  },
+  onUnload() {
+  },
+  onBackPress() {
+    if (this.direction == 1) {
+      this.$refs.video_view.toggleFullScreen();
+      return true; // 阻止默认返回
+    } else {
+      if (this.$refs.tv_select.popupShow) {
+        this.$refs.tv_select.hidePopup();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+};
+</script>
+
+<style lang="scss">
+page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.video-player {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  overflow: hidden;
+  width: 750rpx;
+
+  .video-player-container {
+    background: #000000;
+    width: 750rpx;
+
+    .video-button {
+      width: 200rpx;
+      border-color: #00b2a0;
+      height: 80rpx;
+      background: #00b2a0;
+      color: #ffffff;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      border-radius: 30rpx;
+      line-height: 80rpx;
+    }
+  }
+}
+</style>

@@ -20,7 +20,7 @@
       </div>
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
-          <div class="left-img">
+          <div class="left-img" @click="enterUserInfo">
             <wil-image backgroundColor="#efefef"
               :src="userInfo.avatar || 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
             </wil-image>
@@ -34,10 +34,10 @@
         </div>
       </div>
       <div class="mine-cell">
-        <base-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell"
-          @toLogin="openLoginPopup"></base-cell>
-        <base-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell"
-          v-if="Authorization && userInfo.phonenumber != '19994658532'"></base-cell>
+        <wil-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell"
+          @toLogin="openLoginPopup"></wil-cell>
+        <wil-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell"
+          v-if="Authorization && userInfo.phonenumber != '19994658532'"></wil-cell>
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
@@ -47,7 +47,7 @@
 
 <script setup>
 import { ref } from "vue";
-import baseCell from "@/components/mobile/wil-cell/index.vue";
+import wilCell from "@/components/mobile/wil-cell/index.vue";
 import shareDialog from "../video/components/index-component/share-dialog.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import userImg from "@/static/user-img.png";
@@ -229,6 +229,13 @@ const openUrl = () => {
   });
 };
 
+//进入个人资料页，进行编辑个人信息
+const enterUserInfo = () => {
+  uni.navigateTo({
+    url: '/pages/mobile/mine/userInfo/index'
+  })
+}
+
 //退出登录
 const toLogout = () => {
   wil_modal.value.showModal({
@@ -254,6 +261,7 @@ const judgeLogin = () => {
   userInfo.value = uni.getStorageSync(CONFIG.USER_KEY);
   Authorization.value = uni.getStorageSync("Authorization");
   if (Authorization.value) {
+    //用来展示默认的游客账号
     isLogin.value = userInfo.value.phonenumber == "19994658532" ? false : true;
   } else {
     isLogin.value = false;
@@ -471,6 +479,11 @@ page {
         color: #ffffff;
         margin-left: 16rpx;
       }
+    }
+  }
+  .mine-cell{
+    :deep(.wil-cell){
+      margin-top: 24rpx;
     }
   }
 }

@@ -1,4 +1,5 @@
 import * as CONFIG from '@/utils/config.js'
+import { sendEmail } from "@/network/apis"
 // import { ipc } from "@/utils/ipcRenderer";
 // import { ipcApiRoute } from "@/utils/ipcApiRoute";
 //webdav
@@ -662,7 +663,38 @@ const getCutContent = () => {
   })
 }
 
+let timer = null
+//发送邮箱验证码
+const toSendEmail = async (codeEncrypt, countDown, email) => {
+  if (countDown.value < 61) return //如果正在倒计时，那么点击不进行任何响应
+  if (email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      uni.showToast({
+        title: '请输入有效的邮箱地址',
+        icon: 'none'
+      })
+    } else {
+      timer = setInterval(() => {
+        countDown.value--
+        if (countDown.value === -1) {
+          countDown.value = 61
+          clearInterval(timer)
+          timer = null
+        }
+      }, 1000);
+      let res = await sendEmail({ email: email })
+      codeEncrypt.value = res.codeEncrypt
+    }
+  } else {
+    uni.showToast({
+      title: '请先输入邮箱',
+      icon: 'none'
+    })
+  }
+}
+
 export {
   getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, get189DownloadUrl, getQuarkFolder, getQuarkVideoUrl,
-  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent
+  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent, toSendEmail
 };

@@ -12,7 +12,7 @@
             <base-form :options="settings" ref="base_form" v-model="formData">
                 <template #authCode="item">
                     <div class="authcode">
-                        <input v-bind="item" v-model="formData.authCode">
+                        <input v-bind="item" v-model="formData.authCode" :maxlength="6">
                         <span class="authcode-button"
                             :style="{ color: countDown < 61 ? 'rgba(204,204,204,1)' : 'rgb(255, 103, 1)' }"
                             @click="toSendEmail">{{

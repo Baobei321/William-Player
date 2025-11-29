@@ -1,12 +1,53 @@
 import * as CONFIG from '@/utils/config.js'
+import { encrypt } from "@/utils/jsencrypt.js";
+
 // 全局请求封装
 const base_url = CONFIG.BASE_URL
 // const base_url = 'http://192.168.31.15:4040/ruoyi'
 // 请求超出时间
-const timeout = 3000
+const timeout = 10000
 
 // const noToastUrl = ['/phone/login']
 const noToastUrl = []
+
+//登录游客账号
+const loginTour = () => {
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: base_url + '/phone/login',
+      method: 'post',
+      header: { 'Content-Type': 'application/json' },
+      data: { phone: "19994658532", password: encrypt("123456789") },
+      timeout: timeout,
+      success: (res) => {
+        uni.setStorageSync(CONFIG.OPEN_ID, res.data.openId);
+        uni.setStorageSync("Authorization", res.data.accessToken);
+        uni.setStorageSync("refreshToken", res.data.refreshToken);
+        getUserByopenId(res.data.openId)
+      }
+    })
+  })
+}
+
+//根据openId获取用户信息
+const getUserByopenId = async (openId) => {
+  let result = await uni.request({
+    url: base_url + '/we/getWuserByopenId',
+    method: 'get',
+    data: { openId },
+    timeout: timeout,
+  })
+  let res = result.data
+  uni.setStorageSync(CONFIG.USER_ID, res.data.userId);
+  uni.setStorageSync(CONFIG.USER_KEY, { roleKey: res.data.roleKey, avatar: res.data.avatar, ...res.data.wuser });
+  let settingData = uni.getStorageSync("settingData");
+  if (settingData) {
+    settingData.tmdbKey = res.data.wuser.tmdbKey;
+    uni.setStorageSync("settingData", settingData);
+  } else {
+    uni.setStorageSync("settingData", { tmdbKey: res.data.wuser.tmdbKey, showProgress: true, playercodec: "exoplayer", showRecommend: true });
+  }
+}
 
 //刷新token的方法
 const refreshAccess = (params) => {
@@ -18,14 +59,24 @@ const refreshAccess = (params) => {
       data: { refreshToken: uni.getStorageSync('refreshToken') },
       timeout: timeout,
       success: (res) => {
-        uni.setStorageSync('Authorization', res.data.accessToken)
-        uni.setStorageSync('refreshToken', res.data.refreshToken)
-        //获取到新的一对token之后，重新请求之前失败的方法
-        retryFail(params).then(res1 => {
-          resolve(res1)
-        }).catch(err => {
-          reject(err)
-        })
+        if (res.statusCode === 200) {
+          if (res.data?.code === 0 || res.data?.code === 200) {
+            uni.setStorageSync('Authorization', res.data.accessToken)
+            uni.setStorageSync('refreshToken', res.data.refreshToken)
+            //获取到新的一对token之后，重新请求之前失败的方法
+            retryFail(params).then(res1 => {
+              resolve(res1)
+            }).catch(err => {
+              reject(err)
+            })
+          } else if (res.data?.code === 401) { //此时的情况是刷新token也过期了
+            //401说明服务器没有挂，正常走下去就行了，不需要处理异常情况
+            loginTour()
+          }
+        }
+      },
+      fail: (err) => {
+        reject(err)
       }
     })
   })
@@ -89,6 +140,9 @@ const retryFail = (params) => {
           reject('接口请求错误')
         }
       },
+      fail: (err) => {
+        reject(err)
+      }
     })
   })
 }

@@ -15,7 +15,7 @@
     <div class="video-list1">
       <div class="video-list1-title">我的文件</div>
       <div class="video-list1-container" v-if="listData.length">
-        <base-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></base-cell>
+        <wil-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></wil-cell>
       </div>
       <wil-empty v-else text="暂无文件，请查看资源是否开启" class="video-list1-tip"></wil-empty>
     </div>
@@ -31,7 +31,7 @@
   
   <script setup>
 import { onBeforeMount, reactive, ref, nextTick } from "vue";
-import baseCell from "@/components/mobile/wil-cell/index.vue";
+import wilCell from "@/components/mobile/wil-cell/index.vue";
 import Folder from "@/static/folder.png";
 import dayjs from 'dayjs';
 import { getFolder, get189Folder, getQuarkFolder } from "@/utils/common.js";
@@ -482,7 +482,7 @@ page {
       font-size: 28rpx;
     }
     &-container {
-      ::v-deep .base-cell {
+      :deep(.wil-cell) {
         .nut-cell-group__wrap {
           .nut-cell {
             .right-icon {

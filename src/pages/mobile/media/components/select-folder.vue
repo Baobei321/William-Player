@@ -148,7 +148,7 @@ const { data, key, selectName, responseAdapter, handleData, handleSize, chooseNa
                     color: #353a45;
                     line-height: normal;
 
-                    .base-cell__title {
+                    .wil-cell__title {
                         display: flex;
                         align-items: center;
 

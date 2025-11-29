@@ -1,18 +1,20 @@
 <template>
-  <nut-cell-group class="base-cell">
-    <nut-cell v-for="item in props.options" :key="item[props.defaultProps.title]" :is-link="item[props.defaultProps.isLink] || true" v-bind="item"
-      @click="clickItem(item)">
+  <nut-cell-group class="wil-cell">
+    <nut-cell v-for="item in props.options" :key="item[props.defaultProps.title]"
+      :is-link="item[props.defaultProps.isLink] || true" v-bind="item" @click="clickItem(item)">
       <template #title>
         <slot v-if="$slots.title" name="title" v-bind="item"></slot>
         <template v-else>
           {{ item[props.defaultProps.title] }}
         </template>
       </template>
-      <template #icon>
-        <image :src="item[props.defaultProps.leftIcon]" v-if="item[props.defaultProps.leftIcon]" />
+      <template #icon v-if="$slots.icon || item[props.defaultProps.leftIcon]">
+        <slot name="icon" v-if="$slots.icon" v-bind="item"></slot>
+        <image :src="item[props.defaultProps.leftIcon]" v-if="item[props.defaultProps.leftIcon] && !$slots.icon" />
       </template>
       <template #link>
-        <image :src="theme=='light' ? icIntoBlack : icIntoWhite" class="right-icon" />
+        <!-- <image :src="theme == 'light' ? icIntoBlack : icIntoWhite" class="right-icon" /> -->
+        <nut-icon name="rect-right" :custom-color="theme === 'light' ? '#bbbbbb' : '#ffffff'"></nut-icon>
       </template>
     </nut-cell>
   </nut-cell-group>
@@ -72,9 +74,10 @@ onUnload(() => {
 </script>
 
 <style lang="scss" scoped>
-.base-cell {
-  ::v-deep .nut-cell-group__wrap {
+.wil-cell {
+  :deep(.nut-cell-group__wrap) {
     border-radius: 24rpx;
+    margin: 0;
 
     .nut-cell {
       padding: 24rpx;
@@ -103,7 +106,7 @@ onUnload(() => {
         color: #353a45;
         line-height: normal;
 
-        .base-cell__title {
+        .wil-cell__title {
           display: flex;
           align-items: center;
 
@@ -114,24 +117,28 @@ onUnload(() => {
 
         // font-weight: bold;
       }
-
-      .right-icon {
-        width: 36rpx;
-        height: 36rpx;
+      .nut-icon-rect-right {
+        width: 40rpx;
+        height: 40rpx;
+        font-size: 32rpx;
       }
     }
   }
 }
+
 @media (prefers-color-scheme: dark) {
-  .base-cell {
-    ::v-deep .nut-cell-group__wrap {
+  .wil-cell {
+    :deep(.nut-cell-group__wrap) {
       background-color: #2f2f2f;
       box-shadow: var(--nut-cell-box-shadow, 0 1px 7px 0 #000);
+
       .nut-cell {
         background-color: #2f2f2f;
+
         &::after {
           border-bottom: 2rpx solid rgb(73, 73, 73);
         }
+
         .nut-cell__title {
           color: #fff;
         }

@@ -152,3 +152,29 @@ export const editPwd = data => {
     data: data
   })
 }
+//修改用户信息
+export const editUserInfo = data => {
+  return request({
+    url: `/system/user/profile`,
+    method: 'put',
+    data: data
+  })
+}
+
+//修改用户手机号
+export const editUserPhone = data => {
+  return request({
+    url: `/william/editPhone`,
+    method: 'post',
+    data: data
+  })
+}
+
+//修改用户邮箱
+export const editUserEmail = data => {
+  return request({
+    url: `/william/editEmail`,
+    method: 'post',
+    data: data
+  })
+}
