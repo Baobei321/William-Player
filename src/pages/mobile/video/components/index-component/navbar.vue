@@ -9,12 +9,12 @@
         <span>William Player</span>
       </template>
       <template #right>
-        <nut-icon name="search" custom-color="#fff" @click="toVideoSearch"></nut-icon>
-        <nut-icon name="uploader" custom-color="#fff" @click="toAddMedia"></nut-icon>
+        <nut-icon class="navbar-icon" name="search" custom-color="#fff" @click="toVideoSearch"></nut-icon>
+        <nut-icon class="navbar-icon" name="uploader" custom-color="#fff" @click="toAddMedia"></nut-icon>
         <div class="video-navbar-popover">
-          <nut-icon name="refresh2" custom-color="#fff" @click="showProgress"
-            class="nut-icon-am-rotate nut-icon-am-infinite" v-show="loading"></nut-icon>
-          <nut-icon name="refresh2" custom-color="#fff" @click="showProgress" v-show="!loading"></nut-icon>
+          <nut-icon  name="refresh2" custom-color="#fff" @click="showProgress"
+            class="nut-icon-am-rotate nut-icon-am-infinite navbar-icon" v-show="loading"></nut-icon>
+          <nut-icon class="navbar-icon" name="refresh2" custom-color="#fff" @click="showProgress" v-show="!loading"></nut-icon>
           <div :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
             :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }" v-show="showPopover">
             <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
@@ -58,6 +58,7 @@ const props = defineProps({
   refreshData: { type: Object, default: {} },
   loading: { type: Boolean, default: false },
   tmdbKey1: { type: String, default: "" },
+  isEmpty: { type: Boolean, default: false },//是否为空状态显示，没有任何影片
 });
 
 const navBarHeight = ref("");

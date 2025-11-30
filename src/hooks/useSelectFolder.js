@@ -7,7 +7,7 @@ import { onBeforeMount } from 'vue';
 
 export function useSelectFolder({ selectType, selectMedia, result, title, emits }) {
 
-    const muluData = ref(uni.getStorageSync('muluData') || {})
+    const muluData = ref(uni.getStorageSync('muluData') || { tv: [], movie: [] })
     const isInit = ref(true)
     const path = ref('')
     const folderFileId = ref(null)
@@ -202,12 +202,12 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             })
             return
         }
-        muluData.value = uni.getStorageSync('muluData') || {}
+        muluData.value = uni.getStorageSync('muluData') || { tv: [], movie: [] }
         if (unref(selectType).type == 'WebDAV') {//这块逻辑有问题，不能存在就替换，像webdav可能挂载多个网盘
             // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
             // //已存在就替换，不存在就新增
             // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
-            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value)
+            let exit = muluData.value[mapping[unref(title)]]?.find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value)
             if (exit) {
                 uni.showToast({
                     title: '已存在该目录',
@@ -226,7 +226,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
             //     let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
             //     muluData.value[mapping[unref(title)]].push(obj)
             // }
-            let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value && v.folderFileId == folderFileId.value)
+            let exit = muluData.value[mapping[unref(title)]]?.find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value && v.folderFileId == folderFileId.value)
             if (exit) {
                 uni.showToast({
                     title: '已存在该目录',

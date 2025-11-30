@@ -1,7 +1,7 @@
 <template>
   <div class="tmdb-key">
-    <div class="tmdb-key-title">请输入要修改的tmdbKey</div>
-    <nut-input v-model="settingData.tmdbKey" placeholder="请输入tmdbKey" @blur="inputTmdb" class="tmdb-key-input"></nut-input>
+    <!-- <div class="tmdb-key-title">请输入要修改的tmdbKey</div>
+    <nut-input v-model="settingData.tmdbKey" placeholder="请输入tmdbKey" @blur="inputTmdb" class="tmdb-key-input"></nut-input> -->
     <div class="tmdb-key-title">播放设置</div>
     <wil-form :options="settings1" :show-button="true" ref="base_form1" v-model="formData" :showButton="false">
       <template #showProgress>

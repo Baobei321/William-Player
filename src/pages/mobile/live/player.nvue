@@ -1,49 +1,38 @@
 <template>
-  <view class="video-player">
-    <view class="video-player-container" :style="{ height: videoHeight, flex: `0 0 ${videoHeight}` }">
-      <view :style="{ width: '750rpx', height: videoHeight, background: '#000', position: 'relative' }"
+  <view class="live-player">
+    <view class="live-player-container" :style="{ height: videoHeight, flex: `0 0 ${videoHeight}` }">
+      <!-- <view
+        :style="{ width: '750rpx', height: videoHeight, background: '#000', position: 'relative', paddingTop: statusBarHeight + 'px' }"
         v-if="plateForm == 'android' && uniPlatform == 'app'">
         <video-view :initialTime="config.initialTime" :bottomButton="routerParams.type == 'tv'" :title="config.title"
-          :url="config.url" :showProgress="settingData.showProgress" :showPre="this.historyObj.ji > 1"
-          :showNext="this.historyObj.ji < tvList.length" :initialFullScreen="false" @timeupdate="setHistory"
-          @getpipstatus="getPipStatus" @pause="pauseVideo" @prev="prevVideo" @next="nextVideo"
-          @getorientation="getOrientation" @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }"
-          ref="video_view">
+          :url="config.url" :showProgress="settingData.showProgress" :showPre="false" :showNext="false"
+          :initialFullScreen="false" @getpipstatus="getPipStatus" @pause="pauseVideo" @getorientation="getOrientation"
+          @ontv="castTv" :style="{ width: '750rpx', height: videoHeight }" ref="video_view">
         </video-view>
         <tv-button v-if="showTvButton" :style="{ width: '750rpx', height: videoHeight }" @setTvButton="setTvButton"
           @changeTv="castTv"></tv-button>
-      </view>
-      <view v-else>
+      </view> -->
+      <view :style="{ width: '750rpx', flex: 1, position: 'relative', paddingTop: statusBarHeight + 'px' }">
         <video :src="config.url" :title="config.title" :autoplay="config.autoplay" :loop="config.loop"
-          :initial-time="config.initialTime" :is-live="config.isLive" :muted="config.muted" :codec="config.codec"
-          :play-strategy="config.playStrategy" style="width:750rpx;height:580rpx" @timeupdate="setHistory"
-          @pause="pauseVideo" v-if="config.url && !showReload">
+          :style="{ height: '100%', flex: 1 }" :initial-time="config.initialTime" :is-live="config.isLive"
+          :muted="config.muted" :codec="config.codec" :play-strategy="config.playStrategy"
+          style="width:750rpx;height:500rpx" @pause="pauseVideo" v-if="config.url">
         </video>
-        <button class="video-button" v-if="showReload" @click="reloadVideo">
-          <text style="color:#fff">重新加载</text>
-        </button>
       </view>
     </view>
-    <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton"
+    <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="0" @setTvButton="setTvButton"
       @playOrPause="playOrPauseVideo"></tv-select>
   </view>
 </template>
 
 <script>
 import nvueNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
-import playerDetail from "./components/player-component/detail.nvue";
-import tvSelect from "./components/player-component/tv-select.nvue";
-import tvButton from "./components/player-component/tv-button.nvue";
-import { addOperLog } from "@/network/apis";
-import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
-import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
-import { getEmbyPlayerUrl } from '@/utils/emby'
-import { IMG_DOMAIN } from "@/utils/config";
+import tvSelect from "../video/components/player-component/tv-select.nvue";
+import tvButton from "../video/components/player-component/tv-button.nvue";
 
 export default {
   components: {
     nvueNavbar,
-    playerDetail,
     tvSelect,
     tvButton,
   },
@@ -52,10 +41,12 @@ export default {
       routerParams: {},
       plateForm: "",
       uniPlatform: "",
-      videoHeight: "580rpx",
+      videoHeight: "",
       settingData: {},
+      pipStatus: false,
+      statusBarHeight: 0,
       config: {
-        url: "",
+        url: "https://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400",
         // 是否自动播放
         autoplay: true,
         //播放器预览背景图片，支持网络地址
@@ -83,8 +74,9 @@ export default {
       this.pipStatus = event.detail.isPip;
       if (this.pipStatus) {
         this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + "rpx";
+        this.videoHeight = uni.upx2px((event.detail.videoHeight / event.detail.videoWidth) * 750) + this.statusBarHeight + 'px'
       } else {
-        this.videoHeight = "580rpx";
+        this.videoHeight = uni.upx2px(500) + this.statusBarHeight + 'px'
       }
     },
     pauseVideo() {
@@ -122,6 +114,12 @@ export default {
     let systemInfo = uni.getSystemInfoSync();
     this.plateForm = systemInfo.platform;
     this.uniPlatform = systemInfo.uniPlatform;
+    this.statusBarHeight = systemInfo.statusBarHeight
+    this.videoHeight = uni.upx2px(500) + this.statusBarHeight + 'px'
+    // uni.showToast({
+    //   title: `calc(${this.videoHeight} + ${this.statusBarHeight + 'px'})`,
+    //   icon: 'none'
+    // })
     this.settingData = uni.getStorageSync("settingData");
     if (this.uniPlatform != "app") {
       uni.showToast({
@@ -155,21 +153,19 @@ page {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
   width: 100%;
 }
 
-.video-player {
+.live-player {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  flex: 1;
   overflow: hidden;
   width: 750rpx;
 
-  .video-player-container {
+  .live-player-container {
     background: #000000;
     width: 750rpx;
 

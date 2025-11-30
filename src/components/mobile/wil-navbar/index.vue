@@ -1,7 +1,7 @@
 <template>
   <div class="wil-navbar" :style="{ 'height': navBarHeight }">
     <nut-navbar :title="$slots.content ? '' : props.title" :left-show="props.leftShow"
-      :style="{ '--content-height': contentHeight, '--right-show': props.rightShow ? 'block' : 'none' }"
+      :style="{ '--content-height': contentHeight, '--right-show': props.rightShow ? 'flex' : 'none' }"
       @on-click-back="clickBack" :title-icon="$slots['title-icon'] ? true : false">
       <template #leftShow v-if="props.leftShow">
         <slot v-if="$slots.leftShow" name="leftShow"></slot>
@@ -111,6 +111,7 @@ const clickBack = () => {
 
     .nut-navbar__right {
       display: var(--right-show);
+      align-items: center;
     }
   }
 }

@@ -55,8 +55,7 @@ page {
 .express-search {
     width: 100%;
     height: 100%;
-    background: url('https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4E2B141_427A_background_20241125161030786newMediaImage.png')center no-repeat;
-    background-size: 100% 100%;
+    background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
 
     .express-search-container {
         flex: 1;

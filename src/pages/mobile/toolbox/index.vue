@@ -81,7 +81,6 @@ page {
     display: flex;
     flex-direction: column;
     background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
-    background-size: 100% 100%;
     position: relative;
 
     .toolbox-container {

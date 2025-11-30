@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import videoNavbar from "./components/index-component/navbar.vue";
 import Skeleton from "./components/index-component/skeleton.vue";
 import starRecommend from "./components/index-component/star-recommend.vue";
@@ -67,7 +67,7 @@ import wilModal from "@/components/mobile/wil-modal/index.vue";
 import shareDialog from "./components/index-component/share-dialog.vue";
 import embyHome from "./components/index-component/emby-home.vue";
 import { setTmdbKey, getUntokenDicts } from "@/network/apis";
-import { getCutContent } from "@/utils/common";
+import { getCutContent, getAppLatestVersion } from "@/utils/common";
 import appLogo from "@/static/app-logo1.png";
 import { onShow, onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
@@ -130,7 +130,7 @@ const onOk = async () => {
 
 //获取应用更新信息
 const getAppUpdateInfo = async () => {
-  let res = await getUntokenDicts("app_version");
+  let res = await getAppLatestVersion();
   return res;
 };
 
@@ -147,6 +147,8 @@ const getNavbarHeight = (val) => {
 }
 //页面滚动，更改标题的背景色
 const handlePageScroll = (event) => {
+  console.log(event.detail.scrollTop, 'asd');
+
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
   let cval = (255 - opacity * 255).toFixed(2)
   navbarStyle.value = {
@@ -179,6 +181,23 @@ uni.onNetworkStatusChange(listenerNetwork);
 onUnload(() => {
   uni.offNetworkStatusChange(listenerNetwork);
 });
+
+watchEffect(() => {
+  let isEmpty = selectType.value.type == 'Emby' ? !embyMovieTvList.value?.length : (!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
+  if (isEmpty) {
+    navbarStyle.value = {
+      background: `rgba(0,0,0,0)`,
+      color: `rgb(0,0,0)`,
+      borderColor: `rgba(246, 247, 248, 1)`
+    }
+  } else {
+    navbarStyle.value = {
+      background: `rgba(255,255,255,0)`,
+      color: `rgb(255,255,255)`,
+      borderColor: `rgba(246, 247, 248, 0)`
+    }
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -211,7 +230,7 @@ page {
         }
 
         .nut-navbar__right {
-          .nut-icon {
+          .navbar-icon {
             color: v-bind('navbarStyle.color') !important;
           }
         }
@@ -233,7 +252,7 @@ page {
         }
 
         .nut-navbar__right {
-          .nut-icon {
+          .navbar-icon {
             color: #000 !important;
           }
         }

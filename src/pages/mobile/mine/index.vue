@@ -1,6 +1,6 @@
 <template>
   <div class="mine">
-    <wil-navbar title="我的" :leftShow="false">
+    <wil-navbar title="我的" :leftShow="false" :rightShow="true">
       <template #right>
         <nut-icon name="scan" custom-color="#ff6701" size="16" @click="openUrl"></nut-icon>
       </template>
@@ -328,7 +328,6 @@ page {
   width: 100%;
   height: 100%;
   background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
-  background-size: 100% 100%;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -337,7 +336,6 @@ page {
   ::v-deep .wil-navbar {
     .nut-navbar {
       .nut-navbar__right {
-        display: block;
         position: absolute;
         right: 0;
       }
