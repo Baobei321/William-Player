@@ -28,8 +28,8 @@
     <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
       <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
     </nut-popup>
-    <wil-upgrade :updateFunction="backInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName :appVersion="appVersion" @closed="closedPopup"
-      v-model:visible="showUpgrade">
+    <wil-upgrade :updateFunction="backInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
+      :appVersion="appVersion" @closed="closedPopup" v-model:visible="showUpgrade">
     </wil-upgrade>
   </view>
 </template>
@@ -42,6 +42,7 @@ import { getUntokenDicts } from "@/network/apis";
 import appLogo from "@/static/app-logo1.png";
 import * as CONFIG from "@/utils/config";
 import { toParse, toStringfy } from "../mine/common";
+import { getAppLatestVersion } from '@/utils/common'
 
 const url = ref("");
 
@@ -120,11 +121,12 @@ const compareVersions = (newBb, oldBb) => {
 };
 
 const getAppUpdateInfo = async () => {
-  let res = await getUntokenDicts("app_version");
+  // let res = await getUntokenDicts("app_version");
+  let res = await getAppLatestVersion()
   isLoading.value = false;
-  let newVersion = res.data[res.data.length - 1];
   versionData.value = res;
-  if (compareVersions(newVersion.dictLabel, appVersion.value) == 1) {
+  versionData.value.downloadUrl = res.assets.find(i => i.name === 'app-mobile.apk')?.browser_download_url || null
+  if (compareVersions(res.tag_name, appVersion.value) == 1) {
     //此时后台设置已有新版本
     showUpgrade.value = true;
   } else {
@@ -200,6 +202,7 @@ page {
           transform: translateX(100%);
         }
       }
+
       .main-time {
         font-size: 28rpx;
         margin-top: 20rpx;
@@ -231,6 +234,7 @@ page {
       }
     }
   }
+
   .about-version-protocol {
     margin-top: 24rpx;
     display: flex;
@@ -241,12 +245,14 @@ page {
       width: 526.5rpx;
       height: 178.5rpx;
     }
+
     .about-version-protocol__button {
       margin-top: 50rpx;
       font-weight: bold;
       font-size: 28rpx;
       color: #68c6b3;
     }
+
     // .about-version-protocol__tip{
     //   padding: 0 100rpx;
     //   margin-top: 24px;
@@ -255,6 +261,7 @@ page {
     //   line-height: 35rpx;
     // }
   }
+
   .about-version-button {
     position: absolute;
     bottom: 50rpx;

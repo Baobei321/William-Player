@@ -694,7 +694,20 @@ const toSendEmail = async (codeEncrypt, countDown, email) => {
   }
 }
 
+//获取gitee的app的最新release版本
+const getAppLatestVersion = () => {
+  return new Promise((resolve) => {
+    uni.request({
+      url: 'https://gitee.com/api/v5/repos/CWLcwl0219/William-Player/releases/latest',
+      method: "GET",
+      success: (res) => {
+        resolve(res.data);
+      },
+    });
+  });
+}
+
 export {
   getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, get189DownloadUrl, getQuarkFolder, getQuarkVideoUrl,
-  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent, toSendEmail
+  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent, toSendEmail, getAppLatestVersion
 };

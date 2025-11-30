@@ -1,7 +1,7 @@
 <template>
   <div class="wil-upgrade">
-    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom" :custom-style="{ height: '60%' }" @closed="closedPopup" @open="open"
-      @close="close">
+    <nut-popup v-model:visible="showBottom" round safe-area-inset-bottom position="bottom"
+      :custom-style="{ height: '60%' }" @closed="closedPopup" @open="open" @close="close">
       <div class="wil-upgrade-container">
         <div class="wil-upgrade-title">
           <div class="wil-upgrade-title__logo">
@@ -9,7 +9,8 @@
           </div>
           <div class="wil-upgrade-title__info">
             <div class="wil-upgrade-title__info-name">{{ props.appName }}</div>
-            <div class="wil-upgrade-title__info-time">{{ newVersion[props.defaultProps.updateTime] }}</div>
+            <div class="wil-upgrade-title__info-time">{{
+              dayjs(newVersion[props.defaultProps.updateTime]).format('YYYY-MM-DD') }}</div>
           </div>
         </div>
         <div class="wil-upgrade-list">
@@ -20,16 +21,18 @@
           </div>
         </div>
         <div class="wil-upgrade-button">
-          <nut-button custom-color="#ff6701" @click="toDownLoad(newVersion[props.defaultProps.apkUrl])" v-if="!showProgress && downStatus == -1">立即下载更新</nut-button>
-          <nut-button custom-color="#ff6701" @click="showBottom = false" v-if="!showProgress && downStatus == 0">安装失败，关闭</nut-button>
-          <nut-button custom-color="#ff6701" @click="installNow" v-if="!showProgress && downStatus == 1">立即安装</nut-button>
+          <nut-button custom-color="#ff6701" @click="toDownLoad(newVersion[props.defaultProps.apkUrl])"
+            v-if="!showProgress && downStatus == -1">立即下载更新</nut-button>
+          <nut-button custom-color="#ff6701" @click="showBottom = false"
+            v-if="!showProgress && downStatus == 0">安装失败，关闭</nut-button>
+          <nut-button custom-color="#ff6701" @click="installNow"
+            v-if="!showProgress && downStatus == 1">立即安装</nut-button>
           <nut-button custom-color="#ff6701" @click="downloadInstallApp(newVersion[props.defaultProps.apkUrl])"
             v-if="!showProgress && downStatus == 2">下载中断，继续下载</nut-button>
           <template v-if="showProgress">
             <nut-progress :percentage="percent" stroke-color="#ff6701" text-color="#000" />
             <div class="wil-upgrade-button__tip">{{ tipText }}</div>
           </template>
-
         </div>
       </div>
     </nut-popup>
@@ -40,6 +43,7 @@
 import { ref, onBeforeMount, watch } from "vue";
 import { onHide } from "@dcloudio/uni-app";
 import { addOperLog } from "@/network/apis";
+import dayjs from "dayjs";
 
 const props = defineProps({
   type: { type: String, default: "outApp" }, //inApp是在应用内更新，outApp是跳转到外部浏览器下载安装包更新
@@ -52,10 +56,10 @@ const props = defineProps({
   defaultProps: {
     type: Object,
     default: {
-      updateTime: "cssClass",
-      version: "dictLabel",
-      remark: "remark",
-      apkUrl: "dictValue",
+      updateTime: "created_at",
+      version: "tag_name",
+      remark: "body",
+      apkUrl: "downloadUrl",
     },
   },
 });
@@ -111,9 +115,9 @@ const judegeShow = () => {
 const getUpdateInfo = async () => {
   // if (systemInfo.platform != 'android') return
   let res = await props.updateFunction();
-  newVersion.value = res.data[res.data.length - 1];
+  newVersion.value = res;
   let version = props.appVersion;
-  if (compareVersions(newVersion.value.dictLabel, version) == 1) {
+  if (compareVersions(newVersion.value.tag_name, version) == 1) {
     //此时后台设置已有新版本
     if (props.enableControl) {
       let remindTime = uni.getStorageSync("remindTime");
@@ -151,11 +155,19 @@ const toDownLoad = (apkUrl) => {
     downloadInstallApp(apkUrl);
   } else if (props.type == "outApp") {
     addOperLog({ title: "更新app", businessType: 13, operatorType: 2 });
-    plus.runtime.openURL(apkUrl, (error) => {
-      if (error) {
-        uni.showToast({ title: "打开浏览器失败", icon: "none" });
-      }
-    });
+    if (apkUrl) {
+      plus.runtime.openURL(apkUrl, (error) => {
+        if (error) {
+          uni.showToast({ title: "打开浏览器失败", icon: "none" });
+        }
+      });
+    } else { //如果没有下载链接，就让用户跳到gitee的release那里，自己下载
+      plus.runtime.openURL('https://gitee.com/CWLcwl0219/William-Player/releases/latest', (error) => {
+        if (error) {
+          uni.showToast({ title: "打开浏览器失败", icon: "none" });
+        }
+      });
+    }
   }
 };
 
@@ -377,6 +389,7 @@ onHide(() => {
         flex: 1;
         width: 100%;
         box-sizing: border-box;
+
         ::v-deep p {
           img {
             width: 100%;
