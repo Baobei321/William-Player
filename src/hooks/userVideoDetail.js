@@ -145,6 +145,26 @@ export function useVideoDetail({ route, router }) {
             }
             season = season != "1" ? season : activeSeason.value.season;
         }
+        let res1 = {};
+        if (!seasonData1) {
+            if (routerParams.value.movieTvId) {
+                res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+            }
+        } else {
+            res1 = seasonData1;
+        }
+        imgData.value.releaseTime = res1.air_date;
+        imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
+        if (season != "1") {
+            imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
+            overview.value = res1.overview;
+        } else {
+            imgData.value.img = seasonFirst.value.img;
+            overview.value = seasonFirst.value.overview;
+        }
+        let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
+        uni.setStorageSync("seasonData", seasonData);
+        season != "1" && res1.overview ? (overview.value = res1.overview) : "";
         let result = {};
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
         if (selectType.value.type == "WebDAV") {
@@ -268,28 +288,6 @@ export function useVideoDetail({ route, router }) {
 
             // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
         }
-        let res1 = {};
-        if (!seasonData1) {
-            if (routerParams.value.movieTvId) {
-                res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
-            }
-        } else {
-            res1 = seasonData1;
-        }
-        imgData.value.releaseTime = res1.air_date;
-        imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
-        if (season != "1") {
-            imgData.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res1.poster_path;
-            overview.value = res1.overview;
-        } else {
-            console.log(seasonFirst.value.img, 'asdsad');
-
-            imgData.value.img = seasonFirst.value.img;
-            overview.value = seasonFirst.value.overview;
-        }
-        let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
-        uni.setStorageSync("seasonData", seasonData);
-        season != "1" && res1.overview ? (overview.value = res1.overview) : "";
         //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
         tvList.value.forEach((v, vindex) => {
             if (res1.episodes) {
@@ -307,8 +305,6 @@ export function useVideoDetail({ route, router }) {
 
     const getMovieTvDetail = async () => {
         if (!routerParams.value.movieTvId) {
-            console.log("到这");
-
             imgData.value.title = routerParams.value.name;
             return false;
         }
@@ -537,7 +533,7 @@ export function useVideoDetail({ route, router }) {
                     windowName: 'Video',
                     windowTitle: `正在播放：`,
                     query: query
-                };                
+                };
                 ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
                     console.log('[createWindow] id:', id);
                 });
@@ -590,7 +586,7 @@ export function useVideoDetail({ route, router }) {
                         type: 'tv'
                     }
                 }
-                
+
                 let args = {
                     type: 'vue',
                     content: '/video',

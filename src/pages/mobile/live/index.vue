@@ -146,8 +146,8 @@ onBeforeMount(() => {
     liveList.value = [{ name: "默认直播源", url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u" }];
     uni.setStorageSync("liveList", liveList.value);
   }
-  subPlayerNvue = uni.getSubNVueById('live_video')
-  showNvuePlayer()
+  // subPlayerNvue = uni.getSubNVueById('live_video')
+  // showNvuePlayer()
 });
 
 onShow(async () => {

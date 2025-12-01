@@ -11,7 +11,8 @@
         <scroll-view :scroll-y="true" class="video-container-scroll" @scroll="handlePageScroll">
           <template v-if="selectType.type != 'Emby'">
             <star-recommend v-if="settingData.showRecommend"></star-recommend>
-            <div class="scroll-list" :style="{ paddingTop: `calc(40rpx + ${navbarHeight + 'px'})` }">
+            <div class="scroll-list"
+              :style="{ paddingTop: settingData.showRecommend ? '40rpx' : `calc(40rpx + ${navbarHeight + 'px'})` }">
               <recent-played v-if="historyPlay.length" :listData="historyPlay"
                 :isConnected="isConnected"></recent-played>
               <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"
@@ -87,6 +88,7 @@ const upgradeInfo = ref({
 
 const navbarHeight = ref(0)//标题栏加状态栏的高度
 let startCommandHeight = 0//轮播海报的高度，在手机端和pad端表现不同
+let scrollTop = 0 //滚动的距离
 
 const isConnected = ref(false); //手机是否连接网络
 
@@ -145,6 +147,7 @@ const getNavbarHeight = (val) => {
 //页面滚动，更改标题的背景色
 const handlePageScroll = (event) => {
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
+  scrollTop = event.detail.scrollTop
   let cval = (255 - opacity * 255).toFixed(2)
   if (settingData.value.showRecommend) {//如果展示影视推荐轮播图，才根据滚动渐变
     navbarStyle.value = {
@@ -155,6 +158,13 @@ const handlePageScroll = (event) => {
   }
 }
 onShow(async () => {
+  if (scrollTop === 0 && settingData.value.showRecommend) {
+    navbarStyle.value = {
+      background: `rgba(255,255,255,0)`,
+      color: `rgb(255,255,255)`,
+      borderColor: `rgba(246, 247, 248, 0)`
+    }
+  }
   let shareUrl1 = await getCutContent();
   if (shareUrl1) {
     shareUrl.value = shareUrl1;
