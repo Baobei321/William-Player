@@ -286,11 +286,11 @@ defineExpose({
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .video-classify {
-    .video-classify-title {
-      color: #fff;
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .video-classify {
+//     .video-classify-title {
+//       color: #fff;
+//     }
+//   }
+// }
 </style>

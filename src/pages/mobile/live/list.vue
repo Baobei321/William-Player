@@ -127,9 +127,9 @@ page {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .live {
-    background: #1e1e20;
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .live {
+//     background: #1e1e20;
+//   }
+// }
 </style>

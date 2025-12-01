@@ -486,43 +486,43 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .mine {
-    background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .mine {
+//     background: #1e1e20;
 
-    .mine-notLog {
-      background-color: #2f2f2f;
+//     .mine-notLog {
+//       background-color: #2f2f2f;
 
-      .mine-notLog__left {
-        .mine-notLog__left-info {
-          span:first-child {
-            color: #fff;
-          }
+//       .mine-notLog__left {
+//         .mine-notLog__left-info {
+//           span:first-child {
+//             color: #fff;
+//           }
 
-          span:last-child {
-            color: gray;
-          }
-        }
-      }
-    }
+//           span:last-child {
+//             color: gray;
+//           }
+//         }
+//       }
+//     }
 
-    &-loged {
-      background-color: #2f2f2f;
+//     &-loged {
+//       background-color: #2f2f2f;
 
-      &__left {
-        display: flex;
+//       &__left {
+//         display: flex;
 
-        .left-info {
-          .left-info-name {
-            color: #fff;
-          }
+//         .left-info {
+//           .left-info-name {
+//             color: #fff;
+//           }
 
-          .left-info-phone {
-            color: #86909c;
-          }
-        }
-      }
-    }
-  }
-}
+//           .left-info-phone {
+//             color: #86909c;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

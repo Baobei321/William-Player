@@ -96,21 +96,22 @@ const toQQpage = () => {
 };
 
 const compareVersions = (newBb, oldBb) => {
-    const v1 = newBb.split(".").map(Number); // 将版本号拆分成数字
-    const v2 = oldBb.split(".").map(Number); // 同样拆分另一个版本号
+  if (newBb) {
+    const v1 = newBb?.split(".").map(Number); // 将版本号拆分成数字
+    const v2 = oldBb?.split(".").map(Number); // 同样拆分另一个版本号
 
     for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
-        // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
-        if ((v1[i] || 0) < (v2[i] || 0)) {
-            return -1;
-        }
-        // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
-        if ((v1[i] || 0) > (v2[i] || 0)) {
-            return 1;
-        }
+      // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
+      if ((v1[i] || 0) < (v2[i] || 0)) {
+        return -1;
+      }
+      // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
+      if ((v1[i] || 0) > (v2[i] || 0)) {
+        return 1;
+      }
     }
-
-    return 0; // 如果两个版本号完全相同，返回 0
+  }
+  return 0; // 如果两个版本号完全相同，返回 0
 };
 
 const getAppUpdateInfo = async () => {

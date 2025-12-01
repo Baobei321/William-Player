@@ -197,57 +197,57 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .video-search {
-    ::v-deep .wil-navbar {
-      background-color: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .video-search {
+//     ::v-deep .wil-navbar {
+//       background-color: #1e1e20;
 
-      .nut-navbar {
-        background: #1e1e20;
+//       .nut-navbar {
+//         background: #1e1e20;
 
-        .nut-navbar__title {
-          .nut-searchbar {
-            background: #1e1e20;
+//         .nut-navbar__title {
+//           .nut-searchbar {
+//             background: #1e1e20;
 
-            .nut-searchbar__search-input {
-              background: #2f2f2f;
+//             .nut-searchbar__search-input {
+//               background: #2f2f2f;
 
-              .nut-searchbar__search-icon {
-                .nut-icon-search {
-                  color: #606060 !important;
-                }
-              }
+//               .nut-searchbar__search-icon {
+//                 .nut-icon-search {
+//                   color: #606060 !important;
+//                 }
+//               }
 
-              .nut-searchbar__input-inner {
-                .nut-searchbar__input-form {
-                  .uni-input-input {
-                    color: #fff;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+//               .nut-searchbar__input-inner {
+//                 .nut-searchbar__input-form {
+//                   .uni-input-input {
+//                     color: #fff;
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
 
-    .video-search-list {
-      .video-search-list__item {
-        .item-right {
-          .item-right-name {
-            color: #fff;
-          }
+//     .video-search-list {
+//       .video-search-list__item {
+//         .item-right {
+//           .item-right-name {
+//             color: #fff;
+//           }
 
-          .item-right-content {
-            color: #b9b9b9;
+//           .item-right-content {
+//             color: #b9b9b9;
 
-            .item-right-content__line {
-              background: #b9b9b9;
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//             .item-right-content__line {
+//               background: #b9b9b9;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

@@ -276,46 +276,46 @@ onMounted(() => {
   margin-top: 20rpx;
 }
 
-@media (prefers-color-scheme: dark) {
-  .category-list {
-    .category-list-wrap {
-      .category-list-menu {
-        background: #2f2f2f;
-        .category-list-tab-item {
-          background: #2f2f2f;
-          color: #fff;
-        }
-        .category-list-tab-item-active {
-          color: #ff6701;
-          background: #1d1d1d;
-          border-left: 6rpx solid #ff6701;
-        }
-      }
-      .category-list-container {
-        background-color: #1e1e20;
-        &-item {
-          background-color: #1e1e20;
-          .category-list-container-title {
-            &__line {
-              background: rgb(73, 73, 73);
-            }
-            &__name {
-              color: #fff;
-            }
-          }
-          &__title {
-            color: #fff;
-          }
-          &__content {
-            .thumb-box {
-              &-name {
-                color: #fff;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .category-list {
+//     .category-list-wrap {
+//       .category-list-menu {
+//         background: #2f2f2f;
+//         .category-list-tab-item {
+//           background: #2f2f2f;
+//           color: #fff;
+//         }
+//         .category-list-tab-item-active {
+//           color: #ff6701;
+//           background: #1d1d1d;
+//           border-left: 6rpx solid #ff6701;
+//         }
+//       }
+//       .category-list-container {
+//         background-color: #1e1e20;
+//         &-item {
+//           background-color: #1e1e20;
+//           .category-list-container-title {
+//             &__line {
+//               background: rgb(73, 73, 73);
+//             }
+//             &__name {
+//               color: #fff;
+//             }
+//           }
+//           &__title {
+//             color: #fff;
+//           }
+//           &__content {
+//             .thumb-box {
+//               &-name {
+//                 color: #fff;
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

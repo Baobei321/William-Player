@@ -30,6 +30,36 @@ export function useVideoIndex({ wil_modal }) {
     const selectMedia = ref({});
     const selectType = ref({});
     const settingData = ref({}); //设置的数据
+    const navbarStyle = ref({
+        background: `rgba(255,255,255,0)`,
+        color: `rgb(255,255,255)`,
+        borderColor: `rgba(246, 247, 248, 0)`
+    })
+
+    //设置navbarStyle
+    const setNavbarStyle = (isEmpty) => {
+        if (isEmpty) {
+            navbarStyle.value = {
+                background: `rgba(0,0,0,0)`,
+                color: `rgb(0,0,0)`,
+                borderColor: `rgba(246, 247, 248, 1)`
+            }
+        } else {
+            if (!settingData.value.showRecommend) {//如果不展示影视推荐轮播图，那么就设置单独的navbar样式
+                navbarStyle.value = {
+                    background: `rgba(255,255,255,1)`,
+                    color: `rgb(0,0,0)`,
+                    borderColor: `rgba(246, 247, 248, 1)`
+                }
+            } else {
+                navbarStyle.value = {
+                    background: `rgba(255,255,255,0)`,
+                    color: `rgb(255,255,255)`,
+                    borderColor: `rgba(246, 247, 248, 0)`
+                }
+            }
+        }
+    }
 
     //通过tmdb接口获取更详细的信息
     const searchMovieTv = (data, type) => {
@@ -174,6 +204,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.updated = refreshData.value.toupdate;
         refreshData.value.toupdate = 0;
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
+        setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
         refreshLoading.value = false;
         addOperLog({ title: "WebDAV生成海报墙", businessType: 11, operatorType: 2 });
@@ -408,6 +439,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.updated = refreshData.value.toupdate;
         refreshData.value.toupdate = 0;
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
+        setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
         refreshLoading.value = false;
         addOperLog({ title: "天翼云盘生成海报墙", businessType: 11, operatorType: 2 });
@@ -518,6 +550,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.updated = refreshData.value.toupdate;
         refreshData.value.toupdate = 0;
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
+        setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
         refreshLoading.value = false;
         addOperLog({ title: "夸克网盘生成海报墙", businessType: 11, operatorType: 2 });
@@ -623,6 +656,7 @@ export function useVideoIndex({ wil_modal }) {
             }
         }))
         refreshLoading.value = false
+        setNavbarStyle(embyMovieTvList?.length)
         uni.setStorageSync('embyMovieTvList', embyMovieTvList)
     }
 
@@ -674,7 +708,15 @@ export function useVideoIndex({ wil_modal }) {
     //页面显示执行的方法
     const showPage = async () => {
         sourceList.value = uni.getStorageSync("sourceList");
+        let showRecommend = settingData.value.showRecommend
         settingData.value = uni.getStorageSync("settingData");
+        if (showRecommend !== settingData.value.showRecommend) {//如果设置改变
+            let embyMovieTvList = uni.getStorageSync('embyMovieTvList')
+            let isEmpty = selectType.value.type === 'Emby' ? embyMovieTvList?.length : (!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
+            if (!settingData.value.showRecommend) {
+                setNavbarStyle(isEmpty)
+            }
+        }
         if (!sourceList.value) {
             sourceList.value = [
                 { type: "WebDAV", list: [], img: webdavFileIcon },
@@ -782,6 +824,7 @@ export function useVideoIndex({ wil_modal }) {
         // setTmdbImgDomain();
         judgeSelect();
         localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
+        setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         historyPlay.value = uni.getStorageSync("historyPlay") || [];
         historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
         historyPlay.value = historyPlay.value.filter((item) => {
@@ -826,7 +869,7 @@ export function useVideoIndex({ wil_modal }) {
         }
     });
     return {
-        video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, selectType,
-        historyPlay, settingData, refreshVideo, showPage
+        video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, navbarStyle,
+        selectType, historyPlay, settingData, refreshVideo, showPage
     }
 }

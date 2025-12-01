@@ -172,27 +172,27 @@ page {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .fileSource {
-    background: #1e1e20;
-    .fileSource-item {
-      .fileSource-item__title {
-        color: rgb(154, 154, 154);
-      }
-      .fileSource-item__list {
-        background: #2f2f2f;
-        .list-item {
-          background: #2f2f2f;
-          border-top: 2rpx solid rgb(73, 73, 73);
-          .list-item-name {
-            color: #fff;
-          }
-          &:active {
-            background: rgb(73, 73, 73);
-          }
-        }
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .fileSource {
+//     background: #1e1e20;
+//     .fileSource-item {
+//       .fileSource-item__title {
+//         color: rgb(154, 154, 154);
+//       }
+//       .fileSource-item__list {
+//         background: #2f2f2f;
+//         .list-item {
+//           background: #2f2f2f;
+//           border-top: 2rpx solid rgb(73, 73, 73);
+//           .list-item-name {
+//             color: #fff;
+//           }
+//           &:active {
+//             background: rgb(73, 73, 73);
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

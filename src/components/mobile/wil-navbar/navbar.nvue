@@ -94,14 +94,14 @@ export default {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .navbar-nvue {
-    background: #1e1e20;
-    .navbar-nvue-container {
-      .navbar-nvue-container__title {
-        color: #fff;
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .navbar-nvue {
+//     background: #1e1e20;
+//     .navbar-nvue-container {
+//       .navbar-nvue-container__title {
+//         color: #fff;
+//       }
+//     }
+//   }
+// }
 </style>

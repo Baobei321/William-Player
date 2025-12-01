@@ -11,7 +11,7 @@
         <scroll-view :scroll-y="true" class="video-container-scroll" @scroll="handlePageScroll">
           <template v-if="selectType.type != 'Emby'">
             <star-recommend v-if="settingData.showRecommend"></star-recommend>
-            <div class="scroll-list">
+            <div class="scroll-list" :style="{ paddingTop: `calc(40rpx + ${navbarHeight + 'px'})` }">
               <recent-played v-if="historyPlay.length" :listData="historyPlay"
                 :isConnected="isConnected"></recent-played>
               <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import videoNavbar from "./components/index-component/navbar.vue";
 import Skeleton from "./components/index-component/skeleton.vue";
 import starRecommend from "./components/index-component/star-recommend.vue";
@@ -74,7 +74,7 @@ import * as CONFIG from "@/utils/config";
 import { useVideoIndex } from "@/hooks/useVideoIndex.js";
 
 const wil_modal = ref(null)
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo } = useVideoIndex({ wil_modal });
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, navbarStyle } = useVideoIndex({ wil_modal });
 const showDialog = ref(false);
 const showShareModal = ref(false);
 const shareUrl = ref("");
@@ -83,12 +83,9 @@ const upgradeInfo = ref({
   logo: appLogo,
   appName: "William Player",
 });
-const navbarStyle = ref({
-  background: `rgba(255,255,255,0)`,
-  color: `rgb(255,255,255)`,
-  borderColor: `rgba(246, 247, 248, 0)`
-})//动态设置标题栏的样式
-let navbarHeight = 0//标题栏加状态栏的高度
+
+
+const navbarHeight = ref(0)//标题栏加状态栏的高度
 let startCommandHeight = 0//轮播海报的高度，在手机端和pad端表现不同
 
 const isConnected = ref(false); //手机是否连接网络
@@ -136,25 +133,25 @@ const getAppUpdateInfo = async () => {
 
 //获取标题加状态栏的高度
 const getNavbarHeight = (val) => {
-  navbarHeight = +val.split('px')[0]
+  navbarHeight.value = +val.split('px')[0]
   let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
   let windowWidth = sysinfo.windowWidth; // 获取状态栏高度
   if (windowWidth >= 700) { //pad端
-    startCommandHeight = uni.upx2px(800) + navbarHeight
+    startCommandHeight = uni.upx2px(800) + navbarHeight.value
   } else { //手机端
-    startCommandHeight = uni.upx2px(500) + navbarHeight
+    startCommandHeight = uni.upx2px(500) + navbarHeight.value
   }
 }
 //页面滚动，更改标题的背景色
 const handlePageScroll = (event) => {
-  console.log(event.detail.scrollTop, 'asd');
-
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
   let cval = (255 - opacity * 255).toFixed(2)
-  navbarStyle.value = {
-    background: `rgba(255,255,255,${opacity.toFixed(2)})`,
-    color: `rgb(${cval},${cval},${cval})`,
-    borderColor: `rgba(246, 247, 248, ${opacity})`
+  if (settingData.value.showRecommend) {//如果展示影视推荐轮播图，才根据滚动渐变
+    navbarStyle.value = {
+      background: `rgba(255,255,255,${opacity.toFixed(2)})`,
+      color: `rgb(${cval},${cval},${cval})`,
+      borderColor: `rgba(246, 247, 248, ${opacity})`
+    }
   }
 }
 onShow(async () => {
@@ -182,22 +179,6 @@ onUnload(() => {
   uni.offNetworkStatusChange(listenerNetwork);
 });
 
-watchEffect(() => {
-  let isEmpty = selectType.value.type == 'Emby' ? !embyMovieTvList.value?.length : (!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
-  if (isEmpty) {
-    navbarStyle.value = {
-      background: `rgba(0,0,0,0)`,
-      color: `rgb(0,0,0)`,
-      borderColor: `rgba(246, 247, 248, 1)`
-    }
-  } else {
-    navbarStyle.value = {
-      background: `rgba(255,255,255,0)`,
-      color: `rgb(255,255,255)`,
-      borderColor: `rgba(246, 247, 248, 0)`
-    }
-  }
-})
 </script>
 
 <style lang="scss" scoped>

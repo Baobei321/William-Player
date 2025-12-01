@@ -205,32 +205,32 @@ defineExpose({
 .overlay-hide {
   animation: overlay2 0.2s ease;
 }
-@media (prefers-color-scheme: dark) {
-  .wil-modal {
-    background: #2f2f2f;
-    .wil-modal-top {
-      .wil-modal-title {
-        color: #fff;
-      }
-      .wil-modal-content {
-        color: #fff;
-      }
-    }
-    .wil-modal-button {
-      border-top: 2rpx solid rgb(73, 73, 73);
-      .wil-modal-button__cancel {
-        border-right: 2rpx solid rgb(73, 73, 73);
-        color: #fff;
-        &:active {
-          background: rgba(0, 0, 0, 0.1);
-        }
-      }
-      .wil-modal-button__confirm {
-        &:active {
-          background: rgba(0, 0, 0, 0.1);
-        }
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .wil-modal {
+//     background: #2f2f2f;
+//     .wil-modal-top {
+//       .wil-modal-title {
+//         color: #fff;
+//       }
+//       .wil-modal-content {
+//         color: #fff;
+//       }
+//     }
+//     .wil-modal-button {
+//       border-top: 2rpx solid rgb(73, 73, 73);
+//       .wil-modal-button__cancel {
+//         border-right: 2rpx solid rgb(73, 73, 73);
+//         color: #fff;
+//         &:active {
+//           background: rgba(0, 0, 0, 0.1);
+//         }
+//       }
+//       .wil-modal-button__confirm {
+//         &:active {
+//           background: rgba(0, 0, 0, 0.1);
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

@@ -227,13 +227,13 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .data-sync {
-    background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .data-sync {
+//     background: #1e1e20;
 
-    .scan-text {
-      color: #fff;
-    }
-  }
-}
+//     .scan-text {
+//       color: #fff;
+//     }
+//   }
+// }
 </style>

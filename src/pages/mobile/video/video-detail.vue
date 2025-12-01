@@ -635,75 +635,75 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .video-detail {
-    .video-detail-container {
-      .video-detail-container__content {
-        background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .video-detail {
+//     .video-detail-container {
+//       .video-detail-container__content {
+//         background: #1e1e20;
 
-        ::v-deep .nut-button {
-          background-color: gray !important;
-        }
+//         ::v-deep .nut-button {
+//           background-color: gray !important;
+//         }
 
-        .movie-version {
-          .movie-version-title {
-            color: #fff;
-          }
+//         .movie-version {
+//           .movie-version-title {
+//             color: #fff;
+//           }
 
-          .movie-version-scroll {
-            .movie-version-list {
-              .movie-version-list__item {
-                color: #fff;
-                border: 2rpx solid #c2c5c6;
-              }
+//           .movie-version-scroll {
+//             .movie-version-list {
+//               .movie-version-list__item {
+//                 color: #fff;
+//                 border: 2rpx solid #c2c5c6;
+//               }
 
-              .movie-version-list__active {
-                color: #315ffd;
-                border: 2rpx solid #315ffd;
-              }
-            }
-          }
-        }
+//               .movie-version-list__active {
+//                 color: #315ffd;
+//                 border: 2rpx solid #315ffd;
+//               }
+//             }
+//           }
+//         }
 
-        .tv-version {
-          .tv-version-tabs__cloud {
-            .tv-version-tabs__cloud-item {
-              color: #fff;
-              border: 2rpx solid #c2c5c6;
-            }
+//         .tv-version {
+//           .tv-version-tabs__cloud {
+//             .tv-version-tabs__cloud-item {
+//               color: #fff;
+//               border: 2rpx solid #c2c5c6;
+//             }
 
-            .tv-version-tabs__cloud-active {
-              color: #315ffd;
-              border: 2rpx solid #315ffd;
-            }
-          }
+//             .tv-version-tabs__cloud-active {
+//               color: #315ffd;
+//               border: 2rpx solid #315ffd;
+//             }
+//           }
 
-          ::v-deep .nut-tabs {
-            &__titles {
-              background-color: #1e1e20 !important;
+//           ::v-deep .nut-tabs {
+//             &__titles {
+//               background-color: #1e1e20 !important;
 
-              .nut-tabs__list {
-                .nut-tabs-active {
-                  color: #fff;
+//               .nut-tabs__list {
+//                 .nut-tabs-active {
+//                   color: #fff;
 
-                  .nut-tabs__titles-item__line {
-                    background: #fff !important;
-                  }
-                }
-              }
-            }
-          }
+//                   .nut-tabs__titles-item__line {
+//                     background: #fff !important;
+//                   }
+//                 }
+//               }
+//             }
+//           }
 
-          .tv-version-scroll {
-            .tv-version-list__item {
-              .item-title {
-                color: #fff;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//           .tv-version-scroll {
+//             .tv-version-list__item {
+//               .item-title {
+//                 color: #fff;
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

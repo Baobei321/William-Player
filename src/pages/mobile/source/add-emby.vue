@@ -169,52 +169,52 @@ page {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .add-emby-form {
-        background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//     .add-emby-form {
+//         background: #1e1e20;
 
-        &__container {
-            ::v-deep .base-form {
-                background-color: #2f2f2f;
+//         &__container {
+//             ::v-deep .base-form {
+//                 background-color: #2f2f2f;
 
-                .nut-form {
-                    .nut-cell-group {
-                        &__wrap {
-                            background-color: #2f2f2f;
+//                 .nut-form {
+//                     .nut-cell-group {
+//                         &__wrap {
+//                             background-color: #2f2f2f;
 
-                            .nut-form-item {
-                                background-color: #2f2f2f;
+//                             .nut-form-item {
+//                                 background-color: #2f2f2f;
 
-                                .nut-form-item__label {
-                                    color: #fff;
-                                }
+//                                 .nut-form-item__label {
+//                                     color: #fff;
+//                                 }
 
-                                &__body {
-                                    &__slots {
-                                        .nut-cell {
-                                            background-color: #2f2f2f;
-                                            color: #fff;
+//                                 &__body {
+//                                     &__slots {
+//                                         .nut-cell {
+//                                             background-color: #2f2f2f;
+//                                             color: #fff;
 
-                                            .nut-cell__title {
-                                                font-size: 28rpx;
-                                            }
-                                        }
-                                    }
-                                }
+//                                             .nut-cell__title {
+//                                                 font-size: 28rpx;
+//                                             }
+//                                         }
+//                                     }
+//                                 }
 
-                                &::after {
-                                    border-color: rgb(73, 73, 73);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//                                 &::after {
+//                                     border-color: rgb(73, 73, 73);
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
 
-        ::v-deep .nut-button {
-            margin-top: 80rpx;
-        }
-    }
-}
+//         ::v-deep .nut-button {
+//             margin-top: 80rpx;
+//         }
+//     }
+// }
 </style>

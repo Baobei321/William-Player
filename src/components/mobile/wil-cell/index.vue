@@ -126,24 +126,24 @@ onUnload(() => {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .wil-cell {
-    :deep(.nut-cell-group__wrap) {
-      background-color: #2f2f2f;
-      box-shadow: var(--nut-cell-box-shadow, 0 1px 7px 0 #000);
+// @media (prefers-color-scheme: dark) {
+//   .wil-cell {
+//     :deep(.nut-cell-group__wrap) {
+//       background-color: #2f2f2f;
+//       box-shadow: var(--nut-cell-box-shadow, 0 1px 7px 0 #000);
 
-      .nut-cell {
-        background-color: #2f2f2f;
+//       .nut-cell {
+//         background-color: #2f2f2f;
 
-        &::after {
-          border-bottom: 2rpx solid rgb(73, 73, 73);
-        }
+//         &::after {
+//           border-bottom: 2rpx solid rgb(73, 73, 73);
+//         }
 
-        .nut-cell__title {
-          color: #fff;
-        }
-      }
-    }
-  }
-}
+//         .nut-cell__title {
+//           color: #fff;
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

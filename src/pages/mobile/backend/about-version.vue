@@ -103,20 +103,21 @@ const toLogin = () => {
 };
 
 const compareVersions = (newBb, oldBb) => {
-  const v1 = newBb.split(".").map(Number); // 将版本号拆分成数字
-  const v2 = oldBb.split(".").map(Number); // 同样拆分另一个版本号
+  if (newBb) {
+    const v1 = newBb?.split(".").map(Number); // 将版本号拆分成数字
+    const v2 = oldBb?.split(".").map(Number); // 同样拆分另一个版本号
 
-  for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
-    // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
-    if ((v1[i] || 0) < (v2[i] || 0)) {
-      return -1;
-    }
-    // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
-    if ((v1[i] || 0) > (v2[i] || 0)) {
-      return 1;
+    for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+      // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
+      if ((v1[i] || 0) < (v2[i] || 0)) {
+        return -1;
+      }
+      // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
+      if ((v1[i] || 0) > (v2[i] || 0)) {
+        return 1;
+      }
     }
   }
-
   return 0; // 如果两个版本号完全相同，返回 0
 };
 
@@ -282,29 +283,29 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .about-version {
-    background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .about-version {
+//     background: #1e1e20;
 
-    .about-version-container {
-      .about-version-container__main {
-        .main-name {
-          span:first-child {
-            color: #fff;
-          }
-        }
-      }
+//     .about-version-container {
+//       .about-version-container__main {
+//         .main-name {
+//           span:first-child {
+//             color: #fff;
+//           }
+//         }
+//       }
 
-      ::v-deep .nut-cell {
-        .nut-cell__title {
-          color: #fff;
-        }
+//       ::v-deep .nut-cell {
+//         .nut-cell__title {
+//           color: #fff;
+//         }
 
-        .nut-cell__value {
-          color: #fff;
-        }
-      }
-    }
-  }
-}
+//         .nut-cell__value {
+//           color: #fff;
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

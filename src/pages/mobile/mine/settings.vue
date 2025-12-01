@@ -216,36 +216,36 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .tmdb-key {
-    background: #1e1e20;
-    .tmdb-key-title {
-      color: #fff;
-    }
-    ::v-deep .tmdb-key-input {
-      background-color: #2f2f2f;
-      border-bottom: 1px solid #2f2f2f;
-    }
-    ::v-deep .base-form {
-      background-color: transparent;
-      .base-form-content {
-        .nut-form {
-          .nut-cell-group__wrap {
-            .nut-form-item {
-              .nut-form-item__body {
-                .nut-form-item__body__slots {
-                  .nut-cell {
-                    .nut-cell__title {
-                      color: #fff;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .tmdb-key {
+//     background: #1e1e20;
+//     .tmdb-key-title {
+//       color: #fff;
+//     }
+//     ::v-deep .tmdb-key-input {
+//       background-color: #2f2f2f;
+//       border-bottom: 1px solid #2f2f2f;
+//     }
+//     ::v-deep .base-form {
+//       background-color: transparent;
+//       .base-form-content {
+//         .nut-form {
+//           .nut-cell-group__wrap {
+//             .nut-form-item {
+//               .nut-form-item__body {
+//                 .nut-form-item__body__slots {
+//                   .nut-cell {
+//                     .nut-cell__title {
+//                       color: #fff;
+//                     }
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

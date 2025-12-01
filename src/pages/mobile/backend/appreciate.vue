@@ -93,24 +93,24 @@ page {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .appreciate {
-    background: #1e1e20;
-    .appreciate-img {
-      background: #1e1e20;
-    }
-    .appreciate-tip {
-      color: #fff;
-    }
-    .appreciate-title {
-      border-bottom: 2rpx solid rgb(219, 219, 219);
-      color: #fff;
-    }
-    .appreciate-list {
-      .appreciate-list-item {
-        color: #fff;
-      }
-    }
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .appreciate {
+//     background: #1e1e20;
+//     .appreciate-img {
+//       background: #1e1e20;
+//     }
+//     .appreciate-tip {
+//       color: #fff;
+//     }
+//     .appreciate-title {
+//       border-bottom: 2rpx solid rgb(219, 219, 219);
+//       color: #fff;
+//     }
+//     .appreciate-list {
+//       .appreciate-list-item {
+//         color: #fff;
+//       }
+//     }
+//   }
+// }
 </style>

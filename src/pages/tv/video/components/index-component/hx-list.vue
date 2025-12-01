@@ -392,40 +392,40 @@ defineExpose({
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .hxList {
-    .hxList-title {
-      .hxList-title-left {
-        color: #fff;
-      }
+// @media (prefers-color-scheme: dark) {
+//   .hxList {
+//     .hxList-title {
+//       .hxList-title-left {
+//         color: #fff;
+//       }
 
-      .hxList-title-right {
-        display: flex;
-        align-items: center;
+//       .hxList-title-right {
+//         display: flex;
+//         align-items: center;
 
-        span {
-          font-size: 30rpx;
-          line-height: 30rpx;
-          color: rgb(154, 154, 154);
-        }
-      }
-    }
+//         span {
+//           font-size: 30rpx;
+//           line-height: 30rpx;
+//           color: rgb(154, 154, 154);
+//         }
+//       }
+//     }
 
-    .hxList-list {
-      .hxList-list-scroll {
-        .hxList-list-movie {
-          .hxList-list-movie__item {
-            &-name {
-              color: #fff;
-            }
+//     .hxList-list {
+//       .hxList-list-scroll {
+//         .hxList-list-movie {
+//           .hxList-list-movie__item {
+//             &-name {
+//               color: #fff;
+//             }
 
-            &-time {
-              color: rgb(154, 154, 154);
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//             &-time {
+//               color: rgb(154, 154, 154);
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

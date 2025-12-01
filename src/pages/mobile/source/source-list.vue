@@ -424,116 +424,116 @@ page {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .source-list {
-    background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .source-list {
+//     background: #1e1e20;
 
-    ::v-deep .wil-navbar {
-      .nut-navbar {
-        .nut-navbar__right {
-          .nut-icon-uploader {
-            color: #fff !important;
-          }
-        }
-      }
-    }
+//     ::v-deep .wil-navbar {
+//       .nut-navbar {
+//         .nut-navbar__right {
+//           .nut-icon-uploader {
+//             color: #fff !important;
+//           }
+//         }
+//       }
+//     }
 
-    .source-list-container {
-      .source-list-item {
-        .source-list-item__title {
-          color: #bcbcbc;
-        }
+//     .source-list-container {
+//       .source-list-item {
+//         .source-list-item__title {
+//           color: #bcbcbc;
+//         }
 
-        .source-list-item__list {
-          background: #2f2f2f;
+//         .source-list-item__list {
+//           background: #2f2f2f;
 
-          .list-item {
-            background: #2f2f2f;
+//           .list-item {
+//             background: #2f2f2f;
 
-            &::before {
-              background: rgb(73, 73, 73);
-            }
+//             &::before {
+//               background: rgb(73, 73, 73);
+//             }
 
-            &:active {
-              background: rgb(73, 73, 73);
-            }
+//             &:active {
+//               background: rgb(73, 73, 73);
+//             }
 
-            .list-item-name {
-              color: #fff;
-            }
+//             .list-item-name {
+//               color: #fff;
+//             }
 
-            .list-item-activeName {
-              color: #ff6701;
-            }
-          }
+//             .list-item-activeName {
+//               color: #ff6701;
+//             }
+//           }
 
-          .list-one {
-            border: 2rpx solid transparent !important;
-          }
+//           .list-one {
+//             border: 2rpx solid transparent !important;
+//           }
 
-          .list-active {
-            border: 2rpx solid #ff6701 !important;
-          }
-        }
-      }
-    }
+//           .list-active {
+//             border: 2rpx solid #ff6701 !important;
+//           }
+//         }
+//       }
+//     }
 
-    .source-list-empty {
-      background: #1e1e20;
+//     .source-list-empty {
+//       background: #1e1e20;
 
-      .source-list-empty__tip {
-        color: #fff;
-      }
+//       .source-list-empty__tip {
+//         color: #fff;
+//       }
 
-      ::v-deep .nut-button {
-        background-color: #fff !important;
+//       ::v-deep .nut-button {
+//         background-color: #fff !important;
 
-        .nut-button__wrap {
-          .nut-icon-uploader {
-            color: #000 !important;
-          }
+//         .nut-button__wrap {
+//           .nut-icon-uploader {
+//             color: #000 !important;
+//           }
 
-          .nut-button__text {
-            color: #000 !important;
-          }
-        }
+//           .nut-button__text {
+//             color: #000 !important;
+//           }
+//         }
 
-        &::before {
-          background-color: #fff !important;
-        }
-      }
-    }
+//         &::before {
+//           background-color: #fff !important;
+//         }
+//       }
+//     }
 
-    ::v-deep .nut-popup {
-      background-color: #464646;
+//     ::v-deep .nut-popup {
+//       background-color: #464646;
 
-      .nut-action-sheet {
-        background-color: #464646;
+//       .nut-action-sheet {
+//         background-color: #464646;
 
-        .nut-action-sheet__title {
-          color: #b7b7b7;
-          background-color: #343437;
-          border-bottom: 2rpx solid #707070;
-          font-weight: bold;
-        }
+//         .nut-action-sheet__title {
+//           color: #b7b7b7;
+//           background-color: #343437;
+//           border-bottom: 2rpx solid #707070;
+//           font-weight: bold;
+//         }
 
-        .nut-action-sheet__menu {
-          background-color: #464646;
+//         .nut-action-sheet__menu {
+//           background-color: #464646;
 
-          .nut-action-sheet__item {
-            background-color: #464646;
-            border-top: 2rpx solid #707070;
-            color: #fff;
-          }
-        }
+//           .nut-action-sheet__item {
+//             background-color: #464646;
+//             border-top: 2rpx solid #707070;
+//             color: #fff;
+//           }
+//         }
 
-        .nut-action-sheet__cancel {
-          border-top: 20rpx solid #343437;
-          background-color: #464646;
-          color: #fff;
-        }
-      }
-    }
-  }
-}
+//         .nut-action-sheet__cancel {
+//           border-top: 20rpx solid #343437;
+//           background-color: #464646;
+//           color: #fff;
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

@@ -234,6 +234,7 @@ watch(
               uni-input {
                 height: 46rpx;
                 line-height: 46rpx;
+                width: 100%;
               }
 
               .uni-input-placeholder {

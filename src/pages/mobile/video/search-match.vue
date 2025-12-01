@@ -389,49 +389,49 @@ page {
     }
   }
 }
-@media (prefers-color-scheme: dark) {
-  .search-match {
-    background: #1e1e20;
-    ::v-deep .nut-searchbar {
-      background-color: #1e1e20;
-      .nut-searchbar__search-input {
-        background: #2f2f2f;
-        .nut-searchbar__search-icon {
-          .nut-icon-search {
-            color: #606060 !important;
-          }
-        }
-        .nut-searchbar__input-inner {
-          .nut-searchbar__input-form {
-            .uni-input-input {
-              color: #fff;
-            }
-          }
-        }
-      }
-    }
-    .search-match-list {
-      ::v-deep .load-list {
-        .search-match-list__item {
-          border: 2rpx solid rgb(40, 40, 40);
+// @media (prefers-color-scheme: dark) {
+//   .search-match {
+//     background: #1e1e20;
+//     ::v-deep .nut-searchbar {
+//       background-color: #1e1e20;
+//       .nut-searchbar__search-input {
+//         background: #2f2f2f;
+//         .nut-searchbar__search-icon {
+//           .nut-icon-search {
+//             color: #606060 !important;
+//           }
+//         }
+//         .nut-searchbar__input-inner {
+//           .nut-searchbar__input-form {
+//             .uni-input-input {
+//               color: #fff;
+//             }
+//           }
+//         }
+//       }
+//     }
+//     .search-match-list {
+//       ::v-deep .load-list {
+//         .search-match-list__item {
+//           border: 2rpx solid rgb(40, 40, 40);
 
-          .item-right {
-            .item-right-name {
-              color: #fff;
-            }
-            .item-right-content {
-              color: #cacaca;
-              .item-right-content__line {
-                background: #cacaca;
-              }
-            }
-            .item-right-overview {
-              color: #cacaca;
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//           .item-right {
+//             .item-right-name {
+//               color: #fff;
+//             }
+//             .item-right-content {
+//               color: #cacaca;
+//               .item-right-content__line {
+//                 background: #cacaca;
+//               }
+//             }
+//             .item-right-overview {
+//               color: #cacaca;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

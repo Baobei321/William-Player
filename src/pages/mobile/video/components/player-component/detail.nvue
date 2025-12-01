@@ -575,65 +575,65 @@ export default {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .player-detail {
-    background: #1e1e20;
+// @media (prefers-color-scheme: dark) {
+//   .player-detail {
+//     background: #1e1e20;
 
-    .swiper-content {
-      .swiper-content-left {
-        background: rgb(212, 212, 212);
-      }
+//     .swiper-content {
+//       .swiper-content-left {
+//         background: rgb(212, 212, 212);
+//       }
 
-      .swiper-content-right {
-        .right-desc {
-          color: rgb(182, 182, 182);
-        }
+//       .swiper-content-right {
+//         .right-desc {
+//           color: rgb(182, 182, 182);
+//         }
 
-        .right-genres {
-          color: #fff;
-        }
+//         .right-genres {
+//           color: #fff;
+//         }
 
-        .right-name {
-          color: #fff;
-        }
+//         .right-name {
+//           color: #fff;
+//         }
 
-        .right-info {
-          .right-info-date {
-            color: #fff;
-          }
+//         .right-info {
+//           .right-info-date {
+//             color: #fff;
+//           }
 
-          .right-info-star {
-            color: #fff;
-          }
-        }
-      }
-    }
+//           .right-info-star {
+//             color: #fff;
+//           }
+//         }
+//       }
+//     }
 
-    .now-play {
-      .now-play-title {
-        color: #fff;
-      }
+//     .now-play {
+//       .now-play-title {
+//         color: #fff;
+//       }
 
-      .now-play-list {
-        .tv-version-scroll {
-          .item-title {
-            color: #fff !important;
-          }
-        }
-      }
-    }
-  }
+//       .now-play-list {
+//         .tv-version-scroll {
+//           .item-title {
+//             color: #fff !important;
+//           }
+//         }
+//       }
+//     }
+//   }
 
-  .play-platform {
-    .play-platform-title {
-      color: #fff !important;
-    }
+//   .play-platform {
+//     .play-platform-title {
+//       color: #fff !important;
+//     }
 
-    .play-platform-container {
-      .container-empty {
-        background: #1e1e20;
-      }
-    }
-  }
-}
+//     .play-platform-container {
+//       .container-empty {
+//         background: #1e1e20;
+//       }
+//     }
+//   }
+// }
 </style>
