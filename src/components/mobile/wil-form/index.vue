@@ -100,6 +100,7 @@ const rules = computed(() => {
 });
 defineExpose({
   confirmCommit,
+  formRef,
 });
 
 watch(

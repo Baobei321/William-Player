@@ -1,7 +1,7 @@
 <template>
     <div ref="playerRef" class="mpv-player">
         <embed ref="mpvRef" id="mpvjs" type="application/x-mpvjs" wmode="transparent" class="mpv-player-embed" />
-        <player-control :nowTime="mpvData.timePos" :time-length="mpvData.duration" :paused="mpvData.paused"
+        <player-control :nowTime="mpvData.timePos" :time-length="mpvData.duration" :paused="mpvData.paused" :mpv="mpv"
             :audioTrack="audioTrack" :subTitleTrack="subTitleTrack" :fullScreen="mpvData.fullScreen" @onPause="onPause"
             @onFullscreen="onFullscreen" @change="changeSlide" @getTrackList="getTrackList"></player-control>
         <div class="mpv-player-loading" v-if="mpvData.loading">
@@ -80,6 +80,7 @@ const onMessage = (e) => {
                 if (data.value > 0 && data.value < 1) {
                     getTrackListData()
                 }
+                mpvData.loading = false
                 mpvData.timePos = Math.round(data.value);
                 break;
             case 'duration':
@@ -149,13 +150,13 @@ onBeforeUnmount(() => {
 onMounted(() => {
     // 监听 MPV 数据
     ipc.on('mpv-track-list', (event, res) => {
-        console.log(res, 'audioTrack.value');
+        console.log(res.data.data, 'audioTrack.value');
         if (res.data.request_id) {
             mpvData.loading = false
             if (res.data.data) {
                 audioTrack.value = res.data.data.filter(v => v.type === 'audio')
                 subTitleTrack.value = res.data.data.filter(v => v.type === 'sub')
-                //初始化的时候设置音轨为第一个，字幕为中午轨道，不保证一定是简体，因为简体繁体都是chi
+                //初始化的时候设置音轨为第一个，字幕为中文轨道，不保证一定是简体，因为简体繁体都是chi
                 if (audioTrack.value.length) {
                     mpv.setAudioTrack(audioTrack.value[0].id)
                 }

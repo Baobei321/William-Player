@@ -113,7 +113,7 @@ const closePopover = () => {
 const clickItem = (item) => {
     showPopover.value = false
     emits('update:visible', false)
-    item.func() ? item.func() : emits('clickItem', item)
+    item.func ? item.func() : emits('clickItem', item)
 }
 
 watch(

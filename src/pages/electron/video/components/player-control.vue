@@ -54,6 +54,8 @@
 import { onMounted, ref, watch } from 'vue';
 import { handleSecond } from '@/utils/scrape.js'
 import Popover from '@/components/electron/wil-popover/index.vue';
+import { ipc } from "@/utils/ipcRenderer";
+import { ipcApiRoute } from "@/utils/ipcApiRoute";
 
 const props = defineProps({
     title: { type: String, default: '' },
@@ -63,6 +65,7 @@ const props = defineProps({
     fullScreen: { type: Boolean, default: false },
     audioTrack: { type: Array, default: [] },
     subTitleTrack: { type: Array, default: [] },
+    mpv: { type: Object, default: {} }
 })
 
 const emits = defineEmits(['onPause', 'onFullscreen', 'getTrackList', 'change'])
@@ -86,10 +89,10 @@ let isInit = '' //初始化选择音轨还是字轨
 let startX = 0;
 let elementStartLeft = 0
 let slideWidth = 0
+
 // 鼠标按下事件处理
 const startDrag = (event) => {
     isDragging.value = true;
-
     // 获取元素当前的位置
     const buttonElement = player_control.value.querySelector('.player-control-bottom__slide-button');
     elementStartLeft = parseInt(buttonElement.style.left, 0) || 0;
@@ -160,8 +163,12 @@ const getAudioTrack = () => {
     if (props.audioTrack.length) {
         popoverPosition.value = positionObj.audioPosition
         popoverOptions.value = props.audioTrack.map(item => {
-            item.label = item.language
-            return item
+            let obj = JSON.parse(JSON.stringify(item))
+            obj.label = item.language
+            obj.func = () => {
+                props.mpv.setAudioTrack(obj.id)
+            }
+            return obj
         })
         showPopover.value = true
     } else {
@@ -178,13 +185,15 @@ const getSubTitleTrack = () => {
         clearTimeout(hideTimer.value); // 清除之前的定时器
         hideTimer.value = null
     }
-    console.log(props.subTitleTrack,'props.subTitleTrack');
-    
     if (props.subTitleTrack.length) {
         popoverPosition.value = positionObj.subtitlePosition
         popoverOptions.value = props.subTitleTrack.map(item => {
-            item.label = item.language
-            return item
+            let obj = JSON.parse(JSON.stringify(item))
+            obj.label = item.language
+            obj.func = () => {
+                props.mpv.setSubtitleTrack(obj.id)
+            }
+            return obj
         })
         showPopover.value = true
     } else {

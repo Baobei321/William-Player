@@ -45,6 +45,7 @@ import wilCell from '@/components/mobile/wil-cell/index.vue'
 import * as CONFIG from '@/utils/config.js'
 import { computed, ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
+import { editUserInfo } from '@/network/apis.js'
 
 const userInfo = ref({})
 const genderDict = {
@@ -107,6 +108,7 @@ const options3 = computed(() => [
 const uploadSuccess = (event) => {
     userInfo.value.avatar = event.data.url
     uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+    editUserInfo({ avatar: event.data.url })
 }
 
 const clickItem = (item) => {

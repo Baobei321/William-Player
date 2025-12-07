@@ -8,7 +8,7 @@
       <div class="login-title-bottom">欢迎使用William Player</div>
     </div>
     <div class="login-tabs">
-      <nut-tabs v-model="tabValue">
+      <nut-tabs v-model="tabValue" @change="changeTabs">
         <nut-tab-pane title="手机登录" pane-key="1">
           <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1">
           </base-form>
@@ -113,6 +113,16 @@ const userAgree = ref(false);
 const checkAgree = () => {
   userAgree.value = !userAgree.value;
 };
+
+const changeTabs=(obj)=>{
+  if(obj.paneKey==='1'){
+    formData2.value = {}
+    base_form2.value.formRef.reset()
+  }else if(obj.paneKey==='2'){
+    formData1.value = {}
+    base_form1.value.formRef.reset()
+  }
+}
 
 const confirmCommit = async () => {
   if (tabValue.value === '1') {//手机号登录

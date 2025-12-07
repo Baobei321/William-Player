@@ -1,7 +1,7 @@
 import * as CONFIG from '@/utils/config.js'
 import { sendEmail } from "@/network/apis"
-// import { ipc } from "@/utils/ipcRenderer";
-// import { ipcApiRoute } from "@/utils/ipcApiRoute";
+import { ipc } from "@/utils/ipcRenderer";
+import { ipcApiRoute } from "@/utils/ipcApiRoute";
 //webdav
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {

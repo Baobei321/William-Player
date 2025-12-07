@@ -35,7 +35,7 @@
                             <input v-bind="item" v-model="phoneForm.authCode" :maxlength="6">
                             <span class="authcode-button"
                                 :style="{ color: countDown < 61 ? 'rgba(204,204,204,1)' : 'rgb(255, 103, 1)' }"
-                                @click="handleSendEmail">{{
+                                @click="handlePhoneSendEmail">{{
                                     countDown > 60 ? '发送验证码' : `${countDown}s后重新发送`
                                 }}</span>
                         </div>
@@ -44,10 +44,10 @@
             </div>
             <div class="edit-container-email" v-else-if="routerParams.title === '邮箱'">
                 <wil-form :options="formOptions2" v-model="emailForm" ref="wil_form">
-                    <template #emailOld>
+                    <template #emailOld v-if="emailForm.emailOld">
                         <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ emailForm.emailOld }}</div>
                     </template>
-                    <template #authCodeOld="item">
+                    <template #authCodeOld="item" v-if="emailForm.emailOld">
                         <div class="authcode">
                             <input v-bind="item" v-model="emailForm.authCodeOld" :maxlength="6">
                             <span class="authcode-button"
@@ -88,6 +88,7 @@ const countDownOld = ref(61) //编辑邮箱的时候使用
 const codeEncrypt = ref('')
 const codeEncryptOld = ref('') //编辑邮箱的时候使用
 userInfo.value = uni.getStorageSync(CONFIG.USER_KEY);
+userInfo.value.email = ''
 let timer = null
 const formData = ref({
     name: userInfo.value.name,
@@ -115,11 +116,14 @@ const formOptions1 = [
     { label: "邮箱验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
 ]
 
-const formOptions2 = [
+const formOptions2 = userInfo.value.email ? [
     { label: "旧邮箱", prop: "emailOld", formItemProps: {} },
     { label: "新邮箱", prop: "email", type: 'input', formItemProps: { placeholder: "请输入新邮箱", type: "text" } },
     { label: "旧邮箱验证码", prop: "authCodeOld", formItemProps: { placeholder: "请输入验证码", type: "number" } },
     { label: "新邮箱验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
+] : [
+    { label: "邮箱", prop: "email", type: 'input', formItemProps: { placeholder: "请输入邮箱", type: "text" } },
+    { label: "验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
 ]
 
 const handleSave = async () => {
@@ -198,22 +202,40 @@ const handleSave = async () => {
                         icon: 'none'
                     })
                 } else {
-                    if (emailForm.value.authCode?.length !== 6 || emailForm.value.authCodeOld?.length !== 6) {
-                        uni.showToast({
-                            title: '验证码为6位',
-                            icon: 'none'
-                        })
+                    if (userInfo.value.email) {
+                        if (emailForm.value.authCode?.length !== 6 || emailForm.value.authCodeOld?.length !== 6) {
+                            uni.showToast({
+                                title: '验证码为6位',
+                                icon: 'none'
+                            })
+                        } else {
+                            await editUserEmail({
+                                email: emailForm.value.email,
+                                codeEncryptOld: codeEncryptOld.value,
+                                authCodeOld: emailForm.value.authCodeOld,
+                                codeEncrypt: codeEncrypt.value,
+                                authCode: emailForm.value.authCode
+                            })
+                            userInfo.value.email = emailForm.value.email
+                            uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+                            uni.navigateBack()
+                        }
                     } else {
-                        await editUserEmail({
-                            email: emailForm.value.email,
-                            codeEncryptOld: codeEncryptOld.value,
-                            authCodeOld: emailForm.value.authCodeOld,
-                            codeEncrypt: codeEncrypt.value,
-                            authCode: emailForm.value.authCode
-                        })
-                        userInfo.value.email = emailForm.value.email
-                        uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
-                        uni.navigateBack()
+                        if (emailForm.value.authCode?.length !== 6) {
+                            uni.showToast({
+                                title: '验证码为6位',
+                                icon: 'none'
+                            })
+                        } else {
+                            await editUserEmail({
+                                email: emailForm.value.email,
+                                codeEncrypt: codeEncrypt.value,
+                                authCode: emailForm.value.authCode
+                            })
+                            userInfo.value.email = emailForm.value.email
+                            uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+                            uni.navigateBack()
+                        }
                     }
                 }
             } else {
@@ -225,13 +247,18 @@ const handleSave = async () => {
             break;
     }
 }
+
+const handlePhoneSendEmail = () => {
+    toSendEmail(codeEncrypt, countDown, phoneForm.value.email)
+}
 //旧邮箱验证码发送
 const handleSendOldEmail = () => {
-    toSendEmail(codeEncryptOld, countDownOld, phoneForm.value.emailOld)
+    toSendEmail(codeEncryptOld, countDownOld, emailForm.value.emailOld)
 }
+
 //发送邮箱验证码
 const handleSendEmail = () => {
-    toSendEmail(codeEncrypt, countDown, phoneForm.value.email)
+    toSendEmail(codeEncrypt, countDown, emailForm.value.email)
 }
 onLoad((options) => {
     routerParams.value = options

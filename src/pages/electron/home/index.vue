@@ -3,6 +3,7 @@
         <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading"
             ref="video_navbar">
         </home-navbar>
+        <span @click="openVideo">调试用</span>
         <template v-if="!refreshLoading">
             <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
             <div class="home-container">
@@ -83,7 +84,10 @@ const openVideo = () => {
         content: '/video',
         windowName: 'Video',
         windowTitle: `正在播放：`,
-        opusId: '1'
+        opusId: '1',
+        query:{
+            videoUrl:'https://cloudcube.telecomjs.com/cloudcube-gslzfy-js-person/PERSONCLOUD/f0b2b9e8-c44f-420c-9482-3abc8d1e426f.mkv?x-obs-traffic-limit=409600&X-Amz-Date=20251207T112101Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&x-amz-CLIENTTYPEIN=PC&x-amz-userLevel=0&X-Amz-Credential=SZshenghuo/20251207/us-east-1/s3/aws4_request&x-amz-UID=64784934&response-content-disposition=attachment%3Bfilename%3DSee.Her.Again.S01E01.2024.1080p.NF.x264.DDP5.1.mkv&x-amz-CLIENTNETWORK=UNKNOWN&x-amz-CLOUDTYPEIN=PERSON&X-Amz-SignedHeaders=host&X-Amz-Expires=7860&x-amz-FSIZE=2056482719&x-amz-UFID=225143168989469276&X-Amz-Signature=c4dc92aabfd89c35fe484dd1e546f7eb5895a39ff3aa6e977cefd63212e8ed62'
+        }
     };
     ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
         console.log('[createWindow] id:', id);

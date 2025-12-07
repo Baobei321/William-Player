@@ -82,7 +82,7 @@ const uploadeSuccess = e => {
             fileList.value = [data.url];
         }
         emit('update:modelValue', fileList.value);
-        emit('success', e)
+        emit('success', JSON.parse(e.data.data))
     }
 };
 

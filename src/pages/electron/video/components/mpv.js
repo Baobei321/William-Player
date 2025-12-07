@@ -14,11 +14,13 @@ export default class Mpv {
       'eof-reached',
       'filename',
       'volume',
-      'mpv-version',
-      'ffmpeg-version',
-      'track-list',
     ]
     observable.forEach(v => this._setObserve(v))
+    // this._sendProperty('sub-ass-force-style', 'FontSize=36,BorderStyle=3');
+    // this._sendProperty('sub-font-provider', 'auto');
+    // this._sendProperty('blend-subtitles', 'yes');
+    // this._sendProperty('vo', 'gpu');
+    // this._sendProperty('gpu-api', 'opengl');  // 或者 webgpu（看你的 mpv.js）
     this._sendProperty('hwdec', 'auto')
     // 启用 IPC 服务器
     this._sendProperty('input-ipc-server', this.socketPath);
@@ -66,7 +68,6 @@ export default class Mpv {
     this._getPropertyAsync('ffmpeg-version')
   }
   getTrackList() {
-    console.log("点击获取轨道");
     this._getPropertyAsync('track-list');
   }
   _sendCommand(cmd, ...args) {

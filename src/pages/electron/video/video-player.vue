@@ -254,7 +254,6 @@ onBeforeMount(() => {
         config.title = route.query.liveTitle;
         return;
     }
-    console.log(route.query,'route.query');
     setUrl();
 })
 </script>
