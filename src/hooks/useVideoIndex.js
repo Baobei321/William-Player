@@ -11,6 +11,7 @@ import webdavFileIcon from "@/static/webdav-fileIcon.png";
 import { getMainView, getEmbyList, getEmbyNewList } from '@/utils/emby'
 import dayjs from 'dayjs';
 import emptyBg from "@/static/poster-empty.png";
+import { PLATFORM } from '@/utils/config.js'
 
 export function useVideoIndex({ wil_modal }) {
     const video_navbar = ref(null);
@@ -169,20 +170,22 @@ export function useVideoIndex({ wil_modal }) {
         await getMovieTv();
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
             refreshLoading.value = false;
-            wil_modal.value.showModal({
-                title: "温馨提示",
-                content: "未刮削出海报墙，是否要查看教程？",
-                confirmColor: "#ff6701",
-                confirm: async () => {
-                    let query = {
-                        url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
-                        title: "问题与反馈",
-                    };
-                    uni.navigateTo({
-                        url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
-                    });
-                },
-            });
+            if (PLATFORM !== 'TV') {
+                wil_modal.value.showModal({
+                    title: "温馨提示",
+                    content: "未刮削出海报墙，是否要查看教程？",
+                    confirmColor: "#ff6701",
+                    confirm: async () => {
+                        let query = {
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            title: "问题与反馈",
+                        };
+                        uni.navigateTo({
+                            url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
+                        });
+                    },
+                });
+            }
             return;
         }
         let movie = groupBySource(movieTvData.value.movie);
@@ -403,20 +406,22 @@ export function useVideoIndex({ wil_modal }) {
         await get189MovieTv();
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
             refreshLoading.value = false;
-            wil_modal.value.showModal({
-                title: "温馨提示",
-                content: "未刮削出海报墙，是否要查看教程？",
-                confirmColor: "#ff6701",
-                confirm: async () => {
-                    let query = {
-                        url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
-                        title: "问题与反馈",
-                    };
-                    uni.navigateTo({
-                        url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
-                    });
-                },
-            });
+            if (PLATFORM !== 'TV') {
+                wil_modal.value.showModal({
+                    title: "温馨提示",
+                    content: "未刮削出海报墙，是否要查看教程？",
+                    confirmColor: "#ff6701",
+                    confirm: async () => {
+                        let query = {
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            title: "问题与反馈",
+                        };
+                        uni.navigateTo({
+                            url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
+                        });
+                    },
+                });
+            }
             return;
         }
         let movie = groupBySource(movieTvData.value.movie);
@@ -514,20 +519,22 @@ export function useVideoIndex({ wil_modal }) {
         await getQuarkMovieTv(listData.value[0]);
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
             refreshLoading.value = false;
-            wil_modal.value.showModal({
-                title: "温馨提示",
-                content: "未刮削出海报墙，是否要查看教程？",
-                confirmColor: "#ff6701",
-                confirm: async () => {
-                    let query = {
-                        url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
-                        title: "问题与反馈",
-                    };
-                    uni.navigateTo({
-                        url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
-                    });
-                },
-            });
+            if (PLATFORM !== 'TV') {
+                wil_modal.value.showModal({
+                    title: "温馨提示",
+                    content: "未刮削出海报墙，是否要查看教程？",
+                    confirmColor: "#ff6701",
+                    confirm: async () => {
+                        let query = {
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            title: "问题与反馈",
+                        };
+                        uni.navigateTo({
+                            url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
+                        });
+                    },
+                });
+            }
             return;
         }
         let movie = groupBySource(movieTvData.value.movie);

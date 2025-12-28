@@ -22,7 +22,10 @@
         // 	"ignoreVersion": true
         // },
         /* 模块配置 */
-        "modules" : {},
+        "modules" : {
+            "Barcode" : {},
+            "Camera" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             "distribute" : {
@@ -124,7 +127,22 @@
                 }
             }
         },
-        "nativePlugins" : {}
+        "nativePlugins" : {
+            "video-native" : {
+                "__plugin_info__" : {
+                    "name" : "video-native",
+                    "description" : "一个集成了Exoplayer原生播放器的插件",
+                    "platforms" : "Android",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
+                }
+            }
+        }
     },
     "h5" : {
         "darkmode" : false,

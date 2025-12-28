@@ -220,8 +220,8 @@ export default {
         left: 0;
         top: 0;
         .popup-title-close__img {
-          width: 38rpx;
-          height: 38rpx;
+          width: 25rpx;
+          height: 25rpx;
         }
       }
       .popup-title-name {

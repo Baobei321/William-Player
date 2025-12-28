@@ -2,10 +2,14 @@
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
     <div class="video-classify-list" :style="{ '--line-height': lineHeight }">
-      <div class="list-item" :class="[tabIndex === index ? 'list-item-active' : '', index == 4 ? 'list-item4' : '']"
-        v-for="(item, index) in listData" :key="item.id" :style="{ marginLeft: index % 4 == 0 ? 0 : '32rpx' }"
+      <div
+        class="list-item"
+        :class="[tabIndex === index ? 'list-item-active' : '', index == 4 ? 'list-item4' : '']"
+        v-for="(item, index) in listData"
+        :key="item.id"
+        :style="{ marginLeft: index % 4 == 0 ? 0 : '32rpx' }"
         @click="toVideoAll(item)">
-        <div class="list-item-container" :style="{ background: item.background, }">
+        <div class="list-item-container" :style="{ background: item.background }">
           <div class="list-item-title">{{ item.label }}</div>
           <div class="list-item-img">
             <div class="img-one"></div>
@@ -21,9 +25,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-import { onShow } from "@dcloudio/uni-app";
-import { classifyList } from "@/utils/scrape.js";
+import { ref, watch } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { classifyList } from '@/utils/scrape.js'
 
 const props = defineProps({
   focusModel: { type: String, default: '' },
@@ -33,74 +37,74 @@ const props = defineProps({
 
 const emits = defineEmits(['setFocus'])
 
-const listData = ref([]);
+const listData = ref([])
 
-const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
+const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)))
 
-const lineHeight = ref("");
+const lineHeight = ref('')
 const scrollTop = ref(0)
 const tabIndex = ref(-1)
 const gridPx = ref(0)
 
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
-  let idArr = [];
-  listData.value = [];
-  let movieTvData = uni.getStorageSync("localMovieTvData") || {};
-  movieTvData.movie?.forEach((item) => {
+  let idArr = []
+  listData.value = []
+  let movieTvData = uni.getStorageSync('localMovieTvData') || {}
+  movieTvData.movie?.forEach(item => {
     if (item.genre_ids) {
-      idArr.push(...item.genre_ids);
+      idArr.push(...item.genre_ids)
     }
-  });
-  movieTvData.tv?.forEach((item) => {
+  })
+  movieTvData.tv?.forEach(item => {
     if (item.genre_ids) {
-      idArr.push(...item.genre_ids);
+      idArr.push(...item.genre_ids)
     }
-  });
+  })
 
-  idArr = [...new Set(idArr)];
-  idArr.forEach((item) => {
-    let obj = classifyList1.value.find((i) => i.id == item);
+  idArr = [...new Set(idArr)]
+  idArr.forEach(item => {
+    let obj = classifyList1.value.find(i => i.id == item)
     if (obj) {
-      obj.loadImg = true;
-      listData.value.push(obj);
+      obj.loadImg = true
+      listData.value.push(obj)
     }
-  });
-};
+  })
+}
 
-const getUpDown = (direction) => {
-  if (direction === "up") {
-    let localMovieTvData = uni.getStorageSync("localMovieTvData");
+const getUpDown = direction => {
+  if (direction === 'up') {
+    let localMovieTvData = uni.getStorageSync('localMovieTvData')
     if (localMovieTvData?.tv?.length) {
-      return "hxTv";
+      return 'hxTv'
     }
     if (localMovieTvData?.movie?.length) {
-      return "hxMovie";
+      return 'hxMovie'
     }
   }
 }
 
-const evtMove = (keyCode) => {
-  if (keyCode === "KeyRight") {
+const evtMove = keyCode => {
+  if (keyCode === 'KeyRight') {
     if (tabIndex.value != listData.value.length - 1) {
-      tabIndex.value++;
+      tabIndex.value++
     }
-  } else if (keyCode === "KeyLeft") {
+  } else if (keyCode === 'KeyLeft') {
     if (tabIndex.value > 0) {
-      tabIndex.value--;
+      tabIndex.value--
     }
-  } else if (keyCode === "KeyUp") {
+  } else if (keyCode === 'KeyUp') {
     if (tabIndex.value - 4 < 0) {
-      emits("setFocus", getUpDown("up"), 'KeyUp');
+      emits('setFocus', getUpDown('up'), 'KeyUp')
       tabIndex.value = -1
     } else {
       tabIndex.value = tabIndex.value - 4
-      emits("setFocus", 'videoClassify', 'KeyUp');
+      emits('setFocus', 'videoClassify', 'KeyUp')
     }
-  } else if (keyCode === "KeyDown") {
+  } else if (keyCode === 'KeyDown') {
     if (tabIndex.value + 4 <= listData.value.length - 1) {
       tabIndex.value += 4
-      emits("setFocus", 'videoClassify', 'KeyDown');
+      emits('setFocus', 'videoClassify', 'KeyDown')
     }
   } else if (keyCode === 'KeyEnter') {
     toVideoAll(listData.value[tabIndex.value])
@@ -116,22 +120,22 @@ const evtMove = (keyCode) => {
   //   setScrollIntoView();
   // }
   // nowTime = time;
-};
+}
 
 const setItemWidth = () => {
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  let windowWidth = sysinfo.windowWidth;
-  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
-  lineHeight.value = (((windowWidth - uni.upx2px(280)) / 4) * 170) / 339 / scale + "rpx";
-};
-setItemWidth();
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth
+  const scale = uni.upx2px(100) / 100 // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(280)) / 4) * 170) / 339 / scale + 'rpx'
+}
+setItemWidth()
 
 //跳转到videoAll
-const toVideoAll = (item) => {
+const toVideoAll = item => {
   uni.navigateTo({
     url: `/pages/tv/video/video-all?title=${item.label}&genreId=${item.id}`,
-  });
-};
+  })
+}
 
 const getScrollTop = () => {
   let row = Math.floor(tabIndex.value / 4)
@@ -140,46 +144,54 @@ const getScrollTop = () => {
 
 watch(
   () => props.isFocus,
-  (val) => {
+  val => {
     if (val) {
-      tabIndex.value = 0;
+      tabIndex.value = 0
     } else {
-      tabIndex.value = -1;
+      tabIndex.value = -1
     }
   }
-);
+)
 onShow(() => {
-  getGenre();
+  getGenre()
   setTimeout(() => {
     let windowHeight = uni.getSystemInfoSync().windowHeight
-    const query = uni.createSelectorQuery();
-    query.select(".list-item").fields(
-      {
-        rect: true,
-        size: true,
-      },
-      (res) => {
-        scrollTop.value = (props.offsetTop + res.top - windowHeight / 2 + res.height / 2) < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
-        const query1 = uni.createSelectorQuery();
-        query1.select(".list-item4").fields(
+    const query = uni.createSelectorQuery()
+    if (listData.value?.length) {
+      query
+        .select('.list-item')
+        .fields(
           {
             rect: true,
             size: true,
           },
-          (res1) => {
-            if (res1?.top) {
-              gridPx.value = res1.top - res.top
-            }
+          res => {
+            scrollTop.value = props.offsetTop + res.top - windowHeight / 2 + res.height / 2 < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
+            const query1 = uni.createSelectorQuery()
+            query1
+              .select('.list-item4')
+              .fields(
+                {
+                  rect: true,
+                  size: true,
+                },
+                res1 => {
+                  if (res1?.top) {
+                    gridPx.value = res1.top - res.top
+                  }
+                }
+              )
+              .exec()
           }
-        ).exec();
-      }
-    ).exec();
-  }, 0);
-});
+        )
+        .exec()
+    }
+  }, 0)
+})
 
 defineExpose({
   evtMove,
-  getScrollTop
+  getScrollTop,
 })
 </script>
 
@@ -277,7 +289,6 @@ defineExpose({
           }
         }
       }
-
     }
 
     .list-item-active {

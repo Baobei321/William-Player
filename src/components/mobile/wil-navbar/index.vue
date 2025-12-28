@@ -93,9 +93,9 @@ const clickBack = () => {
       left: 0;
 
       .nut-icon-rect-left {
-        font-size: 17px;
-        width: 17px;
-        height: 17px;
+        font-size: 34rpx;
+        width: 34rpx;
+        height: 34rpx;
       }
     }
 
@@ -104,7 +104,7 @@ const clickBack = () => {
 
       .text {
         color: #000 !important;
-        font-size: 17px;
+        font-size: 34rpx;
         font-weight: bold;
       }
     }

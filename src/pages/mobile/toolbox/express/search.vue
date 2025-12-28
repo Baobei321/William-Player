@@ -1,9 +1,6 @@
 <template>
     <div class="express-search">
         <wil-navbar title="快递查询">
-            <template #leftShow>
-                <nut-icon name="rect-down" custom-color="#000"></nut-icon>
-            </template>
         </wil-navbar>
         <div class="express-search-container">
             <div class="express-search-container__input">
@@ -55,7 +52,7 @@ page {
 .express-search {
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
+    // background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
 
     .express-search-container {
         flex: 1;

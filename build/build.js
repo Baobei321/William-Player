@@ -103,6 +103,25 @@ function generateAppVueContent() {
       content = content.replace('<script>', `${pcTemplate}\n<script>`);
     }
 
+    // 如果是MOBILE平台，在条件编译注释下插入屏幕方向锁定代码
+    if (platform === PLATFORMS.MOBILE) {
+      const targetComment = '// #ifdef APP-PLUS';
+      const orientationCode = '    plus.screen.lockOrientation("portrait-primary");';
+
+      // 查找目标注释位置
+      const targetIndex = content.indexOf(targetComment);
+      if (targetIndex !== -1) {
+        // 计算目标注释所在行的结束位置（下一个换行符）
+        const lineEndIndex = content.indexOf('\n', targetIndex);
+
+        if (lineEndIndex !== -1) {
+          // 在目标注释行的下一行插入方向锁定代码
+          content = content.slice(0, lineEndIndex + 1) +
+            orientationCode + '\n' +
+            content.slice(lineEndIndex + 1);
+        }
+      }
+    }
     return content;
   } catch (error) {
     console.error('✗✗ 生成 App.vue 内容失败:', error.message);

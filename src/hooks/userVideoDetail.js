@@ -60,6 +60,7 @@ export function useVideoDetail({ route, router }) {
         } else if (item.text == "设置跳过片头时间") {
             let localMovieTvData = uni.getStorageSync("localMovieTvData");
             let nowTv = localMovieTvData.tv.find((i) => i.movieTvId == routerParams.value.movieTvId);
+            console.log(nowTv, 'nowTv');
             if (nowTv.openingTime) {
                 const minutes = String(Math.floor(nowTv.openingTime / 60)); // 取整分钟数
                 const remainingSeconds = String(nowTv.openingTime % 60); // 剩余秒数
@@ -289,13 +290,19 @@ export function useVideoDetail({ route, router }) {
             // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
         }
         //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
+        console.log(res1, 're1s1');
+
         tvList.value.forEach((v, vindex) => {
             if (res1.episodes) {
                 v.title = res1.episodes[vindex]?.name || "暂无标题";
                 v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
                 v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
+                v.runtimeOrg = res1.episodes[vindex]?.runtime || 0
+                v.vote_average = res1.episodes[vindex]?.vote_average || res1.vote_average
+                v.overview = res1.episodes[vindex]?.overview || res1.overview
             } else {
                 v.title = `第${vindex + 1}集`;
+                // v.vote_average = res1.vote_average
             }
         });
         nextTick(() => {

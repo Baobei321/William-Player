@@ -1,6 +1,6 @@
 <template>
   <div class="video-detail" :style="{ overflow: showPopover ? 'hidden' : 'auto' }">
-    <wil-navbar style="position: fixed;z-index: 999;" arrow-color="#fff">
+    <wil-navbar style="position: fixed; z-index: 999" arrow-color="#fff">
       <template #right>
         <nut-icon name="more-x" custom-color="#fff" size="20" @click="showPopover = true"></nut-icon>
         <nut-transition :show="showPopover" name="fade" :duration="200">
@@ -49,12 +49,13 @@
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
           <div class="movie-version-title">影片版本</div>
-          <scroll-view class="movie-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
-            :showScrollbar="false">
+          <scroll-view class="movie-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="movie-version-list">
               <div
                 :class="['movie-version-list__item', item.provider + item.name == selectSource.provider + selectSource.name ? 'movie-version-list__active' : '']"
-                v-for="item in sourceList" :key="item.provider + item.name" @click="changeSource(item)">
+                v-for="item in sourceList"
+                :key="item.provider + item.name"
+                @click="changeSource(item)">
                 {{ item.sourceName }}
               </div>
             </div>
@@ -66,31 +67,41 @@
             <div class="tv-version-tabs__cloud">
               <div
                 :class="['tv-version-tabs__cloud-item', item.provider + item.name == selectSource.provider + selectSource.name ? 'tv-version-tabs__cloud-active' : '']"
-                v-for="item in sourceList" :key="item.provider + item.name" @click="changeTvSource(item)">
+                v-for="item in sourceList"
+                :key="item.provider + item.name"
+                @click="changeTvSource(item)">
                 {{ item.sourceName }}
               </div>
             </div>
-            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff"
-              @change="changeTvSeason">
-              <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr"
-                :key="item.season">
-              </nut-tab-pane>
-            </nut-tabs>
-            <div class="tv-version-tabs__disabled" v-if="!tvList.length && !showRehandleButton" @click="disabledTip">
+            <div class="tv-version-tabs__season">
+              <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSeason">
+                <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr" :key="item.season"> </nut-tab-pane>
+              </nut-tabs>
+              <div class="tv-version-tabs__season-viewAll" @click="openTvListPopup">
+                <span>查看全部</span>
+                <nut-icon name="rect-right" custom-color="#090909" size="14"></nut-icon>
+              </div>
             </div>
+            <div class="tv-version-tabs__disabled" v-if="!tvList.length && !showRehandleButton" @click="disabledTip"></div>
           </div>
-          <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView"
-            :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false" v-if="tvList.length"
+          <scroll-view
+            class="tv-version-scroll"
+            :scroll-with-animation="true"
+            :scroll-into-view="scrollIntoView"
+            :scroll-x="true"
+            style="width: 100%"
+            :enhanced="true"
+            :showScrollbar="false"
+            v-if="tvList.length"
             :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
-            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)"
-              :key="item.name" @click="toPlayVideo(item, index)">
+            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
                 <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
-                <div class="item-img-process"
+                <div
+                  class="item-img-process"
                   :style="{ width: Number(historyTv.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"
-                  v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path">
-                </div>
+                  v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"></div>
               </div>
               <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
             </div>
@@ -100,31 +111,76 @@
             <span v-else>加载中...</span>
           </div>
         </div>
-        <actor-list ref="actor_list" :routerParams="routerParams"
+        <actor-list
+          ref="actor_list"
+          :routerParams="routerParams"
           :selectSource="{ ...selectSource, size: routerParams.type == 'movie' ? selectSource.size : tvList[0]?.size }"
           :imgData="{ ...imgData, overview: overview }"></actor-list>
       </div>
       <nut-popup v-model:visible="showTimePicker" round position="center">
-        <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker"
-          @cancel="showTimePicker = false" />
+        <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
       </nut-popup>
     </div>
+    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" @playVideo="toPlayVideo"></tvlist-popup>
   </div>
 </template>
 
 <script setup>
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import actorList from "./components/detail-component/actor-list.vue";
-import { useDict } from "@/utils/useDict";
-import { parseTime } from "@/utils/scrape";
-import { useVideoDetail } from "@/hooks/userVideoDetail";
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import actorList from './components/detail-component/actor-list.vue'
+import { useDict } from '@/utils/useDict'
+import { parseTime } from '@/utils/scrape'
+import { useVideoDetail } from '@/hooks/userVideoDetail'
+import tvlistPopup from './components/detail-component/tvlist-popup.vue'
+import { ref } from 'vue'
 
-const { getUntokenDict } = useDict();
+const { getUntokenDict } = useDict()
+const showTvlistPopup = ref(false)
 
-const { showPopover, popoverArr, showTimePicker, pickerTitle, pickerVal, pickerColumns, imgData, overview, sourceList, selectSource, activeSeason, tvList, buttonText,
-  routerParams, showRehandleButton, historyTv, scrollIntoView, lineNumber, lineHeight, toSelect, confirmPicker, changeSource, changeTvSource, changeTvSeason, disabledTip,
-  clickPlayButton, toPlayVideo, reHandleTv } = useVideoDetail({})
+const {
+  showPopover,
+  popoverArr,
+  showTimePicker,
+  pickerTitle,
+  pickerVal,
+  pickerColumns,
+  imgData,
+  overview,
+  sourceList,
+  selectSource,
+  activeSeason,
+  tvList,
+  buttonText,
+  routerParams,
+  showRehandleButton,
+  historyTv,
+  scrollIntoView,
+  lineNumber,
+  lineHeight,
+  toSelect,
+  confirmPicker,
+  changeSource,
+  changeTvSource,
+  changeTvSeason,
+  disabledTip,
+  clickPlayButton,
+  toPlayVideo,
+  reHandleTv,
+} = useVideoDetail({})
 
+//打开电视剧集列表popup
+const openTvListPopup = () => {
+  if (!tvList.value?.length) {
+    uni.showToast({
+      title: '暂无剧集',
+      icon: 'none',
+    })
+    return
+  } else {
+    //打开popup展示剧集列表
+    showTvlistPopup.value = true
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -233,7 +289,7 @@ page {
       position: relative;
 
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
@@ -272,7 +328,7 @@ page {
 
             &::after {
               position: absolute;
-              content: "";
+              content: '';
               width: 2rpx;
               height: 24rpx;
               background-color: #c2c5c6;
@@ -303,7 +359,7 @@ page {
 
             &::after {
               position: absolute;
-              content: "";
+              content: '';
               width: 2rpx;
               height: 24rpx;
               background-color: #c2c5c6;
@@ -368,7 +424,7 @@ page {
           &::before {
             position: absolute;
             display: block;
-            content: "";
+            content: '';
             width: 3rpx;
             height: 24rpx;
             background-color: #c2c5c6;
@@ -443,70 +499,88 @@ page {
       .tv-version {
         margin-top: 20rpx;
 
-        .tv-version-tabs__cloud {
-          display: flex;
-          align-items: center;
-          flex-wrap: nowrap;
-          width: 100%;
-          overflow: auto;
-
-          .tv-version-tabs__cloud-item {
-            font-size: 28rpx;
-            color: #000;
-            font-weight: bold;
-            padding: 12rpx 24rpx;
-            border-radius: 8rpx;
-            border: 2rpx solid #c2c5c6;
-            margin-left: 12rpx;
-            white-space: nowrap;
-
-            &:first-child {
-              margin-left: 0;
-            }
-          }
-
-          .tv-version-tabs__cloud-active {
-            color: #315ffd;
-            border: 2rpx solid #315ffd;
-          }
-        }
-
-        ::v-deep .nut-tabs {
-          &__titles {
-            .nut-tabs__list {
-              .nut-tabs__titles-item {
-                // width: 92px;
-                // flex: 0 0 92px;
-                flex: 0 0 auto;
-                min-width: auto;
-                width: auto;
-                margin-left: 30rpx;
-
-                &:first-child {
-                  margin-left: 0;
-                }
-              }
-
-              .nut-tabs-active {
-                color: #090909;
-
-                .nut-tabs__titles-item__line {
-                  width: 100%;
-                  border-radius: 8rpx;
-                  bottom: 12%;
-                }
-              }
-            }
-          }
-
-          &__content {
-            display: none;
-          }
-        }
-
         .tv-version-tabs {
           position: relative;
+          .tv-version-tabs__cloud {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+            overflow: auto;
 
+            .tv-version-tabs__cloud-item {
+              font-size: 28rpx;
+              color: #000;
+              font-weight: bold;
+              padding: 12rpx 24rpx;
+              border-radius: 8rpx;
+              border: 2rpx solid #c2c5c6;
+              margin-left: 12rpx;
+              white-space: nowrap;
+
+              &:first-child {
+                margin-left: 0;
+              }
+            }
+
+            .tv-version-tabs__cloud-active {
+              color: #315ffd;
+              border: 2rpx solid #315ffd;
+            }
+          }
+          .tv-version-tabs__season {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            :deep(.nut-tabs) {
+              .nut-tabs__titles {
+                .nut-tabs__list {
+                  .nut-tabs__titles-item {
+                    // width: 92px;
+                    // flex: 0 0 92px;
+                    flex: 0 0 auto;
+                    min-width: auto;
+                    width: auto;
+                    margin-left: 30rpx;
+
+                    &:first-child {
+                      margin-left: 0;
+                    }
+                  }
+
+                  .nut-tabs-active {
+                    color: #090909;
+
+                    .nut-tabs__titles-item__line {
+                      width: 100%;
+                      border-radius: 8rpx;
+                      bottom: 12%;
+                    }
+                  }
+                }
+              }
+
+              .nut-tabs__content {
+                display: none;
+              }
+            }
+            .tv-version-tabs__season-viewAll {
+              display: flex;
+              align-items: center;
+              span {
+                font-size: 28rpx;
+                font-weight: bold;
+              }
+              :deep(.nut-icon) {
+                font-size: 28rpx;
+                width: 28rpx;
+                height: 28rpx;
+                &::before {
+                  font-size: 28rpx;
+                }
+              }
+            }
+          }
           .tv-version-tabs__disabled {
             position: absolute;
             width: 100%;
@@ -516,7 +590,7 @@ page {
             z-index: 99;
           }
 
-          ::v-deep .nut-tabs {
+          :deep(.nut-tabs) {
             .nut-tabs__titles {
               height: 92rpx;
 
