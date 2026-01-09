@@ -45,37 +45,7 @@
         {
             "path": "pages/tv/source/code-input",
             "style": {
-                "navigationStyle": "custom",
-                "app-plus": {
-                    "subNVues": [
-                        {
-                            "id": "cloud189_subnvue", // 唯一标识  
-                            "path": "pages/mobile/backend/cloud189-webview", // 页面路径  
-                            /*"type": "popup",  这里不需要*/
-                            "style": {
-                                "position": "absolute",
-                                "right": "0",
-                                "bottom": "0",
-                                "width": "68%",
-                                "height": "93%",
-                                "background": "transparent"
-                            }
-                        },
-                        {
-                            "id": "cloudquark_subnvue", // 唯一标识  
-                            "path": "pages/mobile/backend/quark-webview", // 页面路径  
-                            /*"type": "popup",  这里不需要*/
-                            "style": {
-                                "position": "absolute",
-                                "right": "0",
-                                "bottom": "0",
-                                "width": "68%",
-                                "height": "93%",
-                                "background": "transparent"
-                            }
-                        }
-                    ]
-                }
+                "navigationStyle": "custom"
             }
         },
         {
@@ -92,6 +62,18 @@
         },
         {
             "path": "pages/tv/mine/enter-qqgroup",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/mobile/backend/cloud189-webview",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/mobile/backend/quark-webview",
             "style": {
                 "navigationStyle": "custom"
             }

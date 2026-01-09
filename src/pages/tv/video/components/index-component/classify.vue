@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { classifyList } from '@/utils/scrape.js'
 
@@ -155,38 +155,45 @@ watch(
 onShow(() => {
   getGenre()
   setTimeout(() => {
-    let windowHeight = uni.getSystemInfoSync().windowHeight
-    const query = uni.createSelectorQuery()
-    if (listData.value?.length) {
-      query
-        .select('.list-item')
-        .fields(
-          {
-            rect: true,
-            size: true,
-          },
-          res => {
-            scrollTop.value = props.offsetTop + res.top - windowHeight / 2 + res.height / 2 < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
-            const query1 = uni.createSelectorQuery()
-            query1
-              .select('.list-item4')
-              .fields(
-                {
-                  rect: true,
-                  size: true,
-                },
-                res1 => {
-                  if (res1?.top) {
-                    gridPx.value = res1.top - res.top
+    nextTick(() => {
+      let windowHeight = uni.getSystemInfoSync().windowHeight
+      const query = uni.createSelectorQuery()
+      if (listData.value?.length) {
+        query
+          .select('.list-item')
+          .fields(
+            {
+              rect: true,
+              size: true,
+            },
+            res => {
+              scrollTop.value = props.offsetTop + res.top - windowHeight / 2 + res.height / 2 < 0 ? 0 : props.offsetTop + res.top - windowHeight / 2 + res.height / 2
+              const query1 = uni.createSelectorQuery()
+              query1
+                .select('.list-item4')
+                .fields(
+                  {
+                    rect: true,
+                    size: true,
+                  },
+                  res1 => {
+                    if (res1?.top) {
+                      gridPx.value = res1.top - res.top
+                      console.log(res1.top,res.top, '上下距离1')
+                      // uni.showToast({
+                      //   title:gridPx.value,
+                      //   icon:'none'
+                      // })
+                    }
                   }
-                }
-              )
-              .exec()
-          }
-        )
-        .exec()
-    }
-  }, 0)
+                )
+                .exec()
+            }
+          )
+          .exec()
+      }
+    })
+  }, 2000)
 })
 
 defineExpose({
@@ -220,8 +227,8 @@ defineExpose({
     .list-item {
       flex: 0 0 calc((100% - 96rpx) / 4);
       // height: 170rpx;
-      // aspect-ratio: 341/170; //webview大于90版本可用
-      height: var(--line-height);
+      aspect-ratio: 341/170; //webview大于90版本可用
+      // height: var(--line-height);
       margin-top: 20rpx;
       position: relative;
       box-sizing: border-box;

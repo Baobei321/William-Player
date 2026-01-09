@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, watchEffect } from 'vue'
 import tvPage from '@/components/tv/tv-page/index.vue'
 import recentPlayed from './components/index-component/recent-played.vue'
 import hxList from './components/index-component/hx-list.vue'
@@ -151,6 +151,7 @@ const getStarList = arr => {
   underImgArr.value = arr.map(item => {
     return CONFIG.IMG_DOMAIN + '/t/p/w1920_and_h1080_bestv2' + item.backdrop
   })
+  scrollTop.value = 0
 }
 const changeSwiper = index => {
   leave.value = true
@@ -228,16 +229,18 @@ const confirmModal = () => {
 
 //设置初始化焦点所在的位置
 const initFocusModel = () => {
-  let isTrue = selectType.type == 'Emby' ? !embyMovieTvList?.length : !localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length
+  let isTrue = selectType.type == 'Emby' ? !embyMovieTvList.value?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
   if (isTrue) {
     //此时不存在任何数据，焦点在添加新资源按钮上
     focusModel.value = 'videoEmpty'
   } else {
     focusModel.value = 'starRecommend'
   }
-  console.log(focusModel.value, 'focuasda')
 }
-initFocusModel()
+
+watchEffect(() => {
+  initFocusModel()
+})
 </script>
 
 <style lang="scss" scoped>

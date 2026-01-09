@@ -158,15 +158,9 @@ export default {
     });
     // this.url = decodeURIComponent(options.url);
     this.url = options.url ? decodeURIComponent(options.url) : '';
-    uni.$on('update189SubNvue', data => {
-      this.platform = data.platform
-      this.url = data.url
-    })
+    this.platform = options.platform
     this.debounceCookie = this.debounce(this.getCookieData, 8000);
   },
-  onUnload() {
-    uni.$off('update189SubNvue')
-  }
 };
 </script>
 

@@ -145,10 +145,7 @@ export default {
   onLoad(options) {
     this.routerParams = options;
     this.url = options.url ? decodeURIComponent(options.url) : '';
-    uni.$on('updateQuarkSubNvue', data => {
-      this.platform = data.platform
-      this.url = data.url
-    })
+    this.platform = options.platform
   },
   onUnload() {
     uni.$off('updateQuarkSubNvue')
