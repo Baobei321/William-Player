@@ -157,6 +157,8 @@ const toDownLoad = (apkUrl) => {
   } else if (props.type == "outApp") {
     addOperLog({ title: "更新app", businessType: 13, operatorType: 2 });
     if (apkUrl) {
+      console.log(apkUrl,'apkUrl');
+      
       plus.runtime.openURL(apkUrl, (error) => {
         if (error) {
           uni.showToast({ title: "打开浏览器失败", icon: "none" });

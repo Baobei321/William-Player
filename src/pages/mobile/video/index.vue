@@ -130,6 +130,7 @@ const onOk = async () => {
 //获取应用更新信息
 const getAppUpdateInfo = async () => {
   let res = await getAppLatestVersion();
+  res.downloadUrl = res.assets.find(i => i.name === 'app-mobile.apk')?.browser_download_url || null
   return res;
 };
 
