@@ -418,7 +418,7 @@ const ucfirst = (l1) => {
 }
 
 export const chineseToPinYin = (l1) => {
-    let l2 = l1.length;
+    let l2 = l1?.length || 0;
     let I1 = '';
     let reg = new RegExp('[a-zA-Z0-9]');
     for (let i = 0; i < l2; i++) {

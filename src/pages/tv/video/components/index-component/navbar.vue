@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="tv-navbar-right">
-      <div :class="['tv-navbar-right__icon', 'tv-navbar-right__refresh', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']" @click="openSetting">
+      <div :class="['tv-navbar-right__icon', 'tv-navbar-right__refresh', tabIndex === 3 ? 'tv-navbar-right__icon-active' : '']" @click="showProgress">
         <image :class="['tv-navbar-right__icon-refresh', loading ? 'refresh-rotate' : '']" src="@/static/xuanzhuan-icon.png"> </image>
       </div>
       <div :class="['tv-navbar-right__icon', tabIndex === 4 ? 'tv-navbar-right__icon-active' : '']" @click="openSetting">

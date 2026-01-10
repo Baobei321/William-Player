@@ -20,7 +20,7 @@
           <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{
             handleSeasonName(removeExtension(item.name)) }}</span>
           <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">{{
-            removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title}`) }}</span>
+            removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title||''}`) }}</span>
         </div>
       </tv-scroll>
     </div>

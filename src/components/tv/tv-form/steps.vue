@@ -11,7 +11,7 @@
                                 <input :value="formData[item.prop]" v-bind="item.formItemProps"
                                     v-if="item.type == 'input'" @blur="customBlurValidate(item.prop)"
                                     @input="(val) => changeInput(val, item.prop)" @click="clickInput(item)"
-                                    :border="false" />
+                                    :border="false"  ref="stepInput" :focus="tabIndex === index"/>
                                 <nut-textarea v-model="formData[item.prop]" v-bind="item.formItemProps"
                                     v-if="item.type == 'textarea'" :disableDefaultPadding="true"
                                     @blur="customBlurValidate(item.prop)" @change="change" />
@@ -76,6 +76,8 @@ const showPopover = ref(false) //点击select的时候，弹窗选择的popover
 const popoverOptions = ref([]) //配置popover的列
 const popoverPosition = ref({}) //popover的弹出位置
 const selectItem = ref({}) //当前点击选中的select
+
+const stepInput=ref(null)
 
 const change = (val) => {
     emits("update:modelValue", JSON.parse(JSON.stringify(formData.value)));
