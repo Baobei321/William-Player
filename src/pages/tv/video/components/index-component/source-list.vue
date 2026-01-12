@@ -278,6 +278,7 @@ const judegeShow = () => {
   sourceList.value = uni.getStorageSync('sourceList')
   //为item.list的每一项依次设置一个index，扁平化的index
   let index = 0
+  lengthValue.value = 0
   sourceList.value.forEach(item => {
     if (item?.list?.length) {
       lengthValue.value += item.list.length

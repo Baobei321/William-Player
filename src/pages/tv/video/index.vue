@@ -11,7 +11,7 @@
       @changeSetting="changeSetting"
       @refresh="refreshVideoData"></tv-navbar>
     <!-- <span style="font-size: 38rpx;color: #fff;">{{ scrollTop }}</span> -->
-     <!-- <span style="font-size: 38rpx;color: #fff;">{{ historyPlay }}</span> -->
+    <!-- <span style="font-size: 38rpx;color: #fff;">{{ historyPlay }}</span> -->
     <tv-page @keyCodeClick="keyCodeClick" style="width: 100%; height: 100%; z-index: 999; position: relative" :scrollTop="scrollTop">
       <div class="refresh-icon" v-if="refreshLoading">
         <nut-icon class="nut-icon-am-rotate nut-icon-am-infinite" name="refresh2" custom-color="#fff"></nut-icon>
@@ -118,7 +118,7 @@ const underImgArr = ref([])
 const swipeIndex = ref(0)
 const leave = ref(false)
 
-const focusModel = ref('starRecommend') //焦点所在的组件
+const focusModel = ref('') //焦点所在的组件
 const scrollTop = ref(1)
 
 const showSettings = ref(false)
@@ -155,7 +155,6 @@ const getStarList = arr => {
   nextTick(() => {
     scrollTop.value === 1 ? (scrollTop.value = 0) : ''
   })
-  
 }
 const changeSwiper = index => {
   leave.value = true
@@ -236,15 +235,17 @@ const initFocusModel = () => {
   let isTrue = selectType.type == 'Emby' ? !embyMovieTvList.value?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
   if (isTrue) {
     //此时不存在任何数据，焦点在添加新资源按钮上
-    focusModel.value = 'videoEmpty'
+    !focusModel.value ? (focusModel.value = 'videoEmpty') : ''
   } else {
     focusModel.value === 'videoEmpty' ? (focusModel.value = 'starRecommend') : ''
   }
+  console.log("刮削玩了",focusModel.value);
+  
 }
 
 const refreshVideoData = async () => {
   await refreshVideo()
-  focusModel.value = 'starRecommend'
+  // focusModel.value = 'starRecommend'
 }
 
 watchEffect(() => {
