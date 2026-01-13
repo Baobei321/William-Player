@@ -1,14 +1,16 @@
 <template>
   <div class="wil-empty">
-    <image src="@/static/no-data.png"></image>
+    <image src="@/static/no-data.png" v-if="props.type === 'data'"></image>
+    <image src="@/static/no-wifi.png" v-else-if="props.type === 'wifi'"></image>
     <span>{{ props.text }}</span>
   </div>
 </template>
 
 <script setup>
 const props = defineProps({
-  text: { type: String, default: "" },
-});
+  text: { type: String, default: '' },
+  type: { type: String, default: 'data' },
+})
 </script>
 
 <style lang="scss" scoped>
@@ -20,6 +22,9 @@ const props = defineProps({
   image {
     width: 400rpx;
     height: 400rpx;
+  }
+  span{
+    color: #9b9b9b;
   }
 }
 </style>

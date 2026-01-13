@@ -2,8 +2,7 @@
   <div class="video-navbar" :style="{ 'height': navBarHeight }" ref="video_navbar">
     <nut-navbar title="" :style="{ '--content-height': contentHeight }" :left-show="true">
       <template #leftShow>
-        <div class="video-navbar-logo">
-        </div>
+        <div class="video-navbar-logo"></div>
       </template>
       <template #left>
         <span>William Player</span>
@@ -12,20 +11,19 @@
         <nut-icon class="navbar-icon" name="search" custom-color="#fff" @click="toVideoSearch"></nut-icon>
         <nut-icon class="navbar-icon" name="uploader" custom-color="#fff" @click="toAddMedia"></nut-icon>
         <div class="video-navbar-popover">
-          <nut-icon  name="refresh2" custom-color="#fff" @click="showProgress"
-            class="nut-icon-am-rotate nut-icon-am-infinite navbar-icon" v-show="loading"></nut-icon>
+          <nut-icon name="refresh2" custom-color="#fff" @click="showProgress" class="nut-icon-am-rotate nut-icon-am-infinite navbar-icon" v-show="loading"></nut-icon>
           <nut-icon class="navbar-icon" name="refresh2" custom-color="#fff" @click="showProgress" v-show="!loading"></nut-icon>
-          <div :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
-            :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }" v-show="showPopover">
-            <image src="@/static/rect-san.png" style="width: 100%;height: 100%;"></image>
+          <div
+            :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
+            :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }"
+            v-show="showPopover">
+            <image src="@/static/rect-san.png" style="width: 100%; height: 100%"></image>
           </div>
-          <div :class="['video-navbar-popover__container', showPopover ? 'show-animation' : 'hide-animation']"
-            :style="{ top: navBarHeight }" v-if="showPopover">
+          <div :class="['video-navbar-popover__container', showPopover ? 'show-animation' : 'hide-animation']" :style="{ top: navBarHeight }" v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">
                 <span>{{ popoverData.title }}</span>
-                <span class="popover-title-left__button" v-if="popoverData.title == '正在扫描' && showPause"
-                  @click="toCancel">暂停</span>
+                <span class="popover-title-left__button" v-if="popoverData.title == '正在扫描' && showPause" @click="toCancel">暂停</span>
               </div>
               <div class="popover-title-right" @click="closePopover">
                 <nut-icon name="close" custom-color="#fff" size="12"></nut-icon>
@@ -46,51 +44,51 @@
         </div>
       </template>
     </nut-navbar>
-
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, watchEffect, nextTick } from "vue";
-import { setTmdbKey } from "@/network/apis";
+import { onMounted, ref, watch, watchEffect, nextTick } from 'vue'
+import { setTmdbKey } from '@/network/apis'
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
   loading: { type: Boolean, default: false },
-  tmdbKey1: { type: String, default: "" },
-  isEmpty: { type: Boolean, default: false },//是否为空状态显示，没有任何影片
-});
+  tmdbKey1: { type: String, default: '' },
+  isEmpty: { type: Boolean, default: false }, //是否为空状态显示，没有任何影片
+  isConnected: { type: Boolean, default: false }, //手机是否连接网络
+})
 
-const navBarHeight = ref("");
-const contentHeight = ref("");
+const navBarHeight = ref('')
+const contentHeight = ref('')
 
-const video_navbar = ref(null);
+const video_navbar = ref(null)
 
-const showPopover = ref(false);
-const popoverPosition = ref({});
+const showPopover = ref(false)
+const popoverPosition = ref({})
 const popoverData = ref({
-  title: "正在扫描",
+  title: '正在扫描',
   list: [
-    { label: "已找到", value: 0 },
-    { label: "待更新", value: 0 },
-    { label: "已更新", value: 0 },
+    { label: '已找到', value: 0 },
+    { label: '待更新', value: 0 },
+    { label: '已更新', value: 0 },
   ],
-});
-const tmdbKey = ref("");
+})
+const tmdbKey = ref('')
 
-const initTmdbKey = ref(uni.getStorageSync("settingData").tmdbKey || "");
+const initTmdbKey = ref(uni.getStorageSync('settingData').tmdbKey || '')
 const selectType = ref({})
 const selectMedia = ref({})
 
-const loading = ref(false);
+const loading = ref(false)
 
-const emits = defineEmits(["refresh", "pause", "getHeight"]);
+const emits = defineEmits(['refresh', 'pause', 'getHeight'])
 
-const showPause = ref(false);
+const showPause = ref(false)
 
-const timer = ref(null);
+const timer = ref(null)
 
-const windowWidth = ref(1);
+const windowWidth = ref(1)
 
 //计算设备navBar高度
 const getNavHeight = () => {
@@ -99,54 +97,68 @@ const getNavHeight = () => {
   // let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
   // navBarHeight.value = ((statusBarHeight + 54) / sysinfo.windowWidth) * 750 + "rpx"; //计算nav导航栏的高度
   // contentHeight.value = "108rpx";
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  let statusBarHeight = sysinfo.statusBarHeight; // 获取状态栏高度
-  navBarHeight.value = statusBarHeight + 44 + "px"; //计算nav导航栏的高度
-  contentHeight.value = "44px";
-  emits("getHeight", navBarHeight.value);
-};
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  let statusBarHeight = sysinfo.statusBarHeight // 获取状态栏高度
+  navBarHeight.value = statusBarHeight + 44 + 'px' //计算nav导航栏的高度
+  contentHeight.value = '44px'
+  emits('getHeight', navBarHeight.value)
+}
 
 //计算h5的navBar高度
 const getH5NavbarHeight = () => {
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  windowWidth.value = sysinfo.windowWidth;
-  navBarHeight.value = "44px";
-  contentHeight.value = "44px";
-  emits("getHeight", navBarHeight.value);
-};
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  windowWidth.value = sysinfo.windowWidth
+  navBarHeight.value = '44px'
+  contentHeight.value = '44px'
+  emits('getHeight', navBarHeight.value)
+}
 
 // #ifdef APP-PLUS
-getNavHeight();
+getNavHeight()
 // #endif
 
 // #ifdef H5
-getH5NavbarHeight();
+getH5NavbarHeight()
 // #endif
 
 const toVideoSearch = () => {
+  if (!props.isConnected) {
+    uni.showToast({
+      title: '网络已断开，请检查网络连接',
+      icon: 'none',
+    })
+    return
+  }
   if (loading.value) {
     uni.showToast({
-      title: "正在同步影片，请完成后再搜索",
-      icon: "none",
-    });
-    return;
+      title: '正在同步影片，请完成后再搜索',
+      icon: 'none',
+    })
+    return
   }
   uni.navigateTo({
     url: `/pages/mobile/video/search`,
-  });
-};
+  })
+}
 
 const toAddMedia = () => {
+  if (!props.isConnected) {
+    uni.showToast({
+      title: '网络已断开，请检查网络连接',
+      icon: 'none',
+    })
+    return
+  }
   if (loading.value) {
     uni.showToast({
-      title: "正在同步影片，请完成后再管理资源",
-      icon: "none",
-    });
-    return;
+      title: '正在同步影片，请完成后再管理资源',
+      icon: 'none',
+    })
+    return
   }
   uni.navigateTo({
-    url: "/pages/mobile/source/source-list",
-  });
+    url: '/pages/mobile/source/source-list',
+  })
   // let webdavInfo = uni.getStorageSync('webdavInfo')
   // if (!webdavInfo) {
   //   uni.navigateTo({
@@ -157,143 +169,150 @@ const toAddMedia = () => {
   //     url: '/pages/mobile/video/add-webdav?title=修改WebDAV'
   //   })
   // }
-};
+}
 
 //判断选择的是webdav还是天翼云盘还是夸克还是Emby
 const judgeSelect = () => {
-  let sourceList = uni.getStorageSync("sourceList");
-  selectType.value = sourceList.find((item) => {
-    let select = item.list.find((i) => i.active);
+  let sourceList = uni.getStorageSync('sourceList')
+  selectType.value = sourceList.find(item => {
+    let select = item.list.find(i => i.active)
     if (select) {
-      selectMedia.value = select;
-      return true;
+      selectMedia.value = select
+      return true
     } else {
-      return false;
+      return false
     }
-  });
-};
+  })
+}
 
 const showProgress = () => {
-  if (!uni.getStorageSync("settingData").tmdbKey) {
-    popoverData.value.title = "api_key";
-    showPopover.value = true;
-    return;
+  if (!props.isConnected) {
+    uni.showToast({
+      title: '网络已断开，请检查网络连接',
+      icon: 'none',
+    })
+    return
+  }
+  if (!uni.getStorageSync('settingData').tmdbKey) {
+    popoverData.value.title = 'api_key'
+    showPopover.value = true
+    return
   }
   if (loading.value) {
-    showPopover.value = true;
-    return;
+    showPopover.value = true
+    return
   }
-  popoverData.value.title = "正在扫描";
+  popoverData.value.title = '正在扫描'
   popoverData.value.list = [
-    { label: "已找到", value: 0 },
-    { label: "待更新", value: 0 },
-    { label: "已更新", value: 0 },
-  ];
-  showPopover.value = true;
+    { label: '已找到', value: 0 },
+    { label: '待更新', value: 0 },
+    { label: '已更新', value: 0 },
+  ]
+  showPopover.value = true
   judgeSelect()
   if (selectType.value.type == 'Emby') {
-    showPopover.value = false;
+    showPopover.value = false
   }
-  emits("refresh");
+  emits('refresh')
   timer.value = setTimeout(() => {
-    showPause.value = true;
-  }, 30000);
-};
+    showPause.value = true
+  }, 30000)
+}
 
 //暂停取消扫描
 const toCancel = () => {
-  popoverData.value.title == "已暂停";
-  showPopover.value = false;
-  showPause.value = false;
-  clearTimeout(timer.value);
-  timer.value = null;
-  emits("pause");
-};
+  popoverData.value.title == '已暂停'
+  showPopover.value = false
+  showPause.value = false
+  clearTimeout(timer.value)
+  timer.value = null
+  emits('pause')
+}
 
 const closePopover = () => {
-  showPopover.value = false;
-};
+  showPopover.value = false
+}
 
 const getRefreshPosition = () => {
-  let selectorQuery = uni.createSelectorQuery();
-  let sysinfo = uni.getSystemInfoSync();
+  let selectorQuery = uni.createSelectorQuery()
+  let sysinfo = uni.getSystemInfoSync()
   selectorQuery
-    .select(".video-navbar-popover")
-    .boundingClientRect((rect) => {
-      popoverPosition.value.top = rect.top + rect.height;
-      popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2;
+    .select('.video-navbar-popover')
+    .boundingClientRect(rect => {
+      popoverPosition.value.top = rect.top + rect.height
+      popoverPosition.value.right = sysinfo.screenWidth - rect.left - rect.width / 2
     })
-    .exec();
-};
+    .exec()
+}
 
 const confirmApiKey = async () => {
-  initTmdbKey.value = tmdbKey.value;
-  uni.setStorageSync("tmdbKey", tmdbKey.value);
-  let settingData = uni.getStorageSync("settingData");
+  initTmdbKey.value = tmdbKey.value
+  uni.setStorageSync('tmdbKey', tmdbKey.value)
+  let settingData = uni.getStorageSync('settingData')
   if (settingData) {
-    settingData.tmdbKey = tmdbKey.value;
-    uni.setStorageSync("settingData", settingData);
+    settingData.tmdbKey = tmdbKey.value
+    uni.setStorageSync('settingData', settingData)
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true, playercodec: "exoplayer", showRecommend: true });
+    uni.setStorageSync('settingData', { tmdbKey: tmdbKey.value, showProgress: true, playercodec: 'exoplayer', showRecommend: true })
   }
-  showPopover.value = false;
-  await setTmdbKey({ tmdbKey: tmdbKey.value });
-};
+  showPopover.value = false
+  await setTmdbKey({ tmdbKey: tmdbKey.value })
+}
 
 watch(
   () => props.refreshData,
-  (val) => {
+  val => {
     if (props.loading) {
       popoverData.value.list = [
-        { label: "已找到", value: 0 },
-        { label: "待更新", value: 0 },
-        { label: "已更新", value: 0 },
-      ];
-      popoverData.value.list.find((i) => i.label == "待更新").value = val.toupdate || 0;
+        { label: '已找到', value: 0 },
+        { label: '待更新', value: 0 },
+        { label: '已更新', value: 0 },
+      ]
+      popoverData.value.list.find(i => i.label == '待更新').value = val.toupdate || 0
     } else {
       popoverData.value.list = [
-        { label: "已找到", value: 0 },
-        { label: "已失败", value: 0 },
-        { label: "已更新", value: 0 },
-      ];
-      popoverData.value.list.find((i) => i.label == "已失败").value = val.fail || 0;
+        { label: '已找到', value: 0 },
+        { label: '已失败', value: 0 },
+        { label: '已更新', value: 0 },
+      ]
+      popoverData.value.list.find(i => i.label == '已失败').value = val.fail || 0
     }
-    popoverData.value.list.find((i) => i.label == "已找到").value = val.found || 0;
-    popoverData.value.list.find((i) => i.label == "已更新").value = val.updated || 0;
+    popoverData.value.list.find(i => i.label == '已找到').value = val.found || 0
+    popoverData.value.list.find(i => i.label == '已更新').value = val.updated || 0
   },
   { deep: true }
-);
+)
 
 watch(
   () => props.loading,
-  (val) => {
-    loading.value = val;
+  val => {
+    loading.value = val
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`;
-      clearTimeout(timer.value);
-      timer.value = null;
-      showPause.value = false;
+      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`
+      clearTimeout(timer.value)
+      timer.value = null
+      showPause.value = false
     }
   },
   { deep: true }
-);
+)
 
 watch(
   () => props.tmdbKey1,
-  (val) => {
-    initTmdbKey.value = val;
-    tmdbKey.value = val;
+  val => {
+    initTmdbKey.value = val
+    tmdbKey.value = val
   },
   { immediate: true }
-);
+)
 
 defineExpose({
   showProgress,
-});
+})
 
 onMounted(() => {
-  getRefreshPosition();
-});
+  getRefreshPosition()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -348,7 +367,7 @@ onMounted(() => {
         // border: 2rpx solid gray;
         border-radius: 20rpx;
         box-sizing: border-box;
-        background: url("@/static/app-logo1.png") center no-repeat;
+        background: url('@/static/app-logo1.png') center no-repeat;
         background-size: 100% 100%;
       }
 
@@ -527,4 +546,5 @@ onMounted(() => {
 //       }
 //     }
 //   }
-// }</style>
+// }
+</style>

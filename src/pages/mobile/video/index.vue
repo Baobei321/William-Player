@@ -1,54 +1,59 @@
 <template>
   <div class="video">
     <!-- <div style="background: #efefef;width: 375px;height: 812px;"></div> -->
-    <video-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading"
-      ref="video_navbar" :tmdbKey1="tmdbKey" @getHeight="getNavbarHeight"
+    <video-navbar
+      @refresh="refreshVideo"
+      @pause="pauseRefresh"
+      :refreshData="refreshData"
+      :loading="refreshLoading"
+      :isConnected="isConnected"
+      ref="video_navbar"
+      :tmdbKey1="tmdbKey"
+      @getHeight="getNavbarHeight"
       :class="['navbar-transparent', refreshLoading ? 'navbar-white' : '']"></video-navbar>
-    <Skeleton v-if="refreshLoading"></Skeleton>
-    <template v-else>
-      <div class="video-container"
-        v-if="selectType.type == 'Emby' ? embyMovieTvList?.length : (localMovieTvData?.movie?.length || localMovieTvData?.tv?.length)">
-        <scroll-view :scroll-y="true" class="video-container-scroll" @scroll="handlePageScroll">
-          <template v-if="selectType.type != 'Emby'">
-            <star-recommend v-if="settingData.showRecommend"></star-recommend>
-            <div class="scroll-list"
-              :style="{ paddingTop: settingData.showRecommend ? '40rpx' : `calc(40rpx + ${navbarHeight + 'px'})` }">
-              <recent-played v-if="historyPlay.length" :listData="historyPlay"
-                :isConnected="isConnected"></recent-played>
-              <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"
-                :isConnected="isConnected"></hx-list>
-              <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"
-                :isConnected="isConnected"></hx-list>
-              <Classify :isConnected="isConnected"></Classify>
-            </div>
-          </template>
-          <!-- emby专用的首页 -->
-          <emby-home v-else></emby-home>
-        </scroll-view>
-      </div>
-      <div class="video-empty"
-        v-if="selectType.type == 'Emby' ? !embyMovieTvList?.length : (!localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length)">
-        <div class="video-empty-logo">
-          <image :src="appLogo" />
-          <span>William Player</span>
+    <template v-if="isConnected">
+      <Skeleton v-if="refreshLoading"></Skeleton>
+      <template v-else>
+        <div class="video-container" v-if="selectType.type == 'Emby' ? embyMovieTvList?.length : localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
+          <scroll-view :scroll-y="true" class="video-container-scroll" @scroll="handlePageScroll">
+            <template v-if="selectType.type != 'Emby'">
+              <star-recommend v-if="settingData.showRecommend"></star-recommend>
+              <div class="scroll-list" :style="{ paddingTop: settingData.showRecommend ? '40rpx' : `calc(40rpx + ${navbarHeight + 'px'})` }">
+                <recent-played v-if="historyPlay.length" :listData="historyPlay" :isConnected="isConnected"></recent-played>
+                <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
+                <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
+                <Classify :isConnected="isConnected"></Classify>
+              </div>
+            </template>
+            <!-- emby专用的首页 -->
+            <emby-home v-else></emby-home>
+          </scroll-view>
         </div>
-        <div class="video-empty-tip">
-          <div>从网盘添加资源到媒体库中</div>
-          <div>即可打造私人影院，随时观看</div>
+        <div class="video-empty" v-if="selectType.type == 'Emby' ? !embyMovieTvList?.length : !localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length">
+          <div class="video-empty-logo">
+            <image :src="appLogo" />
+            <span>William Player</span>
+          </div>
+          <div class="video-empty-tip">
+            <div>从网盘添加资源到媒体库中</div>
+            <div>即可打造私人影院，随时观看</div>
+          </div>
+          <nut-button custom-color="#090909" @click="toAddWebdav">
+            <template #icon>
+              <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
+            </template>
+            <span>添加新资源</span>
+          </nut-button>
+          <nut-dialog title="api_key" v-model:visible="showDialog" @cancel="onCancel" @ok="onOk">
+            <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
+          </nut-dialog>
         </div>
-        <nut-button custom-color="#090909" @click="toAddWebdav">
-          <template #icon>
-            <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
-          </template>
-          <span>添加新资源</span>
-        </nut-button>
-        <nut-dialog title="api_key" v-model:visible="showDialog" @cancel="onCancel" @ok="onOk">
-          <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
-        </nut-dialog>
-      </div>
+      </template>
     </template>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
-      :enableControl="true" :appVersion="CONFIG.VERSIOIN">
+    <div class="video-nowifi" v-else>
+      <wil-empty type="wifi" text="网络已断开，请检查网络连接"></wil-empty>
+    </div>
+    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name="upgradeInfo.appName" :enableControl="true" :appVersion="CONFIG.VERSIOIN">
     </wil-upgrade>
     <wil-modal ref="wil_modal"></wil-modal>
     <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
@@ -56,140 +61,146 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import videoNavbar from "./components/index-component/navbar.vue";
-import Skeleton from "./components/index-component/skeleton.vue";
-import starRecommend from "./components/index-component/star-recommend.vue";
-import recentPlayed from "./components/index-component/recent-played.vue";
-import hxList from "./components/index-component/hx-list.vue";
-import Classify from "./components/index-component/classify.vue";
-import wilUpgrade from "@/components/mobile/wil-upgrade/index.vue";
-import wilModal from "@/components/mobile/wil-modal/index.vue";
-import shareDialog from "./components/index-component/share-dialog.vue";
-import embyHome from "./components/index-component/emby-home.vue";
-import { setTmdbKey, getUntokenDicts } from "@/network/apis";
-import { getCutContent, getAppLatestVersion } from "@/utils/common";
-import appLogo from "@/static/app-logo1.png";
-import { onShow, onUnload } from "@dcloudio/uni-app";
-import * as CONFIG from "@/utils/config";
-import { useVideoIndex } from "@/hooks/useVideoIndex.js";
+import { ref } from 'vue'
+import videoNavbar from './components/index-component/navbar.vue'
+import Skeleton from './components/index-component/skeleton.vue'
+import starRecommend from './components/index-component/star-recommend.vue'
+import recentPlayed from './components/index-component/recent-played.vue'
+import hxList from './components/index-component/hx-list.vue'
+import Classify from './components/index-component/classify.vue'
+import wilUpgrade from '@/components/mobile/wil-upgrade/index.vue'
+import wilModal from '@/components/mobile/wil-modal/index.vue'
+import shareDialog from './components/index-component/share-dialog.vue'
+import embyHome from './components/index-component/emby-home.vue'
+import { setTmdbKey, getUntokenDicts } from '@/network/apis'
+import { getCutContent, getAppLatestVersion } from '@/utils/common'
+import appLogo from '@/static/app-logo1.png'
+import { onShow, onUnload } from '@dcloudio/uni-app'
+import * as CONFIG from '@/utils/config'
+import { useVideoIndex } from '@/hooks/useVideoIndex.js'
 
 const wil_modal = ref(null)
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, navbarStyle } = useVideoIndex({ wil_modal });
-const showDialog = ref(false);
-const showShareModal = ref(false);
-const shareUrl = ref("");
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, navbarStyle } =
+  useVideoIndex({ wil_modal })
+const showDialog = ref(false)
+const showShareModal = ref(false)
+const shareUrl = ref('')
 
 const upgradeInfo = ref({
   logo: appLogo,
-  appName: "William Player",
-});
+  appName: 'William Player',
+})
 
-
-const navbarHeight = ref(0)//标题栏加状态栏的高度
-let startCommandHeight = 0//轮播海报的高度，在手机端和pad端表现不同
+const navbarHeight = ref(0) //标题栏加状态栏的高度
+let startCommandHeight = 0 //轮播海报的高度，在手机端和pad端表现不同
 let scrollTop = 0 //滚动的距离
 
-const isConnected = ref(false); //手机是否连接网络
+const isConnected = ref(false) //手机是否连接网络
 
 const embyMovieTvList = ref(uni.getStorageSync('embyMovieTvList'))
 
 const pauseRefresh = () => {
-  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 };
-  movieTvData.value = { movie: [], tv: [] };
-  localMovieTvData.value.tv = [];
-  localMovieTvData.value.movie = [];
-  uni.setStorageSync("localMovieTvData", localMovieTvData.value);
-  refreshLoading.value = false;
-};
+  refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 }
+  movieTvData.value = { movie: [], tv: [] }
+  localMovieTvData.value.tv = []
+  localMovieTvData.value.movie = []
+  uni.setStorageSync('localMovieTvData', localMovieTvData.value)
+  refreshLoading.value = false
+}
 
 const toAddWebdav = () => {
   uni.navigateTo({
-    url: "/pages/mobile/source/source-list",
-  });
-};
+    url: '/pages/mobile/source/source-list',
+  })
+}
 
 const onCancel = () => {
-  showDialog.value = false;
-  tmdbKey.value = "";
-};
+  showDialog.value = false
+  tmdbKey.value = ''
+}
 
 const onOk = async () => {
-  showDialog.value = false;
-  let settingData = uni.getStorageSync("settingData");
+  showDialog.value = false
+  let settingData = uni.getStorageSync('settingData')
   if (settingData) {
-    settingData.tmdbKey = tmdbKey.value;
-    uni.setStorageSync("settingData", settingData);
+    settingData.tmdbKey = tmdbKey.value
+    uni.setStorageSync('settingData', settingData)
   } else {
-    uni.setStorageSync("settingData", { tmdbKey: tmdbKey.value, showProgress: true });
+    uni.setStorageSync('settingData', { tmdbKey: tmdbKey.value, showProgress: true })
   }
-  await setTmdbKey({ tmdbKey: tmdbKey.value });
-  video_navbar.value.showProgress();
-};
+  await setTmdbKey({ tmdbKey: tmdbKey.value })
+  video_navbar.value.showProgress()
+}
 
 //获取应用更新信息
 const getAppUpdateInfo = async () => {
-  let res = await getAppLatestVersion();
+  let res = await getAppLatestVersion()
   res.downloadUrl = res.assets.find(i => i.name === 'app-mobile.apk')?.browser_download_url || null
-  return res;
-};
+  return res
+}
 
 //获取标题加状态栏的高度
-const getNavbarHeight = (val) => {
+const getNavbarHeight = val => {
   navbarHeight.value = +val.split('px')[0]
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  let windowWidth = sysinfo.windowWidth; // 获取状态栏高度
-  if (windowWidth >= 700) { //pad端
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth // 获取状态栏高度
+  if (windowWidth >= 700) {
+    //pad端
     startCommandHeight = uni.upx2px(800) + navbarHeight.value
-  } else { //手机端
+  } else {
+    //手机端
     startCommandHeight = uni.upx2px(500) + navbarHeight.value
   }
 }
 //页面滚动，更改标题的背景色
-const handlePageScroll = (event) => {
+const handlePageScroll = event => {
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
   scrollTop = event.detail.scrollTop
   let cval = (255 - opacity * 255).toFixed(2)
-  if (settingData.value.showRecommend) {//如果展示影视推荐轮播图，才根据滚动渐变
+  if (settingData.value.showRecommend) {
+    //如果展示影视推荐轮播图，才根据滚动渐变
     navbarStyle.value = {
       background: `rgba(255,255,255,${opacity.toFixed(2)})`,
       color: `rgb(${cval},${cval},${cval})`,
-      borderColor: `rgba(246, 247, 248, ${opacity})`
+      borderColor: `rgba(246, 247, 248, ${opacity})`,
     }
   }
 }
 onShow(async () => {
-  if (scrollTop === 0 && settingData.value.showRecommend) {
+  if (
+    scrollTop === 0 && settingData.value.showRecommend && selectType.type == 'Emby'
+      ? embyMovieTvList?.length
+      : localMovieTvData?.movie?.length || localMovieTvData?.tv?.length
+  ) {
     navbarStyle.value = {
       background: `rgba(255,255,255,0)`,
       color: `rgb(255,255,255)`,
-      borderColor: `rgba(246, 247, 248, 0)`
+      borderColor: `rgba(246, 247, 248, 0)`,
     }
   }
-  let shareUrl1 = await getCutContent();
+  let shareUrl1 = await getCutContent()
   if (shareUrl1) {
-    shareUrl.value = shareUrl1;
-    showShareModal.value = true;
+    shareUrl.value = shareUrl1
+    showShareModal.value = true
   }
-});
+})
 
-const listenerNetwork = (res) => {
-  isConnected.value = res.isConnected;
-};
+const listenerNetwork = res => {
+  isConnected.value = res.isConnected
+}
 uni.getNetworkType({
-  success: (res) => {
-    if (res.networkType != "none") {
-      isConnected.value = true;
+  success: res => {
+    if (res.networkType != 'none') {
+      isConnected.value = true
     } else {
-      isConnected.value = false;
+      isConnected.value = false
     }
   },
-});
-uni.onNetworkStatusChange(listenerNetwork);
+})
+uni.onNetworkStatusChange(listenerNetwork)
 onUnload(() => {
-  uni.offNetworkStatusChange(listenerNetwork);
-});
-
+  uni.offNetworkStatusChange(listenerNetwork)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -350,6 +361,14 @@ page {
       }
     }
   }
+  .video-nowifi {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 // @media (prefers-color-scheme: dark) {
@@ -388,4 +407,5 @@ page {
 //       }
 //     }
 //   }
-// }</style>
+// }
+</style>
