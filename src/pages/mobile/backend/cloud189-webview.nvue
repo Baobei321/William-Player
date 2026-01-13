@@ -1,15 +1,14 @@
 <template>
   <view class="cloud-drive">
-    <nvue-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm" v-if="platform!='TV'"></nvue-navbar>
-    <wil-webview type="web" :platform="platform" :src="url" style="flex: 1;" @getcookies="getCookies"
-      class="wil-webview" v-if="url" />
+    <nvue-navbar class="wil-navbar" title="天翼云盘" @handleConfirm="handleConfirm" v-if="platform != 'TV'"></nvue-navbar>
+    <wil-webview type="web" :platform="platform" :src="url" style="flex: 1" @getcookies="getCookies" class="wil-webview" v-if="url" />
   </view>
 </template>
 
 <script>
-import NvueNavbar from "@/components/mobile/wil-navbar/navbar.nvue";
-import { get189Folder, get189User } from "@/utils/common";
-import { addOperLog } from "@/network/apis";
+import NvueNavbar from '@/components/mobile/wil-navbar/navbar.nvue'
+import { get189Folder, get189User } from '@/utils/common'
+import { addOperLog } from '@/network/apis'
 
 export default {
   components: {
@@ -17,7 +16,7 @@ export default {
   },
   data() {
     return {
-      url: "",
+      url: '',
       sum: 0,
       debounceCookie: null,
       timeout: null,
@@ -25,8 +24,8 @@ export default {
       cookieObj: {},
       routerParams: {},
       oldName: '',
-      platform: ''
-    };
+      platform: '',
+    }
   },
   methods: {
     editMulu(newName) {
@@ -43,125 +42,125 @@ export default {
     },
     debounce(func, wait) {
       return function () {
-        let context = this; // 保存this指向
-        let args = arguments; // 拿到event对象
+        let context = this // 保存this指向
+        let args = arguments // 拿到event对象
         if (this.timeout) {
-          clearTimeout(this.timeout);
+          clearTimeout(this.timeout)
         }
         this.timeout = setTimeout(function () {
-          func.apply(context, args);
-        }, wait);
-      };
+          func.apply(context, args)
+        }, wait)
+      }
     },
     getCookieData(event) {
-      let cookies = event.detail.cookies;
-      const cookieArray = cookies.split(";");
-      cookieArray.forEach((item) => {
-        let arr = item.split("=");
-        this.cookieObj[arr[0]] = arr[1];
-      });
-      this.sourceList = uni.getStorageSync("sourceList");
+      let cookies = event.detail.cookies
+      const cookieArray = cookies.split(';')
+      cookieArray.forEach(item => {
+        let arr = item.split('=')
+        this.cookieObj[arr[0]] = arr[1]
+      })
+      this.sourceList = uni.getStorageSync('sourceList')
     },
     getCookies(event) {
-      this.debounceCookie(event);
+      this.debounceCookie(event)
     },
     async handleConfirm() {
-      let cloud189 = this.sourceList.find((item) => {
-        return item.type == "天翼云盘";
-      });
+      let cloud189 = this.sourceList.find(item => {
+        return item.type == '天翼云盘'
+      })
       if (!this.cookieObj.JSESSIONID || !this.cookieObj.COOKIE_LOGIN_USER) {
         uni.showToast({
-          title: "正在加载，请稍后再试",
-          icon: "none",
-        });
-        return;
+          title: '正在加载，请稍后再试',
+          icon: 'none',
+        })
+        return
       }
-      let res = await get189Folder({ folderId: "-11" }, { JSESSIONID: this.cookieObj.JSESSIONID, COOKIE_LOGIN_USER: this.cookieObj.COOKIE_LOGIN_USER });
+      let res = await get189Folder({ folderId: '-11' }, { JSESSIONID: this.cookieObj.JSESSIONID, COOKIE_LOGIN_USER: this.cookieObj.COOKIE_LOGIN_USER })
       if (res.res_code == 0) {
-        let res1 = await get189User(this.cookieObj);
+        let res1 = await get189User(this.cookieObj)
         if (cloud189.list.length) {
           this.oldName = cloud189.list[0].name
           if (cloud189.list[0].name != res1.loginName) {
-            let historyArr = uni.getStorageSync("historyPlay") || [];
-            historyArr = historyArr.filter((v) => v.sourceType != "天翼云盘" || v.sourceName != cloud189.list[0].name);
-            uni.setStorageSync("historyPlay", historyArr);
+            let historyArr = uni.getStorageSync('historyPlay') || []
+            historyArr = historyArr.filter(v => v.sourceType != '天翼云盘' || v.sourceName != cloud189.list[0].name)
+            uni.setStorageSync('historyPlay', historyArr)
             this.editMulu(res1.loginName) //修改电视剧电影目录
           }
-          cloud189.list[0].name = res1.loginName;
-          Object.keys(this.cookieObj).forEach((item) => {
-            cloud189.list[0][item] = this.cookieObj[item];
-          });
-          uni.setStorageSync("sourceList", this.sourceList);
+          cloud189.list[0].name = res1.loginName
+          Object.keys(this.cookieObj).forEach(item => {
+            cloud189.list[0][item] = this.cookieObj[item]
+          })
+          uni.setStorageSync('sourceList', this.sourceList)
           uni.showToast({
-            title: "修改成功",
-            icon: "none",
-          });
-          const pages = getCurrentPages();
+            title: '修改成功',
+            icon: 'none',
+          })
+          const pages = getCurrentPages()
           // 上一级页面实例（pages[pages.length - 2]）
-          const prevPage = pages[pages.length - 2];
-          console.log(prevPage);
+          const prevPage = pages[pages.length - 2]
+          console.log(prevPage)
           // 直接获取上一级页面的数据或调用方法
-          if (prevPage.route == "pages/mobile/source/source-list") {
-            if (this.routerParams.isActive == "1") {
-              uni.setStorageSync("isreload", true);
-            } else if (this.routerParams.isActive == "0") {
+          if (prevPage.route == 'pages/mobile/source/source-list') {
+            if (this.routerParams.isActive == '1') {
+              uni.setStorageSync('isreload', true)
+            } else if (this.routerParams.isActive == '0') {
               setTimeout(() => {
                 uni.navigateBack({
                   delta: 1,
-                });
-              }, 1500);
-              return;
+                })
+              }, 1500)
+              return
             }
           }
         } else {
-          let isHaveData = !this.sourceList.every((item) => {
-            return !item.list.length;
-          });
-          let obj = { name: res1.loginName };
-          Object.keys(this.cookieObj).forEach((item) => {
-            obj[item] = this.cookieObj[item];
-          });
+          let isHaveData = !this.sourceList.every(item => {
+            return !item.list.length
+          })
+          let obj = { name: res1.loginName }
+          Object.keys(this.cookieObj).forEach(item => {
+            obj[item] = this.cookieObj[item]
+          })
           if (!isHaveData) {
-            obj.active = true;
-            uni.setStorageSync("isreload", true);
+            obj.active = true
+            uni.setStorageSync('isreload', true)
           }
-          cloud189.list.push(obj);
+          cloud189.list.push(obj)
           uni.showToast({
-            title: "添加成功",
-            icon: "none",
-          });
+            title: '添加成功',
+            icon: 'none',
+          })
           setTimeout(() => {
             uni.navigateTo({
-              url: '/pages/mobile/media/catelog-setting'
+              url: '/pages/mobile/media/catelog-setting',
             })
-          }, 1800);
-          addOperLog({ title: "登录天翼云盘", businessType: 12, operatorType: 2, operUrl: "" });
+          }, 1800)
+          addOperLog({ title: '登录天翼云盘', businessType: 12, operatorType: 2, operUrl: '' })
         }
-        uni.setStorageSync("sourceList", this.sourceList);
+        uni.setStorageSync('sourceList', this.sourceList)
         setTimeout(() => {
           uni.navigateBack({
             delta: 2,
-          });
-        }, 1500);
+          })
+        }, 1500)
       } else {
         uni.showToast({
-          title: "正在加载，请稍后再试",
-          icon: "none",
-        });
+          title: '正在加载，请稍后再试',
+          icon: 'none',
+        })
       }
     },
   },
   onLoad(options) {
-    this.routerParams = options;
+    this.routerParams = options
     uni.setNavigationBarTitle({
       title: decodeURIComponent(options.title),
-    });
+    })
     // this.url = decodeURIComponent(options.url);
-    this.url = options.url ? decodeURIComponent(options.url) : '';
-    this.platform = options.platform
-    this.debounceCookie = this.debounce(this.getCookieData, 8000);
+    this.url = options.url ? decodeURIComponent(options.url) : ''
+    this.platform = options.platform || ''
+    this.debounceCookie = this.debounce(this.getCookieData, 8000)
   },
-};
+}
 </script>
 
 <style lang="scss">
