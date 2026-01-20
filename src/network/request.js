@@ -118,7 +118,7 @@ const retryFail = (params) => {
                 duration: 2000,
               })
             }
-            reject('接口请求错误')
+            reject(res.data)
           }
         } else {
           // uni.clearStorageSync()
@@ -194,14 +194,14 @@ export default (params) => {
                 title: '请求地址不存在...',
                 duration: 2000,
               })
-              reject("接口请求错误")
+              reject(res.data)
             } else {
               uni.showToast({
                 title: res.data.msg,
                 icon: 'none',
                 duration: 2000,
               })
-              reject("接口请求错误")
+              reject(res.data)
             }
           }
         } else {

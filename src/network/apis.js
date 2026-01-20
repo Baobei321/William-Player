@@ -178,3 +178,27 @@ export const editUserEmail = data => {
     data: data
   })
 }
+//用户使用支付宝登录
+export const loginByAlipay = data => {
+  return request({
+    url: `/william/alipay/login`,
+    method: 'post',
+    data: data
+  })
+}
+//用户绑定支付宝
+export const bindAlipay = data => {
+  return request({
+    url: `/william/alipay/bind`,
+    method: 'post',
+    data: data
+  })
+}
+//用户解绑支付宝
+export const unbindAlipay = data => {
+  return request({
+    url: `/william/alipay/unbind`,
+    method: 'post',
+    data: data
+  })
+}

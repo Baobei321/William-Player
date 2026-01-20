@@ -182,7 +182,7 @@
     {
       "path": "pages/mobile/mine/userInfo/index",
       "style": {
-        "navigationBarTitleText": "个人信息"
+        "navigationBarTitleText": "个人中心"
       }
     },
     {

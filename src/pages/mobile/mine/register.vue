@@ -242,7 +242,7 @@ page {
   .register-container {
     flex: 1;
     padding: 0 0 68rpx 0;
-    padding-top: calc(200rpx - v-bind(navbarHeight));
+    padding-top: calc(150rpx - v-bind(navbarHeight));
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

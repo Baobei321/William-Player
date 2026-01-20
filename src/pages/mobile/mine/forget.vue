@@ -136,7 +136,7 @@ page {
         color: #262424;
         margin-bottom: 64rpx;
         padding: 0 48rpx;
-        padding-top: calc(200rpx - v-bind(navbarHeight));
+        padding-top: calc(150rpx - v-bind(navbarHeight));
 
         &-top {
             display: flex;

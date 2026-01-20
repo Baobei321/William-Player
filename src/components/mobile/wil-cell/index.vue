@@ -1,7 +1,11 @@
 <template>
   <nut-cell-group class="wil-cell">
-    <nut-cell v-for="item in props.options" :key="item[props.defaultProps.title]"
-      :is-link="item[props.defaultProps.isLink] || true" v-bind="item" @click="clickItem(item)">
+    <nut-cell
+      v-for="item in props.options"
+      :key="item[props.defaultProps.title]"
+      :is-link="item[props.defaultProps.isLink] || true"
+      v-bind="item"
+      @click="clickItem(item)">
       <template #title>
         <slot v-if="$slots.title" name="title" v-bind="item"></slot>
         <template v-else>
@@ -14,38 +18,39 @@
       </template>
       <template #link>
         <!-- <image :src="theme == 'light' ? icIntoBlack : icIntoWhite" class="right-icon" /> -->
-        <nut-icon name="rect-right" :custom-color="theme === 'light' ? '#bbbbbb' : '#ffffff'"></nut-icon>
+        <slot v-if="$slots.link" name="link" v-bind="item"></slot>
+        <nut-icon name="rect-right" :custom-color="theme === 'light' ? '#bbbbbb' : '#ffffff'" v-else></nut-icon>
       </template>
     </nut-cell>
   </nut-cell-group>
 </template>
 
 <script setup>
-import icIntoBlack from "@/static/ic-intoblack.png";
-import icIntoWhite from "@/static/ic-intowhite.png";
-import { toStringfy, toParse } from "@/pages/mobile/mine/common";
-import { onUnload } from "@dcloudio/uni-app";
-import { ref } from "vue";
+import icIntoBlack from '@/static/ic-intoblack.png'
+import icIntoWhite from '@/static/ic-intowhite.png'
+import { toStringfy, toParse } from '@/pages/mobile/mine/common'
+import { onUnload } from '@dcloudio/uni-app'
+import { ref } from 'vue'
 
 const props = defineProps({
   options: { type: Array, default: [] },
   defaultProps: {
     type: Object,
     default: {
-      title: "title",
-      isLink: "isLink",
-      leftIcon: "leftIcon",
-      path: "path",
-      query: "query",
+      title: 'title',
+      isLink: 'isLink',
+      leftIcon: 'leftIcon',
+      path: 'path',
+      query: 'query',
     },
   },
-});
+})
 
-const theme = ref(uni.getSystemInfoSync().theme);
+const theme = ref(uni.getSystemInfoSync().theme)
 
-const emits = defineEmits(["clickItem"]);
+const emits = defineEmits(['clickItem'])
 
-const clickItem = (item) => {
+const clickItem = item => {
   if (item[props.defaultProps.path]) {
     // if (uni.getStorageSync('Authorization')) { //还在登录状态
     //   uni.navigateTo({
@@ -57,20 +62,20 @@ const clickItem = (item) => {
 
     //不需要判断token是否存在，是直接跳转页面
     uni.navigateTo({
-      url: toStringfy(item[props.defaultProps.query]) ? item[props.defaultProps.path] + "?" + toStringfy(item[props.defaultProps.query]) : item[props.defaultProps.path],
-    });
+      url: toStringfy(item[props.defaultProps.query]) ? item[props.defaultProps.path] + '?' + toStringfy(item[props.defaultProps.query]) : item[props.defaultProps.path],
+    })
   } else {
-    emits("clickItem", item);
+    emits('clickItem', item)
   }
-};
+}
 
 const changeTheme = () => {
-  theme.value = uni.getSystemInfoSync().theme;
-};
-uni.onThemeChange(changeTheme);
+  theme.value = uni.getSystemInfoSync().theme
+}
+uni.onThemeChange(changeTheme)
 onUnload(() => {
-  uni.offThemeChange(changeTheme);
-});
+  uni.offThemeChange(changeTheme)
+})
 </script>
 
 <style lang="scss" scoped>

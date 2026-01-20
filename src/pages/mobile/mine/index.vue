@@ -8,7 +8,8 @@
     <div class="mine-container">
       <div class="mine-notLog" v-if="!isLogin">
         <div class="mine-notLog__left">
-          <wil-image backgroundColor="#efefef"
+          <wil-image
+            backgroundColor="#efefef"
             src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
           </wil-image>
           <div class="mine-notLog__left-info">
@@ -21,8 +22,12 @@
       <div class="mine-loged" v-else>
         <div class="mine-loged__left">
           <div class="left-img" @click="enterUserInfo">
-            <wil-image backgroundColor="#efefef"
-              :src="userInfo.avatar || 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'">
+            <wil-image
+              backgroundColor="#efefef"
+              :src="
+                userInfo.avatar ||
+                'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
+              ">
             </wil-image>
           </div>
           <div class="left-info">
@@ -32,12 +37,11 @@
             <div class="left-info-phone">{{ userInfo.phonenumber }}</div>
           </div>
         </div>
+        <nut-button custom-color="#ff6701" class="mine-loged__right" @click="enterUserInfo">个人中心</nut-button>
       </div>
       <div class="mine-cell">
-        <wil-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell"
-          @toLogin="openLoginPopup"></wil-cell>
-        <wil-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell"
-          v-if="Authorization && userInfo.phonenumber != '19994658532'"></wil-cell>
+        <wil-cell :options="item" v-for="(item, index) in cellOptions" :key="index" @click-item="clickCell" @toLogin="openLoginPopup"></wil-cell>
+        <wil-cell :options="[{ title: '退出登录', leftIcon: logOut }]" @click-item="clickCell" v-if="Authorization && userInfo.phonenumber != '19994658532'"></wil-cell>
       </div>
     </div>
     <wil-modal ref="wil_modal"></wil-modal>
@@ -46,44 +50,44 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import wilCell from "@/components/mobile/wil-cell/index.vue";
-import shareDialog from "../video/components/index-component/share-dialog.vue";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import userImg from "@/static/user-img.png";
-import * as CONFIG from "@/utils/config";
-import logOut from "@/static/log-out.png";
-import iconMedia from "@/static/icon-media.png";
-import iconTb from "@/static/icon-tb.png";
+import { ref } from 'vue'
+import wilCell from '@/components/mobile/wil-cell/index.vue'
+import shareDialog from '../video/components/index-component/share-dialog.vue'
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import userImg from '@/static/user-img.png'
+import * as CONFIG from '@/utils/config'
+import logOut from '@/static/log-out.png'
+import iconMedia from '@/static/icon-media.png'
+import iconTb from '@/static/icon-tb.png'
 // import iconDownload from "@/static/icon-download.png";
-import iconMulu from "@/static/icon-mulu.png"
-import iconDeepseek from "@/static/icon-deepseek.png";
-import iconToolbox from "@/static/icon-toolbox.png";
-import iconFeedback from "@/static/icon-feedback.png";
-import iconGift from "@/static/icon-gift.png";
-import iconSetting from "@/static/icon-setting.png";
-import iconAbout from "@/static/icon-about.png";
-import { onShow } from "@dcloudio/uni-app";
-import { toParse, toStringfy } from "./common";
-import { getCutContent } from "@/utils/common";
-import showModal from "@/components/mobile/wil-modal/modal.js";
-import wilModal from "@/components/mobile/wil-modal/index.vue";
-import wilImage from "@/components/mobile/wil-image/index.vue";
-import { setShareData, doLogout } from "@/network/apis";
+import iconMulu from '@/static/icon-mulu.png'
+import iconDeepseek from '@/static/icon-deepseek.png'
+import iconToolbox from '@/static/icon-toolbox.png'
+import iconFeedback from '@/static/icon-feedback.png'
+import iconGift from '@/static/icon-gift.png'
+import iconSetting from '@/static/icon-setting.png'
+import iconAbout from '@/static/icon-about.png'
+import { onShow } from '@dcloudio/uni-app'
+import { toParse, toStringfy } from './common'
+import { getCutContent } from '@/utils/common'
+import showModal from '@/components/mobile/wil-modal/modal.js'
+import wilModal from '@/components/mobile/wil-modal/index.vue'
+import wilImage from '@/components/mobile/wil-image/index.vue'
+import { setShareData, doLogout } from '@/network/apis'
 
 // const { getUntokenDict } = useDict()
 
-const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY));
-const Authorization = ref(uni.getStorageSync("Authorization"));
-const isLogin = ref(false);
+const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
+const Authorization = ref(uni.getStorageSync('Authorization'))
+const isLogin = ref(false)
 
-const showLoginPopup = ref(false);
-const wil_modal = ref(null);
-const showShareModal = ref(false);
-const shareUrl = ref("");
+const showLoginPopup = ref(false)
+const wil_modal = ref(null)
+const showShareModal = ref(false)
+const shareUrl = ref('')
 
 // #ifdef APP-PLUS
-let TcpModule = uni.requireNativePlugin("TcpModule");
+let TcpModule = uni.requireNativePlugin('TcpModule')
 // #endif
 
 const cellOptions = ref([
@@ -91,231 +95,235 @@ const cellOptions = ref([
     // { title: '报账信息', leftIcon: cellClock, path: '/pages/mobile/account-information/list' },
     // { title: '快递查询', leftIcon: cellClock, path: '/account-information/express-search' },
     {
-      title: "媒体库列表",
+      title: '媒体库列表',
       leftIcon: iconMedia,
-      path: "/pages/mobile/media/list",
+      path: '/pages/mobile/media/list',
     },
     {
-      title: "数据同步",
+      title: '数据同步',
       leftIcon: iconTb,
-      path: "/pages/mobile/backend/data-sync",
+      path: '/pages/mobile/backend/data-sync',
       // path: null,
-      tip: "敬请期待...",
+      tip: '敬请期待...',
     },
     {
-      title: "目录设置",
+      title: '目录设置',
       leftIcon: iconMulu,
-      path: "/pages/mobile/media/catelog-setting",
+      path: '/pages/mobile/media/catelog-setting',
       // path: null,
-      tip: "敬请期待...",
+      tip: '敬请期待...',
     },
     {
-      title: "工具箱",
+      title: '工具箱',
       leftIcon: iconToolbox,
-      path: "/pages/mobile/toolbox/index",
+      path: '/pages/mobile/toolbox/index',
     },
   ],
   [
     {
-      title: "问题与反馈",
+      title: '问题与反馈',
       leftIcon: iconFeedback,
       // path: null,
       // outside: true,
       // outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
-      path: "/pages/mobile/backend/index",
+      path: '/pages/mobile/backend/index',
       query: {
-        url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
-        title: "问题与反馈",
+        url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview',
+        title: '问题与反馈',
       },
     },
     {
-      title: "赞赏",
+      title: '赞赏',
       leftIcon: iconGift,
-      path: "/pages/mobile/backend/appreciate",
+      path: '/pages/mobile/backend/appreciate',
     },
     {
-      title: "设置",
+      title: '设置',
       leftIcon: iconSetting,
-      path: "/pages/mobile/mine/settings",
+      path: '/pages/mobile/mine/settings',
     },
     {
-      title: "关于",
+      title: '关于',
       leftIcon: iconAbout,
-      path: "/pages/mobile/backend/about-version",
+      path: '/pages/mobile/backend/about-version',
     },
   ],
-]);
+])
 
 const openUrl = () => {
   uni.scanCode({
-    success: async (res) => {
-      if (res.result.startsWith("http://") || res.result.startsWith("https://")) {
+    success: async res => {
+      if (res.result.startsWith('http://') || res.result.startsWith('https://')) {
         uni.navigateTo({
           url: `/pages/mobile/backend/index?url=${res.result}`,
-        });
+        })
       } else {
-        let result = JSON.parse(res.result);
-        if (result.type == "dataSync") {
+        let result = JSON.parse(res.result)
+        if (result.type == 'dataSync') {
           let obj = {
             userInfo: {
-              userKey: uni.getStorageSync(CONFIG.USER_KEY), userId: uni.getStorageSync(CONFIG.USER_ID),
-              Authorization: uni.getStorageSync("Authorization"), refreshToken: uni.getStorageSync("refreshToken")
+              userKey: uni.getStorageSync(CONFIG.USER_KEY),
+              userId: uni.getStorageSync(CONFIG.USER_ID),
+              Authorization: uni.getStorageSync('Authorization'),
+              refreshToken: uni.getStorageSync('refreshToken'),
             },
             // localMovieTvData: uni.getStorageSync("localMovieTvData"),
             muluData: uni.getStorageSync('muluData') || {},
-            sourceList: uni.getStorageSync("sourceList"),
-            historyPlay: uni.getStorageSync("historyPlay"),
-          };
+            sourceList: uni.getStorageSync('sourceList'),
+            historyPlay: uni.getStorageSync('historyPlay'),
+          }
           if (init) {
             uni.showToast({
-              title: "开始连接",
-              icon: 'none'
+              title: '开始连接',
+              icon: 'none',
             })
-            TcpModule.connectAsClient(result.port.split(':')[0], 1025, (res) => {
+            TcpModule.connectAsClient(result.port.split(':')[0], 1025, res => {
               uni.showToast({
                 title: res,
-                icon: 'none'
+                icon: 'none',
               })
               let result = JSON.parse(res)
-              if (result.code == 500) { //本地局域网同步失败，走后端接口同步
+              if (result.code == 500) {
+                //本地局域网同步失败，走后端接口同步
                 setShareData({ port: result.port.split(':')[1], data: obj }).then(() => {
                   uni.showToast({
-                    title: "同步成功",
-                    icon: "none",
-                  });
+                    title: '同步成功',
+                    icon: 'none',
+                  })
                 })
-              } else { //本机局域网同步成功
+              } else {
+                //本机局域网同步成功
                 init = false
-                TcpModule.send(JSON.stringify(obj), (res1) => {
+                TcpModule.send(JSON.stringify(obj), res1 => {
                   let res2 = JSON.parse(res1)
                   if (res2.code == 500) {
                     uni.showToast({
                       title: '同步失败请重新扫描',
-                      icon: 'none'
+                      icon: 'none',
                     })
                   } else {
                     uni.showToast({
-                      title: "同步成功",
-                      icon: "none",
-                    });
+                      title: '同步成功',
+                      icon: 'none',
+                    })
                   }
                 })
               }
             })
           } else {
-            TcpModule.send(JSON.stringify(obj), (res1) => {
+            TcpModule.send(JSON.stringify(obj), res1 => {
               let res2 = JSON.parse(res1)
               if (res2.code == 500) {
                 uni.showToast({
                   title: '同步失败请重新扫描',
-                  icon: 'none'
+                  icon: 'none',
                 })
               } else {
                 uni.showToast({
-                  title: "同步成功",
-                  icon: "none",
-                });
+                  title: '同步成功',
+                  icon: 'none',
+                })
               }
             })
           }
         } else {
           uni.showToast({
-            title: "扫描此二维码无效",
-            icon: "none",
-          });
+            title: '扫描此二维码无效',
+            icon: 'none',
+          })
         }
       }
     },
-  });
-};
+  })
+}
 
 //进入个人资料页，进行编辑个人信息
 const enterUserInfo = () => {
   uni.navigateTo({
-    url: '/pages/mobile/mine/userInfo/index'
+    url: '/pages/mobile/mine/userInfo/index',
   })
 }
 
 //退出登录
 const toLogout = () => {
   wil_modal.value.showModal({
-    title: "温馨提示",
-    content: "是否退出登录",
-    confirmColor: "#ff6701",
+    title: '温馨提示',
+    content: '是否退出登录',
+    confirmColor: '#ff6701',
     confirm: async () => {
-      uni.removeStorageSync(CONFIG.USER_ID);
-      uni.removeStorageSync(CONFIG.OPEN_ID);
-      uni.removeStorageSync(CONFIG.USER_KEY);
-      uni.removeStorageSync("refreshToken");
-      doLogout();
-      uni.removeStorageSync("Authorization");
+      uni.removeStorageSync(CONFIG.USER_ID)
+      uni.removeStorageSync(CONFIG.OPEN_ID)
+      uni.removeStorageSync(CONFIG.USER_KEY)
+      uni.removeStorageSync('refreshToken')
+      doLogout()
+      uni.removeStorageSync('Authorization')
       uni.reLaunch({
-        url: "/pages/mobile/mine/login",
-      });
+        url: '/pages/mobile/mine/login',
+      })
     },
-  });
-};
+  })
+}
 
 //判断是否为登录状态
 const judgeLogin = () => {
-  userInfo.value = uni.getStorageSync(CONFIG.USER_KEY);
-  Authorization.value = uni.getStorageSync("Authorization");
+  userInfo.value = uni.getStorageSync(CONFIG.USER_KEY)
+  Authorization.value = uni.getStorageSync('Authorization')
   if (Authorization.value) {
     //用来展示默认的游客账号
-    isLogin.value = userInfo.value.phonenumber == "19994658532" ? false : true;
+    isLogin.value = userInfo.value.phonenumber == '19994658532' ? false : true
   } else {
-    isLogin.value = false;
+    isLogin.value = false
   }
-};
+}
 
-const clickCell = (item) => {
-  if (item.title == "退出登录") {
-    toLogout();
+const clickCell = item => {
+  if (item.title == '退出登录') {
+    toLogout()
   }
   if (item.tip) {
     uni.showToast({
       title: item.tip,
-      icon: "none",
-    });
+      icon: 'none',
+    })
   }
   if (item.outside) {
-    plus.runtime.openURL(item.outsideUrl, (error) => {
+    plus.runtime.openURL(item.outsideUrl, error => {
       if (error) {
-        uni.showToast({ title: "打开浏览器失败", icon: "none" });
+        uni.showToast({ title: '打开浏览器失败', icon: 'none' })
       }
-    });
+    })
   }
-};
+}
 
 const toLogin = () => {
-  uni.removeStorageSync(CONFIG.USER_ID);
-  uni.removeStorageSync(CONFIG.OPEN_ID);
-  uni.removeStorageSync(CONFIG.USER_KEY);
-  uni.removeStorageSync("Authorization");
+  uni.removeStorageSync(CONFIG.USER_ID)
+  uni.removeStorageSync(CONFIG.OPEN_ID)
+  uni.removeStorageSync(CONFIG.USER_KEY)
+  uni.removeStorageSync('Authorization')
   uni.reLaunch({
-    url: "/pages/mobile/mine/login",
-  });
-};
+    url: '/pages/mobile/mine/login',
+  })
+}
 
-const openLoginPopup = (item) => {
-  const whiteList = ["后台管理", "壁纸"];
+const openLoginPopup = item => {
+  const whiteList = ['后台管理', '壁纸']
   if (whiteList.indexOf(item.title) > -1) {
     uni.navigateTo({
-      url: item.path + "?" + toStringfy(item.query),
-    });
-    return;
+      url: item.path + '?' + toStringfy(item.query),
+    })
+    return
   }
-  showLoginPopup.value = true;
-};
+  showLoginPopup.value = true
+}
 
 onShow(async () => {
-  judgeLogin();
-  let shareUrl1 = await getCutContent();
+  judgeLogin()
+  let shareUrl1 = await getCutContent()
   if (shareUrl1) {
-    shareUrl.value = shareUrl1;
-    showShareModal.value = true;
+    shareUrl.value = shareUrl1
+    showShareModal.value = true
   }
-});
+})
 </script>
 
 <style lang="scss">
@@ -479,8 +487,8 @@ page {
       }
     }
   }
-  .mine-cell{
-    :deep(.wil-cell){
+  .mine-cell {
+    :deep(.wil-cell) {
       margin-top: 24rpx;
     }
   }

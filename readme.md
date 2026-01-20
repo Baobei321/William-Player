@@ -51,8 +51,8 @@
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
-| arm64-v8a   | [app-phone.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.4.7/app-mobile.apk)   | 适合大部分设备，手机和平板多数为此架构     |
-| armeabi-v7a   | [app-tv.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/1.4.7/app-tv.apk)   | 适合大部分电视设备，TV多数为此架构     |
+| arm64-v8a   | [app-phone.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/latest/app-mobile.apk)   | 适合大部分设备，手机和平板多数为此架构     |
+| armeabi-v7a   | [app-tv.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/latest/app-tv.apk)   | 适合大部分电视设备，TV多数为此架构     |
 
 ## 版本适配
 
