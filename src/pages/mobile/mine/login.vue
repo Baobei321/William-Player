@@ -31,7 +31,10 @@
     <div class="login-other">
       <div class="login-other-way">
         <div class="login-other-way__title">其他登录方式</div>
-        <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"></image>
+        <div class="login-other-way__list">
+          <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"></image>
+          <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ"></image>
+        </div>
       </div>
       <div class="user-agreement" @click="checkAgree">
         <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon" />
@@ -217,6 +220,7 @@ const clickNoAgree = () => {
   })
 }
 
+//使用支付宝快捷登录
 const loginAlipay = () => {
   const Alipay = uni.requireNativePlugin('AlipayModule')
   Alipay.openAuthScheme(
@@ -236,6 +240,15 @@ const loginAlipay = () => {
       })
     }
   )
+}
+//使用QQ快捷登录
+const loginQQ = () => {
+  uni.login({
+    provider: 'qq', //使用qq登录
+    success: function (loginRes) {
+      console.log(loginRes.authResult)
+    },
+  })
 }
 </script>
 
@@ -417,19 +430,27 @@ page {
       flex-direction: column;
       align-items: center;
       width: 100%;
+      margin-bottom: 36rpx;
       .login-other-way__title {
         color: #acacac;
         font-size: 22rpx;
         margin-bottom: 24rpx;
       }
-      image {
-        display: block;
-        width: 70rpx;
-        height: 70rpx;
-        border-radius: 50%;
-        cursor: pointer;
+      .login-other-way__list {
+        display: flex;
+        align-items: center;
+        image {
+          display: block;
+          width: 70rpx;
+          height: 70rpx;
+          border-radius: 50%;
+          cursor: pointer;
+          margin-left: 24rpx;
+          &:first-child {
+            margin-left: 0;
+          }
+        }
       }
-      margin-bottom: 36rpx;
     }
 
     .user-agreement {
