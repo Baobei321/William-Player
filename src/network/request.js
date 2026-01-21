@@ -109,6 +109,7 @@ const retryFail = (params) => {
             if (code == 404) {
               uni.showToast({
                 title: '请求地址不存在...',
+                icon:'none',
                 duration: 2000,
               })
             } else {
@@ -126,6 +127,7 @@ const retryFail = (params) => {
             case 404:
               uni.showToast({
                 title: '请求地址不存在...',
+                icon: 'none',
                 duration: 2000,
               })
               break;
@@ -192,6 +194,7 @@ export default (params) => {
             } else if (code == 404) {
               uni.showToast({
                 title: '请求地址不存在...',
+                icon:'none',
                 duration: 2000,
               })
               reject(res.data)
@@ -217,6 +220,7 @@ export default (params) => {
             case 404:
               uni.showToast({
                 title: '请求地址不存在...',
+                icon:'none',
                 duration: 2000,
               })
               reject("接口请求错误")

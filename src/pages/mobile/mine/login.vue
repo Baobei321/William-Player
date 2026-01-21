@@ -55,7 +55,7 @@ import { computed, ref } from 'vue'
 import baseForm from '@/components/mobile/wil-form/index.vue'
 import checkIcon from '@/static/check.png'
 import checkActiveIcon from '@/static/check-active.png'
-import { loginByPhone, loginByEmail, loginByAlipay, getWeUserByopenId } from '@/network/apis'
+import { loginByPhone, loginByEmail, loginByAlipay, loginByQQ, getWeUserByopenId } from '@/network/apis'
 import { encrypt } from '@/utils/jsencrypt.js'
 import * as CONFIG from '@/utils/config'
 import { getUserByopenId } from './common.js'
@@ -245,8 +245,20 @@ const loginAlipay = () => {
 const loginQQ = () => {
   uni.login({
     provider: 'qq', //使用qq登录
-    success: function (loginRes) {
-      console.log(loginRes.authResult)
+    success: loginRes => {
+      uni.getUserInfo({
+        provider: 'qq',
+        success: async res => {
+          await loginByQQ({ qqId: res.userInfo.openId })
+          uni.setStorageSync(CONFIG.OPEN_ID, result.openId)
+          uni.setStorageSync('Authorization', result.accessToken)
+          uni.setStorageSync('refreshToken', result.refreshToken)
+          getUserByopenId()
+          uni.reLaunch({
+            url: '/pages/mobile/video/index',
+          })
+        },
+      })
     },
   })
 }

@@ -1,46 +1,48 @@
 {
-    "name" : "William Player",
-    "appid" : "__UNI__0C3D8A9",
-    "description" : "",
-    "versionName" : "1.4.7",
-    "versionCode" : "147",
-    "transformPx" : false,
+    "name": "William Player",
+    "appid": "__UNI__0C3D8A9",
+    "description": "",
+    "versionName": "1.4.7",
+    "versionCode": "147",
+    "transformPx": false,
     /* 5+App特有相关 */
-    "app-plus" : {
-        "usingComponents" : true,
-        "nvueStyleCompiler" : "uni-app",
-        "darkmode" : true,
-        "themeLocation" : "theme.json",
-        "compilerVersion" : 3,
-        "splashscreen" : {
-            "alwaysShowBeforeRender" : false,
-            "waiting" : false,
-            "autoclose" : true,
-            "delay" : 0
+    "app-plus": {
+        "usingComponents": true,
+        "nvueStyleCompiler": "uni-app",
+        "darkmode": true,
+        "themeLocation": "theme.json",
+        "compilerVersion": 3,
+        "splashscreen": {
+            "alwaysShowBeforeRender": false,
+            "waiting": false,
+            "autoclose": true,
+            "delay": 0
         },
         // "compatible": {
         // 	"ignoreVersion": true
         // },
         /* 模块配置 */
-        "modules" : {
-            "Barcode" : {},
-            "Camera" : {}
+        "modules": {
+            "Barcode": {},
+            "Camera": {}
         },
         /* 应用发布信息 */
-        "distribute" : {
-            "distribute" : {
-                "orientation" : [ "portrait-primary" ]
+        "distribute": {
+            "distribute": {
+                "orientation": [
+                    "portrait-primary"
+                ]
             },
             /* android打包配置 */
-            "android" : {
-                "targetSdkVersion" : 31, // 新增或确认此配置
-                "minSdkVersion" : 21, // 新增或确认此配置
-                "gradleProperties" : {
+            "android": {
+                "targetSdkVersion": 31, // 新增或确认此配置
+                "minSdkVersion": 21, // 新增或确认此配置
+                "gradleProperties": {
                     // 可选但推荐的新增配置
-                    "android.useAndroidX" : "true",
-                    "android.enableJetifier" : "true"
+                    "android.useAndroidX": "true",
+                    "android.enableJetifier": "true"
                 },
-                "permissions" : [
+                "permissions": [
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
@@ -78,101 +80,85 @@
                     "<uses-permission android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\"/>",
                     "<uses-permission android:name=\"android.permission.REORDER_TASKS\"/>"
                 ],
-                "abiFilters" : []
+                "abiFilters": []
             },
             /* ios打包配置 */
-            "ios" : {
-                "dSYMs" : false
+            "ios": {
+                "dSYMs": false
             },
             /* SDK配置 */
-            "sdkConfigs" : {
-                "ad" : {}
+            "sdkConfigs": {
+                "ad": {}
             },
-            "splashscreen" : {
-                "androidStyle" : "default",
-                "android" : {
-                    "xxhdpi" : ""
+            "splashscreen": {
+                "androidStyle": "default",
+                "android": {
+                    "xxhdpi": ""
                 }
             },
-            "icons" : {
-                "android" : {
-                    "hdpi" : "",
-                    "xhdpi" : "",
-                    "xxhdpi" : "",
-                    "xxxhdpi" : ""
+            "icons": {
+                "android": {
+                    "hdpi": "",
+                    "xhdpi": "",
+                    "xxhdpi": "",
+                    "xxxhdpi": ""
                 },
-                "ios" : {
-                    "appstore" : "",
-                    "ipad" : {
-                        "app" : "",
-                        "app@2x" : "",
-                        "notification" : "",
-                        "notification@2x" : "",
-                        "proapp@2x" : "",
-                        "settings" : "",
-                        "settings@2x" : "",
-                        "spotlight" : "",
-                        "spotlight@2x" : ""
+                "ios": {
+                    "appstore": "",
+                    "ipad": {
+                        "app": "",
+                        "app@2x": "",
+                        "notification": "",
+                        "notification@2x": "",
+                        "proapp@2x": "",
+                        "settings": "",
+                        "settings@2x": "",
+                        "spotlight": "",
+                        "spotlight@2x": ""
                     },
-                    "iphone" : {
-                        "app@2x" : "",
-                        "app@3x" : "",
-                        "notification@2x" : "",
-                        "notification@3x" : "",
-                        "settings@2x" : "",
-                        "settings@3x" : "",
-                        "spotlight@2x" : "",
-                        "spotlight@3x" : ""
+                    "iphone": {
+                        "app@2x": "",
+                        "app@3x": "",
+                        "notification@2x": "",
+                        "notification@3x": "",
+                        "settings@2x": "",
+                        "settings@3x": "",
+                        "spotlight@2x": "",
+                        "spotlight@3x": ""
                     }
                 }
             }
-        },
-        "nativePlugins" : {
-            "video-native" : {
-                "__plugin_info__" : {
-                    "name" : "video-native",
-                    "description" : "一个集成了Exoplayer原生播放器的插件",
-                    "platforms" : "Android",
-                    "url" : "",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
-                    "isCloud" : false,
-                    "bought" : -1,
-                    "pid" : "",
-                    "parameters" : {}
-                }
-            }
         }
     },
-    "h5" : {
-        "darkmode" : false,
-        "themeLocation" : "theme.json",
-        "router" : {
-            "mode" : "hash",
-            "base" : "./"
+    "h5": {
+        "darkmode": false,
+        "themeLocation": "theme.json",
+        "router": {
+            "mode": "hash",
+            "base": "./"
         }
     },
     /* 快应用特有相关 */
-    "quickapp" : {},
+    "quickapp": {},
     /* 小程序特有相关 */
-    "mp-weixin" : {
-        "appid" : "",
-        "setting" : {
-            "urlCheck" : false
+    "mp-weixin": {
+        "appid": "",
+        "setting": {
+            "urlCheck": false
         },
-        "usingComponents" : true
+        "usingComponents": true
     },
-    "mp-alipay" : {
-        "usingComponents" : true
+    "mp-alipay": {
+        "usingComponents": true
     },
-    "mp-baidu" : {
-        "usingComponents" : true
+    "mp-baidu": {
+        "usingComponents": true
     },
-    "mp-toutiao" : {
-        "usingComponents" : true
+    "mp-toutiao": {
+        "usingComponents": true
     },
-    "uniStatistics" : {
-        "enable" : false
+    "uniStatistics": {
+        "enable": false
     },
-    "vueVersion" : "3"
+    "vueVersion": "3"
 }

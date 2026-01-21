@@ -202,3 +202,27 @@ export const unbindAlipay = data => {
     data: data
   })
 }
+//用户使用QQ登录
+export const loginByQQ = data => {
+  return request({
+    url: `/william/qq/login`,
+    method: 'post',
+    data: data
+  })
+}
+//用户绑定QQ
+export const bindQQ = data => {
+  return request({
+    url: `/william/qq/bind`,
+    method: 'post',
+    data: data
+  })
+}
+//用户解绑QQ
+export const unbindQQ = data => {
+  return request({
+    url: `/william/qq/unbind`,
+    method: 'post',
+    data: data
+  })
+}

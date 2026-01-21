@@ -32,14 +32,14 @@
           {{ item.title }}
         </template>
         <template #title="item">
-          <div v-if="item.title === '支付宝'" class="alipay-cell">
-            <image :src="userInfo?.isBindAlipay ? bindedIcon : nobindedIcon"></image>
-            <span :style="{ color: userInfo?.isBindAlipay ? '#00c286' : '#FE4344' }">{{ userInfo?.isBindAlipay ? '已绑定' : '未绑定' }}</span>
+          <div class="alipay-cell" v-if="item.title === '支付宝' || item.title === 'QQ'">
+            <image :src="userInfo?.[item.prop] ? bindedIcon : nobindedIcon"></image>
+            <span :style="{ color: userInfo?.[item.prop] ? '#00c286' : '#FE4344' }">{{ userInfo?.[item.prop] ? '已绑定' : '未绑定' }}</span>
           </div>
           <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }" v-else>{{ item.value || item.placeholder }}</span>
         </template>
         <template #link="item">
-          <span class="unbind-button" v-if="item.title === '支付宝' && userInfo?.isBindAlipay" @click.stop="unBind">解除绑定</span>
+          <span class="unbind-button" v-if="(item.title === '支付宝' || item.title === 'QQ') && userInfo?.isBindAlipay" @click.stop="unBind(item)">解除绑定</span>
         </template>
       </wil-cell>
     </div>
@@ -56,7 +56,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { editUserInfo } from '@/network/apis.js'
 import bindedIcon from '@/static/binded-icon.png'
 import nobindedIcon from '@/static/nobinded-icon.png'
-import { bindAlipay, unbindAlipay } from '@/network/apis'
+import { bindAlipay, unbindAlipay, bindQQ, unbindQQ } from '@/network/apis'
 
 const userInfo = ref({})
 const wil_modal = ref(null)
@@ -114,6 +114,14 @@ const options3 = computed(() => [
     path: null,
     value: userInfo.value.email,
     placeholder: '请绑定支付宝',
+    prop: 'isBindAlipay',
+  },
+  {
+    title: 'QQ',
+    path: null,
+    value: userInfo.value.email,
+    placeholder: '请绑定QQ',
+    prop: 'isBindQQ',
   },
   //   {
   //     title: 'Tmdb密钥',
@@ -137,6 +145,8 @@ const clickItem = item => {
   } else {
     if (item.title === '支付宝') {
       toBindAlipay()
+    } else if (item.title === 'QQ') {
+      toBindQQ()
     } else {
       uni.navigateTo({
         url: `/pages/mobile/mine/userInfo/edit?title=${item.title}`,
@@ -145,7 +155,7 @@ const clickItem = item => {
   }
 }
 
-const toBindPost = async (res) => {
+const toBindPost = async res => {
   await bindAlipay({ alipayCode: res.auth_code })
   userInfo.value.isBindAlipay = true
   uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
@@ -164,19 +174,48 @@ const toBindAlipay = () => {
     }
   )
 }
-
-//解除绑定
-const unBind = event => {
-  wil_modal.value.showModal({
-    title: '温馨提示',
-    content: '是否确认解绑支付宝？',
-    confirmColor: '#ff6701',
-    confirm: async () => {
-      await unbindAlipay({})
-      userInfo.value.isBindAlipay = false
-      uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+//绑定QQ
+const toBindQQ = async () => {
+  uni.login({
+    provider: 'qq', //使用qq登录
+    success: function (loginRes) {
+      uni.getUserInfo({
+        provider: 'qq',
+        success: async res => {
+          await bindQQ({ qqId: res.openId })
+          userInfo.value.isBindQQ = true
+          uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+        },
+      })
     },
   })
+}
+
+//解除绑定
+const unBind = item => {
+  if (item.title === '支付宝') {
+    wil_modal.value.showModal({
+      title: '温馨提示',
+      content: '是否确认解绑支付宝？',
+      confirmColor: '#ff6701',
+      confirm: async () => {
+        await unbindAlipay({})
+        userInfo.value.isBindAlipay = false
+        uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+      },
+    })
+  } else if (item.title === 'QQ') {
+    wil_modal.value.showModal({
+      title: '温馨提示',
+      content: '是否确认解绑QQ？',
+      confirmColor: '#ff6701',
+      confirm: async () => {
+        await unbindQQ({})
+        userInfo.value.isBindQQ = false
+        uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+      },
+    })
+  }
 }
 onShow(() => {
   userInfo.value = uni.getStorageSync(CONFIG.USER_KEY)

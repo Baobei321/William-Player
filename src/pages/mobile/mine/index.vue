@@ -467,25 +467,29 @@ page {
     }
 
     &__right {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 136rpx;
-      height: 48rpx;
-      background: linear-gradient(180deg, #ffae35 0%, #ff9900 100%);
-      border-radius: 80rpx;
-
-      img {
-        width: 28rpx;
-        height: 28rpx;
-      }
-
-      span {
-        font-size: 24rpx;
-        color: #ffffff;
-        margin-left: 16rpx;
-      }
+      height: 32px;
+      // padding: 0 17.5px;
     }
+    // &__right {
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    //   width: 136rpx;
+    //   height: 48rpx;
+    //   background: linear-gradient(180deg, #ffae35 0%, #ff9900 100%);
+    //   border-radius: 80rpx;
+
+    //   img {
+    //     width: 28rpx;
+    //     height: 28rpx;
+    //   }
+
+    //   span {
+    //     font-size: 24rpx;
+    //     color: #ffffff;
+    //     margin-left: 16rpx;
+    //   }
+    // }
   }
   .mine-cell {
     :deep(.wil-cell) {
