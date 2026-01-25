@@ -180,6 +180,12 @@
       }
     },
     {
+      "path": "pages/mobile/toolbox/download/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mobile/mine/userInfo/index",
       "style": {
         "navigationBarTitleText": "个人中心"

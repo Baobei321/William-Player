@@ -39,7 +39,7 @@
           <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }" v-else>{{ item.value || item.placeholder }}</span>
         </template>
         <template #link="item">
-          <span class="unbind-button" v-if="(item.title === '支付宝' || item.title === 'QQ') && userInfo?.isBindAlipay" @click.stop="unBind(item)">解除绑定</span>
+          <span class="unbind-button" v-if="(item.title === '支付宝' || item.title === 'QQ') && userInfo?.[item.prop]" @click.stop="unBind(item)">解除绑定</span>
         </template>
       </wil-cell>
     </div>
@@ -182,7 +182,7 @@ const toBindQQ = async () => {
       uni.getUserInfo({
         provider: 'qq',
         success: async res => {
-          await bindQQ({ qqId: res.openId })
+          await bindQQ({ qqId: res.userInfo.openId })
           userInfo.value.isBindQQ = true
           uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
         },

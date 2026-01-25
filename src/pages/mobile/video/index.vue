@@ -187,13 +187,36 @@ onShow(async () => {
 
 const listenerNetwork = res => {
   isConnected.value = res.isConnected
+  if (isConnected.value) {
+    navbarStyle.value = {
+      background: `rgba(255,255,255,0)`,
+      color: `rgb(255,255,255)`,
+      borderColor: `rgba(246, 247, 248, 0)`,
+    }
+  } else {
+    navbarStyle.value = {
+      background: `rgba(255,255,255,1)`,
+      color: `rgb(0,0,0)`,
+      borderColor: `rgba(246, 247, 248, 1)`,
+    }
+  }
 }
 uni.getNetworkType({
   success: res => {
     if (res.networkType != 'none') {
       isConnected.value = true
+      navbarStyle.value = {
+        background: `rgba(255,255,255,0)`,
+        color: `rgb(255,255,255)`,
+        borderColor: `rgba(246, 247, 248, 0)`,
+      }
     } else {
       isConnected.value = false
+      navbarStyle.value = {
+        background: `rgba(255,255,255,1)`,
+        color: `rgb(0,0,0)`,
+        borderColor: `rgba(246, 247, 248, 1)`,
+      }
     }
   },
 })

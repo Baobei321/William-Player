@@ -15,9 +15,11 @@
 <script setup>
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import expressSearch from '@/static/express-search.png'
+import downloadIcon from '@/static/download-manage.png'
 import { toStringfy, toParse } from "@/pages/mobile/mine/common";
 
 const toolboxArr = [
+    { title: '下载管理', icon: downloadIcon, path: '/pages/mobile/toolbox/download/index' },
     { title: '快递查询', icon: expressSearch, path: '/pages/mobile/toolbox/express/search' },
     {
         title: 'AI应用', icon: 'https://img2.baidu.com/it/u=1301209709,4272401830&fm=253&fmt=auto&app=138&f=JPEG?w=437&h=437',

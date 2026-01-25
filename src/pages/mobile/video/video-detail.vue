@@ -1,5 +1,5 @@
 <template>
-  <div class="video-detail" :style="{ overflow: showPopover ? 'hidden' : 'auto' }">
+  <div class="video-detail" :style="{ overflow: showPopover || showTvlistPopup ? 'hidden' : 'auto' }">
     <wil-navbar style="position: fixed; z-index: 999" arrow-color="#fff">
       <template #right>
         <nut-icon name="more-x" custom-color="#fff" size="20" @click="showPopover = true"></nut-icon>
@@ -94,16 +94,16 @@
             :showScrollbar="false"
             v-if="tvList.length"
             :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
-            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)" :key="item.name" @click="toPlayVideo(item, index)">
+            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + item.ji" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
                 <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div
                   class="item-img-process"
                   :style="{ width: Number(historyTv.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"
-                  v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"></div>
+                  v-if="item.ji == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"></div>
               </div>
-              <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
+              <div class="item-title">{{ item.ji + '.' + (item.title || `第${item.ji}集`) }}</div>
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
@@ -121,7 +121,7 @@
         <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
       </nut-popup>
     </div>
-    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" @playVideo="toPlayVideo"></tvlist-popup>
+    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" @playVideo="toPlayVideo" v-if="routerParams.type === 'tv'"></tvlist-popup>
   </div>
 </template>
 

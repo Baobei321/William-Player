@@ -4,6 +4,7 @@ import { parseTime, calTime, handleSecond, handleSeasonName, generateChineseNumb
 import { onShow, onLoad } from "@dcloudio/uni-app";
 import editIcon from "@/static/edit_icon.png";
 import timeIcon from "@/static/time_icon.png";
+import downloadIcon from '@/static/download-icon.png'
 import { toStringfy } from "@/pages/mobile/mine/common";
 import * as CONFIG from "@/utils/config";
 import { ipc } from "@/utils/ipcRenderer";
@@ -194,16 +195,21 @@ export function useVideoDetail({ route, router }) {
                     let bName = b.name.match(regex)[0];
                     const numA = parseInt(aName.slice(-2), 10);
                     const numB = parseInt(bName.slice(-2), 10);
+                    a.ji = numA
+                    b.ji = numB
                     return numA - numB;
                 } else if (a.name.match(regex1) && b.name.match(regex1)) {
                     let aName = a.name.match(regex1)[0];
                     let bName = b.name.match(regex1)[0];
                     const numA = parseInt(aName.slice(-2), 10);
                     const numB = parseInt(bName.slice(-2), 10);
+                    a.ji = numA
+                    b.ji = numB
                     return numA - numB;
                 }
                 return a - b;
             });
+
             // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result?.data?.total || 0}集）`;
         } else if (selectType.value.type == "天翼云盘") {
             // imgData.value.releaseTime = res1.air_date;
@@ -231,12 +237,16 @@ export function useVideoDetail({ route, router }) {
                     let bName = b.name.match(regex)[0];
                     const numA = parseInt(aName.slice(-2), 10);
                     const numB = parseInt(bName.slice(-2), 10);
+                    a.ji = numA
+                    b.ji = numB
                     return numA - numB;
                 } else if (a.name.match(regex1) && b.name.match(regex1)) {
                     let aName = a.name.match(regex1)[0];
                     let bName = b.name.match(regex1)[0];
                     const numA = parseInt(aName.slice(-2), 10);
                     const numB = parseInt(bName.slice(-2), 10);
+                    a.ji = numA
+                    b.ji = numB
                     return numA - numB;
                 }
                 return a - b;
@@ -269,12 +279,16 @@ export function useVideoDetail({ route, router }) {
                         let bName = b.file_name.match(regex)[0];
                         const numA = parseInt(aName.slice(-2), 10);
                         const numB = parseInt(bName.slice(-2), 10);
+                        a.ji = numA
+                        b.ji = numB
                         return numA - numB;
                     } else if (a.file_name.match(regex1)) {
                         let aName = a.file_name.match(regex1)[0];
                         let bName = b.file_name.match(regex1)[0];
                         const numA = parseInt(aName.slice(-2), 10);
                         const numB = parseInt(bName.slice(-2), 10);
+                        a.ji = numA
+                        b.ji = numB
                         return numA - numB;
                     }
                 })
@@ -282,6 +296,7 @@ export function useVideoDetail({ route, router }) {
                     return {
                         id: i.fid,
                         name: i.file_name,
+                        ji: i.ji,
                         // path: "/我的视频/电视剧",
                         provider: "Quark",
                     };
@@ -289,19 +304,21 @@ export function useVideoDetail({ route, router }) {
 
             // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
         }
+        imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
         //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
         console.log(res1, 're1s1');
 
         tvList.value.forEach((v, vindex) => {
             if (res1.episodes) {
-                v.title = res1.episodes[vindex]?.name || "暂无标题";
-                v.poster = res1.episodes[vindex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : imgData.value.img;
-                v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
-                v.runtimeOrg = res1.episodes[vindex]?.runtime || 0
-                v.vote_average = res1.episodes[vindex]?.vote_average || res1.vote_average
-                v.overview = res1.episodes[vindex]?.overview || res1.overview
+                let jiIndex = +v.ji - 1
+                v.title = res1.episodes[jiIndex]?.name || "暂无标题";
+                v.poster = res1.episodes[jiIndex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[jiIndex]?.still_path : imgData.value.img;
+                v.runtime = res1.episodes[jiIndex]?.runtime ? calTime(res1.episodes[jiIndex]?.runtime, "en") : "00:00";
+                v.runtimeOrg = res1.episodes[jiIndex]?.runtime || 0
+                v.vote_average = res1.episodes[jiIndex]?.vote_average || res1.vote_average
+                v.overview = res1.episodes[jiIndex]?.overview || res1.overview
             } else {
-                v.title = `第${vindex + 1}集`;
+                v.title = `第${jiIndex + 1}集`;
                 // v.vote_average = res1.vote_average
             }
         });
@@ -559,7 +576,7 @@ export function useVideoDetail({ route, router }) {
             let historyItem = {
                 path: `${activeSeason.value.path.slice(1)}/${item.name}`,
                 titlePlay: imgData.value.title,
-                ji: String(index + 1),
+                ji: String(item.ji),
                 poster: item.poster || imgData.value.img,
                 type: "tv",
                 name: item.name,
@@ -858,6 +875,7 @@ export function useVideoDetail({ route, router }) {
         } else if (routerParams.value.type == "tv") {
             popoverArr.value = [
                 { icon: editIcon, text: "手动编辑" },
+                { icon: downloadIcon, text: "下载" },
                 { icon: timeIcon, text: "设置跳过片头时间" },
                 { icon: timeIcon, text: "设置跳过片尾时间" },
             ];

@@ -249,7 +249,7 @@ const loginQQ = () => {
       uni.getUserInfo({
         provider: 'qq',
         success: async res => {
-          await loginByQQ({ qqId: res.userInfo.openId })
+          let result = await loginByQQ({ qqId: res.userInfo.openId })
           uni.setStorageSync(CONFIG.OPEN_ID, result.openId)
           uni.setStorageSync('Authorization', result.accessToken)
           uni.setStorageSync('refreshToken', result.refreshToken)
