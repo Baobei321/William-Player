@@ -121,7 +121,7 @@
         <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
       </nut-popup>
     </div>
-    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" @playVideo="toPlayVideo" v-if="routerParams.type === 'tv'"></tvlist-popup>
+    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" :active-season="activeSeason" @playVideo="toPlayVideo" v-if="routerParams.type === 'tv'"></tvlist-popup>
   </div>
 </template>
 

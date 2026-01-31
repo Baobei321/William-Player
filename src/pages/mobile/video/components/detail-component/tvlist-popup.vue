@@ -16,7 +16,7 @@
         <div class="tvlist-popup-wrapper__list">
           <div class="tvlist-popup-wrapper__list-item" v-for="(item, index) in props.tvList" :key="item.name" @click="playVideo(item, index)">
             <div class="item-img">
-              <image :src="item.poster" mode="aspectFill"></image>
+              <image :src="item.poster" mode="aspectFill" class="item-img-poster"></image>
               <template v-if="isDownload">
                 <image src="@/static/check-active.png" class="select-icon" v-if="selectArr.some(i => i.id === item.id)"></image>
                 <image src="@/static/check.png" class="select-icon" v-else></image>
@@ -26,10 +26,10 @@
               <div class="item-info-title">{{ item.ji + '.' + (item.title || `第${item.ji}集`) }}</div>
               <div class="item-info-star">
                 <image src="@/static/star-fill.png"></image>
-                <span class="star-score">{{ item.vote_average.toFixed(1) }}</span>
-                <span class="star-runtime">{{ calTime(item.runtimeOrg, 'cn') }}</span>
+                <span class="star-score">{{ item.vote_average?.toFixed(1) || 10 }}</span>
+                <span class="star-runtime">{{ item.runtimeOrg ? calTime(item.runtimeOrg, 'cn') : '暂无时长' }}</span>
               </div>
-              <div class="item-info-desc">{{ item.overview }}</div>
+              <div class="item-info-desc">{{ item.overview||'暂无简介' }}</div>
             </div>
           </div>
         </div>
@@ -41,10 +41,12 @@
 <script setup>
 import { ref } from 'vue'
 import { calTime } from '@/utils/scrape'
+import { getWebDAVUrl, get189VideoUrl, getQuarkResolutionUrl, getQuarkVideoUrl } from '@/utils/common'
 
 const props = defineProps({
   tvList: { type: Array, default: [] },
   title: { type: String, default: '' },
+  activeSeason: { type: Object, default: {} },
 })
 
 const emits = defineEmits(['playVideo'])
@@ -53,7 +55,10 @@ const navBarHeight = ref('')
 const contentHeight = ref('')
 const isDownload = ref(false) //是否在下载模式
 const selectArr = ref([]) //已选中的需要下载的视频
+const selectType = ref({})
+const selectMedia = ref({})
 let DownloaderManager = null
+let downloadList = [] //下载列表
 
 //计算微信navBar高度
 const getNavHeight = () => {
@@ -99,35 +104,91 @@ const initDownloader = () => {
     )
   }
 }
+//查询所有下载任务
+const queryAll = callback => {
+  initDownloader()
+  DownloaderManager.queryAll(res => {
+    let arr = res.data ? JSON.parse(res.data) : []
+    downloadList = arr.filter(i => i.status === 'DOWNLOADING' || i.status === 'PAUSED' || i.status === 'CONNECTING' || i.status === 'ERROR')
+    if (downloadList?.length + selectArr.value?.length >= 3) {
+      uni.showToast({
+        title: `已存在${downloadList?.length}个下载任务,最多同时下载三个`,
+        icon: 'none',
+      })
+    } else {
+      callback()
+    }
+  })
+}
+//判断选择的是webdav还是天翼云盘还是夸克
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync('sourceList')
+  selectType.value = sourceList.find(item => {
+    let select = item.list.find(i => i.active)
+    if (select) {
+      selectMedia.value = select
+      return true
+    } else {
+      return false
+    }
+  })
+}
+//获取下载链接
+const getDownloadUrl = async item => {
+  judgeSelect()
+  if (selectType.value.type == 'WebDAV') {
+    if (selectMedia.value.name) {
+      let res = await getWebDAVUrl(
+        {
+          path: decodeURIComponent(props.activeSeason.path.slice(1) + '/' + item.name),
+        },
+        selectMedia.value
+      )
+      return res.data.raw_url
+    }
+  } else if (selectType.value.type == '天翼云盘') {
+    if (selectMedia.value.name) {
+      let res = await get189VideoUrl(
+        {
+          folderFileId: item.id,
+        },
+        selectMedia.value
+      )
+      return res.normal.url
+    }
+  } else if (selectType.value.type == '夸克网盘') {
+    if (selectMedia.value.name) {
+      let res = await getQuarkVideoUrl({ folderFileId: item.id }, selectMedia.value)
+      return res.data[0].download_url
+    }
+  } else if (selectType.value.type == 'Emby') {
+    if (selectMedia.value.name) {
+      let res = await getEmbyPlayerUrl(
+        {
+          folderFileId: item.id,
+        },
+        selectMedia.value
+      )
+      return res.MediaSources[0].Path
+    }
+  }
+}
 
 //创建下载任务
-const createDownload = item => {
-  const lastDotIndex = item.name.lastIndexOf('.')
-  let format = val.substring(lastDotIndex+1)
-  // let saveName = `${props.title} 第${}集`
-
-  DownloaderManager.createDownloadTask(
-    {
-      downUrl:
-        'https://media-zjhz-fy-person01.zj6oss.ctyunxs.cn/PERSONCLOUD/f310df5a-15cd-4dbc-b414-7a5100252967.mp4?x-amz-CLIENTTYPEIN=PC&AWSAccessKeyId=0Lg7dAq3ZfHvePP8DKEU&x-amz-userLevel=100&x-amz-limitrate=51200&response-content-type=video/mp4&x-amz-UID=64784934&response-content-disposition=attachment%3Bfilename%3D%2209.mp4%22%3Bfilename*%3DUTF-8%27%2709.mp4&x-amz-CLIENTNETWORK=UNKNOWN&x-amz-CLOUDTYPEIN=PERSON&Signature=4XB2gn0QF%2BQtw3HR3DyRot7tlL8%3D&Expires=1769238525&x-amz-FSIZE=1227841923&x-amz-UFID=225481186083258592',
-      saveName: '腾讯视频.mp4', // 此处可改成根据下载地址自动获取文件名及文件格式
-      imgUrl: 'https://n.sinaimg.cn/sinakd20230822s/429/w1000h1029/20230822/85c9-12a6845ed1089e9489c8510b78bfd6ef.jpg',
-    },
-    function (res) {
-      uni.showToast({
-        title: res,
-        icon: 'none',
-        duration: 7000,
-      })
-      if (res.code == 0) {
-        uni.showToast({
-          title: '创建下载任务之后开始监听',
-        })
-        queryAll()
-        startListener()
-      }
-    }
-  )
+const createDownload = () => {
+  selectArr.value.forEach(async i => {
+    const lastDotIndex = i.name.lastIndexOf('.')
+    let format = i.name.substring(lastDotIndex + 1)
+    let url = await getDownloadUrl(i)
+    DownloaderManager.createDownloadTask(
+      {
+        downUrl: url,
+        saveName: `${props.title} 第${i.ji}集.${format}`, // 此处可改成根据下载地址自动获取文件名及文件格式
+        imgUrl: i.poster,
+      },
+      () => {}
+    )
+  })
 }
 
 const openDownload = val => {
@@ -136,7 +197,7 @@ const openDownload = val => {
 }
 //确认下载
 const confirmDownload = () => {
-  initDownloader()
+  queryAll(createDownload)
 }
 
 const playVideo = (item, index) => {
@@ -221,6 +282,9 @@ getH5NavbarHeight()
             flex: 0 0 150rpx;
             height: 224rpx;
             position: relative;
+            .item-img-poster{
+              background: rgb(212, 212, 212);
+            }
             image {
               display: block;
               width: 100%;

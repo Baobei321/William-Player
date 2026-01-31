@@ -81,6 +81,10 @@ const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const Authorization = ref(uni.getStorageSync('Authorization'))
 const isLogin = ref(false)
 
+const name = ref('')
+console.log(!name.value,'值');
+
+
 const showLoginPopup = ref(false)
 const wil_modal = ref(null)
 const showShareModal = ref(false)

@@ -121,9 +121,11 @@ export function useVideoDetail({ route, router }) {
         showTimePicker.value = false;
     };
 
-    //处理电视的详情和剧集等
-    const handleTv = async (seasonData1 = null) => {
-        showRehandleButton.value = false;
+    const getValue = (data, prop) => {
+        return prop.split(".").reduce((obj, key) => obj?.[key], data);
+    };
+    //从对象或者名称中提取第几季
+    const determineSeason = () => {
         let season = "";
         season = activeSeason.value.season;
         if (localMovieTvData.value.tv) {
@@ -147,10 +149,36 @@ export function useVideoDetail({ route, router }) {
             }
             season = season != "1" ? season : activeSeason.value.season;
         }
+        return season
+    }
+
+    //处理tvList，将获取到的季数据写入到这个数组中
+    const processTvlist = (res) => {
+        if (tvList.value?.length) {
+            tvList.value.forEach((v, vindex) => {
+                let jiIndex = +v.ji - 1
+                if (res.episodes) {
+                    v.title = res.episodes[jiIndex]?.name || "暂无标题";
+                    v.poster = res.episodes[jiIndex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res.episodes[jiIndex]?.still_path : imgData.value.img;
+                    v.runtime = res.episodes[jiIndex]?.runtime ? calTime(res.episodes[jiIndex]?.runtime, "en") : "00:00";
+                    v.runtimeOrg = res.episodes[jiIndex]?.runtime || 0
+                    v.vote_average = res.episodes[jiIndex]?.vote_average || res.vote_average
+                    v.overview = res.episodes[jiIndex]?.overview || res.overview
+                } else {
+                    v.title = `第${jiIndex + 1}集`;
+                    // v.vote_average = res.vote_average
+                }
+            });
+        }
+    }
+
+    //获取季数据，并且将季数据的结果赋值给一些参数
+    const getSeasonData = async (seasonData1 = null, season) => {
         let res1 = {};
         if (!seasonData1) {
             if (routerParams.value.movieTvId) {
-                res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season });
+                res1 = await getTvSeason({ movieTvId: routerParams.value.movieTvId, season: season })
+                processTvlist(res1)
             }
         } else {
             res1 = seasonData1;
@@ -167,161 +195,89 @@ export function useVideoDetail({ route, router }) {
         let seasonData = { _id: res1._id, air_date: res1.air_date, name: res1.name, overview: res1.overview, id: res1.id, poster_path: res1.poster_path, season_number: res1.season_number, vote_average: res1.vote_average };
         uni.setStorageSync("seasonData", seasonData);
         season != "1" && res1.overview ? (overview.value = res1.overview) : "";
+        return res1
+    }
+
+    //处理webdav、天翼云盘、夸克网盘的剧集列表获取
+    const getTvlist = async (type) => {
         let result = {};
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
-        if (selectType.value.type == "WebDAV") {
-            // imgData.value.releaseTime = res1.air_date;
-            // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
-            try {
-                result = await getFolder(
-                    {
-                        path: activeSeason.value.path,
-                    },
-                    selectMedia.value
-                );
-            } catch (error) {
-                showRehandleButton.value = true;
-                return;
+        const apiMapping = {
+            'WebDAV': {
+                apiFunction: getFolder,
+                params: { path: activeSeason.value.path },
+                prop: 'data.content'
+            },
+            '天翼云盘': {
+                apiFunction: get189Folder,
+                params: { folderId: activeSeason.value.folderFileId },
+                prop: 'fileListAO.fileList'
+            },
+            '夸克网盘': {
+                apiFunction: getQuarkFolder,
+                params: { fid: activeSeason.value.folderFileId },
+                prop: 'data.list'
             }
-            result.data.content = result.data.content.filter((h) => {
-                return videoFormat.some((v) => h.name.includes(v));
-            });
-            //对电视进行排序
-            tvList.value = result.data.content.sort((a, b) => {
-                const regex = /S\d{2}E\d{2}/;
-                const regex1 = /\d+/;
-                if (a.name.match(regex) && b.name.match(regex)) {
-                    let aName = a.name.match(regex)[0];
-                    let bName = b.name.match(regex)[0];
-                    const numA = parseInt(aName.slice(-2), 10);
-                    const numB = parseInt(bName.slice(-2), 10);
-                    a.ji = numA
-                    b.ji = numB
-                    return numA - numB;
-                } else if (a.name.match(regex1) && b.name.match(regex1)) {
-                    let aName = a.name.match(regex1)[0];
-                    let bName = b.name.match(regex1)[0];
-                    const numA = parseInt(aName.slice(-2), 10);
-                    const numB = parseInt(bName.slice(-2), 10);
-                    a.ji = numA
-                    b.ji = numB
-                    return numA - numB;
-                }
-                return a - b;
-            });
-
-            // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result?.data?.total || 0}集）`;
-        } else if (selectType.value.type == "天翼云盘") {
-            // imgData.value.releaseTime = res1.air_date;
-            // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有0集）`);
-            try {
-                result = await get189Folder(
-                    {
-                        folderId: activeSeason.value.folderFileId,
-                    },
-                    selectMedia.value
-                );
-            } catch (error) {
-                showRehandleButton.value = true;
-                return;
-            }
-            result.fileListAO.fileList = result.fileListAO.fileList.filter((h) => {
-                return videoFormat.some((v) => h.name.includes(v));
-            });
-            //对电视进行排序
-            tvList.value = result.fileListAO.fileList.sort((a, b) => {
-                const regex = /S\d{2}E\d{2}/;
-                const regex1 = /\d+/;
-                if (a.name.match(regex) && b.name.match(regex)) {
-                    let aName = a.name.match(regex)[0];
-                    let bName = b.name.match(regex)[0];
-                    const numA = parseInt(aName.slice(-2), 10);
-                    const numB = parseInt(bName.slice(-2), 10);
-                    a.ji = numA
-                    b.ji = numB
-                    return numA - numB;
-                } else if (a.name.match(regex1) && b.name.match(regex1)) {
-                    let aName = a.name.match(regex1)[0];
-                    let bName = b.name.match(regex1)[0];
-                    const numA = parseInt(aName.slice(-2), 10);
-                    const numB = parseInt(bName.slice(-2), 10);
-                    a.ji = numA
-                    b.ji = numB
-                    return numA - numB;
-                }
-                return a - b;
-            });
-            // imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${result.fileListAO.count || 0}集）`;
-        } else if (selectType.value.type == "夸克网盘") {
-            // imgData.value.releaseTime = res1.air_date;
-            // imgData.value.runtime ? "" : (imgData.value.runtime = `共${res1.episodes.length}集（库中有0集）`);
-            try {
-                result = await getQuarkFolder(
-                    {
-                        fid: activeSeason.value.folderFileId,
-                    },
-                    selectMedia.value
-                );
-            } catch (error) {
-                showRehandleButton.value = true;
-                return;
-            }
-            result.data.list = result.data.list.filter((h) => {
-                return videoFormat.some((v) => h.file_name.includes(v));
-            });
-            //对电视进行排序
-            tvList.value = result.data.list
-                .sort((a, b) => {
-                    const regex = /S\d{2}E\d{2}/;
-                    const regex1 = /\d+/;
-                    if (a.file_name.match(regex)) {
-                        let aName = a.file_name.match(regex)[0];
-                        let bName = b.file_name.match(regex)[0];
-                        const numA = parseInt(aName.slice(-2), 10);
-                        const numB = parseInt(bName.slice(-2), 10);
-                        a.ji = numA
-                        b.ji = numB
-                        return numA - numB;
-                    } else if (a.file_name.match(regex1)) {
-                        let aName = a.file_name.match(regex1)[0];
-                        let bName = b.file_name.match(regex1)[0];
-                        const numA = parseInt(aName.slice(-2), 10);
-                        const numB = parseInt(bName.slice(-2), 10);
-                        a.ji = numA
-                        b.ji = numB
-                        return numA - numB;
-                    }
-                })
-                .map((i) => {
-                    return {
-                        id: i.fid,
-                        name: i.file_name,
-                        ji: i.ji,
-                        // path: "/我的视频/电视剧",
-                        provider: "Quark",
-                    };
-                });
-
-            // imgData.value.runtime = `共${res1.episodes.length}集（库中有${result.data.list?.length || 0}集）`;
         }
+        try {
+            result = await apiMapping[type].apiFunction(apiMapping[type].params, selectMedia.value);
+        } catch (error) {
+            showRehandleButton.value = true;
+            return;
+        }
+        let arr = getValue(result, apiMapping[type].prop).filter((h) => {
+            return videoFormat.some((v) => h.name.includes(v));
+        });
+        //对电视进行排序
+        tvList.value = arr.sort((a, b) => {
+            const regex = /S\d{2}E\d{2}/;
+            const regex1 = /\d+/;
+            if (a.name.match(regex) && b.name.match(regex)) {
+                let aName = a.name.match(regex)[0];
+                let bName = b.name.match(regex)[0];
+                const numA = parseInt(aName.slice(-2), 10);
+                const numB = parseInt(bName.slice(-2), 10);
+                a.ji = numA
+                b.ji = numB
+                return numA - numB;
+            } else if (a.name.match(regex1) && b.name.match(regex1)) {
+                let aName = a.name.match(regex1)[0];
+                let bName = b.name.match(regex1)[0];
+                const numA = parseInt(aName.slice(-2), 10);
+                const numB = parseInt(bName.slice(-2), 10);
+                a.ji = numA
+                b.ji = numB
+                return numA - numB;
+            }
+            return a - b;
+        });
+        if (type === '夸克网盘') {
+            tvList.value = tvList.value.map((i) => {
+                return {
+                    id: i.fid,
+                    name: i.file_name,
+                    ji: i.ji,
+                    // path: "/我的视频/电视剧",
+                    provider: "Quark",
+                };
+            });
+        }
+    }
+
+    //处理电视的详情和剧集等
+    const handleTv = async (seasonData1 = null) => {
+        showRehandleButton.value = false;
+        //提取季
+        const season = determineSeason()
+        let res1 = {};
+        //获取季数据，并且设置给某些参数，把res1传进去，获取到季的数据
+        getSeasonData(seasonData1, season).then(seasonRes => {
+            res1 = seasonRes
+        })
+        await getTvlist(selectType.value.type)
         imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`;
         //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
-        console.log(res1, 're1s1');
-
-        tvList.value.forEach((v, vindex) => {
-            if (res1.episodes) {
-                let jiIndex = +v.ji - 1
-                v.title = res1.episodes[jiIndex]?.name || "暂无标题";
-                v.poster = res1.episodes[jiIndex]?.still_path ? CONFIG.IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[jiIndex]?.still_path : imgData.value.img;
-                v.runtime = res1.episodes[jiIndex]?.runtime ? calTime(res1.episodes[jiIndex]?.runtime, "en") : "00:00";
-                v.runtimeOrg = res1.episodes[jiIndex]?.runtime || 0
-                v.vote_average = res1.episodes[jiIndex]?.vote_average || res1.vote_average
-                v.overview = res1.episodes[jiIndex]?.overview || res1.overview
-            } else {
-                v.title = `第${jiIndex + 1}集`;
-                // v.vote_average = res1.vote_average
-            }
-        });
+        processTvlist(res1)
         nextTick(() => {
             historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
         });

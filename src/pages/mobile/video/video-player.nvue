@@ -180,7 +180,6 @@ export default {
             },
             this.selectMedia
           )
-          // let res = await getQuarkVideoUrl({ folderFileId: this.routerParams.folderFileId }, this.selectMedia);
           return res
         }
       }

@@ -220,6 +220,6 @@ const setHistoryPlay = (data, selectMedia) => {
 
 
 export {
-    setEmbyImg, loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList,
+    handleSize, setEmbyImg, loginEmby, getEmbyInfo, getMainView, getEmbyList, getEmbyNewList,
     getGenresList, getEmbyMovieTv, getEmbySeasonList, getEmbyPlayerUrl, getSeasonTvList, setHistoryPlay
 }
