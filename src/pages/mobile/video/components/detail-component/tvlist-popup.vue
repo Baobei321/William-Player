@@ -29,7 +29,7 @@
                 <span class="star-score">{{ item.vote_average?.toFixed(1) || 10 }}</span>
                 <span class="star-runtime">{{ item.runtimeOrg ? calTime(item.runtimeOrg, 'cn') : '暂无时长' }}</span>
               </div>
-              <div class="item-info-desc">{{ item.overview||'暂无简介' }}</div>
+              <div class="item-info-desc">{{ item.overview || '暂无简介' }}</div>
             </div>
           </div>
         </div>
@@ -42,6 +42,7 @@
 import { ref } from 'vue'
 import { calTime } from '@/utils/scrape'
 import { getWebDAVUrl, get189VideoUrl, getQuarkResolutionUrl, getQuarkVideoUrl } from '@/utils/common'
+import { queryAll, createDownload } from '@/utils/download'
 
 const props = defineProps({
   tvList: { type: Array, default: [] },
@@ -55,10 +56,6 @@ const navBarHeight = ref('')
 const contentHeight = ref('')
 const isDownload = ref(false) //是否在下载模式
 const selectArr = ref([]) //已选中的需要下载的视频
-const selectType = ref({})
-const selectMedia = ref({})
-let DownloaderManager = null
-let downloadList = [] //下载列表
 
 //计算微信navBar高度
 const getNavHeight = () => {
@@ -78,131 +75,33 @@ const close = () => {
   visible.value = false
 }
 
-//初始化安卓原生下载器
-const initDownloader = () => {
-  if (!DownloaderManager) {
-    DownloaderManager = uni.requireNativePlugin('WilliamDownloader')
-    DownloaderManager.init(
-      {
-        maxDownloadTasks: 3, // 最大同时下载任务数
-        downloadDir: '/storage/emulated/0/Android/data/com.android.williamplayer/cache/myDownloader', // 下载文件路径
-        maxDownloadThreads: 3, // 最大下载线程数
-        autoRecovery: true, // 是否自动恢复下载
-        openRetry: true, // 下载失败是否打开重试
-        maxRetryCount: 2, // 重试次数
-        retryIntervalMillis: 1000, // 每次重试时间间隔（毫秒）
-      },
-      function (res) {
-        if (0 == res.code) {
-          uni.showToast({
-            title: res.msg,
-            icon: 'none',
-          })
-          // 显示下载列表
-        }
-      }
-    )
-  }
-}
-//查询所有下载任务
-const queryAll = callback => {
-  initDownloader()
-  DownloaderManager.queryAll(res => {
-    let arr = res.data ? JSON.parse(res.data) : []
-    downloadList = arr.filter(i => i.status === 'DOWNLOADING' || i.status === 'PAUSED' || i.status === 'CONNECTING' || i.status === 'ERROR')
-    if (downloadList?.length + selectArr.value?.length >= 3) {
-      uni.showToast({
-        title: `已存在${downloadList?.length}个下载任务,最多同时下载三个`,
-        icon: 'none',
-      })
-    } else {
-      callback()
-    }
-  })
-}
-//判断选择的是webdav还是天翼云盘还是夸克
-const judgeSelect = () => {
-  let sourceList = uni.getStorageSync('sourceList')
-  selectType.value = sourceList.find(item => {
-    let select = item.list.find(i => i.active)
-    if (select) {
-      selectMedia.value = select
-      return true
-    } else {
-      return false
-    }
-  })
-}
-//获取下载链接
-const getDownloadUrl = async item => {
-  judgeSelect()
-  if (selectType.value.type == 'WebDAV') {
-    if (selectMedia.value.name) {
-      let res = await getWebDAVUrl(
-        {
-          path: decodeURIComponent(props.activeSeason.path.slice(1) + '/' + item.name),
-        },
-        selectMedia.value
-      )
-      return res.data.raw_url
-    }
-  } else if (selectType.value.type == '天翼云盘') {
-    if (selectMedia.value.name) {
-      let res = await get189VideoUrl(
-        {
-          folderFileId: item.id,
-        },
-        selectMedia.value
-      )
-      return res.normal.url
-    }
-  } else if (selectType.value.type == '夸克网盘') {
-    if (selectMedia.value.name) {
-      let res = await getQuarkVideoUrl({ folderFileId: item.id }, selectMedia.value)
-      return res.data[0].download_url
-    }
-  } else if (selectType.value.type == 'Emby') {
-    if (selectMedia.value.name) {
-      let res = await getEmbyPlayerUrl(
-        {
-          folderFileId: item.id,
-        },
-        selectMedia.value
-      )
-      return res.MediaSources[0].Path
-    }
-  }
-}
-
-//创建下载任务
-const createDownload = () => {
-  selectArr.value.forEach(async i => {
-    const lastDotIndex = i.name.lastIndexOf('.')
-    let format = i.name.substring(lastDotIndex + 1)
-    let url = await getDownloadUrl(i)
-    DownloaderManager.createDownloadTask(
-      {
-        downUrl: url,
-        saveName: `${props.title} 第${i.ji}集.${format}`, // 此处可改成根据下载地址自动获取文件名及文件格式
-        imgUrl: i.poster,
-      },
-      () => {}
-    )
-  })
-}
-
 const openDownload = val => {
   isDownload.value = val
   selectArr.value = []
 }
 //确认下载
 const confirmDownload = () => {
-  queryAll(createDownload)
+  queryAll(createDownload, selectArr.value)
+  close()
+  isDownload.value = false
+  selectArr.value = []
 }
 
 const playVideo = (item, index) => {
   if (isDownload.value) {
-    selectArr.value.some(i => i.id === item.id) ? (selectArr.value = selectArr.value.filter(i => i.id !== item.id)) : selectArr.value.push(item)
+    const { selectMedia, selectType } = judgeSelect()
+    const lastDotIndex = item.name.lastIndexOf('.')
+    let format = item.name.substring(lastDotIndex + 1)
+    if (selectArr.value.some(i => i.id === item.id)) {
+      selectArr.value = selectArr.value.filter(i => i.id !== item.id)
+    } else {
+      selectArr.value.push({ saveName: `${props.title} 第${item.ji}集.${format}`, ...item })
+      if (selectType.type === 'WebDAV') {
+        selectArr.value.forEach(v => {
+          v.webdavPath = decodeURIComponent(props.activeSeason.path.slice(1) + '/' + v.name)
+        })
+      }
+    }
   } else {
     emits('playVideo', item, index)
   }
@@ -282,7 +181,7 @@ getH5NavbarHeight()
             flex: 0 0 150rpx;
             height: 224rpx;
             position: relative;
-            .item-img-poster{
+            .item-img-poster {
               background: rgb(212, 212, 212);
             }
             image {

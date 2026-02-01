@@ -48,7 +48,13 @@
         </nut-button>
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
-          <div class="movie-version-title">影片版本</div>
+          <div class="movie-version-title">
+            <span>影片版本</span>
+            <div class="movie-version-title__download" @click="downloadMovie">
+              <image src="@/static/download-icon.png"></image>
+              <span>下载</span>
+            </div>
+          </div>
           <scroll-view class="movie-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
             <div class="movie-version-list">
               <div
@@ -121,7 +127,14 @@
         <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
       </nut-popup>
     </div>
-    <tvlist-popup v-model:visible="showTvlistPopup" :title="imgData.title" :tv-list="tvList" :active-season="activeSeason" @playVideo="toPlayVideo" v-if="routerParams.type === 'tv'"></tvlist-popup>
+    <tvlist-popup
+      v-model:visible="showTvlistPopup"
+      :title="imgData.title"
+      :tv-list="tvList"
+      :active-season="activeSeason"
+      @playVideo="toPlayVideo"
+      v-if="routerParams.type === 'tv'">
+    </tvlist-popup>
   </div>
 </template>
 
@@ -166,6 +179,7 @@ const {
   clickPlayButton,
   toPlayVideo,
   reHandleTv,
+  downloadMovie,
 } = useVideoDetail({})
 
 //打开电视剧集列表popup
@@ -465,6 +479,21 @@ page {
           font-weight: bold;
           color: #000;
           padding-bottom: 20rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .movie-version-title__download {
+            display: flex;
+            align-items: center;
+            image {
+              width: 34rpx;
+              height: 34rpx;
+            }
+            span {
+              font-size: 28rpx;
+              padding-left: 4rpx;
+            }
+          }
         }
 
         .movie-version-scroll {

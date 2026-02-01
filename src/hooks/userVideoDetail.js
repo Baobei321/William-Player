@@ -9,6 +9,7 @@ import { toStringfy } from "@/pages/mobile/mine/common";
 import * as CONFIG from "@/utils/config";
 import { ipc } from "@/utils/ipcRenderer";
 import { ipcApiRoute } from "@/utils/ipcApiRoute";
+import { queryAll, createDownload } from '@/utils/download'
 
 export function useVideoDetail({ route, router }) {
     const showPopover = ref(false);
@@ -302,6 +303,8 @@ export function useVideoDetail({ route, router }) {
             },
             routerParams.value.type
         );
+        console.log(res, 'res111');
+
         overview.value = res.overview;
         if (routerParams.value.type == "movie") {
             imgData.value = {
@@ -312,6 +315,7 @@ export function useVideoDetail({ route, router }) {
                 runtimeEn: calTime(res.runtime, "en"),
                 genres: res.genres.map((i) => i.name).join(" "),
                 title: res.title,
+                posterPath: CONFIG.IMG_DOMAIN + "/t/p/w300_and_h450_bestv2" + res.poster_path,
             };
         } else if (routerParams.value.type == "tv") {
             seasonFirst.value.img = CONFIG.IMG_DOMAIN + "/t/p/w1920_and_h1080_bestv2" + res.backdrop_path;
@@ -800,6 +804,21 @@ export function useVideoDetail({ route, router }) {
         });
     }
 
+    //下载电影
+    const downloadMovie = () => {
+        console.log(selectSource.value, 'selectSource/va.ue');
+        let obj = {
+            saveName: selectSource.value.name,
+            imgUrl: imgData.value.posterPath,
+        }
+        if (selectType.value.type === 'WebDAV') {//如果是webdav，就需要设置webdavPath用于获取下载链接
+            obj.webdavPath = selectSource.value.path.slice(1)
+        } else {//如果是天翼云盘或者夸克网盘，那么就需要folderFileId，用来获取下载链接
+            obj.id = selectSource.value.folderFileId
+        }
+        queryAll(createDownload, [obj])
+    }
+
     onBeforeMount(async () => {
         judgeSelect();
         // historyPlay.value = uni.getStorageSync('historyPlay') || []
@@ -827,11 +846,14 @@ export function useVideoDetail({ route, router }) {
             routerParams.value.movieTvId = undefined;
         }
         if (routerParams.value.type == "movie") {
-            popoverArr.value = [{ icon: editIcon, text: "手动编辑" }];
+            popoverArr.value = [
+                { icon: editIcon, text: "手动编辑" },
+                { icon: downloadIcon, text: "下载中心" }
+            ];
         } else if (routerParams.value.type == "tv") {
             popoverArr.value = [
                 { icon: editIcon, text: "手动编辑" },
-                { icon: downloadIcon, text: "下载" },
+                { icon: downloadIcon, text: "下载中心" },
                 { icon: timeIcon, text: "设置跳过片头时间" },
                 { icon: timeIcon, text: "设置跳过片尾时间" },
             ];
@@ -842,7 +864,7 @@ export function useVideoDetail({ route, router }) {
     return {
         showPopover, popoverArr, showTimePicker, pickerTitle, pickerVal, pickerColumns, imgData, overview, sourceList, selectSource, activeSeason, tvList, buttonText,
         routerParams, showRehandleButton, historyTv, scrollIntoView, lineNumber, lineHeight, toSelect, confirmPicker, changeSource, changeTvSource, changeTvSeason, disabledTip,
-        clickPlayButton, toPlayVideo, reHandleTv
+        clickPlayButton, toPlayVideo, reHandleTv, downloadMovie
     }
 
 }
