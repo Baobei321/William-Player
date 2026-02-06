@@ -34,12 +34,14 @@ const pagesJsonPath = path.resolve(rootDir, 'src/pages.json');
 const appVuePath = path.resolve(rootDir, 'src/App.vue');
 const templateDir = path.resolve(rootDir, 'config-pages-json');
 const commonJsPath = path.resolve(rootDir, 'src/utils/common.js');
+const mainJsPath = path.resolve(rootDir, 'src/main.js'); // 新增main.js路径
 
 console.log('项目根目录:', rootDir);
 console.log('config.js 路径:', configJsPath);
 console.log('App.vue 路径:', appVuePath);
 console.log('pages.json 路径:', pagesJsonPath);
 console.log('common.js 路径:', commonJsPath);
+console.log('main.js 路径:', mainJsPath);
 
 // 修改config.js文件
 function modifyConfigJs() {
@@ -194,13 +196,143 @@ function modifyCommonJs() {
     return false;
   }
 }
+// 修改vite.config.js文件 - 直接生成对应配置
+function modifyViteConfig() {
+  try {
+    const viteConfigPath = path.resolve(rootDir, 'vite.config.js');
 
+    if (!fs.existsSync(viteConfigPath)) {
+      console.error('✗ vite.config.js 文件不存在');
+      return false;
+    }
 
+    let content;
+
+    if (platform === PLATFORMS.PC) {
+      content = `import { defineConfig } from 'vite'
+import uni from '@dcloudio/vite-plugin-uni'
+import UniComponents from "@uni-helper/vite-plugin-uni-components";
+import { NutResolver } from "nutui-uniapp";
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [
+    uni(),
+    UniComponents({
+      resolvers: [
+        NutResolver(),
+      ]
+    }),
+    createSvgIconsPlugin({
+      iconDirs: [path.resolve(process.cwd(), 'src/static/svg')],
+      symbolId: 'icon-[dir]-[name]',
+      svgoOptions: true
+    })
+  ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: \`@import "nutui-uniapp/styles/variables.scss";\`
+      }
+    }
+  }
+})`;
+      console.log('✓ 已生成 PC 平台专用配置');
+    } else {
+      content = `import { defineConfig } from 'vite'
+import uni from '@dcloudio/vite-plugin-uni'
+import UniComponents from "@uni-helper/vite-plugin-uni-components";
+import { NutResolver } from "nutui-uniapp";
+
+export default defineConfig({
+  plugins: [
+    uni(),
+    UniComponents({
+      resolvers: [
+        NutResolver(),
+      ]
+    })
+  ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: \`@import "nutui-uniapp/styles/variables.scss";\`
+      }
+    }
+  }
+})`;
+      console.log('✓ 已生成非 PC 平台专用配置');
+    }
+
+    fs.writeFileSync(viteConfigPath, content, 'utf8');
+    console.log('✓ 成功重写 vite.config.js');
+    return true;
+  } catch (error) {
+    console.error('✗ 修改 vite.config.js 失败:', error.message);
+    return false;
+  }
+}
+
+// 修改main.js文件
+function modifyMainJs() {
+  try {
+    let content;
+
+    if (platform === PLATFORMS.PC) {
+      // PC平台的main.js内容
+      content = `import {
+\tcreateSSRApp
+} from "vue";
+import { createPinia } from 'pinia'
+import App from "./App.vue";
+import router from "./router/index.js";
+import 'virtual:svg-icons-register'
+
+export function createApp() {
+\tconst app = createSSRApp(App);
+\tconst pinia = createPinia()
+\tapp.use(pinia)
+\tapp.use(router)
+\tapp.mount('#app1')
+\treturn {
+\t\tapp,
+\t};
+}`;
+      console.log('✓ 已生成 PC 平台 main.js 配置');
+    } else {
+      // 非PC平台（MOBILE/TV）的main.js内容
+      content = `import {
+\tcreateSSRApp
+} from "vue";
+import { createPinia } from 'pinia'
+import App from "./App.vue";
+
+export function createApp() {
+\tconst app = createSSRApp(App);
+\tconst pinia = createPinia()
+\tapp.use(pinia)
+\t// 非PC平台直接挂载，不需要路由
+\treturn {
+\t\tapp,
+\t};
+}`;
+      console.log('✓ 已生成非 PC 平台 main.js 配置');
+    }
+
+    fs.writeFileSync(mainJsPath, content, 'utf8');
+    console.log('✓ 成功修改 main.js');
+    return true;
+  } catch (error) {
+    console.error('✗ 修改 main.js 失败:', error.message);
+    return false;
+  }
+}
 // 主函数
 async function main() {
   try {
     // 修改配置文件
-    if (!modifyConfigJs() || !replacePagesJson() || !modifyAppVue() || !modifyCommonJs()) {
+    if (!modifyConfigJs() || !replacePagesJson() || !modifyAppVue() || !modifyCommonJs() || !modifyViteConfig() || !modifyMainJs()) {
       process.exit(1);
     }
 

@@ -6,8 +6,20 @@ const constantRoutes = [
     path: '/',
     component: Layout,
     hidden: true,
-    redirect: '/home',
+    redirect: '/entry',
     children: [
+      {
+        path: 'entry',
+        component: () => import('@/pages/electron/login/entry'),
+        name: 'Entry',
+        meta: { title: '入口', hideSidebar: true, noTransition: true }
+      },
+      {
+        path: 'login',
+        component: () => import('@/pages/electron/login/index'),
+        name: 'Login',
+        meta: { title: '登录', hideSidebar: true, noTransition: true }
+      },
       {
         path: 'home',
         component: () => import('@/pages/electron/home/index'),

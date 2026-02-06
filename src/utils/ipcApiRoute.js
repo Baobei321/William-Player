@@ -8,12 +8,14 @@ const ipcApiRoute = {
   curl: 'controller.client.curl',
   cache: 'controller.client.cache',
   getCache: 'controller.client.getCache',
+  changeWindowSize:'controller.window.changeWindowSize',
+  windowAction:'controller.window.windowAction',
   createWindow: 'controller.window.createWindow',
   createMpv: 'controller.window.createMpv',
   closeMpv: 'controller.window.closeMpv',
   httpRequest: 'controller.http.request',
   mpvConnect: 'controller.mpv.connectToMpv',
-  mpvTrackList:'controller.mpv.getTrackList'
+  mpvTrackList:'controller.mpv.getTrackList',
 }
 
 export {

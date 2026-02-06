@@ -109,7 +109,7 @@ const retryFail = (params) => {
             if (code == 404) {
               uni.showToast({
                 title: '请求地址不存在...',
-                icon:'none',
+                icon: 'none',
                 duration: 2000,
               })
             } else {
@@ -132,14 +132,16 @@ const retryFail = (params) => {
               })
               break;
             default:
-              uni.showToast({
-                title: '请重试...',
-                icon: 'none',
-                duration: 2000,
-              })
+              if (res.statusCode !== 403) {
+                uni.showToast({
+                  title: '请重试...',
+                  icon: 'none',
+                  duration: 2000,
+                })
+              }
               break;
           }
-          reject('接口请求错误')
+          reject(res.data)
         }
       },
       fail: (err) => {
@@ -194,7 +196,7 @@ export default (params) => {
             } else if (code == 404) {
               uni.showToast({
                 title: '请求地址不存在...',
-                icon:'none',
+                icon: 'none',
                 duration: 2000,
               })
               reject(res.data)
@@ -220,10 +222,15 @@ export default (params) => {
             case 404:
               uni.showToast({
                 title: '请求地址不存在...',
-                icon:'none',
+                icon: 'none',
                 duration: 2000,
               })
               reject("接口请求错误")
+              break;
+            case 403:
+              uni.navigateTo({
+                url: '/pages/mobile/mine/no-permission'
+              })
               break;
             default:
               uni.showToast({
@@ -231,7 +238,7 @@ export default (params) => {
                 icon: 'none',
                 duration: 2000,
               })
-              reject("接口请求错误")
+              reject(res.data)
               break;
           }
         }

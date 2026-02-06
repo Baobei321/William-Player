@@ -106,6 +106,10 @@ export function useVideoDetail({ route, router }) {
             pickerColumns.value[0] = arr1;
             pickerColumns.value[1] = arr2;
             showTimePicker.value = true;
+        } else if (item.text == '下载中心'){
+            uni.navigateTo({
+                url:'/pages/mobile/toolbox/download/index'
+            })
         }
     };
 

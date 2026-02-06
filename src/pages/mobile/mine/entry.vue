@@ -42,7 +42,7 @@ onBeforeMount(async () => {
         url: '/pages/mobile/video/index',
       })
     } else {
-      //白屏时间久的原因在于此处，接口地址改了，请求超时是10s，所以一直显示白屏
+      //白屏时间久的原因在于此处，接口地址改成本地了，请求超时是10s，所以一直显示白屏
       await loginByPhone({ phone: '19994658532', password: encrypt('123456789') })
         .then(res => {
           uni.setStorageSync(CONFIG.OPEN_ID, res.openId)

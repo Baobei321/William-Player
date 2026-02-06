@@ -61,10 +61,10 @@ const initDownloader = () => {
       },
       function (res) {
         if (0 == res.code) {
-          uni.showToast({
-            title: res.msg,
-            icon: 'none',
-          })
+          // uni.showToast({
+          //   title: res.msg,
+          //   icon: 'none',
+          // })
           // 显示下载列表
         }
       }
@@ -75,10 +75,6 @@ const initDownloader = () => {
 //监听下载进度
 const startListener = () => {
   if (!isListener) {
-    uni.showToast({
-      title: '开始监听',
-      icon: 'none',
-    })
     isListener = true //此时已经在监听了
     DownloaderManager.startListener(result => {
       index1.value++
@@ -124,9 +120,9 @@ const createDownload = () => {
         duration: 7000,
       })
       if (res.code == 0) {
-        uni.showToast({
-          title: '创建下载任务之后开始监听',
-        })
+        // uni.showToast({
+        //   title: '创建下载任务之后开始监听',
+        // })
         queryAll()
         startListener()
       }

@@ -1,9 +1,13 @@
+<template>
+  <div id="app1">
+    <router-view></router-view>
+  </div>
+</template>
 <script>
 export default {
   onLaunch: function () {
     console.log('App Launch')
     // #ifdef APP-PLUS
-    plus.screen.lockOrientation("portrait-primary");
     if (process.env.NODE_ENV === "production") {
       //生产环境 禁用log
       console.log = function () { };
@@ -22,6 +26,7 @@ export default {
 
 <style lang="scss">
 @import "nutui-uniapp/styles/index.scss";
+@import "./styles/nutui.scss";
 
 /*每个页面公共css */
 .nut-button {

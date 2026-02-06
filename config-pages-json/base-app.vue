@@ -21,6 +21,7 @@ export default {
 
 <style lang="scss">
 @import "nutui-uniapp/styles/index.scss";
+@import "./styles/nutui.scss";
 
 /*每个页面公共css */
 .nut-button {

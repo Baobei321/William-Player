@@ -2,6 +2,7 @@
   <div class="wil-empty">
     <image src="@/static/no-data.png" v-if="props.type === 'data'"></image>
     <image src="@/static/no-wifi.png" v-else-if="props.type === 'wifi'"></image>
+    <image src="https://oss-dev.quectel.com/group1/2026/02/05/285dbe9fc33f432383f23548c4488ed8.png" v-else-if="props.type === 'permission'"></image>
     <span>{{ props.text }}</span>
   </div>
 </template>
@@ -23,7 +24,7 @@ const props = defineProps({
     width: 400rpx;
     height: 400rpx;
   }
-  span{
+  span {
     color: #9b9b9b;
   }
 }
