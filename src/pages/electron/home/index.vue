@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"> </home-navbar>
-    <span @click="openVideo">调试用</span>
+    <!-- <span @click="openVideo">调试用</span> -->
     <template v-if="!refreshLoading">
       <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
       <div class="home-container">

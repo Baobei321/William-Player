@@ -43,6 +43,7 @@ declare module 'vue' {
     WilForm: typeof import('./src/components/mobile/wil-form/index.vue')['default']
     WilImage: typeof import('./src/components/mobile/wil-image/index.vue')['default']
     WilList: typeof import('./src/components/mobile/wil-list/index.vue')['default']
+    WilMessageBox: typeof import('./src/components/electron/wil-message-box/index.vue')['default']
     WilModal: typeof import('./src/components/mobile/wil-modal/index.vue')['default']
     WilNavbar: typeof import('./src/components/mobile/wil-navbar/index.vue')['default']
     WilPopover: typeof import('./src/components/electron/wil-popover/index.vue')['default']

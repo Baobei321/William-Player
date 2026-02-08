@@ -245,6 +245,8 @@ initAccount()
 .login {
   padding: 20rpx 80rpx;
   background: #fff;
+  width: 100%;
+  height: 100%;
   .login-welcome {
     font-size: 42rpx;
     font-weight: bold;

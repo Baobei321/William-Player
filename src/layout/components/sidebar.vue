@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-logo">
-      <wil-popover trigger="click" placement="right-start">
+      <wil-popover trigger="click" placement="right-start" v-model:visible="popoverVisible">
         <template #reference>
           <img
             :src="
@@ -10,7 +10,7 @@
             "
             style="cursor: pointer" />
         </template>
-        <user-info-inner></user-info-inner>
+        <user-info-inner @closePopover="popoverVisible = false"></user-info-inner>
       </wil-popover>
     </div>
     <div class="sidebar-list" ref="sidebar_list">
@@ -41,6 +41,7 @@ import * as CONFIG from '@/utils/config'
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const router = useRouter()
 const sidebar_list = ref(null)
+const popoverVisible = ref(false)
 const activeTab = ref('首页')
 const sidebarList = ref([
   { name: '首页', icon: homeBlack, activeIcon: homeOrange, active: true, path: '/home' },

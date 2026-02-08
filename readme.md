@@ -110,7 +110,7 @@ Android 8+
 
 如果觉得此项目有用，可以考虑赞助我喝杯 ~~奶茶~~ 咖啡 ☕
 
-<img src="https://gitee.com/CWLcwl0219/William-Player/raw/master/static/zanshang.jpg" alt="Sponsor" width="240"/>
+<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/zanshang.jpg" alt="Sponsor" width="240"/>
 
 
 ## Star History

@@ -66,14 +66,7 @@ const refreshAccess = () => {
 }
 //初始化刷新token
 const initRefreshToken = () => {
-  let refreshToken = uni.getStorageSync('refreshToken')
-  if (refreshToken) {
     refreshAccess()
-  } else {
-    router.replace({
-      path: '/login',
-    })
-  }
 }
 initRefreshToken()
 </script>
