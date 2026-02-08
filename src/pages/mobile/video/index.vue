@@ -26,7 +26,7 @@
               </div>
             </template>
             <!-- emby专用的首页 -->
-            <emby-home v-else></emby-home>
+            <emby-home v-else :style="{ paddingTop: `calc(40rpx + ${navbarHeight + 'px'})` }"></emby-home>
           </scroll-view>
         </div>
         <div class="video-empty" v-if="selectType.type == 'Emby' ? !embyMovieTvList?.length : !localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length">
@@ -80,7 +80,7 @@ import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex.js'
 
 const wil_modal = ref(null)
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, navbarStyle } =
+const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, scrollTop, refreshVideo, navbarStyle } =
   useVideoIndex({ wil_modal })
 const showDialog = ref(false)
 const showShareModal = ref(false)
@@ -93,7 +93,6 @@ const upgradeInfo = ref({
 
 const navbarHeight = ref(0) //标题栏加状态栏的高度
 let startCommandHeight = 0 //轮播海报的高度，在手机端和pad端表现不同
-let scrollTop = 0 //滚动的距离
 
 const isConnected = ref(false) //手机是否连接网络
 
@@ -155,9 +154,9 @@ const getNavbarHeight = val => {
 //页面滚动，更改标题的背景色
 const handlePageScroll = event => {
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
-  scrollTop = event.detail.scrollTop
+  scrollTop.value = event.detail.scrollTop
   let cval = (255 - opacity * 255).toFixed(2)
-  if (settingData.value.showRecommend) {
+  if (settingData.value.showRecommend && selectType.value.type !== 'Emby') {
     //如果展示影视推荐轮播图，才根据滚动渐变
     navbarStyle.value = {
       background: `rgba(255,255,255,${opacity.toFixed(2)})`,
@@ -166,18 +165,34 @@ const handlePageScroll = event => {
     }
   }
 }
-onShow(async () => {
-  if (
-    scrollTop === 0 && settingData.value.showRecommend && selectType.type == 'Emby'
-      ? embyMovieTvList?.length
-      : localMovieTvData?.movie?.length || localMovieTvData?.tv?.length
-  ) {
-    navbarStyle.value = {
-      background: `rgba(255,255,255,0)`,
-      color: `rgb(255,255,255)`,
-      borderColor: `rgba(246, 247, 248, 0)`,
+
+//根据判断显示标题栏的颜色
+const showNavbarColor = () => {
+  const { movie, tv } = localMovieTvData.value || {}
+  const hasData = movie?.length || tv?.length
+  const isEmby = selectType.value.type === 'Emby'
+  const transparentStyle = {
+    background: `rgba(255,255,255,0)`,
+    color: `rgb(255,255,255)`,
+    borderColor: `rgba(246, 247, 248, 0)`,
+  }
+  const solidStyle = {
+    background: `rgba(255,255,255,1)`,
+    color: `rgb(0,0,0)`,
+    borderColor: `rgba(246, 247, 248, 1)`,
+  }
+  if (isEmby) {
+    navbarStyle.value = solidStyle
+  } else if (scrollTop.value === 0) {
+    if (!settingData.value.showRecommend) {
+      navbarStyle.value = solidStyle
+    } else {
+      navbarStyle.value = hasData ? transparentStyle : solidStyle
     }
   }
+}
+onShow(async () => {
+  showNavbarColor()
   let shareUrl1 = await getCutContent()
   if (shareUrl1) {
     shareUrl.value = shareUrl1
@@ -186,13 +201,10 @@ onShow(async () => {
 })
 
 const listenerNetwork = res => {
+  scrollTop.value = 0
   isConnected.value = res.isConnected
   if (isConnected.value) {
-    navbarStyle.value = {
-      background: `rgba(255,255,255,0)`,
-      color: `rgb(255,255,255)`,
-      borderColor: `rgba(246, 247, 248, 0)`,
-    }
+    showNavbarColor()
   } else {
     navbarStyle.value = {
       background: `rgba(255,255,255,1)`,
@@ -203,13 +215,10 @@ const listenerNetwork = res => {
 }
 uni.getNetworkType({
   success: res => {
+    scrollTop.value = 0
     if (res.networkType != 'none') {
       isConnected.value = true
-      navbarStyle.value = {
-        background: `rgba(255,255,255,0)`,
-        color: `rgb(255,255,255)`,
-        borderColor: `rgba(246, 247, 248, 0)`,
-      }
+      showNavbarColor()
     } else {
       isConnected.value = false
       navbarStyle.value = {

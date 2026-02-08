@@ -132,7 +132,7 @@ const cellOptions = ref([
       // outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
       path: '/pages/mobile/backend/index',
       query: {
-        url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview',
+        url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/question',
         title: '问题与反馈',
       },
     },

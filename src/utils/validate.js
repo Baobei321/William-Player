@@ -74,7 +74,6 @@ export const validateWebdav = async (title, formData, oldData, routerParams, bac
             Object.keys(formData).forEach((v) => {
                 obj[v] = formData[v];
             });
-            editMulu()
             uni.setStorageSync("sourceList", sourceList);
             if (routerParams.isActive == "1") {
                 uni.setStorageSync("isreload", true);
@@ -181,7 +180,6 @@ export const validateEmby = async (title, formData, oldData, routerParams) => {
                 Object.keys(formData).forEach((v) => {
                     obj[v] = formData[v];
                 });
-                editMulu()
                 uni.setStorageSync("sourceList", sourceList);
                 if (routerParams.isActive == "1") {
                     uni.setStorageSync("isreload", true);

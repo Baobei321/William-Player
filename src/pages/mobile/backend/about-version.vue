@@ -14,6 +14,7 @@
     <div class="about-version-protocol">
       <image src="@/static/tmdb-xy.png"></image>
       <div class="about-version-protocol__button" @click="toQQpage">联系我们</div>
+      <div class="about-version-protocol__other" @click="toOtherPage">下载其他平台版本</div>
       <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
     </div>
     <div class="about-version-button">
@@ -28,65 +29,81 @@
     <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
       <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
     </nut-popup>
-    <wil-upgrade :updateFunction="backInfo" :logo="upgradeInfo.logo" :app-name=upgradeInfo.appName
-      :appVersion="appVersion" @closed="closedPopup" v-model:visible="showUpgrade">
+    <wil-upgrade
+      :updateFunction="backInfo"
+      :logo="upgradeInfo.logo"
+      :app-name="upgradeInfo.appName"
+      :appVersion="appVersion"
+      @closed="closedPopup"
+      v-model:visible="showUpgrade">
     </wil-upgrade>
   </view>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
-import wilUpgrade from "@/components/mobile/wil-upgrade/index.vue";
-import { getUntokenDicts } from "@/network/apis";
-import appLogo from "@/static/app-logo1.png";
-import * as CONFIG from "@/utils/config";
-import { toParse, toStringfy } from "../mine/common";
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import wilUpgrade from '@/components/mobile/wil-upgrade/index.vue'
+import { getUntokenDicts } from '@/network/apis'
+import appLogo from '@/static/app-logo1.png'
+import * as CONFIG from '@/utils/config'
+import { toParse, toStringfy } from '../mine/common'
 import { getAppLatestVersion } from '@/utils/common'
 
-const url = ref("");
+const url = ref('')
 
-const status = ref(["总是"]);
-const showPopover = ref(false);
+const status = ref(['总是'])
+const showPopover = ref(false)
 const popoverList = ref([
-  { text: "总是", value: "总是" },
-  { text: "每天", value: "每天" },
-  { text: "每周", value: "每周" },
-  { text: "从不", value: "从不" },
-]);
-const isLoading = ref(false);
-const showButton = ref(true);
-const showUpgrade = ref(false);
-const versionData = ref({});
+  { text: '总是', value: '总是' },
+  { text: '每天', value: '每天' },
+  { text: '每周', value: '每周' },
+  { text: '从不', value: '从不' },
+])
+const isLoading = ref(false)
+const showButton = ref(true)
+const showUpgrade = ref(false)
+const versionData = ref({})
 
-const appVersion = ref(CONFIG.VERSIOIN);
+const appVersion = ref(CONFIG.VERSIOIN)
 
-let num = 0;
+let num = 0
 
 const upgradeInfo = ref({
   logo: appLogo,
-  appName: "William Player",
-});
+  appName: 'William Player',
+})
 
 const checkUpdate = async () => {
-  isLoading.value = true;
-  await getAppUpdateInfo();
-};
+  isLoading.value = true
+  await getAppUpdateInfo()
+}
 
 const confirm = ({ selectedValue, selectedOptions }) => {
-  uni.setStorageSync("remindTime", { type: selectedValue[0] });
-  showPopover.value = false;
-};
+  uni.setStorageSync('remindTime', { type: selectedValue[0] })
+  showPopover.value = false
+}
 
 const toQQpage = () => {
   let query = {
-    url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview/#/qqTalk",
-    title: "问题与反馈",
-  };
+    url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/qqTalk',
+    title: '问题与反馈',
+  }
   uni.navigateTo({
-    url: "/pages/mobile/backend/index" + "?" + toStringfy(query),
-  });
-};
+    url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
+  })
+}
+
+//跳转到下载页
+const toOtherPage = () => {
+  let query = {
+    url: 'https://chenweiliang6.github.io/app-webview/#/download-center',
+    title: '下载中心',
+  }
+  uni.navigateTo({
+    url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
+  })
+}
 
 const toLogin = () => {
   // if (num == 5) {
@@ -100,56 +117,56 @@ const toLogin = () => {
   // } else {
   //   num++;
   // }
-};
+}
 
 const compareVersions = (newBb, oldBb) => {
   if (newBb) {
-    const v1 = newBb?.split(".").map(Number); // 将版本号拆分成数字
-    const v2 = oldBb?.split(".").map(Number); // 同样拆分另一个版本号
+    const v1 = newBb?.split('.').map(Number) // 将版本号拆分成数字
+    const v2 = oldBb?.split('.').map(Number) // 同样拆分另一个版本号
 
     for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
       // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
       if ((v1[i] || 0) < (v2[i] || 0)) {
-        return -1;
+        return -1
       }
       // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
       if ((v1[i] || 0) > (v2[i] || 0)) {
-        return 1;
+        return 1
       }
     }
   }
-  return 0; // 如果两个版本号完全相同，返回 0
-};
+  return 0 // 如果两个版本号完全相同，返回 0
+}
 
 const getAppUpdateInfo = async () => {
   // let res = await getUntokenDicts("app_version");
   let res = await getAppLatestVersion()
-  isLoading.value = false;
-  versionData.value = res;
+  isLoading.value = false
+  versionData.value = res
   versionData.value.downloadUrl = res.assets.find(i => i.name === 'app-mobile.apk')?.browser_download_url || null
   if (compareVersions(res.tag_name, appVersion.value) == 1) {
     //此时后台设置已有新版本
-    showUpgrade.value = true;
+    showUpgrade.value = true
   } else {
-    showButton.value = false;
+    showButton.value = false
   }
-};
+}
 
 const backInfo = async () => {
-  return versionData.value;
-};
+  return versionData.value
+}
 
 const closedPopup = () => {
-  showUpgrade.value = false;
-};
+  showUpgrade.value = false
+}
 
-onLoad((options) => {
-  status.value = uni.getStorageSync("remindTime").type ? [uni.getStorageSync("remindTime").type] : ["总是"];
-  url.value = decodeURIComponent(options.url);
-});
+onLoad(options => {
+  status.value = uni.getStorageSync('remindTime').type ? [uni.getStorageSync('remindTime').type] : ['总是']
+  url.value = decodeURIComponent(options.url)
+})
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 page {
   width: 100%;
   height: 100%;
@@ -252,6 +269,11 @@ page {
       font-weight: bold;
       font-size: 28rpx;
       color: #68c6b3;
+    }
+    .about-version-protocol__other {
+      margin-top: 50rpx;
+      font-size: 28rpx;
+      color: #1e6efa;
     }
 
     // .about-version-protocol__tip{

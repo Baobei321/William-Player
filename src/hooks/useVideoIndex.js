@@ -19,6 +19,7 @@ export function useVideoIndex({ wil_modal }) {
     const sourceList = ref([]);
     const refreshData = ref({ found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 });
     const refreshLoading = ref(false);
+    const scrollTop = ref(0)
     const movieTvData = ref({
         //存储电影电视剧数据
         movie: [],
@@ -41,7 +42,7 @@ export function useVideoIndex({ wil_modal }) {
     const setNavbarStyle = (isEmpty) => {
         if (isEmpty) {
             navbarStyle.value = {
-                background: `rgba(0,0,0,0)`,
+                background: `rgba(255,255,255,1)`,
                 color: `rgb(0,0,0)`,
                 borderColor: `rgba(246, 247, 248, 1)`
             }
@@ -169,6 +170,7 @@ export function useVideoIndex({ wil_modal }) {
         }
         await getMovieTv();
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
+            scrollTop.value = 0
             refreshLoading.value = false;
             if (PLATFORM !== 'TV') {
                 wil_modal.value.showModal({
@@ -177,7 +179,7 @@ export function useVideoIndex({ wil_modal }) {
                     confirmColor: "#ff6701",
                     confirm: async () => {
                         let query = {
-                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview/#/question",
                             title: "问题与反馈",
                         };
                         uni.navigateTo({
@@ -197,6 +199,7 @@ export function useVideoIndex({ wil_modal }) {
                 localMovieTvData.value.movie = res;
             })
             .catch(() => {
+                scrollTop.value = 0
                 refreshLoading.value = false;
                 uni.showToast({
                     title: "请填写正确的api_key",
@@ -209,6 +212,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
         setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+        scrollTop.value = 0
         refreshLoading.value = false;
         addOperLog({ title: "WebDAV生成海报墙", businessType: 11, operatorType: 2 });
     };
@@ -236,6 +240,7 @@ export function useVideoIndex({ wil_modal }) {
             })
             return
         }
+        scrollTop.value = 0
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
         let movieMulu = muluData.movie?.filter(v => v.name == selectMedia.value.name)
@@ -384,6 +389,7 @@ export function useVideoIndex({ wil_modal }) {
     const handleGx = async () => {
         let isreload = uni.getStorageSync("isreload");
         if (isreload) {
+            scrollTop.value = 0
             uni.removeStorageSync("isreload");
             sourceList.value = uni.getStorageSync("sourceList");
             if (selectType.value.type == "WebDAV") {
@@ -405,6 +411,7 @@ export function useVideoIndex({ wil_modal }) {
         movieTvData.value = { movie: [], tv: [] };
         await get189MovieTv();
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
+            scrollTop.value = 0
             refreshLoading.value = false;
             if (PLATFORM !== 'TV') {
                 wil_modal.value.showModal({
@@ -413,7 +420,7 @@ export function useVideoIndex({ wil_modal }) {
                     confirmColor: "#ff6701",
                     confirm: async () => {
                         let query = {
-                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview/#/question",
                             title: "问题与反馈",
                         };
                         uni.navigateTo({
@@ -433,6 +440,7 @@ export function useVideoIndex({ wil_modal }) {
                 localMovieTvData.value.movie = res;
             })
             .catch(() => {
+                scrollTop.value = 0
                 refreshLoading.value = false;
                 showDialog.value = true;
                 uni.showToast({
@@ -446,6 +454,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
         setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+        scrollTop.value = 0
         refreshLoading.value = false;
         addOperLog({ title: "天翼云盘生成海报墙", businessType: 11, operatorType: 2 });
     };
@@ -462,6 +471,7 @@ export function useVideoIndex({ wil_modal }) {
             })
             return
         }
+        scrollTop.value = 0
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
         if (movieMulu?.length) {
@@ -518,6 +528,7 @@ export function useVideoIndex({ wil_modal }) {
         movieTvData.value = { movie: [], tv: [] };
         await getQuarkMovieTv(listData.value[0]);
         if (!movieTvData.value.movie.length && !movieTvData.value.tv.length) {
+            scrollTop.value = 0
             refreshLoading.value = false;
             if (PLATFORM !== 'TV') {
                 wil_modal.value.showModal({
@@ -526,7 +537,7 @@ export function useVideoIndex({ wil_modal }) {
                     confirmColor: "#ff6701",
                     confirm: async () => {
                         let query = {
-                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview",
+                            url: CONFIG.BASE_URL.split(":4040")[0] + ":8443/app-webview/#/question",
                             title: "问题与反馈",
                         };
                         uni.navigateTo({
@@ -546,6 +557,7 @@ export function useVideoIndex({ wil_modal }) {
                 localMovieTvData.value.movie = res;
             })
             .catch(() => {
+                scrollTop.value = 0
                 refreshLoading.value = false;
                 showDialog.value = true;
                 uni.showToast({
@@ -559,6 +571,7 @@ export function useVideoIndex({ wil_modal }) {
         refreshData.value.success = localMovieTvData.value.movie.length + localMovieTvData.value.tv.length;
         setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
         uni.setStorageSync("localMovieTvData", localMovieTvData.value);
+        scrollTop.value = 0
         refreshLoading.value = false;
         addOperLog({ title: "夸克网盘生成海报墙", businessType: 11, operatorType: 2 });
     };
@@ -575,6 +588,7 @@ export function useVideoIndex({ wil_modal }) {
             })
             return
         }
+        scrollTop.value = 0
         refreshLoading.value = true;
         let videoFormat = ["mp4", "mkv", "m2ts", "avi", "mov", "ts", "m3u8", "iso"];
         if (movieMulu?.length) {
@@ -632,6 +646,7 @@ export function useVideoIndex({ wil_modal }) {
     //Emby的refresh
     const refreshEmby = async () => {
         const CollectionTypeArr = ['movies', 'tvshows', 'music', 'games', 'books', 'musicvideos', 'homevideos', 'livetv', 'channels']
+        scrollTop.value = 0
         refreshLoading.value = true
         let res1 = await getMainView(selectMedia.value)
         let embyMovieTvList = res1.Items.map(v => {
@@ -662,6 +677,7 @@ export function useVideoIndex({ wil_modal }) {
                 v.list = arr
             }
         }))
+        scrollTop.value = 0
         refreshLoading.value = false
         setNavbarStyle(embyMovieTvList?.length)
         uni.setStorageSync('embyMovieTvList', embyMovieTvList)
@@ -743,6 +759,7 @@ export function useVideoIndex({ wil_modal }) {
         }
         judgeSelect();
         localMovieTvData.value = uni.getStorageSync("localMovieTvData") || {};
+        !localMovieTvData.value?.tv?.length && !localMovieTvData.value?.movie?.length ? scrollTop.value = 0 : ''
         tmdbKey.value = uni.getStorageSync("settingData").tmdbKey || "";
         if (uni.getStorageSync("secondPage") == "videoPlayer") {
             setTimeout(() => {
@@ -794,6 +811,7 @@ export function useVideoIndex({ wil_modal }) {
         } else if (selectType.value.type == "天翼云盘") {
             let isreload = uni.getStorageSync("isreload");
             if (isreload || prevPage == "pages/mobile/backend/data-sync") {
+                scrollTop.value = 0
                 uni.removeStorageSync("isreload");
                 // let res = await get189Folder({ folderId: "-11" }, selectMedia.value);
                 // listData.value = [res.fileListAO];
@@ -804,6 +822,7 @@ export function useVideoIndex({ wil_modal }) {
         } else if (selectType.value.type == "夸克网盘") {
             let isreload = uni.getStorageSync("isreload");
             if (isreload || prevPage == "pages/mobile/backend/data-sync") {
+                scrollTop.value = 0
                 uni.removeStorageSync("isreload");
                 // let res = await getQuarkFolder({ fid: "0" }, selectMedia.value);
                 // listData.value = [res.data];
@@ -814,6 +833,7 @@ export function useVideoIndex({ wil_modal }) {
         } else if (selectType.value.type == 'Emby') {
             let isreload = uni.getStorageSync('isreload')
             if (isreload || prevPage == "pages/mobile/backend/data-sync") {
+                scrollTop.value = 0
                 uni.removeStorageSync("isreload");
                 if (uni.getStorageSync("settingData").tmdbKey) {
                     video_navbar.value.showProgress();
@@ -877,6 +897,6 @@ export function useVideoIndex({ wil_modal }) {
     });
     return {
         video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, navbarStyle,
-        selectType, historyPlay, settingData, refreshVideo, showPage
+        selectType, historyPlay, settingData, scrollTop, refreshVideo, showPage
     }
 }

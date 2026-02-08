@@ -35,7 +35,7 @@ import chilunBlack from '@/static/chilun-black.png'
 import chilunOrange from '@/static/chilun-orange.png'
 import embyBlack from '@/static/emby-black.png'
 import embyOrange from '@/static/emby-orange.png'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import * as CONFIG from '@/utils/config'
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
@@ -74,9 +74,11 @@ const changeTab = item => {
 }
 
 onMounted(() => {
-  sidebarList.value.forEach((item, index) => {
-    item.height = sidebar_list.value.childNodes[index + 1].offsetHeight
-  })
+  setTimeout(() => {
+    sidebarList.value.forEach((item, index) => {
+      item.height = sidebar_list.value.childNodes[index + 1].offsetHeight
+    })
+  },100)
 })
 </script>
 

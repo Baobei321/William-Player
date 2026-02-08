@@ -27,7 +27,7 @@ const options1 = [
     { title: '电影目录设置', icon: dyBlack, path: '/catelog-mulu', query: { title: '电影' } },
 ]
 const options2 = [
-    { title: '问题与反馈', icon: fankuiBlack, path: '/iframe', query: { title: '问题与反馈', url: CONFIG.BASE_URL.split(":4040")[0] + ':8443/app-webview' } },
+    { title: '问题与反馈', icon: fankuiBlack, path: '/iframe', query: { title: '问题与反馈', url: CONFIG.BASE_URL.split(":4040")[0] + ':8443/app-webview/#/question' } },
     { title: '赞赏', icon: zanshangBlack, path: '/appreciate' },
     { title: '其他设置', icon: chilunBlack },
     { title: '关于', icon: guanyuBlack, path: '/about-version' },
