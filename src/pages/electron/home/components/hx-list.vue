@@ -136,12 +136,10 @@ onShow(() => {
         .hxList-title-left {
             display: flex;
             align-items: center;
-
             img {
                 width: 30rpx;
                 height: 30rpx;
             }
-
             span {
                 font-size: 36rpx;
                 font-weight: bold;

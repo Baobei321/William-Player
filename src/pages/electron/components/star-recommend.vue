@@ -58,13 +58,13 @@ const removeExtension = (filename) => {
 
 const toVideoDetail = (item) => {
     router.push({
-        path:'/homeDetail',
-        query:{
-            path:item.path,
-            name:handleSeasonName(item.name,true),
-            type:item.type,
-            source:JSON.stringify(item.source),
-            movieTvId:item.movieTvId
+        path: '/homeDetail',
+        query: {
+            path: item.path,
+            name: handleSeasonName(item.name, true),
+            type: item.type,
+            source: JSON.stringify(item.source),
+            movieTvId: item.movieTvId
         }
     })
 };
@@ -107,6 +107,7 @@ defineExpose({
 });
 
 onShow(() => {
+    //为什么在onShow中呢，是因为可能会清空影片列表，此时也需要更新轮播列表
     classifyList1.value = JSON.parse(JSON.stringify(classifyList));
     let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
     let tv = [];

@@ -1,11 +1,11 @@
 <template>
   <div class="home">
-    <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"> </home-navbar>
+    <home-navbar @refresh="refreshVideo" @pause="pauseRefresh" :refreshData="refreshData" :loading="refreshLoading" ref="video_navbar"></home-navbar>
     <!-- <span @click="openVideo">调试用</span> -->
     <template v-if="!refreshLoading">
       <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
       <div class="home-container">
-        <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend" :initPage="swipeIndex" :showSwiper="showSwiper"></star-recommend>
+        <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend" :showSwiper="showSwiper"></star-recommend>
         <div class="home-container-list">
           <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
           <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"></hx-list>

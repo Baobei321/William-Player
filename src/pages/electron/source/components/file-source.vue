@@ -3,14 +3,16 @@
     <div class="fileSource-item" v-for="item in sourceList" :key="item.type">
       <div class="fileSource-item__title">{{ item.type }}</div>
       <div class="fileSource-item__list">
-        <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list"
-          :key="vitem.name" @click="toPath(vitem)">
-          <div class="list-item-img">
-            <img :src="vitem.img">
+        <template v-for="vitem in item.list" :key="vitem.name">
+          <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" @click="toPath(vitem)"
+            v-if="(vitem.name === 'Emby') === props.isEmby">
+            <div class="list-item-img">
+              <img :src="vitem.img">
+            </div>
+            <div class="list-item-name">{{ vitem.name }}</div>
+            <img :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button">
           </div>
-          <div class="list-item-name">{{ vitem.name }}</div>
-          <img :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button">
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -24,8 +26,11 @@ import icIntoWhite from "@/static/ic-intowhite.png";
 import { toParse, toStringfy } from "@/pages/mobile/mine/common";
 import { onUnload } from "@dcloudio/uni-app";
 
-const theme = ref(uni.getSystemInfoSync().theme);
 
+const props = defineProps({
+  isEmby: { type: Boolean, default: false }
+})
+const theme = ref(uni.getSystemInfoSync().theme);
 const emits = defineEmits(['clickItem'])
 
 const sourceList = ref([

@@ -59,7 +59,8 @@ const isShowPopover = ref(false)
 
 const toSourceList = () => {
     router.push({
-        path: '/sourceList'
+        path: '/sourceList',
+        query: { isEmby: '0' }
     })
 }
 
@@ -177,14 +178,15 @@ defineExpose({
 
 <style lang="scss" scoped>
 @keyframes spin-reverse {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
+
 .home-navbar {
     position: absolute;
     width: 100%;
@@ -207,6 +209,7 @@ defineExpose({
                 margin-left: 0;
             }
         }
+
         .refresh-rotate {
             animation: spin-reverse 1s linear infinite reverse;
         }

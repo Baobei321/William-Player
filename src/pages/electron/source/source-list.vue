@@ -7,7 +7,8 @@
         </wil-title>
         <div class="source-list-container" v-if="show">
             <div class="source-list-item" v-for="item in sourceList" :key="item.type">
-                <template v-if="item.list.length">
+                <template
+                    v-if="item.list.length && (route.query.isEmby === '1' ? item.type === 'Emby' : item.type !== 'Emby')">
                     <div class="source-list-item__title">{{ item.type }}</div>
                     <div class="source-list-item__list">
                         <div :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.active ? 'list-active' : '']"
@@ -61,7 +62,8 @@
             <template #default>
                 <div class="dialog-content">
                     <transition :name="transitionName">
-                        <file-source v-if="showType === 'fileSource'" @click-item="changeFileSource"></file-source>
+                        <file-source v-if="showType === 'fileSource'" @click-item="changeFileSource"
+                            :isEmby="route.query.isEmby === '1'"></file-source>
                         <wil-form :options="state.options" v-model="state.formData" v-else ref="wil_form"></wil-form>
                     </transition>
                 </div>
@@ -281,16 +283,22 @@ const getCookieObject = (cookie) => {
     return cookieObj;
 }
 
-const clearAcitve = () => {
-    sourceList.value.forEach((item) => {
-        item.list.forEach((v) => {
-            v.active = false;
+const clearActive = () => {
+    const isEmby = route.query.isEmby === '1';
+    sourceList.value
+        .filter(item => isEmby
+            ? item.type === 'Emby'
+            : item.type !== 'Emby'
+        )
+        .forEach(item => {
+            item.list.forEach(v => {
+                v.active = false;
+            });
         });
-    });
 };
 
 const resetSelect = (vitem) => {
-    clearAcitve();
+    clearActive();
     vitem.active = true;
     uni.setStorageSync("isreload", true);
     uni.setStorageSync("sourceList", sourceList.value);
