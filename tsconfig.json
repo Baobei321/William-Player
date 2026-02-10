@@ -2,10 +2,11 @@
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "nodenext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "node",
+    "allowJs":true,
+    "moduleResolution": "nodenext",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -22,16 +23,18 @@
       "dom.iterable",
       "scripthost"
     ],
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"  // 如果有自定义类型目录
-    ]
+    // "typeRoots": [
+    //   "./node_modules/@types",
+    //   "./src/types"  // 如果有自定义类型目录
+    // ],
+    "types": ["@dcloudio/types"]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "src/**/*.js",
     "shims-uni.d.ts"  // 明确包含这个文件
   ],
   "exclude": [

@@ -1,55 +1,93 @@
 <template>
-    <div class="video-all">
-      <wil-navbar :title="routerParams.title" :leftShow="true">
-        <template #right>
-          <nut-icon name="more-x" custom-color="#000" size="20" @click="showPopover = true"
-            v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"></nut-icon>
-          <sort-popover :type="mapping[routerParams.title]" v-model="showPopover"
-            @changeSort="changeSort"></sort-popover>
-        </template>
-      </wil-navbar>
-      <div class="video-all-list">
-        <wil-tabs :tabsList="tabList" lineColor="#52b54b" @changeTab="changeTab" v-model="embyActiveTab"
-          v-if="routerParams.type == 'emby' && (routerParams.embyIncludeItemTypes == 'Series' || routerParams.embyIncludeItemTypes == 'Movie')"></wil-tabs>
-        <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
-          idKey="path" listContainerClass="list-container" :pageSize="windowWidth > 700 ? 50 : 12"
-          :changeItemFn="changeItemFn" :listItemStyle="listItemStyle"
-          :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
-          <template #default="item">
-            <div class="video-all-list__item" @click="toVideoDetail(item)">
-              <div class="item-poster">
-                <image :src="(!routerParams.isConnected && !item.loadImg) ? posterEmpty : setEmptyImg(item.poster)"
-                  class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
-                </image>
-              </div>
-              <span class="item-name">{{ removeExtension(item) }}</span>
-              <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
+  <div class="video-all">
+    <wil-navbar :title="routerParams.title" :leftShow="true">
+      <template #right>
+        <nut-icon
+          name="more-x"
+          custom-color="#000"
+          size="20"
+          @click="showPopover = true"
+          v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"
+        ></nut-icon>
+        <sort-popover :type="mapping[routerParams.title]" v-model="showPopover" @changeSort="changeSort"></sort-popover>
+      </template>
+    </wil-navbar>
+    <div class="video-all-list">
+      <wil-tabs
+        :tabsList="tabList"
+        lineColor="#52b54b"
+        @changeTab="changeTab"
+        v-model="embyActiveTab"
+        v-if="routerParams.type == 'emby' && (routerParams.embyIncludeItemTypes == 'Series' || routerParams.embyIncludeItemTypes == 'Movie')"
+      ></wil-tabs>
+      <wil-list
+        :requestFn="getMovieTvList"
+        :request-params="requestParams"
+        ref="wil_list"
+        :refresherEnabled="false"
+        idKey="path"
+        listContainerClass="list-container"
+        :pageSize="windowWidth > 700 ? 50 : 12"
+        :changeItemFn="changeItemFn"
+        :listItemStyle="listItemStyle"
+        :style="{ '--line-number': lineNumber, '--line-height': lineHeight }"
+      >
+        <template #default="item">
+          <div class="video-all-list__item" @click="toVideoDetail(item)">
+            <div class="item-poster">
+              <image
+                :src="!routerParams.isConnected && !item.loadImg ? posterEmpty : setEmptyImg(item.poster)"
+                class="item-poster-image"
+                mode="aspectFill"
+                @error="imgError(item)"
+                @load="imgLoad(item)"
+              ></image>
             </div>
-          </template>
-        </wil-list>
-      </div>
+            <span class="item-name">{{ removeExtension(item) }}</span>
+            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
+          </div>
+        </template>
+      </wil-list>
     </div>
+  </div>
 </template>
 
 <script setup>
-import wilList from "@/components/mobile/wil-list/index.vue";
+import wilList from '@/components/mobile/wil-list/index.vue'
 // import emptyBg from "@/static/empty_bg.png";
-import posterEmpty from "@/static/poster-empty.png";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import sortPopover from "./components/index-component/sort-popover.vue";
-import wilTabs from "@/components/mobile/wil-tabs/index.vue"
-import { ref,onBeforeUnmount } from 'vue'
-import { useVideoAll } from "@/hooks/useVideoAll";
-import { onUnload } from "@dcloudio/uni-app";
+import posterEmpty from '@/static/poster-empty.png'
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import sortPopover from './components/index-component/sort-popover.vue'
+import wilTabs from '@/components/mobile/wil-tabs/index.vue'
+import { ref, onBeforeUnmount } from 'vue'
+import { useVideoAll } from '@/hooks/useVideoAll'
+import { onUnload } from '@dcloudio/uni-app'
 
-const wil_list = ref(null);
+const wil_list = ref(null)
 
 const show = ref(true)
 
-const { routerParams, showPopover, mapping, changeSort, tabList, changeTab,
-  getMovieTvList, requestParams, windowWidth, changeItemFn, listItemStyle, lineNumber, lineHeight, embyActiveTab,
-  toVideoDetail, setEmptyImg, imgError, imgLoad, removeExtension } = useVideoAll({ wil_list })
-
+const {
+  routerParams,
+  showPopover,
+  mapping,
+  changeSort,
+  tabList,
+  changeTab,
+  getMovieTvList,
+  requestParams,
+  windowWidth,
+  changeItemFn,
+  listItemStyle,
+  lineNumber,
+  lineHeight,
+  embyActiveTab,
+  toVideoDetail,
+  setEmptyImg,
+  imgError,
+  imgLoad,
+  removeExtension,
+} = useVideoAll({ wil_list })
 </script>
 
 <style lang="scss" scoped>
