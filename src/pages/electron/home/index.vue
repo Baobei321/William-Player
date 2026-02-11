@@ -48,6 +48,7 @@ const wil_modal = ref(null)
 const showSwiper = ref(true)
 
 let scrollTop = 0
+console.log(uni.getStorageSync('historyPlay'))
 
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, refreshVideo, showPage } = useVideoIndex(
   { wil_modal }
@@ -111,6 +112,8 @@ onUnmounted(() => {
 })
 
 onActivated(() => {
+  console.log(uni.getStorageSync('historyPlay'), 'historyPlay')
+
   let element = document.querySelector('.home-container')
   element.scrollTop = scrollTop
   // setTimeout(() => {

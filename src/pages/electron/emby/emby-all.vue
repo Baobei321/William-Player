@@ -1,9 +1,12 @@
 <template>
   <div class="emby-all">
-    <div class="emby-all-tabs">
-      <nut-radio-group v-model="embyActiveTab" direction="horizontal" @change="changeTab">
-        <nut-radio :label="item.title" shape="button" v-for="item in tabList" :key="item.title">{{ item.title }}</nut-radio>
-      </nut-radio-group>
+    <div class="emby-all-title" :style="{ paddingBottom: tabList.length ? '24rpx' : '0' }">
+      <wil-title :title="String(route.query.title)" :style="{ position: tabList.length ? 'absolute' : 'static' }"></wil-title>
+      <div class="emby-all-tabs" v-if="tabList.length">
+        <nut-radio-group v-model="embyActiveTab" direction="horizontal" @change="changeTab">
+          <nut-radio :label="item.title" shape="button" v-for="item in tabList" :key="item.title">{{ item.title }}</nut-radio>
+        </nut-radio-group>
+      </div>
     </div>
     <wil-list
       :requestFn="getMovieTvList"
@@ -35,13 +38,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import posterEmpty from '@/static/poster-empty.png'
 import wilList from '@/components/mobile/wil-list/index.vue'
 import { useVideoAll } from '@/hooks/useVideoAll'
-import * as CONFIG from '@/utils/config'
-import { handleSeasonName } from '@/utils/scrape.js'
+import wilTitle from '@/components/electron/wil-title/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -81,12 +83,13 @@ const {
 } = useVideoAll({ wil_list, route: route as any }) as any
 
 const handlePushVideoDetail = (item: ListItem) => {
+  const path = route.path === '/embyAll' ? '/embyAll-copy' : '/embyAll'
   if (item.type == 'Genre') {
     router.push({
-      path: '/embyAll',
+      path: path,
       query: {
         title: item.name,
-        embyIncludeItemTypes: 'Genre',
+        embyIncludeItemTypes: 'Genres',
         type: 'emby',
         GenreIds: item.id,
         embyParentId: routerParams.value.embyParentId,
@@ -96,7 +99,7 @@ const handlePushVideoDetail = (item: ListItem) => {
     })
   } else if (item.type == 'Folder') {
     router.push({
-      path: '/embyAll',
+      path: path,
       query: {
         title: item.name,
         embyIncludeItemTypes: 'Folder',
@@ -112,25 +115,43 @@ const handlePushVideoDetail = (item: ListItem) => {
     // })
   }
 }
+onBeforeMount(() => {
+  console.log('初始化进入')
+})
 </script>
 
 <style lang="scss" scoped>
 .emby-all {
   width: 100%;
   height: 100%;
-  .emby-all-tabs {
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  .emby-all-title {
+    position: relative;
     display: flex;
+    align-items: center;
     justify-content: center;
-    :deep(.nut-radio-group) {
-      .nut-radio--button {
-        .nut-radio__button {
-          cursor: pointer;
-          padding: 16rpx 46rpx;
-          font-size: 32rpx;
-          font-weight: bold;
-          &::after {
-            display: none;
+    :deep(.wil-title) {
+      z-index: 1;
+      left: 0;
+    }
+    .emby-all-tabs {
+      // width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9;
+      :deep(.nut-radio-group) {
+        .nut-radio--button {
+          margin-bottom: 0;
+          .nut-radio__button {
+            cursor: pointer;
+            padding: 16rpx 46rpx;
+            font-size: 32rpx;
+            font-weight: bold;
+            &::after {
+              display: none;
+            }
           }
         }
       }
@@ -138,8 +159,9 @@ const handlePushVideoDetail = (item: ListItem) => {
   }
 
   :deep(.load-list) {
-    height: 100%;
+    // height: 100%;
     overflow: hidden;
+    flex: 1;
 
     .list-container {
       display: flex;

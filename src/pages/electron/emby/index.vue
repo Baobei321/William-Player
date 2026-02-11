@@ -1,7 +1,9 @@
 <template>
   <div class="emby">
+    <home-navbar :showRefresh="false" :isEmby="true" ref="video_navbar"></home-navbar>
     <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
     <div class="emby-list">
+      <recent-played v-if="historyPlay.length" :listData="historyPlay" type="emby"></recent-played>
       <div class="emby-media">
         <div class="emby-media-title">
           <img :src="embyIcon" />
@@ -24,21 +26,24 @@ import { ref } from 'vue'
 import underImg from '../components/under-img.vue'
 import emptyBg from '@/static/poster-empty.png'
 import hxList from '../home/components/hx-list.vue'
+import homeNavbar from '../home/components/navbar.vue'
+import recentPlayed from '../home/components/recent-played.vue'
 import { useRouter } from 'vue-router'
-interface ClassifyItem {
-  id: number | string
-  poster: string
-  name: string
-  collectionType: string
-  [key: string]: any
-}
-
+import { getMainView, getEmbyList, getEmbyNewList, getHistoryList } from '@/utils/emby'
+import { onShow } from '@dcloudio/uni-app'
+import type { EmbyCollectionItem, ProcessedCollectionItem, EmbyQueryParams, ClassifyItem, SourceList, HistoryItem } from './types'
+import dayjs from 'dayjs'
 const router = useRouter()
 
 const underImgArr = ref<string[]>([])
 const swipeIndex = ref(0)
 const leave = ref(false)
 const showList = ref<ClassifyItem[]>([])
+const sourceList = ref<SourceList[]>([])
+const selectType = ref<Partial<SourceList>>({})
+const selectMedia = ref<Record<string, any>>({})
+const historyPlay = ref<HistoryItem[]>([])
+
 let timer: ReturnType<typeof setInterval> | null = null
 
 const embyIcon: string = 'https://emby.media/support/images/logo.png'
@@ -90,13 +95,106 @@ const clickAll = (item: ClassifyItem) => {
     'tvshows': 'Series',
     'movies': 'Movie',
   }
-  router.push({})
-  uni.navigateTo({
-    url: `/pages/mobile/video/video-all?title=${item.name}&type=emby&embyParentId=${item.id}&embyIncludeItemTypes=${typeMapping[item.collectionType as keyof typeof typeMapping]}&isConnected1=true`,
+  router.push({
+    path: '/embyAll',
+    query: {
+      title: item.name,
+      type: 'emby',
+      embyParentId: item.id,
+      embyIncludeItemTypes: typeMapping[item.collectionType as keyof typeof typeMapping],
+      isConnected1: 'true',
+    },
   })
+}
+//判断选择的是哪个emby
+const judgeSelect = () => {
+  sourceList.value = uni.getStorageSync('sourceList') || []
+  const embySource = sourceList.value.find(item => item.type === 'Emby')
+  if (!embySource?.list) {
+    selectType.value = {}
+    return
+  }
+  const activeItem = embySource.list.find(item => item.active)
+  if (activeItem) {
+    selectMedia.value = activeItem
+    selectType.value = embySource
+  } else {
+    selectType.value = {}
+  }
+}
+//Emby的refresh
+const refreshEmby = async (): Promise<void> => {
+  const CollectionTypeArr = ['movies', 'tvshows', 'music', 'games', 'books', 'musicvideos', 'homevideos', 'livetv', 'channels']
+  let res1 = await getMainView(selectMedia.value)
+  let embyMovieTvList = res1.Items.map((v: EmbyCollectionItem) => {
+    return {
+      name: v.Name,
+      collectionType: v.CollectionType,
+      poster: v?.ImageTags?.Primary
+        ? `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${v.Id}/Images/Primary?tag=${v.ImageTags.Primary}`
+        : emptyBg,
+      id: v.Id,
+      list: [],
+    }
+  })
+  let embyObj: EmbyQueryParams = {
+    EnableImageTypes: 'Primary,Backdrop,Thumb',
+    Fields: 'BasicSyncInfo,CanDelete,Container,PrimaryImageAspectRatio,ProductionYear,Status,EndDate,Prefix',
+    MediaTypes: 'Video',
+    Limit: '20',
+    Recursive: true,
+    ImageTypeLimit: '1',
+  }
+  await Promise.all(
+    embyMovieTvList.map(async (v: ProcessedCollectionItem) => {
+      if (CollectionTypeArr.includes(v.collectionType)) {
+        embyObj.ParentId = v.id
+        let res2 = await getEmbyNewList(embyObj, selectMedia.value)
+        let arr = res2.map((i: EmbyCollectionItem) => {
+          return {
+            id: i.Id,
+            name: i.Name,
+            provider: 'Emby',
+            releaseTime: dayjs(i.EndDate).format('YYYY-MM-DD'),
+            poster: i?.ImageTags?.Primary
+              ? `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${i.Id}/Images/Primary?tag=${i.ImageTags.Primary}`
+              : emptyBg,
+          }
+        })
+        v.list = arr
+      }
+    })
+  )
+  uni.setStorageSync('embyMovieTvList', embyMovieTvList)
+}
+
+//获取历史播放记录
+const getHistoryEmby = async (): Promise<void> => {
+  let embyObj: EmbyQueryParams = {
+    EnableImageTypes: 'Primary,Backdrop,Thumb',
+    Fields: 'BasicSyncInfo,CanDelete,PrimaryImageAspectRatio,ProductionYear',
+    MediaTypes: 'Video',
+    Limit: '1000',
+    Recursive: true,
+    ImageTypeLimit: '1',
+  }
+  let res = await getHistoryList(embyObj, selectMedia.value)
+  historyPlay.value = res.rows
 }
 setUnderImg()
 setShowList()
+judgeSelect()
+getHistoryEmby()
+refreshEmby()
+// onShow(() => {
+//   let isreload = uni.getStorageSync('isreload')
+//   if (isreload) {
+//     uni.removeStorageSync('isreload')
+//     if (uni.getStorageSync('settingData').tmdbKey) {
+//       refreshEmby()
+//     }
+//   }
+// })
 </script>
 
 <style lang="scss" scoped>
@@ -115,6 +213,17 @@ setShowList()
     height: 100%;
     overflow: auto;
     padding: 100rpx;
+    :deep(.recent-played) {
+      position: relative;
+      z-index: 99;
+      .recent-played-title {
+        .recent-played-title-right {
+          span {
+            color: rgb(82, 181, 75);
+          }
+        }
+      }
+    }
     .emby-media {
       position: relative;
       z-index: 99;
@@ -142,6 +251,7 @@ setShowList()
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
+        margin-top: 24rpx;
 
         .emby-media-list__item {
           margin-left: 24rpx;

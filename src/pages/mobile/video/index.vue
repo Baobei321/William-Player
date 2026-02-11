@@ -10,7 +10,8 @@
       ref="video_navbar"
       :tmdbKey1="tmdbKey"
       @getHeight="getNavbarHeight"
-      :class="['navbar-transparent', refreshLoading ? 'navbar-white' : '']"></video-navbar>
+      :class="['navbar-transparent', refreshLoading ? 'navbar-white' : '']"
+    ></video-navbar>
     <template v-if="isConnected">
       <Skeleton v-if="refreshLoading"></Skeleton>
       <template v-else>
@@ -53,8 +54,13 @@
     <div class="video-nowifi" v-else>
       <wil-empty type="wifi" text="网络已断开，请检查网络连接"></wil-empty>
     </div>
-    <wil-upgrade :updateFunction="getAppUpdateInfo" :logo="upgradeInfo.logo" :app-name="upgradeInfo.appName" :enableControl="true" :appVersion="CONFIG.VERSIOIN">
-    </wil-upgrade>
+    <wil-upgrade
+      :updateFunction="getAppUpdateInfo"
+      :logo="upgradeInfo.logo"
+      :app-name="upgradeInfo.appName"
+      :enableControl="true"
+      :appVersion="CONFIG.VERSIOIN"
+    ></wil-upgrade>
     <wil-modal ref="wil_modal"></wil-modal>
     <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
   </div>

@@ -1,78 +1,78 @@
 <template>
   <div class="fileSource">
     <div class="fileSource-item" v-for="item in sourceList" :key="item.type">
-      <div class="fileSource-item__title">{{ item.type }}</div>
-      <div class="fileSource-item__list">
-        <template v-for="vitem in item.list" :key="vitem.name">
-          <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" @click="toPath(vitem)"
-            v-if="(vitem.name === 'Emby') === props.isEmby">
-            <div class="list-item-img">
-              <img :src="vitem.img">
+      <template v-if="props.isEmby ? item.type === '网络存储' : true">
+        <div class="fileSource-item__title">{{ item.type }}</div>
+        <div class="fileSource-item__list">
+          <template v-for="vitem in item.list" :key="vitem.name">
+            <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" @click="toPath(vitem)" v-if="(vitem.name === 'Emby') === props.isEmby">
+              <div class="list-item-img">
+                <img :src="vitem.img" />
+              </div>
+              <div class="list-item-name">{{ vitem.name }}</div>
+              <img :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button" />
             </div>
-            <div class="list-item-name">{{ vitem.name }}</div>
-            <img :src="theme == 'dark' ? icIntoWhite : icIntoBlack" class="list-item-button">
-          </div>
-        </template>
-      </div>
+          </template>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from "vue";
-import webdavFileIcon from "@/static/webdav-fileIcon.png";
-import icIntoBlack from "@/static/ic-intoblack.png";
-import icIntoWhite from "@/static/ic-intowhite.png";
-import { toParse, toStringfy } from "@/pages/mobile/mine/common";
-import { onUnload } from "@dcloudio/uni-app";
-
+import { ref, onBeforeMount } from 'vue'
+import webdavFileIcon from '@/static/webdav-fileIcon.png'
+import icIntoBlack from '@/static/ic-intoblack.png'
+import icIntoWhite from '@/static/ic-intowhite.png'
+import { toParse, toStringfy } from '@/pages/mobile/mine/common'
+import { onUnload } from '@dcloudio/uni-app'
 
 const props = defineProps({
-  isEmby: { type: Boolean, default: false }
+  isEmby: { type: Boolean, default: false },
 })
-const theme = ref(uni.getSystemInfoSync().theme);
+const theme = ref(uni.getSystemInfoSync().theme)
 const emits = defineEmits(['clickItem'])
 
 const sourceList = ref([
   {
-    type: "网络存储",
+    type: '网络存储',
     list: [
       {
-        name: "WebDAV",
+        name: 'WebDAV',
         img: webdavFileIcon,
       },
       {
-        name: "Emby",
-        img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc",
+        name: 'Emby',
+        img: 'https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc',
       },
     ],
   },
   {
-    type: "云盘存储",
+    type: '云盘存储',
     list: [
       {
-        name: "天翼云盘",
-        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
+        name: '天翼云盘',
+        img: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png',
       },
       {
-        name: "夸克网盘",
-        img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
+        name: '夸克网盘',
+        img: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?',
       },
     ],
   },
-]);
+])
 
-const toPath = (vitem) => {
+const toPath = vitem => {
   emits('clickItem', vitem)
-};
+}
 const changeTheme = () => {
-  theme.value = uni.getSystemInfoSync().theme;
-};
-uni.onThemeChange(changeTheme);
+  theme.value = uni.getSystemInfoSync().theme
+}
+uni.onThemeChange(changeTheme)
 
 onUnload(() => {
-  uni.offThemeChange(changeTheme);
-});
+  uni.offThemeChange(changeTheme)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -191,4 +191,5 @@ page {
 //       }
 //     }
 //   }
-// }</style>
+// }
+</style>

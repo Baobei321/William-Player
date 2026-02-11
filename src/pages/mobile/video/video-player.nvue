@@ -20,8 +20,8 @@
           @getorientation="getOrientation"
           @ontv="castTv"
           :style="{ width: '750rpx', height: videoHeight }"
-          ref="video_view">
-        </video-view>
+          ref="video_view"
+        ></video-view>
         <tv-button v-if="showTvButton" :style="{ width: '750rpx', height: videoHeight }" @setTvButton="setTvButton" @changeTv="castTv"></tv-button>
       </view>
       <view v-else>
@@ -38,7 +38,8 @@
           style="width: 750rpx; height: 580rpx"
           @timeupdate="setHistory"
           @pause="pauseVideo"
-          v-if="config.url && !showReload"></video>
+          v-if="config.url && !showReload"
+        ></video>
         <button class="video-button" v-if="showReload" @click="reloadVideo">
           <text style="color: #fff">重新加载</text>
         </button>
@@ -54,8 +55,8 @@
       :path="historyObj.path"
       @changeVideo="changeVideo"
       @resetTv="resetTv"
-      v-if="routerParams.noSetHistory != 0">
-    </player-detail>
+      v-if="routerParams.noSetHistory != 0"
+    ></player-detail>
     <tv-select ref="tv_select" :videoUrl="config.url" :initialTime="historyObj.initialTime" @setTvButton="setTvButton" @playOrPause="playOrPauseVideo"></tv-select>
   </view>
 </template>
