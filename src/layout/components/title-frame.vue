@@ -1,6 +1,6 @@
 <template>
   <!-- 此为electron的标题组件，用户隐藏放大和关闭还有拖拽的功能 -->
-  <div class="title-frame">
+  <div :class="['title-frame', blackRoute.includes(route.path) ? 'title-black' : '']">
     <div class="title-frame-logo">
       <img src="@/static/app-logo1.png" />
       <span>William Player</span>
@@ -31,6 +31,7 @@ const route = useRoute()
 const isMaxWindow = ref(false) //是否最大化
 
 const notShowSize = ['/login', '/entry'] //不显示放大按钮的路由
+const blackRoute = ['/video'] //显示黑色背景的路由
 
 const windowAction = action => {
   if (action === 'window-maximize') {
@@ -55,6 +56,7 @@ const windowAction = action => {
       display: block;
       width: 60rpx;
       height: 60rpx;
+      border-radius: 20rpx;
     }
     span {
       font-size: 36rpx;
@@ -95,6 +97,21 @@ const windowAction = action => {
             fill: #fff;
           }
         }
+      }
+    }
+  }
+}
+.title-black {
+  background: #000000;
+  .title-frame-logo {
+    span {
+      color: #ffffff;
+    }
+  }
+  .title-frame-button {
+    :deep(.wil-svg) {
+      use {
+        fill: #ffffff;
       }
     }
   }

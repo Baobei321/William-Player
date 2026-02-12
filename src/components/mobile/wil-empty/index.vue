@@ -1,17 +1,32 @@
 <template>
   <div class="wil-empty">
-    <image src="@/static/no-data.png" v-if="props.type === 'data'"></image>
-    <image src="@/static/no-wifi.png" v-else-if="props.type === 'wifi'"></image>
-    <image src="https://oss-dev.quectel.com/group1/2026/02/05/285dbe9fc33f432383f23548c4488ed8.png" v-else-if="props.type === 'permission'"></image>
+    <image :src="imageMapping[props.type]"></image>
     <span>{{ props.text }}</span>
   </div>
 </template>
 
 <script setup>
+import noData from '@/static/no-data.png'
 const props = defineProps({
   text: { type: String, default: '' },
   type: { type: String, default: 'data' },
 })
+
+const imageMapping = {
+  data: noData,
+  car: 'https://ps.ssl.qhimg.com/t027251a15cc0e30e3e.jpg',
+  comment: 'https://uview-plus.jiangruyi.com/uview/empty/comment.png',
+  coupon: 'https://uview-plus.jiangruyi.com/uview/empty/coupon.png',
+  history: 'https://uview-plus.jiangruyi.com/uview/empty/history.png',
+  list: 'https://uview-plus.jiangruyi.com/uview/empty/list.png',
+  message: 'https://uview-plus.jiangruyi.com/uview/empty/message.png',
+  news: 'https://uview-plus.jiangruyi.com/uview/empty/news.png',
+  order: 'https://uview-plus.jiangruyi.com/uview/empty/order.png',
+  page: 'https://uview-plus.jiangruyi.com/uview/empty/page.png',
+  permission: 'https://uview-plus.jiangruyi.com/uview/empty/permission.png',
+  search: 'https://uview-plus.jiangruyi.com/uview/empty/search.png',
+  wifi: 'https://uview-plus.jiangruyi.com/uview/empty/wifi.png',
+}
 </script>
 
 <style lang="scss" scoped>

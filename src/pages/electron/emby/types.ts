@@ -118,9 +118,8 @@ export type ActorListInstance = {
 export type HistoryItem = {
   initialTime: number
   ji?: string
-  movieTvId: string
+  folderFileId: string
   name: string
-  path: string
   poster: string
   runtime: string
   sourceName: string

@@ -1,14 +1,14 @@
 <template>
-  <nut-transition :show="show" name="fade" :duration="200" style="position: fixed;z-index: 9999;">
+  <nut-transition :show="show" name="fade" :duration="200" style="position: fixed; z-index: 9999">
     <div :class="['wil-modal']">
-      <div :class="['wil-modal-top',$slots.default?'':'wil-modal-height']">
-        <div class="wil-modal-title">{{data.title}}</div>
+      <div :class="['wil-modal-top', $slots.default ? '' : 'wil-modal-height']">
+        <div class="wil-modal-title">{{ data.title }}</div>
         <slot v-if="$slots.default"></slot>
-        <div class="wil-modal-content" v-else>{{data.content}}</div>
+        <div class="wil-modal-content" v-else>{{ data.content }}</div>
       </div>
       <div class="wil-modal-button">
-        <div class="wil-modal-button__cancel" :style="{color:theme=='light'?data.cancelColor:'#fff'}" @click="cancel">{{ data.cancelText }}</div>
-        <div class="wil-modal-button__confirm" :style="{color:data.confirmColor}" @click="confirm">{{ data.confirmText }}</div>
+        <div class="wil-modal-button__cancel" :style="{ color: data.cancelColor }" @click="cancel">{{ data.cancelText }}</div>
+        <div class="wil-modal-button__confirm" :style="{ color: data.confirmColor }" @click="confirm">{{ data.confirmText }}</div>
       </div>
     </div>
     <div :class="['wil-overlay']"></div>
@@ -16,51 +16,51 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
+import { ref, nextTick } from 'vue'
 
 const props = defineProps({
-  title: { type: String, default: "温馨提示" },
-  content: { type: String, default: "是否退出登录" },
-  confirmText: { type: String, default: "确定" },
-  confirmColor: { type: String, default: "#00B2A0" },
-  cancelText: { type: String, default: "取消" },
-  cancelColor: { type: String, default: "#000" },
+  title: { type: String, default: '温馨提示' },
+  content: { type: String, default: '是否退出登录' },
+  confirmText: { type: String, default: '确定' },
+  confirmColor: { type: String, default: '#00B2A0' },
+  cancelText: { type: String, default: '取消' },
+  cancelColor: { type: String, default: '#000' },
   confirm: { type: Function, default: () => {} },
   cancel: { type: Function, default: () => {} },
-});
+})
 
-const theme = ref(uni.getSystemInfoSync().theme);
+const theme = ref(uni.getSystemInfoSync().theme)
 
-const data = ref({}); //由于app端无法引入这个方法使用，所以还是使用组件的形式
+const data = ref({}) //由于app端无法引入这个方法使用，所以还是使用组件的形式
 
-const show = ref(false);
+const show = ref(false)
 const changeTheme = () => {
-  theme.value = uni.getSystemInfoSync().theme;
-};
-const showModal = (obj) => {
-  data.value = { ...data.value, ...props, ...obj };
-  show.value = true;
-  uni.onThemeChange(changeTheme);
-};
+  theme.value = uni.getSystemInfoSync().theme
+}
+const showModal = obj => {
+  data.value = { ...data.value, ...props, ...obj }
+  show.value = true
+  uni.onThemeChange(changeTheme)
+}
 
 const cancel = () => {
-  show.value = false;
-  uni.offThemeChange(changeTheme);
+  show.value = false
+  uni.offThemeChange(changeTheme)
   setTimeout(() => {
-    data.value.cancel();
-  }, 200);
-};
+    data.value.cancel()
+  }, 200)
+}
 
 const confirm = () => {
-  show.value = false;
-  uni.offThemeChange(changeTheme);
+  show.value = false
+  uni.offThemeChange(changeTheme)
   setTimeout(() => {
-    data.value.confirm();
-  }, 200);
-};
+    data.value.confirm()
+  }, 200)
+}
 defineExpose({
   showModal,
-});
+})
 </script>
 
 <style lang="scss" scoped>

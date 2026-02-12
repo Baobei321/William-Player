@@ -1,23 +1,26 @@
 <template>
   <div class="emby">
     <home-navbar :showRefresh="false" :isEmby="true" ref="video_navbar"></home-navbar>
-    <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
-    <div class="emby-list">
-      <recent-played v-if="historyPlay.length" :listData="historyPlay" type="emby"></recent-played>
-      <div class="emby-media">
-        <div class="emby-media-title">
-          <img :src="embyIcon" />
-          <span>我的媒体</span>
-        </div>
-        <div class="emby-media-list">
-          <div class="emby-media-list__item" v-for="item in classifyList" :key="item.id">
-            <img :src="setEmptyImg(item.poster)" />
-            <span>{{ item.name }}</span>
+    <template v-if="classifyList?.length">
+      <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
+      <div class="emby-list">
+        <recent-played v-if="historyPlay.length" :listData="historyPlay" type="emby"></recent-played>
+        <div class="emby-media" v-if="classifyList?.length">
+          <div class="emby-media-title">
+            <img :src="embyIcon" />
+            <span>我的媒体</span>
+          </div>
+          <div class="emby-media-list">
+            <div class="emby-media-list__item" v-for="item in classifyList" :key="item.id">
+              <img :src="setEmptyImg(item.poster)" />
+              <span>{{ item.name }}</span>
+            </div>
           </div>
         </div>
+        <hx-list :listData="item.list" :title="item.name" v-for="item in showList" :key="item.id" type="emby" @clickAll="clickAll(item)"></hx-list>
       </div>
-      <hx-list :listData="item.list" :title="item.name" v-for="item in showList" :key="item.id" type="emby" @clickAll="clickAll(item)"></hx-list>
-    </div>
+    </template>
+    <wil-empty type="data" v-else text="暂无数据"></wil-empty>
   </div>
 </template>
 
@@ -28,6 +31,7 @@ import emptyBg from '@/static/poster-empty.png'
 import hxList from '../home/components/hx-list.vue'
 import homeNavbar from '../home/components/navbar.vue'
 import recentPlayed from '../home/components/recent-played.vue'
+import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import { useRouter } from 'vue-router'
 import { getMainView, getEmbyList, getEmbyNewList, getHistoryList } from '@/utils/emby'
 import { onShow } from '@dcloudio/uni-app'
@@ -289,6 +293,13 @@ refreshEmby()
       position: relative;
       z-index: 99;
     }
+  }
+  :deep(.wil-empty) {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

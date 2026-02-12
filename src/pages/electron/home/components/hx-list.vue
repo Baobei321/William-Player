@@ -2,7 +2,7 @@
   <div class="hxList" ref="hx_list">
     <div class="hxList-title">
       <div class="hxList-title-left">
-        <img v-if="props.type == 'emby'" src="https://emby.media/support/images/logo.png" />
+        <img v-if="props.type == 'emby'" src="https://emby.media/support/images/logo.png" draggable="false" />
         <span>{{ props.title }}</span>
       </div>
       <div class="hxList-title-right" @click="toVideoAll">
@@ -20,6 +20,7 @@
               style="object-fit: cover"
               @error="imgError(item)"
               @load="imgLoad(item)"
+              draggable="false"
             />
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
             <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>

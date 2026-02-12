@@ -48,6 +48,8 @@ import { handleSecond, parseTime, handleSeasonName } from '@/utils/scrape'
 import { onShow } from '@dcloudio/uni-app'
 import emptyBg from '@/static/empty_bg.png'
 import { toStringfy } from '@/pages/mobile/mine/common'
+import { ipc } from '@/utils/ipcRenderer'
+import { ipcApiRoute } from '@/utils/ipcApiRoute'
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -60,19 +62,6 @@ const scrollData = ref([])
 const selectType = ref({})
 const selectMedia = ref({})
 
-//判断选择的是webdav还是天翼云盘还是夸克
-const judgeSelect = () => {
-  let sourceList = uni.getStorageSync('sourceList')
-  selectType.value = sourceList.find(item => {
-    let select = item.list.find(i => i.active)
-    if (select) {
-      selectMedia.value = select
-      return true
-    } else {
-      return false
-    }
-  })
-}
 const setEmptyImg = poster => {
   if (poster) {
     return poster
@@ -96,6 +85,23 @@ const getMovieName = val => {
   return name
 }
 
+//判断选择的是哪个emby
+const judgeSelect = () => {
+  let sourceList = uni.getStorageSync('sourceList') || []
+  const embySource = sourceList.find(item => (props.type === 'emby') === (item.type === 'Emby'))
+  if (!embySource?.list) {
+    selectType.value = {}
+    return
+  }
+  const activeItem = embySource.list.find(item => item.active)
+  if (activeItem) {
+    selectMedia.value = activeItem
+    selectType.value = embySource
+  } else {
+    selectType.value = {}
+  }
+}
+
 //将点击了的视频放置到数组的第一个去
 const setItemFirst = item => {
   let index = null
@@ -117,20 +123,35 @@ const setItemFirst = item => {
 
 const toVideoPlayer = async item => {
   uni.setStorageSync('secondPage', 'videoPlayer')
+  let args = {
+    type: 'vue',
+    content: '/video',
+    windowName: 'Video',
+    windowTitle: `正在播放：`,
+    opusId: '1',
+    windowsOption: {
+      frame: false,
+      width: 1358,
+      height: 841,
+      backgroundColor: '#000000',
+    },
+    query: {
+      path: item.path,
+      type: 'movie',
+      isEmby: true,
+    },
+  }
   if (item.type == 'movie') {
     if (selectType.value.type == 'WebDAV') {
-      uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&type=movie`,
-        success: () => {
-          setItemFirst(item)
-        },
+      ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+        setItemFirst(item)
       })
     } else {
-      uni.navigateTo({
-        url: `/pages/mobile/video/video-player?path=${item.path}&folderFileId=${item.folderFileId}&type=movie`,
-        success: () => {
+      args.query.folderFileId = item.folderFileId
+      ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+        if (selectType.value.type !== 'Emby') {
           setItemFirst(item)
-        },
+        }
       })
     }
   } else if (item.type == 'tv') {

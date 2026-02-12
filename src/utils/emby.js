@@ -237,8 +237,7 @@ const getHistoryList = async (data, selectMedia) => {
   const arr = res.Items.map(item => {
     let obj = {
       name: item.Name,
-      path: '',
-      movieTvId: '',
+      folderFileId: item.Id,
       poster: `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${item.Type === 'Movie' ? item.Id : item.SeriesId}/Images/Backdrop?tag=${item.BackdropImageTags?.[0] || item.ParentBackdropImageTags?.[0]}`,
       runtime: formatSecondTime(item.RunTimeTicks),
       sourceName: selectMedia.name,
