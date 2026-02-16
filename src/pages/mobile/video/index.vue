@@ -239,6 +239,23 @@ uni.onNetworkStatusChange(listenerNetwork)
 onUnload(() => {
   uni.offNetworkStatusChange(listenerNetwork)
 })
+
+//用于在本地设置cookie，然后hbuilderx调试app可用
+const setLocalCookie = () => {
+  let sourceList = uni.getStorageSync('sourceList')
+  let cloudQuark = sourceList.find(item => {
+    return item.type == '夸克网盘'
+  })
+  cloudQuark.list = [
+    {
+      name: '测试夸克cookie',
+      active: true,
+      Cookie:
+        '_UP_A4A_11_=wb9cc1ef4c7c4ec2a41163e7a4211c4a; b-user-id=44c01048-09c6-b739-5b00-344176216f9c; tfstk=goYjKm0_L-2jFKxdcNlzALwdrybwhbuEh519tCU46ZQv6N95UsrqmGk6VdpPHr7YDTE11p6OMNCOezChkGxVQtW15CvBcvuE8IAcSZHEL28QllhPSO3NW07RuPWBrvuE8InAiNR-LnrbsWB56NFYkGh52sW8DopOHgeRO6bOBdpTwaC1MPUOHoF-N1XRBNQ9BQh5_TBOWNp9wXTEF_mfHIGHo7Q8NAGXITaTWU1RI9d5R_fkPssfp2X7WGT5Gi6pgExDlyCJzUsF45k1yBxyH__IlJfX2B_A1FcLfOs6oa19h2VCeEO6Pixz9ydWNCKFVUlK-Z_AHh7D_WM2NE92iUOa6o96YKxhfFHbRTLD4EjHuYUfJHAVuhpKUoWvA1IPfyWQfbr_NM4ONocSNlqMPW-U1-SNkJSAZ_8ENbwbjJ4T7uYZNlEVD_fyBbG7hR1..; isg=BKqqBk_2t3zYtzTnAT586ip4-BBMGy51dVbJzjRjfv2IZ0ohHKibhfLc8xP7jKYN; _UP_30C_6A_=st9cf620130wm88gm1n67yg8a8bxiojk; _UP_TS_=sg10bec6e1e2e7f1f4af3afa125678dbc58; _UP_E37_B7_=sg10bec6e1e2e7f1f4af3afa125678dbc58; _UP_TG_=st9cf620130wm88gm1n67yg8a8bxiojk; _UP_335_2B_=1; _UP_D_=pc; __pus=99bcaa02cda155a9c2b4f1552ecc2404AARnS7inN7ZjK7lWGm5n0wgnxwF9qfXVQq5qRqheDvX0A8DRRSWEvhsQfY2Rupwr9zy/Q5jMADI2JNRtGA3Aco//; __kp=71daf5f0-0b15-11f1-845c-5bcb4f0f72f5; __kps=AAQaI3zfwkdNODBzRZfHJttU; __ktd=O9xHWjWcFWLVdWjKUhdLbA==; __uid=AAQaI3zfwkdNODBzRZfHJttU; __puus=dace061c4c385de9e0f9f6519c3ae1f3AAQD5/l6Y+t2gtVZs5rSKdurR/VU1uiE2S3sfCJGn/blW+wj3Y0Pf6QNyufgNpMa84jpSUW73jKxQcSHQM2MjXjnrX9mnEHDRFrCzI+OIMZ+hv84Rl/ViaL2UT4+dousuNe4I8j0BXrMQFWt5c7yEbfE3UNx8NJ1tvySecCtZ8lUNwf0KYpCces7GDiidJD8QCNk/TLQfK0YSA8Mx71W7tFy',
+    },
+  ]
+  uni.setStorageSync('sourceList', sourceList)
+}
 </script>
 
 <style lang="scss" scoped>

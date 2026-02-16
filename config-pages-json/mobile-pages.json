@@ -53,12 +53,6 @@
       }
     },
     {
-      "path": "pages/mobile/live/player",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
       "path": "pages/mobile/live/list",
       "style": {
         "navigationBarTitleText": "直播列表"

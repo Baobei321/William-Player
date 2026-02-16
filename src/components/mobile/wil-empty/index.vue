@@ -14,18 +14,17 @@ const props = defineProps({
 
 const imageMapping = {
   data: noData,
-  car: 'https://ps.ssl.qhimg.com/t027251a15cc0e30e3e.jpg',
-  comment: 'https://uview-plus.jiangruyi.com/uview/empty/comment.png',
-  coupon: 'https://uview-plus.jiangruyi.com/uview/empty/coupon.png',
-  history: 'https://uview-plus.jiangruyi.com/uview/empty/history.png',
-  list: 'https://uview-plus.jiangruyi.com/uview/empty/list.png',
-  message: 'https://uview-plus.jiangruyi.com/uview/empty/message.png',
-  news: 'https://uview-plus.jiangruyi.com/uview/empty/news.png',
-  order: 'https://uview-plus.jiangruyi.com/uview/empty/order.png',
-  page: 'https://uview-plus.jiangruyi.com/uview/empty/page.png',
-  permission: 'https://uview-plus.jiangruyi.com/uview/empty/permission.png',
-  search: 'https://uview-plus.jiangruyi.com/uview/empty/search.png',
-  wifi: 'https://uview-plus.jiangruyi.com/uview/empty/wifi.png',
+  car: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/969326bb155d49c6acdd3ff619624831.png',
+  comment: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/4016874cd79149a5bfb3880e2637439c.png',
+  coupon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/2eee878e50fa42b4b2497be026d69a9b.png',
+  history: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/459730bee7f44bc08a0120b5c726b1ac.png',
+  list: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/c9eb338576984175afb61ff3f65b1bee.png',
+  message: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/f7062dbdcd4648328e1701d5ba0fefef.png',
+  order: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/611f3eca20304a1dae76778b1f5dc553.png',
+  page: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/4b76ab4c3acf4bbea2311e288a02575d.png',
+  permission: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/edf7e5008bae4d6cb24c307ac5872e91.png',
+  search: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/d09fde259d8f4a1d9c261cb204d5851b.png',
+  wifi: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/bec8b886737c4fe0b634f0b411ad34cc.png',
 }
 </script>
 
