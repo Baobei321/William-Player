@@ -7,6 +7,7 @@
 
 <script setup>
 import noData from '@/static/no-data.png'
+import noWifi from '@/static/wifi.png'
 const props = defineProps({
   text: { type: String, default: '' },
   type: { type: String, default: 'data' },
@@ -24,7 +25,7 @@ const imageMapping = {
   page: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/4b76ab4c3acf4bbea2311e288a02575d.png',
   permission: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/edf7e5008bae4d6cb24c307ac5872e91.png',
   search: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/d09fde259d8f4a1d9c261cb204d5851b.png',
-  wifi: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/02/16/bec8b886737c4fe0b634f0b411ad34cc.png',
+  wifi: noWifi,
 }
 </script>
 
