@@ -57,6 +57,12 @@ const constantRoutes = [
         meta: { title: '所有' },
       },
       {
+        path: 'search',
+        component: () => import('@/pages/electron/search/index'),
+        name: 'Search',
+        meta: { title: '搜索' },
+      },
+      {
         path: 'embyAll',
         component: () => import('@/pages/electron/emby/emby-all'),
         name: 'EmbyAll',

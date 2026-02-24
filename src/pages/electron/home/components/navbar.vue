@@ -1,7 +1,7 @@
 <template>
   <div class="home-navbar">
     <div class="home-navbar-container">
-      <img src="@/static/search-black.png" />
+      <img src="@/static/search-black.png" @click="toSearch" />
       <img src="@/static/refresh-black.png" :class="['home-navbar-container__refresh', loading ? 'refresh-rotate' : '']" @click="showProgress" v-if="props.showRefresh" />
       <img src="@/static/jia-black.png" @click="toSourceList" />
     </div>
@@ -61,6 +61,13 @@ const timer2 = ref(null)
 
 const popoverStyle = ref({})
 const isShowPopover = ref(false)
+
+const toSearch = () => {
+  router.push({
+    path: '/search',
+    query: {},
+  })
+}
 
 const toSourceList = () => {
   router.push({

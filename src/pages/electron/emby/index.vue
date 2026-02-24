@@ -96,8 +96,8 @@ const startAutoPlay = (): void => {
 //点击全部
 const clickAll = (item: ClassifyItem) => {
   const typeMapping = {
-    'tvshows': 'Series',
-    'movies': 'Movie',
+    tvshows: 'Series',
+    movies: 'Movie',
   }
   router.push({
     path: '/embyAll',
