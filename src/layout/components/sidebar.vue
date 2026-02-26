@@ -1,17 +1,18 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-logo">
-      <wil-popover trigger="click" placement="right-start" v-model:visible="popoverVisible">
+      <el-popover trigger="click" placement="right-start" v-model:visible="popoverVisible" :popper-style="{ width: 'auto' }">
         <template #reference>
           <img
             :src="
               userInfo.avatar ||
               'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
             "
-            style="cursor: pointer" />
+            style="cursor: pointer"
+          />
         </template>
         <user-info-inner @closePopover="popoverVisible = false"></user-info-inner>
-      </wil-popover>
+      </el-popover>
     </div>
     <div class="sidebar-list" ref="sidebar_list">
       <div :class="['sidebar-list-item', item.active ? 'sidebar-list-active' : '']" v-for="item in sidebarList" :key="item.name" @click="changeTab(item)">
@@ -38,6 +39,7 @@ import embyOrange from '@/static/emby-orange.png'
 import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import * as CONFIG from '@/utils/config'
+import { ElPopover } from 'element-plus'
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const router = useRouter()
 const sidebar_list = ref(null)
@@ -78,7 +80,7 @@ onMounted(() => {
     sidebarList.value.forEach((item, index) => {
       item.height = sidebar_list.value.childNodes[index + 1].offsetHeight
     })
-  },100)
+  }, 100)
 })
 </script>
 

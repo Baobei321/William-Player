@@ -9,8 +9,7 @@
       </nut-swipe>
     </nut-cell-group>
     <wil-modal ref="wil_modal">
-      <wil-form v-model="state.formData" :options="options" ref="base_form">
-      </wil-form>
+      <wil-form v-model="state.formData" :options="options" ref="base_form"></wil-form>
     </wil-modal>
     <div class="live-add" @click="openForm">
       <image src="@/static/jia-hao.png"></image>
@@ -20,143 +19,161 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref, reactive } from "vue";
-import wilForm from "@/components/mobile/wil-form/index.vue";
-import wilModal from "@/components/mobile/wil-modal/index.vue";
-import shareDialog from "../video/components/index-component/share-dialog.vue";
-import { parseM3UToArray, groupByGroupTitle } from "./common.js";
-import { getCutContent } from "@/utils/common";
-import { onShow } from "@dcloudio/uni-app";
+import { onBeforeMount, ref, reactive } from 'vue'
+import wilForm from '@/components/mobile/wil-form/index.vue'
+import wilModal from '@/components/mobile/wil-modal/index.vue'
+import shareDialog from '../video/components/index-component/share-dialog.vue'
+import { parseM3UToArray, groupByGroupTitle } from '@/utils/tools.js'
+import { getCutContent } from '@/utils/common'
+import { onShow } from '@dcloudio/uni-app'
 
-const liveList = ref([]);
-const wil_modal = ref(null);
-const base_form = ref(null);
-const showShareModal = ref(false);
-const shareUrl = ref("");
+const liveList = ref([])
+const wil_modal = ref(null)
+const base_form = ref(null)
+const showShareModal = ref(false)
+const shareUrl = ref('')
 
 const state = reactive({
   formData: {},
-});
+})
 
 let subPlayerNvue = null
 
 //m3u校验
-const validatorUrl = (val) => {
+const validatorUrl = val => {
   if (!val) {
-    return false;
+    return false
   } else {
-    const reg = /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+    const reg = /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i
     if (!reg.test(val)) {
-      return false;
+      return false
     } else {
-      return true;
+      return true
     }
   }
-};
+}
 
 const options = [
-  { label: "直播源名称", prop: "name", type: "input", required: false, formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入直播源名称" }] },
-  { label: "直播源地址", prop: "url", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ validator: validatorUrl, message: "请输入正确的直播源地址" }] },
-];
+  {
+    label: '直播源名称',
+    prop: 'name',
+    type: 'input',
+    required: false,
+    formItemProps: { placeholder: '请输入', type: 'text' },
+    rule: [{ required: true, message: '请输入直播源名称' }],
+  },
+  {
+    label: '直播源地址',
+    prop: 'url',
+    type: 'input',
+    formItemProps: { placeholder: '请输入', type: 'text' },
+    rule: [{ validator: validatorUrl, message: '请输入正确的直播源地址' }],
+  },
+]
 
 //获取iptv
-const getIptv = (url) => {
+const getIptv = url => {
   return new Promise((resolve, reject) => {
     uni.request({
       url: url,
-      method: "GET",
-      success: (res) => {
-        resolve(parseM3UToArray(res.data));
+      method: 'GET',
+      success: res => {
+        resolve(parseM3UToArray(res.data))
       },
-      fail: (error) => {
-        reject(error);
+      fail: error => {
+        reject(error)
       },
-    });
-  });
-};
+    })
+  })
+}
 
 const openForm = () => {
   wil_modal.value.showModal({
-    title: "添加",
-    confirmColor: "#ff6701",
+    title: '添加',
+    confirmColor: '#ff6701',
     confirm: async () => {
       if (!state.formData.name || !state.formData.url) {
         uni.showToast({
-          title: "请输入完整的直播源",
-          icon: "none",
-        });
-        return;
+          title: '请输入完整的直播源',
+          icon: 'none',
+        })
+        return
       }
-      if (liveList.value.some((v) => v.name == state.formData.name)) {
+      if (liveList.value.some(v => v.name == state.formData.name)) {
         uni.showToast({
-          title: "存在同名直播源",
-          icon: "none",
-        });
-        return;
+          title: '存在同名直播源',
+          icon: 'none',
+        })
+        return
       }
-      if (liveList.value.some((v) => v.url == state.formData.url)) {
+      if (liveList.value.some(v => v.url == state.formData.url)) {
         uni.showToast({
-          title: "存在相同url直播源",
-          icon: "none",
-        });
-        return;
+          title: '存在相同url直播源',
+          icon: 'none',
+        })
+        return
       }
-      let res = await getIptv(state.formData.url);
+      let res = await getIptv(state.formData.url)
       if (!res[0].groupTitle) {
         uni.showToast({
-          title: "请检查文件的格式是否正确",
-          icon: "error",
-        });
+          title: '请检查文件的格式是否正确',
+          icon: 'error',
+        })
       } else {
-        liveList.value.push(state.formData);
-        uni.setStorageSync("liveList", liveList.value);
+        liveList.value.push(state.formData)
+        uni.setStorageSync('liveList', liveList.value)
       }
-      state.formData = {};
+      state.formData = {}
     },
     cancel: () => {
-      state.formData = {};
+      state.formData = {}
     },
-  });
-};
+  })
+}
 
-const deleteLive = (index) => {
-  liveList.value.splice(index, 1);
-  uni.setStorageSync("liveList", liveList.value);
-};
+const deleteLive = index => {
+  liveList.value.splice(index, 1)
+  uni.setStorageSync('liveList', liveList.value)
+}
 
-const toLiveList = (item) => {
+const toLiveList = item => {
   uni.navigateTo({
-    url: "/pages/mobile/live/list?name=" + item.name,
-  });
-};
+    url: '/pages/mobile/live/list?name=' + item.name,
+  })
+}
 
 //显示原生的视频播放器窗体
 const showNvuePlayer = () => {
   subPlayerNvue.show('auto', 200, function () {
     uni.$emit('updatePlayerNvue', {
       pipStatus: false,
-      noSetHistory: 0
-    });
-  });
+      noSetHistory: 0,
+    })
+  })
 }
 
 onBeforeMount(() => {
-  liveList.value = uni.getStorageSync("liveList");
+  liveList.value = uni.getStorageSync('liveList')
   if (!liveList.value) {
-    liveList.value = [{ name: "默认直播源", url: "https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u" }];
-    uni.setStorageSync("liveList", liveList.value);
+    liveList.value = [
+      {
+        name: '默认直播源',
+        url: 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u',
+      },
+    ]
+    uni.setStorageSync('liveList', liveList.value)
   }
   // subPlayerNvue = uni.getSubNVueById('live_video')
   // showNvuePlayer()
-});
+})
 
 onShow(async () => {
-  let shareUrl1 = await getCutContent();
+  let shareUrl1 = await getCutContent()
   if (shareUrl1) {
-    shareUrl.value = shareUrl1;
-    showShareModal.value = true;
+    shareUrl.value = shareUrl1
+    showShareModal.value = true
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>

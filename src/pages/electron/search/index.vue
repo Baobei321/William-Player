@@ -3,7 +3,7 @@
     <wil-title title="搜索"></wil-title>
     <div class="search-container">
       <div class="search-container-input">
-    <input v-model="searchValue" placeholder="搜索"></input>
+        <input v-model="searchValue" placeholder="搜索" />
       </div>
     </div>
   </div>
@@ -16,9 +16,8 @@ const searchValue = ref('')
 </script>
 
 <style lang="scss" scoped>
-.search{
-  .search-container{
-    
+.search {
+  .search-container {
   }
 }
 </style>
