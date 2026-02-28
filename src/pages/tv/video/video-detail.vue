@@ -3,7 +3,8 @@
     <div class="video-detail" :style="{ backgroundImage: `url(${imgData.img})` }">
       <div
         class="video-detail-left"
-        :style="{ background: showRightPopup ? 'rgba(0,0,0,0.4)' : 'linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 0) 100%)' }">
+        :style="{ background: showRightPopup ? 'rgba(0,0,0,0.4)' : 'linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 0) 100%)' }"
+      >
         <div class="left-title">{{ imgData.title }}</div>
         <div class="left-info">
           <div class="left-info-date">
@@ -24,13 +25,14 @@
           :title="buttonText"
           :type="routerParams.type"
           @openPopup="openPopup"
-          @toPlay="clickPlayButton"></operation-button>
+          @toPlay="clickPlayButton"
+        ></operation-button>
       </div>
       <div class="video-detail-right" :style="{ backgroundColor: showRightPopup ? 'rgba(0,0,0,0.4)' : 'transparent' }">
         <nut-popup v-model:visible="showRightPopup" :overlay="false" position="right">
-          <cloud-list :list="sourceList" @backLeft="backLeft" ref="cloud_list" v-if="focusModel === 'cloudList'"> </cloud-list>
-          <season-list :list="selectSource.seasonArr" @backLeft="backLeft" v-if="focusModel === 'seasonList'" ref="season_list"> </season-list>
-          <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft" @toPlay="toPlayVideo"> </tv-listd>
+          <cloud-list :list="sourceList" @backLeft="backLeft" ref="cloud_list" v-if="focusModel === 'cloudList'"></cloud-list>
+          <season-list :list="selectSource.seasonArr" @backLeft="backLeft" v-if="focusModel === 'seasonList'" ref="season_list"></season-list>
+          <tv-listd :list="tvList" ref="tv_list" v-if="focusModel === 'tvList'" @backLeft="backLeft" @toPlay="toPlayVideo"></tv-listd>
           <actor-list :routerParams="routerParams" ref="actor_list" v-if="focusModel === 'actorList'" @backLeft="backLeft"></actor-list>
         </nut-popup>
       </div>
@@ -825,14 +827,16 @@ onBeforeMount(async () => {
   let dict = [
     { value: '189CloudPC', label: '天翼云盘' },
     { value: 'Quark', label: '夸克网盘' },
+    { value: 'WoPan', label: '联通云盘' },
+    { value: 'unknown', label: '未知' },
   ]
   let source = JSON.parse(routerParams.value.source)
   sourceList.value = source.map(i => {
     if (source.filter(v => v.provider == i.provider).length > 1) {
-      let label = dict.find(v => v.value == i.provider).label
+      let label = dict.find(v => v.value == i.provider)?.label
       i.sourceName = label ? label + `(${i.name})` : i.provider
     } else {
-      i.sourceName = dict.find(v => v.value == i.provider).label || i.provider
+      i.sourceName = dict.find(v => v.value == i.provider)?.label || i.provider
     }
     return i
   })

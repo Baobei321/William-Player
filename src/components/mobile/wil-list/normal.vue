@@ -23,23 +23,28 @@
         :style="props.listItemStyle ? props.listItemStyle({ ...item, index }) : {}"
         class="list-item"
       >
-        <slot v-bind="{ ...item, $index: index }" v-if="props.isUseCustom" />
-        <slot v-bind="{ ...item, $index: index }" v-else></slot>
+        <slot v-bind="{ ...item, $index: index }"></slot>
       </div>
       <div class="load-list__loading-text" v-show="loading">
         <nut-icon name="loading"></nut-icon>
         <span>加载中...</span>
       </div>
       <div class="load-list__finished-text" v-show="finished">
-        {{ paginationData.total == 0 ? (!$slots.empty ? noDataText : '') : finishedText }}
+        <template v-if="paginationData.total > 0">
+          {{ finishedText }}
+        </template>
+        <template v-else>
+          <slot name="empty" v-if="$slots.empty" />
+          <wil-empty text="暂无数据" v-else></wil-empty>
+        </template>
       </div>
-      <slot name="empty" v-if="loaded && list.length === 0" />
     </div>
   </scroll-view>
 </template>
 
 <script setup>
 import { computed, onBeforeMount, reactive, ref, unref, watch } from 'vue'
+import wilEmpty from '../wil-empty/index.vue'
 
 const emit = defineEmits(['currentData', 'scroll'])
 
@@ -149,7 +154,7 @@ const load = async () => {
 
 const execLoad = async () => {
   if (props.requestParams === null) {
-    // loaded.value = true
+    loaded.value = true
     return
   }
 

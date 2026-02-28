@@ -35,8 +35,8 @@
       :app-name="upgradeInfo.appName"
       :appVersion="appVersion"
       @closed="closedPopup"
-      v-model:visible="showUpgrade">
-    </wil-upgrade>
+      v-model:visible="showUpgrade"
+    ></wil-upgrade>
   </view>
 </template>
 
@@ -97,7 +97,7 @@ const toQQpage = () => {
 //跳转到下载页
 const toOtherPage = () => {
   let query = {
-    url: 'https://chenweiliang6.github.io/app-webview/#/download-center',
+    url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/download-center',
     title: '下载中心',
   }
   uni.navigateTo({

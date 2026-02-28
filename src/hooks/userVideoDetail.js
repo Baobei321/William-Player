@@ -273,15 +273,15 @@ export function useVideoDetail({ route, router }) {
       return a - b
     })
     if (type === '夸克网盘') {
-      tvList.value = tvList.value.map((i) => {
-          return {
-              id: i.fid,
-              name: i.file_name,
-              ji: i.ji,
-              // path: "/我的视频/电视剧",
-              provider: "Quark",
-          };
-      });
+      tvList.value = tvList.value.map(i => {
+        return {
+          id: i.fid,
+          name: i.file_name,
+          ji: i.ji,
+          // path: "/我的视频/电视剧",
+          provider: 'Quark',
+        }
+      })
     }
   }
 
@@ -334,6 +334,7 @@ export function useVideoDetail({ route, router }) {
         genres: res.genres.map(i => i.name).join(' '),
         title: res.title,
         posterPath: CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + res.poster_path,
+        networks: res.networks,
       }
     } else if (routerParams.value.type == 'tv') {
       seasonFirst.value.img = CONFIG.IMG_DOMAIN + '/t/p/w1920_and_h1080_bestv2' + res.backdrop_path
@@ -342,6 +343,7 @@ export function useVideoDetail({ route, router }) {
       imgData.value.genres = res.genres.map(i => i.name).join(' ')
       imgData.value.releaseTime = res.first_air_date
       imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有0集）`
+      imgData.value.networks = res.networks
     }
     return res
   }
@@ -770,6 +772,8 @@ export function useVideoDetail({ route, router }) {
     let dict = [
       { value: '189CloudPC', label: '天翼云盘' },
       { value: 'Quark', label: '夸克网盘' },
+      { value: 'WoPan', label: '联通云盘' },
+      { value: 'unknown', label: '未知' },
     ]
     if (CONFIG.PLATFORM === 'PC') {
       routerParams.value = route.query
@@ -781,10 +785,10 @@ export function useVideoDetail({ route, router }) {
     }
     sourceList.value = source.map(i => {
       if (source.filter(v => v.provider == i.provider).length > 1) {
-        let label = dict.find(v => v.value == i.provider).label
+        let label = dict.find(v => v.value == i.provider)?.label || ''
         i.sourceName = label ? label + `(${i.name})` : i.provider
       } else {
-        i.sourceName = dict.find(v => v.value == i.provider).label || i.provider
+        i.sourceName = dict.find(v => v.value == i.provider)?.label || i.provider
       }
       return i
     })

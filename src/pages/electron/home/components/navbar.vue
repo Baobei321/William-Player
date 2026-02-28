@@ -65,7 +65,7 @@ const isShowPopover = ref(false)
 const toSearch = () => {
   router.push({
     path: '/search',
-    query: {},
+    query: { isEmby: props.isEmby ? '1' : '0' },
   })
 }
 

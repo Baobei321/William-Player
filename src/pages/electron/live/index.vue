@@ -2,7 +2,7 @@
   <div class="live">
     <div class="live-left">
       <div class="live-left-video">
-        <video :src="videoUrl"></video>
+        <wil-player :videoUrl="videoUrl" :config="config"></wil-player>
       </div>
       <div class="live-left-title">
         <div class="live-left-title__left">直播</div>
@@ -47,23 +47,31 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, onMounted, onUnmounted } from 'vue'
 import { parseM3UToArray, groupByGroupTitle, groupByName } from '@/utils/tools.js'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import wilCategoryList from '@/components/mobile/wil-category-list/index.vue'
-import wilPopover from '@/components/electron/wil-popover/other.vue'
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
+import wilPlayer from '@/components/electron/wil-player/index.vue'
 import type { LiveItem, MenuItem, MenuChild } from './types'
 import { ElPopover } from 'element-plus'
+import HlsPlugin from 'xgplayer-hls'
 
+const videoRef = ref<HTMLVideoElement | null>(null)
 const liveList = ref<LiveItem[]>([])
 const listData = ref<MenuItem[]>([])
 const loading = ref(false)
 const popupValue = ref<string[]>([])
 const lineColumns = ref<{ value: string; text: string }[]>([])
 const selectItem = ref<MenuChild | null>(null)
-const videoUrl = ref('http://112.46.85.60:8009/hls/501/index.m3u8')
+const videoUrl = ref('')
+
+const config = {
+  isLive: true,
+  plugins: [HlsPlugin],
+}
+
 //获取iptv
 const getIptv = (url: string) => {
   return new Promise((resolve, reject) => {
@@ -120,7 +128,6 @@ const getListData = async (url: string) => {
 //选择线路
 const selectLine = (item: { value: string; text: string }) => {
   videoUrl.value = item.value
-  console.log(videoUrl.value, 'viudeo')
 }
 
 onBeforeMount(() => {
@@ -146,7 +153,7 @@ onBeforeMount(() => {
     flex: 0 0 55%;
     .live-left-video {
       width: 100%;
-      video {
+      :deep(.wil-player) {
         width: 100%;
         aspect-ratio: 5/3;
         height: auto;
@@ -184,6 +191,7 @@ onBeforeMount(() => {
     }
   }
   .live-right {
+    flex: 1;
     :deep(.category-list) {
       .category-list-wrap {
         .category-list-container {

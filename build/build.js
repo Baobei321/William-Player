@@ -343,12 +343,34 @@ function modifyPackageJson() {
         changed = true
         console.log('✓ 添加 element-plus 到 dependencies')
       }
+      // 确保PC平台有xgplayer
+      if (!packageData.dependencies['xgplayer']) {
+        packageData.dependencies['xgplayer'] = '^3.0.23'
+        changed = true
+        console.log('✓ 添加 xgplayer 到 dependencies')
+      }
+      // 确保PC平台有xgplayer-hls
+      if (!packageData.dependencies['xgplayer-hls']) {
+        packageData.dependencies['xgplayer-hls'] = '^3.0.23'
+        changed = true
+        console.log('✓ 添加 xgplayer-hls 到 dependencies')
+      }
     } else {
       // 非PC平台删除这些依赖
       if (packageData.dependencies['element-plus']) {
         delete packageData.dependencies['element-plus']
         changed = true
         console.log('✓ 从 dependencies 中移除 element-plus')
+      }
+      if (packageData.dependencies['xgplayer']) {
+        delete packageData.dependencies['xgplayer']
+        changed = true
+        console.log('✓ 从 dependencies 中移除 xgplayer')
+      }
+      if (packageData.dependencies['xgplayer-hls']) {
+        delete packageData.dependencies['xgplayer-hls']
+        changed = true
+        console.log('✓ 从 dependencies 中移除 xgplayer-hls')
       }
     }
 

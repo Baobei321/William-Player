@@ -10,8 +10,8 @@
         <div class="mine-notLog__left">
           <wil-image
             backgroundColor="#efefef"
-            src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png">
-          </wil-image>
+            src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png"
+          ></wil-image>
           <div class="mine-notLog__left-info">
             <span>游客用户</span>
             <span>即使不登录，也能正常使用，这个模块主要是为了UI好看</span>
@@ -27,8 +27,8 @@
               :src="
                 userInfo.avatar ||
                 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
-              ">
-            </wil-image>
+              "
+            ></wil-image>
           </div>
           <div class="left-info">
             <div class="left-info-name">
@@ -82,8 +82,7 @@ const Authorization = ref(uni.getStorageSync('Authorization'))
 const isLogin = ref(false)
 
 const name = ref('')
-console.log(!name.value,'值');
-
+console.log(!name.value, '值')
 
 const showLoginPopup = ref(false)
 const wil_modal = ref(null)

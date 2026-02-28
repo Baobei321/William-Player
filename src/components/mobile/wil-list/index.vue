@@ -6,7 +6,7 @@
     <template #default="item">
       <slot v-bind="{ ...item }"></slot>
     </template>
-    <template #empty>
+    <template #empty v-if="$slots.empty">
       <slot name="empty" />
     </template>
   </normalList>
@@ -22,7 +22,7 @@ import { ref } from 'vue'
 import normalList from './normal.vue'
 import virtualList from './virtual.vue'
 const props = defineProps({
-  type: { type: String, default: "normal" },
+  type: { type: String, default: 'normal' },
 })
 
 const normal_list = ref(null)
@@ -47,7 +47,7 @@ defineExpose({
   handleAdd,
   handleDelete,
   handleEdit,
-  clearList
+  clearList,
 })
 </script>
 
