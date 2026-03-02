@@ -27,7 +27,9 @@
             </div>
           </div>
           <div class="detail-info-right__genre">
-            <span class="genre-value">{{ imgData.genres }}</span>
+            <div class="genre-value" v-for="item in imgData.genres?.split(' ') || []">
+              {{ item }}
+            </div>
             <span v-if="routerParams.type == 'movie'" class="genre-size">{{ selectSource.size }}</span>
           </div>
           <div class="detail-info-right__button">
@@ -45,7 +47,6 @@
             {{ overview }}
           </div>
           <div class="detail-info-right__platform">
-            <div class="platform-title">播出平台</div>
             <div class="platform-list">
               <div class="platform-list-item" v-for="item in imgData.networks" :key="item.id">
                 <img :src="IMG_DOMAIN + '/t/p/h30' + item.logo_path" v-if="item.logo_path" class="container-item-img" mode="heightFix" />
@@ -332,11 +333,21 @@ onBeforeMount(() => {
         .detail-info-right__genre {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
           font-size: 30rpx;
           margin-top: 24rpx;
 
           .genre-size {
             margin-left: 14rpx;
+          }
+          .genre-value {
+            background: rgb(240, 240, 240);
+            padding: 10rpx 24rpx;
+            border-radius: 16rpx;
+            margin-left: 24rpx;
+            &:first-child {
+              margin-left: 0;
+            }
           }
         }
 
@@ -391,18 +402,30 @@ onBeforeMount(() => {
           line-height: 50rpx;
         }
         .detail-info-right__platform {
+          margin-top: 24rpx;
+          width: 100%;
           .platform-title {
             font-size: 32rpx;
           }
           .platform-list {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
             .platform-list-item {
               background: rgb(240, 240, 240);
               width: auto;
               display: flex;
               align-items: center;
               justify-content: center;
+              padding: 10rpx 16rpx;
+              border-radius: 16rpx;
+              font-size: 24rpx;
+              margin-left: 24rpx;
+              margin-bottom: 24rpx;
+              &:first-child {
+                margin-left: 0;
+              }
               img {
                 height: 40rpx;
               }
@@ -500,6 +523,10 @@ onBeforeMount(() => {
             border: 2rpx solid #000;
             padding: 10rpx;
             cursor: pointer;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             img {
               width: 100%;
@@ -514,6 +541,9 @@ onBeforeMount(() => {
             border: 2rpx solid #000;
             padding: 10rpx;
             margin-left: 24rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
 
             img {

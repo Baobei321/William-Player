@@ -24,10 +24,10 @@
                 <wil-tooltip content="修改" placement="top" trigger="hover">
                   <img src="@/static/bianji-black.png" @click.stop="editSource(item, vitem)" />
                 </wil-tooltip>
-                <wil-tooltip content="电视剧目录" placement="top" trigger="hover">
+                <wil-tooltip content="电视剧目录" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
                   <img src="@/static/xsp-black.png" @click.stop="setTvMulu(item, vitem)" />
                 </wil-tooltip>
-                <wil-tooltip content="电影目录" placement="top" trigger="hover">
+                <wil-tooltip content="电影目录" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
                   <img src="@/static/dy-black.png" @click.stop="setMovieMulu(item, vitem)" />
                 </wil-tooltip>
                 <wil-tooltip content="删除" placement="top" trigger="hover">

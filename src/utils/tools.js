@@ -86,4 +86,24 @@ const groupByName = arr => {
   }, [])
 }
 
-export { parseM3UToArray, groupByGroupTitle, groupByName }
+//查询手机号是哪个城市以及运营商的
+const getPhoneCityAndCarrier = data => {
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: 'https://cx.shouji.360.cn/phonearea.php',
+      data: {
+        number: data.number,
+      },
+      timeout: 10000,
+      method: 'GET',
+      success: res => {
+        resolve(res.data)
+      },
+      fail: error => {
+        reject(error)
+      },
+    })
+  })
+}
+
+export { parseM3UToArray, groupByGroupTitle, groupByName, getPhoneCityAndCarrier }

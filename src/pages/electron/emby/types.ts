@@ -126,5 +126,24 @@ export type HistoryItem = {
   sourceType: string
   title: string
   type: string
-  titlePlay?: string
+  titlePlay?: string,
+  [key: string]: any
+}
+
+//获取影片详情接口返回的数据的类型
+export type MovieTvDetailType = {
+  name?: string
+  overview?: string
+  backdrop_path?: string
+  poster_path?: string
+  vote_average?: number
+  release_date?: string
+  runtime?: number
+  genres?: { name: string }[]
+  size?: any
+  tmdbId?: string | number
+  production_companies?: any[]
+  path?: string
+  number_of_episodes?: number
+  actors?: any[]
 }

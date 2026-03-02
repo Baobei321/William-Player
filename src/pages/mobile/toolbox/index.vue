@@ -17,6 +17,8 @@ import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import expressSearch from '@/static/express-search.png'
 import downloadIcon from '@/static/download-manage.png'
 import { toStringfy, toParse } from '@/pages/mobile/mine/common'
+import { getPhoneCityAndCarrier } from '@/utils/tools'
+import * as CONFIG from '@/utils/config'
 
 const toolboxArr = [
   { title: '下载管理', icon: downloadIcon, path: '/pages/mobile/toolbox/download/index' },
@@ -71,9 +73,40 @@ const toolboxArr = [
       title: '下厨房',
     },
   },
+  {
+    title: '流量查询',
+    icon: 'https://wap.10086.cn/uploadBaseDir/content/png/20181226/20181226211743406YJS.png',
+    path: '/pages/mobile/backend/index',
+    query: {
+      url: '',
+      title: '流量查询',
+    },
+  },
 ]
 
-const clickItem = item => {
+//流量查询单独的方法
+const queryTraffic = async item => {
+  if (item.title === '流量查询') {
+    const userInfo = uni.getStorageSync(CONFIG.USER_KEY)
+    if (!userInfo.phonenumber) {
+      uni.showToast({
+        title: '请先绑定手机号',
+        icon: 'none',
+      })
+      return
+    }
+    let res = await getPhoneCityAndCarrier({ number: userInfo.phonenumber })
+    if (res.data.sp === '电信') {
+      item.query.url = 'https://wappark.189.cn/resources/feeBill/home.html?pageType=unifiedlogin&isSMS=true&channel=wap'
+    } else if (res.data.sp === '联通') {
+      item.query.url = 'https://img.client.10010.com/unicom_weiting/index.html'
+    } else if (res.data.sp === '移动') {
+      item.query.url = 'https://wap.10086.cn/bj/index_100_100.html'
+    }
+  }
+}
+
+const clickItem = async item => {
   if (item.path.includes('https://') || item.path.includes('http://')) {
     plus.runtime.openURL(item.path, error => {
       if (error) {
@@ -81,6 +114,7 @@ const clickItem = item => {
       }
     })
   } else {
+    await queryTraffic(item)
     uni.navigateTo({
       url: toStringfy(item.query) ? item.path + '?' + toStringfy(item.query) : item.path,
       animationType: 'slide-in-bottom',
