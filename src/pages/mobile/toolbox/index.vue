@@ -75,7 +75,7 @@ const toolboxArr = [
   },
   {
     title: '流量查询',
-    icon: 'https://wap.10086.cn/uploadBaseDir/content/png/20181226/20181226211743406YJS.png',
+    icon: 'https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20251130/4mfwmxop/202511302251297qv4p.webp',
     path: '/pages/mobile/backend/index',
     query: {
       url: '',

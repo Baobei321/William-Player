@@ -3,7 +3,314 @@ import { toStringfy, toParse } from '@/pages/mobile/mine/common'
 import dayjs from 'dayjs'
 import { classifyList, formatNanoseconds, formatSecondTime } from '@/utils/scrape'
 import posterEmpty from '@/static/poster-empty.png'
-
+const playbackInfo = {
+  'DeviceProfile': {
+    'CodecProfiles': [
+      {
+        'Codec': 'aac',
+        'Conditions': [
+          {
+            'Condition': 'Equals',
+            'IsRequired': 'false',
+            'Property': 'IsSecondaryAudio',
+            'Value': 'false',
+          },
+        ],
+        'Type': 'VideoAudio',
+      },
+      {
+        'Conditions': [
+          {
+            'Condition': 'Equals',
+            'IsRequired': 'false',
+            'Property': 'IsSecondaryAudio',
+            'Value': 'false',
+          },
+        ],
+        'Type': 'VideoAudio',
+      },
+      {
+        'Codec': 'h264',
+        'Conditions': [
+          {
+            'Condition': 'EqualsAny',
+            'IsRequired': false,
+            'Property': 'VideoProfile',
+            'Value': 'high|main|baseline|constrained baseline',
+          },
+          {
+            'Condition': 'LessThanEqual',
+            'IsRequired': false,
+            'Property': 'VideoLevel',
+            'Value': '62',
+          },
+          {
+            'Condition': 'LessThanEqual',
+            'IsRequired': false,
+            'Property': 'Width',
+            'Value': '3840',
+          },
+        ],
+        'Type': 'Video',
+      },
+      {
+        'Codec': 'hevc',
+        'Conditions': [
+          {
+            'Condition': 'EqualsAny',
+            'IsRequired': false,
+            'Property': 'VideoCodecTag',
+            'Value': 'hvc1|hev1|hevc|hdmv',
+          },
+          {
+            'Condition': 'LessThanEqual',
+            'IsRequired': false,
+            'Property': 'Width',
+            'Value': '3840',
+          },
+        ],
+        'Type': 'Video',
+      },
+      {
+        'Conditions': [
+          {
+            'Condition': 'LessThanEqual',
+            'IsRequired': false,
+            'Property': 'Width',
+            'Value': '3840',
+          },
+        ],
+        'Type': 'Video',
+      },
+    ],
+    'ContainerProfiles': [],
+    'DirectPlayProfiles': [
+      {
+        'AudioCodec': 'aac,opus,flac,vorbis',
+        'Container': 'mp4,m4v',
+        'Type': 'Video',
+        'VideoCodec': 'h264,h265,hevc,av1,vp8,vp9',
+      },
+      {
+        'AudioCodec': 'aac,opus,flac,vorbis',
+        'Container': 'mkv',
+        'Type': 'Video',
+        'VideoCodec': 'h264,h265,hevc,av1,vp8,vp9',
+      },
+      {
+        'AudioCodec': 'aac,mp3',
+        'Container': 'flv',
+        'Type': 'Video',
+        'VideoCodec': 'h264',
+      },
+      {
+        'AudioCodec': 'aac,opus,flac,vorbis',
+        'Container': 'mov',
+        'Type': 'Video',
+        'VideoCodec': 'h264',
+      },
+      {
+        'Container': 'opus',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'mp3',
+        'Container': 'mp3',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'mp2',
+        'Container': 'mp2,mp3',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'aac',
+        'Container': 'm4a',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'aac',
+        'Container': 'mp4',
+        'Type': 'Audio',
+      },
+      {
+        'Container': 'flac',
+        'Type': 'Audio',
+      },
+      {
+        'Container': 'webma,webm',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'PCM_S16LE,PCM_S24LE',
+        'Container': 'wav',
+        'Type': 'Audio',
+      },
+      {
+        'Container': 'ogg',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'vorbis,opus',
+        'Container': 'webm',
+        'Type': 'Video',
+        'VideoCodec': 'av1,VP8,VP9',
+      },
+    ],
+    'MaxStaticBitrate': 140000000,
+    'MaxStreamingBitrate': 140000000,
+    'MusicStreamingTranscodingBitrate': 192000,
+    'ResponseProfiles': [
+      {
+        'Container': 'm4v',
+        'MimeType': 'video/mp4',
+        'Type': 'Video',
+      },
+    ],
+    'SubtitleProfiles': [
+      {
+        'Format': 'vtt',
+        'Method': 'Hls',
+      },
+      {
+        'Format': 'eia_608',
+        'Method': 'VideoSideData',
+        'Protocol': 'hls',
+      },
+      {
+        'Format': 'eia_708',
+        'Method': 'VideoSideData',
+        'Protocol': 'hls',
+      },
+      {
+        'Format': 'vtt',
+        'Method': 'External',
+      },
+      {
+        'Format': 'ass',
+        'Method': 'External',
+      },
+      {
+        'Format': 'ssa',
+        'Method': 'External',
+      },
+    ],
+    'TranscodingProfiles': [
+      {
+        'AudioCodec': 'aac',
+        'BreakOnNonKeyFrames': true,
+        'Container': 'aac',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'MinSegments': '1',
+        'Protocol': 'hls',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'aac',
+        'Container': 'aac',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'mp3',
+        'Container': 'mp3',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'opus',
+        'Container': 'opus',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'wav',
+        'Container': 'wav',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'opus',
+        'Container': 'opus',
+        'Context': 'Static',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'mp3',
+        'Container': 'mp3',
+        'Context': 'Static',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'aac',
+        'Container': 'aac',
+        'Context': 'Static',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'wav',
+        'Container': 'wav',
+        'Context': 'Static',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Audio',
+      },
+      {
+        'AudioCodec': 'aac,opus,flac,vorbis',
+        'Container': 'mkv',
+        'Context': 'Static',
+        'CopyTimestamps': true,
+        'MaxAudioChannels': '2',
+        'Type': 'Video',
+        'VideoCodec': 'h264,h265,hevc,av1,vp8,vp9',
+      },
+      {
+        'AudioCodec': 'aac',
+        'BreakOnNonKeyFrames': true,
+        'Container': 'ts',
+        'Context': 'Streaming',
+        'ManifestSubtitles': 'vtt',
+        'MaxAudioChannels': '2',
+        'MinSegments': '1',
+        'Protocol': 'hls',
+        'Type': 'Video',
+        'VideoCodec': 'h264,h265,hevc,av1',
+      },
+      {
+        'AudioCodec': 'vorbis',
+        'Container': 'webm',
+        'Context': 'Streaming',
+        'MaxAudioChannels': '2',
+        'Protocol': 'http',
+        'Type': 'Video',
+        'VideoCodec': 'vpx',
+      },
+      {
+        'AudioCodec': 'aac,opus,flac,vorbis',
+        'Container': 'mp4',
+        'Context': 'Static',
+        'Protocol': 'http',
+        'Type': 'Video',
+        'VideoCodec': 'h264',
+      },
+    ],
+  },
+}
 //处理内存大小
 const handleSize = size => {
   if (size == 0) return '0'
@@ -185,9 +492,9 @@ const getEmbyPlayerUrl = (data, selectMedia) => {
   let params = {
     UserId: selectMedia.userId,
     StartTimeTicks: 0,
-    IsPlayback: false,
+    IsPlayback: true,
     AutoOpenLiveStream: false,
-    ...data,
+    MaxStreamingBitrate: 500000000,
   }
   delete params.folderFileId
   const apiInfo = {
@@ -195,7 +502,7 @@ const getEmbyPlayerUrl = (data, selectMedia) => {
     method: 'POST',
     ...selectMedia,
   }
-  return getEmby({}, apiInfo)
+  return getEmby(playbackInfo, apiInfo)
 }
 
 //获取第几季下的剧集列表

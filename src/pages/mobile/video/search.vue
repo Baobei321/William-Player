@@ -13,36 +13,43 @@
       </template>
     </wil-navbar>
     <div class="video-search-list" v-if="selectType.type == 'Emby'" v-show="listData.length">
-      <wil-list :requestFn="getSearchEmbyList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
-        idKey="id" listContainerClass="list-recent" :pageSize="50" 
-         @currentData="currentData">
+      <wil-list
+        :requestFn="getSearchEmbyList"
+        :request-params="requestParams"
+        ref="wil_list"
+        :refresherEnabled="false"
+        :useListTotal="true"
+        idKey="id"
+        listContainerClass="list-recent"
+        :pageSize="50"
+        @currentData="currentData"
+      >
         <template #default="item">
           <searchBox :data="item" :oldValue="oldValue" @click="toVideoDetail(item)" :isEmby="true"></searchBox>
         </template>
       </wil-list>
     </div>
     <div class="video-search-list" v-if="listData.length && selectType.type != 'Emby'">
-      <searchBox :data="item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)"
-        :oldValue="oldValue" :isEmby="false"></searchBox>
+      <searchBox :data="item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)" :oldValue="oldValue" :isEmby="false"></searchBox>
     </div>
     <wil-empty v-if="!listData.length" text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import wilEmpty from "@/components/mobile/wil-empty/index.vue";
+import { ref } from 'vue'
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import wilList from '@/components/mobile/wil-list/index.vue'
-import { handleSeasonName } from "@/utils/scrape.js";
-import { onLoad } from "@dcloudio/uni-app";
-import searchBox from "./components/index-component/search-box.vue";
+import { handleSeasonName } from '@/utils/scrape.js'
+import { onLoad } from '@dcloudio/uni-app'
+import searchBox from './components/index-component/search-box.vue'
 import { getEmbyList, setEmbyImg } from '@/utils/emby'
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 
-const oldValue = ref("");
-const searchValue = ref("");
-const listData = ref([]);
+const oldValue = ref('')
+const searchValue = ref('')
+const listData = ref([])
 
 const selectType = ref({})
 const selectMedia = ref({})
@@ -50,82 +57,86 @@ const wil_list = ref(null)
 const requestParams = ref(null)
 
 const toSearch = () => {
-  if (oldValue.value == searchValue.value || !searchValue.value) return;
+  if (oldValue.value == searchValue.value || !searchValue.value) return
   if (selectType.value.type == 'Emby') {
     requestParams.value = {}
     wil_list.value.reload()
   } else {
-    let data = uni.getStorageSync("localMovieTvData");
-    let movieArr = data.movie.filter((item) => item.name.indexOf(searchValue.value) > -1);
-    let tvArr = data.tv.filter((item) => item.name.indexOf(searchValue.value) > -1);
-    listData.value = [...movieArr, ...tvArr];
+    let data = uni.getStorageSync('localMovieTvData')
+    let movieArr = data.movie.filter(item => item.name.indexOf(searchValue.value) > -1)
+    let tvArr = data.tv.filter(item => item.name.indexOf(searchValue.value) > -1)
+    listData.value = [...movieArr, ...tvArr]
   }
-  oldValue.value = searchValue.value;
-};
+  oldValue.value = searchValue.value
+}
 
 const toCancel = () => {
   if (selectType.value.type == 'Emby') {
     wil_list.value.clearList()
   } else {
-    searchValue.value = "";
-    oldValue.value = "";
-    listData.value = [];
+    searchValue.value = ''
+    oldValue.value = ''
+    listData.value = []
   }
-};
+}
 
-const currentData = (data) => {
+const currentData = data => {
   listData.value = data.list
 }
 
-const typeMapping = {
-  "Movie": "movie",
-  "Series": "tv",
-};
-
-const toVideoDetail = (item) => {
+const toVideoDetail = item => {
   if (selectType.value.type == 'Emby') {
     uni.navigateTo({
-      url: `/pages/mobile/video/emby/emby-detail?name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&movieTvId=${item.id}`,
-    });
+      url: `/pages/mobile/video/emby/emby-detail?name=${handleSeasonName(item.name, true)}&type=${item.type == '1' ? 'tv' : 'movie'}&movieTvId=${item.id}`,
+    })
   } else {
     uni.navigateTo({
-      url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == "1" ? "tv" : "movie"}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
-    });
+      url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type == '1' ? 'tv' : 'movie'}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    })
   }
-};
+}
 
 //判断选择的是webdav还是天翼云盘还是夸克还是Emby
 const judgeSelect = () => {
-  let sourceList = uni.getStorageSync("sourceList");
-  selectType.value = sourceList.find((item) => {
-    let select = item.list.find((i) => i.active);
+  let sourceList = uni.getStorageSync('sourceList')
+  selectType.value = sourceList.find(item => {
+    let select = item.list.find(i => i.active)
     if (select) {
-      selectMedia.value = select;
-      return true;
+      selectMedia.value = select
+      return true
     } else {
-      return false;
+      return false
     }
-  });
-};
+  })
+}
 
 //emby分页查询影视
-const getSearchEmbyList = async (params) => {
-  let res = await getEmbyList({
-    IncludeItemTypes: 'Series,Movie', Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,ProductionYear,Status,EndDate',
-    StartIndex: (params.pageNum - 1) * params.pageSize,
-    Limit: params.pageSize,
-    SortBy: 'SortName',
-    SortOrder: 'Ascending',
-    EnableImageTypes: 'Primary,Backdrop,Thumb',
-    ImageTypeLimit: '1',
-    Recursive: true,
-    SearchTerm: searchValue.value,
-    IncludeSearchTypes: false,
-  }, selectMedia.value)
+const getSearchEmbyList = async params => {
+  //由于递归查询Recursive为true，导致返回TotalRecordCount失效，那么就不传分页了，直接一次性查全部吧
+  let res = await getEmbyList(
+    {
+      IncludeItemTypes: 'Series,Movie',
+      Fields: 'BasicSyncInfo,CanDelete,CanDownload,PrimaryImageAspectRatio,ProductionYear,Status,EndDate',
+      // StartIndex: (params.pageNum - 1) * params.pageSize,
+      // Limit: params.pageSize,
+      SortBy: 'SortName',
+      SortOrder: 'Ascending',
+      EnableImageTypes: 'Primary,Backdrop,Thumb',
+      ImageTypeLimit: '1',
+      Recursive: true,
+      SearchTerm: searchValue.value,
+      IncludeSearchTypes: true,
+      GroupProgramsBySeries: true,
+    },
+    selectMedia.value
+  )
   let rows = res.Items.map(item => {
     return {
-      id: item.Id, type: item.Type == 'Series' ? '1' : '0', poster: setEmbyImg(item, selectMedia.value), name: item.Name,
-      releaseTime: item.ProductionYear + (item.EndDate ? `-${dayjs(item.EndDate).format('YYYY')}` : '')
+      id: item.Id,
+      type: item.Type == 'Series' ? '1' : '0',
+      poster: setEmbyImg(item, selectMedia.value),
+      name: item.Name,
+      releaseTime: item.ProductionYear + (item.EndDate ? `-${dayjs(item.EndDate).format('YYYY')}` : ''),
     }
   })
   return { total: res.TotalRecordCount, rows }
@@ -185,15 +196,25 @@ page {
     }
   }
 
-  ::v-deep .wil-list {
-    flex: 1;
-    overflow: hidden;
-  }
-
   .video-search-list {
     padding: 24rpx 24rpx 68rpx 24rpx;
     flex: 1;
     overflow: auto;
+    :deep(.search-box) {
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+    :deep(.load-list) {
+      .list-recent {
+        .list-item {
+          margin-top: 30rpx;
+          &:first-child {
+            margin-top: 0;
+          }
+        }
+      }
+    }
   }
 }
 

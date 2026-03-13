@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import videoNavbar from './components/index-component/navbar.vue'
 import Skeleton from './components/index-component/skeleton.vue'
 import starRecommend from './components/index-component/star-recommend.vue'
@@ -86,8 +86,21 @@ import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex.js'
 
 const wil_modal = ref(null)
-const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, selectType, scrollTop, refreshVideo, navbarStyle } =
-  useVideoIndex({ wil_modal })
+const {
+  video_navbar,
+  refreshData,
+  refreshLoading,
+  movieTvData,
+  localMovieTvData,
+  tmdbKey,
+  historyPlay,
+  settingData,
+  selectType,
+  scrollTop,
+  navbarStyle,
+  refreshVideo,
+  judgeSelect,
+} = useVideoIndex({ wil_modal })
 const showDialog = ref(false)
 const showShareModal = ref(false)
 const shareUrl = ref('')
@@ -210,6 +223,7 @@ const listenerNetwork = res => {
   scrollTop.value = 0
   isConnected.value = res.isConnected
   if (isConnected.value) {
+    judgeSelect()
     showNavbarColor()
   } else {
     navbarStyle.value = {
@@ -224,6 +238,7 @@ uni.getNetworkType({
     scrollTop.value = 0
     if (res.networkType != 'none') {
       isConnected.value = true
+      judgeSelect()
       showNavbarColor()
     } else {
       isConnected.value = false
@@ -256,6 +271,9 @@ const setLocalCookie = () => {
   ]
   uni.setStorageSync('sourceList', sourceList)
 }
+onBeforeMount(() => {
+  showNavbarColor()
+})
 </script>
 
 <style lang="scss" scoped>

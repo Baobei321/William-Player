@@ -1,7 +1,6 @@
 <template>
   <div class="emby-detail">
-    <wil-navbar style="position: fixed;z-index: 999;" arrow-color="#fff">
-    </wil-navbar>
+    <wil-navbar style="position: fixed; z-index: 999" arrow-color="#fff"></wil-navbar>
     <div class="emby-detail-container">
       <div class="emby-detail-container__img" :style="{ backgroundImage: `url(${imgData.img})` }">
         <div class="img-container">
@@ -36,38 +35,39 @@
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
           <div class="movie-version-title">影片版本</div>
-          <div class="movie-version-item">
-            Emby
-          </div>
+          <div class="movie-version-item">Emby</div>
         </div>
         <!-- 电视专用 -->
         <div class="tv-version" v-if="routerParams.type == 'tv'">
           <div class="tv-version-tabs">
             <div class="tv-version-tabs__cloud">
-              <div class="tv-version-tabs__cloud-item">
-                Emby
-              </div>
+              <div class="tv-version-tabs__cloud-item">Emby</div>
             </div>
-            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff"
-              @change="changeTvSeason">
-              <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in seasonArr" :key="item.season">
-              </nut-tab-pane>
+            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSeason">
+              <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in seasonArr" :key="item.season"></nut-tab-pane>
             </nut-tabs>
-            <div class="tv-version-tabs__disabled" v-if="!tvList.length && !showRehandleButton" @click="disabledTip">
-            </div>
+            <div class="tv-version-tabs__disabled" v-if="!tvList.length && !showRehandleButton" @click="disabledTip"></div>
           </div>
-          <scroll-view class="tv-version-scroll" :scroll-with-animation="true" :scroll-into-view="scrollIntoView"
-            :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false" v-if="tvList.length"
-            :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
-            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)"
-              :key="item.name" @click="toPlayVideo(item, index)">
+          <scroll-view
+            class="tv-version-scroll"
+            :scroll-with-animation="true"
+            :scroll-into-view="scrollIntoView"
+            :scroll-x="true"
+            style="width: 100%"
+            :enhanced="true"
+            :showScrollbar="false"
+            v-if="tvList.length"
+            :style="{ '--line-number': lineNumber, '--line-height': lineHeight }"
+          >
+            <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
                 <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
-                <div class="item-img-process"
+                <div
+                  class="item-img-process"
                   :style="{ width: Number(historyTv.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"
-                  v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path">
-                </div>
+                  v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"
+                ></div>
               </div>
               <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
             </div>
@@ -77,9 +77,15 @@
             <span v-else>加载中...</span>
           </div>
         </div>
-        <actor-list ref="actor_list" :routerParams="routerParams" :actorArr="actorArr" type="emby" v-if="showActor"
-          :selectSource="{ name: imgData.title, path: imgData.path, sourceName: 'Emby', size: null, }"
-          :imgData="{ ...imgData, overview: overview }"></actor-list>
+        <actor-list
+          ref="actor_list"
+          :routerParams="routerParams"
+          :actorArr="actorArr"
+          type="emby"
+          v-if="showActor"
+          :selectSource="{ name: imgData.title, path: imgData.path, sourceName: 'Emby', size: null }"
+          :imgData="{ ...imgData, overview: overview }"
+        ></actor-list>
       </div>
     </div>
   </div>
@@ -87,62 +93,62 @@
 
 <script setup>
 import { ref, onBeforeMount, nextTick } from 'vue'
-import { onShow, onLoad } from "@dcloudio/uni-app";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import actorList from '../components/detail-component/actor-list.vue';
+import { onShow, onLoad } from '@dcloudio/uni-app'
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import actorList from '../components/detail-component/actor-list.vue'
 import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTvList } from '@/utils/emby'
-import { parseTime, calTime, formatNanoseconds, handleSecond, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
+import { parseTime, calTime, formatNanoseconds, handleSecond, handleSeasonName, generateChineseNumberMapping } from '@/utils/scrape'
 
-const imgData = ref({}); //图片内的信息
-const overview = ref(""); //剧情简介
-const actor_list = ref(null);
-const activeSeason = ref({});
-const seasonFirst = ref({});
-const tvList = ref([]); //目前Emby所拥有的电视集数列表
-const historyPlay = ref(uni.getStorageSync("historyPlay") || []); //历史播放
-const buttonText = ref("播放");
-const firstEnter = ref(true);
-const routerParams = ref({});
-const selectMedia = ref({});
-const selectType = ref({});
-const nowSourceList = ref([]);
-const showRehandleButton = ref(false);
-const historyTv = ref({});
-const scrollIntoView = ref("");
+const imgData = ref({}) //图片内的信息
+const overview = ref('') //剧情简介
+const actor_list = ref(null)
+const activeSeason = ref({})
+const seasonFirst = ref({})
+const tvList = ref([]) //目前Emby所拥有的电视集数列表
+const historyPlay = ref(uni.getStorageSync('historyPlay') || []) //历史播放
+const buttonText = ref('播放')
+const firstEnter = ref(true)
+const routerParams = ref({})
+const selectMedia = ref({})
+const selectType = ref({})
+const nowSourceList = ref([])
+const showRehandleButton = ref(false)
+const historyTv = ref({})
+const scrollIntoView = ref('')
 const seasonArr = ref([]) //季的数组
 const actorArr = ref([]) //emby获取到的演员列表
 const showActor = ref(false) //显示演员列表组件
 
-const lineNumber = ref(2);
-const lineHeight = ref(0);
+const lineNumber = ref(2)
+const lineHeight = ref(0)
 
 const allDetail = ref({}) //如果电视剧有很多季,这个参数就存放总的电视剧的详情，用于初始化
 
 //判断选择的是哪个Emby
 const judgeSelect = () => {
-  nowSourceList.value = uni.getStorageSync("sourceList");
-  selectType.value = nowSourceList.value.find((item) => {
-    let select = item.list.find((i) => i.active);
+  nowSourceList.value = uni.getStorageSync('sourceList')
+  selectType.value = nowSourceList.value.find(item => {
+    let select = item.list.find(i => i.active)
     if (select) {
-      selectMedia.value = select;
-      return true;
+      selectMedia.value = select
+      return true
     } else {
-      return false;
+      return false
     }
-  });
-};
+  })
+}
 
 //获取影片详情
 const getMovieTvDetail = async (type = 'all') => {
   if (!routerParams.value.movieTvId) {
-    imgData.value.title = routerParams.value.name;
-    return false;
+    imgData.value.title = routerParams.value.name
+    return false
   }
-  if (routerParams.value.type == "tv") {
-    if (activeSeason.value.season != "1") {
-      imgData.value.title = routerParams.value.name + " " + activeSeason.value.name;
+  if (routerParams.value.type == 'tv') {
+    if (activeSeason.value.season != '1') {
+      imgData.value.title = routerParams.value.name + ' ' + activeSeason.value.name
     } else {
-      imgData.value.title = routerParams.value.name;
+      imgData.value.title = routerParams.value.name
     }
   }
   let res = {}
@@ -152,52 +158,53 @@ const getMovieTvDetail = async (type = 'all') => {
   } else if (type == 'season') {
     res = await getEmbyMovieTv({ movieTvId: activeSeason.value.id }, selectMedia.value)
   }
-  res.overview ? overview.value = res.overview : overview.value = allDetail.value.overview;
+  res.overview ? (overview.value = res.overview) : (overview.value = allDetail.value.overview)
   actorArr.value = res.actors
   showActor.value = true
   let copyImgData = imgData.value
-  if (routerParams.value.type == "movie") {
-    imgData.value = { //如果季接口返回的值不存在，就用imgData原来的
+  if (routerParams.value.type == 'movie') {
+    imgData.value = {
+      //如果季接口返回的值不存在，就用imgData原来的
       title: res.name || copyImgData.title,
       img: res.backdrop_path || copyImgData.img,
       score: res.vote_average.toFixed(1) || copyImgData.score,
       releaseTime: res.release_date || copyImgData.releaseTime,
       runtime: calTime(res.runtime) || copyImgData.runtime,
-      runtimeEn: calTime(res.runtime, "en") || copyImgData.runtimeEn,
-      genres: res.genres.map((i) => i.name).join(" ") || copyImgData.genres,
+      runtimeEn: calTime(res.runtime, 'en') || copyImgData.runtimeEn,
+      genres: res.genres.map(i => i.name).join(' ') || copyImgData.genres,
       size: res.size || copyImgData.size,
       poster: res.poster_path || copyImgData.poster,
       tmdbId: res.tmdbId || copyImgData.tmdbId,
       production_companies: res.production_companies || copyImgData.production_companies,
       overview: res.overview || copyImgData.overview,
       path: res.path || copyImgData.path,
-    };
-  } else if (routerParams.value.type == "tv") {
-    seasonFirst.value.img = res.backdrop_path;
-    if ((type == 'all' && seasonArr.value.length == 1) || (type == 'season' && seasonArr.value.length > 1)) {
-      res.backdrop_path ? imgData.value.img = res.backdrop_path : ''
     }
-    seasonFirst.value.overview = res.overview;
-    res.vote_average ? imgData.value.score = res.vote_average.toFixed(1) : '';
-    res.genres?.length ? imgData.value.genres = res.genres.map((i) => i.name).join(" ") : '';
-    res.release_date ? imgData.value.releaseTime = res.release_date : '';
-    res.poster_path ? imgData.value.poster = res.poster_path : '';
-    res.tmdbId ? imgData.value.tmdbId = res.tmdbId : '';
-    res.production_companies ? imgData.value.production_companies = res.production_companies : '';
-    res.overview ? imgData.value.overview = res.overview : '';
-    res.path ? imgData.value.path = res.path : '';
-    res.number_of_episodes ? imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）` : '';
+  } else if (routerParams.value.type == 'tv') {
+    seasonFirst.value.img = res.backdrop_path
+    if ((type == 'all' && seasonArr.value.length == 1) || (type == 'season' && seasonArr.value.length > 1)) {
+      res.backdrop_path ? (imgData.value.img = res.backdrop_path) : ''
+    }
+    seasonFirst.value.overview = res.overview
+    res.vote_average ? (imgData.value.score = res.vote_average.toFixed(1)) : ''
+    res.genres?.length ? (imgData.value.genres = res.genres.map(i => i.name).join(' ')) : ''
+    res.release_date ? (imgData.value.releaseTime = res.release_date) : ''
+    res.poster_path ? (imgData.value.poster = res.poster_path) : ''
+    res.tmdbId ? (imgData.value.tmdbId = res.tmdbId) : ''
+    res.production_companies ? (imgData.value.production_companies = res.production_companies) : ''
+    res.overview ? (imgData.value.overview = res.overview) : ''
+    res.path ? (imgData.value.path = res.path) : ''
+    res.number_of_episodes ? (imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）`) : ''
   }
-  return res;
-};
+  return res
+}
 
 //切换第几季
-const changeTvSeason = async (obj) => {
+const changeTvSeason = async obj => {
   activeSeason.value = { ...seasonArr.value.find(v => v.name == obj.title) }
-  if (activeSeason.value.season != "1") {
-    imgData.value.title = routerParams.value.name + " " + activeSeason.value.name;
+  if (activeSeason.value.season != '1') {
+    imgData.value.title = routerParams.value.name + ' ' + activeSeason.value.name
   } else {
-    imgData.value.title = routerParams.value.name;
+    imgData.value.title = routerParams.value.name
   }
   getMovieTvDetail('season')
   handleTv()
@@ -223,73 +230,72 @@ const handleTv = async () => {
     } else if (seasonArr.value.length > 1) {
       let embyObj = {
         SeasonId: activeSeason.value.id,
-        folderFileId: routerParams.value.movieTvId
+        folderFileId: routerParams.value.movieTvId,
       }
       result = await getSeasonTvList(embyObj, selectMedia.value)
     }
-
+    console.log(result, 'result')
   } catch (error) {
-    showRehandleButton.value = true;
-    return;
+    showRehandleButton.value = true
+    return
   }
-  tvList.value = result.Items
-    .map((i) => {
-      return {
-        id: i.Id,
-        name: i.Name,
-        title: i.Name,
-        provider: "Emby",
-        poster: setEmbyImg(i, selectMedia.value)
-      };
-    });
-  console.log(tvList.value, '电视剧列表');
+  tvList.value = result.Items.map(i => {
+    return {
+      id: i.Id,
+      name: i.Name,
+      title: i.Name,
+      provider: 'Emby',
+      poster: setEmbyImg(i, selectMedia.value),
+    }
+  })
+  console.log(tvList.value, '电视剧列表')
 }
 
 //设置按钮文字
 const setButtonText = () => {
-  historyPlay.value = uni.getStorageSync("historyPlay") || [];
-  historyPlay.value = historyPlay.value.filter((v) => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name);
-  if (routerParams.value.type == "movie") {
-    let history = historyPlay.value?.find((i) => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true));
-    if (history && selectSource.value.path == "/" + history.path) {
-      buttonText.value = "播放 " + handleSecond(history.initialTime);
+  historyPlay.value = uni.getStorageSync('historyPlay') || []
+  historyPlay.value = historyPlay.value.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
+  if (routerParams.value.type == 'movie') {
+    let history = historyPlay.value?.find(i => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true))
+    if (history && selectSource.value.path == '/' + history.path) {
+      buttonText.value = '播放 ' + handleSecond(history.initialTime)
     } else {
-      buttonText.value = "播放";
+      buttonText.value = '播放'
     }
-  } else if (routerParams.value.type == "tv") {
-    let history = historyPlay.value?.find((i) => {
-      if (activeSeason.value.season == "1") {
-        return i.titlePlay == handleSeasonName(selectSource.value.name, true);
+  } else if (routerParams.value.type == 'tv') {
+    let history = historyPlay.value?.find(i => {
+      if (activeSeason.value.season == '1') {
+        return i.titlePlay == handleSeasonName(selectSource.value.name, true)
       } else {
-        return i.titlePlay == handleSeasonName(selectSource.value.name, true) + " " + activeSeason.value.name;
+        return i.titlePlay == handleSeasonName(selectSource.value.name, true) + ' ' + activeSeason.value.name
       }
-    });
-    historyTv.value = history || {};
-    if (history && activeSeason.value.path + "/" + history.name == "/" + history.path && history.season == activeSeason.value.season) {
-      let time = handleSecond(history.initialTime);
-      buttonText.value = `第${history.ji}集 ${time}`;
+    })
+    historyTv.value = history || {}
+    if (history && activeSeason.value.path + '/' + history.name == '/' + history.path && history.season == activeSeason.value.season) {
+      let time = handleSecond(history.initialTime)
+      buttonText.value = `第${history.ji}集 ${time}`
     } else {
-      buttonText.value = "播放";
+      buttonText.value = '播放'
     }
   }
-};
+}
 
 //点击播放按钮
 const clickPlayButton = () => {
   uni.setStorageSync('overviewData', imgData.value)
-  if (routerParams.value.type == "movie") {
+  if (routerParams.value.type == 'movie') {
     uni.navigateTo({
       url: `/pages/mobile/video/emby/emby-player?folderFileId=${routerParams.value.movieTvId}&type=movie&movieName=${imgData.value.title}`,
-    });
-  } else if (routerParams.value.type == "tv") {
-    uni.setStorageSync("tvList", tvList.value);
-    let openEndTime = {};
-    routerParams.value.movieTvId ? "" : (openEndTime.noSetHistory = 0);
+    })
+  } else if (routerParams.value.type == 'tv') {
+    uni.setStorageSync('tvList', tvList.value)
+    let openEndTime = {}
+    routerParams.value.movieTvId ? '' : (openEndTime.noSetHistory = 0)
     uni.navigateTo({
       url: `/pages/mobile/video/emby/emby-player?folderFileId=${tvList.value[0].id}&type=tv`,
-    });
+    })
   }
-};
+}
 
 //电视剧点击某一集进行播放
 const toPlayVideo = (item, index) => {
@@ -297,12 +303,12 @@ const toPlayVideo = (item, index) => {
   if (routerParams.value.type == 'movie') {
     uni.navigateTo({
       url: `/pages/mobile/video/emby/emby-player?folderFileId=${routerParams.value.movieTvId}&type=movie&movieName=${imgData.value.title}`,
-    });
+    })
   } else if (routerParams.value.type == 'tv') {
-    uni.setStorageSync("tvList", tvList.value);//用于给视频播放器页面显示集数
+    uni.setStorageSync('tvList', tvList.value) //用于给视频播放器页面显示集数
     uni.navigateTo({
       url: `/pages/mobile/video/emby/emby-player?folderFileId=${item.id}&type=tv`,
-    });
+    })
   }
 }
 
@@ -320,26 +326,24 @@ const getSeasonArr = async () => {
   activeSeason.value = { ...seasonArr.value[0] }
 }
 const setItemWidth = () => {
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  let windowWidth = sysinfo.windowWidth;
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth
   if (windowWidth > 700) {
-    lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
-    let remain = windowWidth - 24 - lineNumber.value * 169.5;
+    lineNumber.value = Math.floor((windowWidth - 24) / 169.5)
+    let remain = windowWidth - 24 - lineNumber.value * 169.5
     if (remain < (lineNumber.value - 1) * 10) {
-      lineNumber.value--;
+      lineNumber.value--
     }
   }
-  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
-  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + "rpx";
-};
-setItemWidth();
+  const scale = uni.upx2px(100) / 100 // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + 'rpx'
+}
+setItemWidth()
 onBeforeMount(async () => {
-  judgeSelect();
-  if (routerParams.value.type == 'tv') {
+  judgeSelect()
+  if (routerParams.value.type === 'tv') {
     await getSeasonArr()
-  }
-  if (routerParams.value.type == "tv") {
-    handleTv();
+    handleTv()
   }
   if (seasonArr.value.length > 1) {
     await getMovieTvDetail()
@@ -347,32 +351,32 @@ onBeforeMount(async () => {
   } else {
     getMovieTvDetail()
   }
-});
+})
 
 onShow(() => {
   setTimeout(() => {
-    setButtonText();
+    setButtonText()
     if (!firstEnter.value) {
       nextTick(() => {
-        historyTv.value.name ? (scrollIntoView.value = "name" + historyTv.value.ji) : "";
-      });
+        historyTv.value.name ? (scrollIntoView.value = 'name' + historyTv.value.ji) : ''
+      })
     }
-    firstEnter.value = false;
-  }, 800); //为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
+    firstEnter.value = false
+  }, 800) //为什么加延迟，因为上一个页面setStorageSync的时候，不加延迟返回这个页面获取不到最新的storage
   //重新设置影片信息
-});
+})
 
-onLoad((options) => {
-  routerParams.value = options;
-  if (options.movieTvId == "undefined") {
-    routerParams.value.movieTvId = undefined;
+onLoad(options => {
+  routerParams.value = options
+  if (options.movieTvId == 'undefined') {
+    routerParams.value.movieTvId = undefined
   }
   if (options.isEmby == 'true') {
-    routerParams.value.isEmby = true;
+    routerParams.value.isEmby = true
   } else {
-    routerParams.value.isEmby = false;
+    routerParams.value.isEmby = false
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>
@@ -481,7 +485,7 @@ page {
       position: relative;
 
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
@@ -520,7 +524,7 @@ page {
 
             &::after {
               position: absolute;
-              content: "";
+              content: '';
               width: 2rpx;
               height: 24rpx;
               background-color: #c2c5c6;
@@ -551,7 +555,7 @@ page {
 
             &::after {
               position: absolute;
-              content: "";
+              content: '';
               width: 2rpx;
               height: 24rpx;
               background-color: #c2c5c6;
@@ -616,7 +620,7 @@ page {
           &::before {
             position: absolute;
             display: block;
-            content: "";
+            content: '';
             width: 3rpx;
             height: 24rpx;
             background-color: #c2c5c6;
@@ -659,8 +663,6 @@ page {
           padding-bottom: 20rpx;
         }
 
-
-
         .movie-version-item {
           font-size: 28rpx;
           font-weight: bold;
@@ -675,7 +677,6 @@ page {
           &:first-child {
             margin-left: 0;
           }
-
         }
       }
 
@@ -884,14 +885,12 @@ page {
 //             color: #fff;
 //           }
 
-
 //               .movie-version-item {
 //                 color: #fff;
 //                 border: 2rpx solid #c2c5c6;
 //               }
 
 //             }
-
 
 //         .tv-version {
 //           .tv-version-tabs__cloud {
@@ -933,4 +932,5 @@ page {
 //       }
 //     }
 //   }
-// }</style>
+// }
+</style>

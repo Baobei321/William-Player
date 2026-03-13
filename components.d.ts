@@ -58,6 +58,7 @@ declare module 'vue' {
     WilPopover: typeof import('./src/components/electron/wil-popover/index.vue')['default']
     WilProgress: typeof import('./src/components/mobile/wil-progress/index.vue')['default']
     WilQrcode: typeof import('./src/components/mobile/wil-qrcode/index.vue')['default']
+    WilShareSheet: typeof import('./src/components/mobile/wil-share-sheet/index.vue')['default']
     WilSvg: typeof import('./src/components/electron/wil-svg/index.vue')['default']
     WilSwiper: typeof import('./src/components/mobile/wil-swiper/index.vue')['default']
     WilTabs: typeof import('./src/components/mobile/wil-tabs/index.vue')['default']
