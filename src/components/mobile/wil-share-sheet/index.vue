@@ -3,8 +3,14 @@
     <nut-popup v-model:visible="visible" position="bottom" :round="props.round">
       <div class="wil-share-sheet__wrapper">
         <div class="wrapper-title">{{ props.title }}</div>
-        <div class="wrapper-list">
-          <div class="wrapper-list-item" v-for="item in props.options" :key="item.name" @click="handleSelect(item)">
+        <div class="wrapper-list" :style="{ flexWrap: props.wrap ? 'wrap' : 'nowrap' }">
+          <div
+            :class="['wrapper-list-item', item.delay !== null && item.delay !== undefined ? 'animate__fadeInUp' : '']"
+            :style="{ animationDelay: item.delay || '0' }"
+            v-for="item in props.options"
+            :key="item.name"
+            @click="handleSelect(item)"
+          >
             <div class="wrapper-list-item__icon">
               <image :src="item.icon"></image>
             </div>
@@ -42,19 +48,30 @@ const handleSelect = (item: ShareSheetOption) => {
 .wil-share-sheet {
   :deep(.nut-popup) {
     .wil-share-sheet__wrapper {
+      width: 100%;
       .wrapper-title {
-        padding: 24rpx 32rpx;
+        padding: 24rpx 32rpx 0 32rpx;
         font-weight: bold;
         color: #222222;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
       }
       .wrapper-list {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
+        width: 100%;
+        overflow-x: auto;
+        padding-top: 24rpx;
         padding-bottom: 60rpx;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
         .wrapper-list-item {
           flex: 0 0 20%;
           display: flex;
@@ -86,5 +103,22 @@ const handleSelect = (item: ShareSheetOption) => {
       }
     }
   }
+}
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(200%);
+  }
+  80% {
+    transform: translateY(-40%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.animate__fadeInUp {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-name: fadeInUp;
+  animation-timing-function: ease-out;
 }
 </style>

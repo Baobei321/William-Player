@@ -19,7 +19,7 @@
     {
       "path": "pages/mobile/backend/about-version",
       "style": {
-        "navigationBarTitleText": "关于"
+        "navigationStyle": "custom"
       }
     },
     {
@@ -236,7 +236,8 @@
     "rpxCalcMaxDeviceWidth": 700
   },
   "uniIdRouter": {},
-  "tabBar": { //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
+  "tabBar": {
+    //打包tv端需要将tabbar隐藏，否则返回上一级页面，无法获取焦点
     "color": "#86909C",
     "selectedColor": "#ff6701",
     "backgroundColor": "@tabBarBackgroundColor",

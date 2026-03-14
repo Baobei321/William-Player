@@ -2,7 +2,7 @@
   <div class="about-version">
     <wil-navbar title="关于" :rightShow="true">
       <template #right>
-        <nut-icon name="share" custom-color="#000"></nut-icon>
+        <nut-icon name="share" custom-color="#000" @click="showShare = true"></nut-icon>
       </template>
     </wil-navbar>
     <div class="about-version-wrapper">
@@ -43,7 +43,7 @@
         @closed="closedPopup"
         v-model:visible="showUpgrade"
       ></wil-upgrade>
-      <wil-share-sheet v-model:show="showShare" title="分享至" :options="options" @select="handleSelect"></wil-share-sheet>
+      <wil-share-sheet v-model:show="showShare" title="分享至" :options="options" @select="handleSelect" :wrap="true"></wil-share-sheet>
     </div>
   </div>
 </template>
@@ -62,6 +62,7 @@ import wilShareSheet from '@/components/mobile/wil-share-sheet/index.vue'
 import weiboIcon from '@/static/weibo-icon.png'
 import copyLink from '@/static/copy-link.png'
 import moreIcon from '@/static/more-icon.png'
+import saveImage from '@/static/save-image.png'
 
 const url = ref('')
 
@@ -81,28 +82,42 @@ const versionData = ref({})
 
 const options = [
   {
+    delay: '0.1s',
     name: '微信',
     icon: 'https://q-learning.quectel.com/train-uniapp/assets/wechat-friends-DbSOyenR.png',
   },
-  { name: '朋友圈', icon: 'https://q-learning.quectel.com/train-uniapp/assets/wechat-moments-Cf8Tr5vB.png' },
-  { name: 'QQ', icon: 'https://q-learning.quectel.com/train-uniapp/assets/qq-friends-D5XyRct4.png' },
   {
+    delay: '0.15s',
+    name: '朋友圈',
+    icon: 'https://q-learning.quectel.com/train-uniapp/assets/wechat-moments-Cf8Tr5vB.png',
+  },
+  {
+    delay: '0.2s',
+    name: 'QQ',
+    icon: 'https://q-learning.quectel.com/train-uniapp/assets/qq-friends-D5XyRct4.png',
+  },
+  {
+    delay: '0.25s',
     name: '微博',
     icon: weiboIcon,
   },
   {
+    delay: '0.3s',
     name: '复制链接',
     icon: copyLink,
   },
   {
+    delay: '0.1s',
+    name: '海报',
+    icon: saveImage,
+  },
+  {
+    delay: '0.15s',
     name: '更多',
     icon: moreIcon,
   },
 ]
 
-setTimeout(() => {
-  showShare.value = true
-}, 1000)
 const appVersion = ref(CONFIG.VERSIOIN)
 
 let num = 0
@@ -146,46 +161,55 @@ const toOtherPage = () => {
 //分享
 const handleSelect = item => {
   if (item.name === '微信') {
-    uni.share({
-      provider: 'weixin',
-      type: 0,
-      title: 'William Player',
-      scene: 'WXSceneSession',
+    uni.shareWithSystem({
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
     })
   } else if (item.name === '朋友圈') {
-    uni.share({
-      provider: 'weixin',
-      type: 0,
-      title: 'William Player',
-      scene: 'WXSceneTimeline',
+    uni.shareWithSystem({
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
     })
   } else if (item.name === 'QQ') {
     uni.share({
       provider: 'qq',
-      type: 0,
+      type: 1,
       title: 'William Player',
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
     })
   } else if (item.name === '微博') {
-    uni.share({
-      provider: 'sinaweibo',
-      type: 0,
-      title: 'William Player',
+    uni.shareWithSystem({
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
+    })
+  } else if (item.name === '复制链接') {
+    uni.setClipboardData({
+      data: 'https://chenweiliang6.github.io/app-webview/#/download-center',
+      success: function () {
+        uni.showToast({
+          title: '复制成功',
+          icon: 'none',
+        })
+      },
+    })
+  } else if (item.name === '海报') {
+    uni.previewImage({
+      urls: [
+        'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/3D7CAC0_427A_haibao1_20260314190031837newMediaImage.png',
+        'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1C3CDC3_427A_haibao_20260314172030157newMediaImage.png',
+      ],
+      indicator: 'none',
+    })
+  } else if (item.name === '更多') {
+    uni.shareWithSystem({
+      summary:
+        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
     })
   }
 }
