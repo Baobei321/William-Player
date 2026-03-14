@@ -99,12 +99,12 @@ const options = [
   {
     delay: '0.25s',
     name: '微博',
-    icon: weiboIcon,
+    icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/bcebd0a5a29d4a559d1a94c28aed5261.png',
   },
   {
     delay: '0.3s',
     name: '复制链接',
-    icon: copyLink,
+    icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/f7349231fa5944c5b6873fd0461452f0.png',
   },
   {
     delay: '0.1s',
@@ -114,10 +114,9 @@ const options = [
   {
     delay: '0.15s',
     name: '更多',
-    icon: moreIcon,
+    icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/3e6732cec150494c975df84aae3c42ee.png',
   },
 ]
-
 const appVersion = ref(CONFIG.VERSIOIN)
 
 let num = 0
