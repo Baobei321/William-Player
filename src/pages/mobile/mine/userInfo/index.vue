@@ -6,8 +6,8 @@
           :src="
             userInfo.avatar ||
             'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
-          ">
-        </image>
+          "
+        ></image>
       </wil-uploader>
     </div>
     <div class="userInfo-cell">
@@ -32,14 +32,14 @@
           {{ item.title }}
         </template>
         <template #title="item">
-          <div class="alipay-cell" v-if="item.title === '支付宝' || item.title === 'QQ'">
+          <div class="alipay-cell" v-if="bindOne.includes(item.title)">
             <image :src="userInfo?.[item.prop] ? bindedIcon : nobindedIcon"></image>
             <span :style="{ color: userInfo?.[item.prop] ? '#00c286' : '#FE4344' }">{{ userInfo?.[item.prop] ? '已绑定' : '未绑定' }}</span>
           </div>
           <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }" v-else>{{ item.value || item.placeholder }}</span>
         </template>
         <template #link="item">
-          <span class="unbind-button" v-if="(item.title === '支付宝' || item.title === 'QQ') && userInfo?.[item.prop]" @click.stop="unBind(item)">解除绑定</span>
+          <span class="unbind-button" v-if="bindOne.includes(item.title) && userInfo?.[item.prop]" @click.stop="unBind(item)">解除绑定</span>
         </template>
       </wil-cell>
     </div>
@@ -56,7 +56,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { editUserInfo } from '@/network/apis.js'
 import bindedIcon from '@/static/binded-icon.png'
 import nobindedIcon from '@/static/nobinded-icon.png'
-import { bindAlipay, unbindAlipay, bindQQ, unbindQQ } from '@/network/apis'
+import { bindAlipay, unbindAlipay, bindQQ, unbindQQ, bindWechat, unbindWechat } from '@/network/apis'
 
 const userInfo = ref({})
 const wil_modal = ref(null)
@@ -65,6 +65,8 @@ const genderDict = {
   '1': '女',
   '2': '未知',
 }
+
+const bindOne = ['微信', '支付宝', 'QQ']
 const options1 = computed(() => [
   {
     title: '用户ID',
@@ -110,16 +112,23 @@ const options3 = computed(() => [
     placeholder: '请绑定邮箱',
   },
   {
+    title: '微信',
+    path: null,
+    value: '',
+    placeholder: '请绑定微信',
+    prop: 'isBindWechat',
+  },
+  {
     title: '支付宝',
     path: null,
-    value: userInfo.value.email,
+    value: '',
     placeholder: '请绑定支付宝',
     prop: 'isBindAlipay',
   },
   {
     title: 'QQ',
     path: null,
-    value: userInfo.value.email,
+    value: '',
     placeholder: '请绑定QQ',
     prop: 'isBindQQ',
   },
@@ -143,7 +152,9 @@ const clickItem = item => {
       icon: 'none',
     })
   } else {
-    if (item.title === '支付宝') {
+    if (item.title === '微信') {
+      toBindWechat()
+    } else if (item.title === '支付宝') {
       toBindAlipay()
     } else if (item.title === 'QQ') {
       toBindQQ()
@@ -159,6 +170,19 @@ const toBindPost = async res => {
   await bindAlipay({ alipayCode: res.auth_code })
   userInfo.value.isBindAlipay = true
   uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+}
+
+//绑定微信
+const toBindWechat = () => {
+  uni.login({
+    provider: 'weixin', //使用qq登录
+    onlyAuthorize: true, // 微信登录仅请求授权认证
+    success: async loginRes => {
+      await bindWechat({ code: loginRes.code })
+      userInfo.value.isBindWechat = true
+      uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+    },
+  })
 }
 
 //绑定支付宝
@@ -193,7 +217,18 @@ const toBindQQ = async () => {
 
 //解除绑定
 const unBind = item => {
-  if (item.title === '支付宝') {
+  if (item.title === '微信') {
+    wil_modal.value.showModal({
+      title: '温馨提示',
+      content: '是否确认解绑微信？',
+      confirmColor: '#ff6701',
+      confirm: async () => {
+        await unbindWechat({})
+        userInfo.value.isBindAlipay = false
+        uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
+      },
+    })
+  } else if (item.title === '支付宝') {
     wil_modal.value.showModal({
       title: '温馨提示',
       content: '是否确认解绑支付宝？',

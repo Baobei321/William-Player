@@ -2,14 +2,14 @@
 import request from './request.js'
 
 //获取字典
-export const getDicts = (data) => {
+export const getDicts = data => {
   return request({
     url: '/system/dict/data/type/' + data,
     method: 'get',
   })
 }
 //不需要token获取字典
-export const getUntokenDicts = (data) => {
+export const getUntokenDicts = data => {
   return request({
     url: `/system/dictNoT/data/type/` + data,
     method: 'get',
@@ -79,7 +79,7 @@ export const getAccountDetail = data => {
   return request({
     url: `/account/detail`,
     method: 'get',
-    data: data
+    data: data,
   })
 }
 //设置tmdbkey
@@ -87,7 +87,7 @@ export const setTmdbKey = data => {
   return request({
     url: `/wechat/setTmdbkey`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -96,7 +96,7 @@ export const setShareData = data => {
   return request({
     url: `/wechat/setShareData`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -105,7 +105,7 @@ export const deleteShareData = data => {
   return request({
     url: `/wechat/deleteShareData`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -114,7 +114,7 @@ export const getShareData = data => {
   return request({
     url: `/wechat/getShareData`,
     method: 'get',
-    data: data
+    data: data,
   })
 }
 
@@ -123,7 +123,7 @@ export const addOperLog = data => {
   return request({
     url: `/monitor/operlog/add`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -132,7 +132,7 @@ export const sendEmail = data => {
   return request({
     url: `/william/send-verification-code`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -149,7 +149,7 @@ export const editPwd = data => {
   return request({
     url: `/william/editPwd`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //修改用户信息
@@ -157,7 +157,7 @@ export const editUserInfo = data => {
   return request({
     url: `/system/user/profile`,
     method: 'put',
-    data: data
+    data: data,
   })
 }
 
@@ -166,7 +166,7 @@ export const editUserPhone = data => {
   return request({
     url: `/william/editPhone`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 
@@ -175,7 +175,7 @@ export const editUserEmail = data => {
   return request({
     url: `/william/editEmail`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户使用支付宝登录
@@ -183,7 +183,7 @@ export const loginByAlipay = data => {
   return request({
     url: `/william/alipay/login`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户绑定支付宝
@@ -191,7 +191,7 @@ export const bindAlipay = data => {
   return request({
     url: `/william/alipay/bind`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户解绑支付宝
@@ -199,7 +199,7 @@ export const unbindAlipay = data => {
   return request({
     url: `/william/alipay/unbind`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户使用QQ登录
@@ -207,7 +207,7 @@ export const loginByQQ = data => {
   return request({
     url: `/william/qq/login`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户绑定QQ
@@ -215,7 +215,7 @@ export const bindQQ = data => {
   return request({
     url: `/william/qq/bind`,
     method: 'post',
-    data: data
+    data: data,
   })
 }
 //用户解绑QQ
@@ -223,6 +223,30 @@ export const unbindQQ = data => {
   return request({
     url: `/william/qq/unbind`,
     method: 'post',
-    data: data
+    data: data,
+  })
+}
+//用户使用微信登录
+export const loginByWechat = data => {
+  return request({
+    url: `/william/weixin/login`,
+    method: 'post',
+    data: data,
+  })
+}
+//用户绑定微信
+export const bindWechat = data => {
+  return request({
+    url: `/william/weixin/bind`,
+    method: 'post',
+    data: data,
+  })
+}
+//用户解绑微信
+export const unbindWechat = data => {
+  return request({
+    url: `/william/weixin/unbind`,
+    method: 'post',
+    data: data,
   })
 }

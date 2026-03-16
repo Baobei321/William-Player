@@ -212,7 +212,6 @@ const handleSelect = item => {
         'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/3D7CAC0_427A_haibao1_20260314190031837newMediaImage.png',
         'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1C3CDC3_427A_haibao_20260314172030157newMediaImage.png',
       ],
-      indicator: 'none',
     })
   } else if (item.name === '更多') {
     uni.shareWithSystem({

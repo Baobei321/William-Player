@@ -87,7 +87,8 @@
             /* SDK配置 */
             "sdkConfigs" : {
                 "ad" : {},
-                "share" : {}
+                "share" : {},
+                "oauth" : {}
             },
             "splashscreen" : {
                 "androidStyle" : "default",

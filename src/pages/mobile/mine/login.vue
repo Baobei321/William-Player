@@ -10,11 +10,11 @@
     <div class="login-tabs">
       <nut-tabs v-model="tabValue" @change="changeTabs">
         <nut-tab-pane title="手机登录" pane-key="1">
-          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"> </base-form>
+          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"></base-form>
           <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
         <nut-tab-pane title="邮箱登录" pane-key="2">
-          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"> </base-form>
+          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"></base-form>
           <div class="forget" @click="toForget">忘记密码?</div>
         </nut-tab-pane>
       </nut-tabs>
@@ -32,6 +32,10 @@
       <div class="login-other-way">
         <div class="login-other-way__title">其他登录方式</div>
         <div class="login-other-way__list">
+          <image
+            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2f/dc/81/2fdc81e4-4c1d-1706-ce9d-ee4932e4dd97/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/350x350.png"
+            @click="loginWx"
+          ></image>
           <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"></image>
           <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ"></image>
         </div>
@@ -55,7 +59,7 @@ import { computed, ref } from 'vue'
 import baseForm from '@/components/mobile/wil-form/index.vue'
 import checkIcon from '@/static/check.png'
 import checkActiveIcon from '@/static/check-active.png'
-import { loginByPhone, loginByEmail, loginByAlipay, loginByQQ, getWeUserByopenId } from '@/network/apis'
+import { loginByPhone, loginByEmail, loginByWechat, loginByAlipay, loginByQQ, getWeUserByopenId } from '@/network/apis'
 import { encrypt } from '@/utils/jsencrypt.js'
 import * as CONFIG from '@/utils/config'
 import { getUserByopenId } from './common.js'
@@ -217,6 +221,24 @@ const clickNoAgree = () => {
     title: '请先勾选用户协议',
     icon: 'none',
     duration: 2000,
+  })
+}
+
+//使用微信登录
+const loginWx = () => {
+  uni.login({
+    provider: 'weixin', //使用qq登录
+    onlyAuthorize: true, // 微信登录仅请求授权认证
+    success: async loginRes => {
+      let result = await loginByWechat({ code: loginRes.code })
+      uni.setStorageSync(CONFIG.OPEN_ID, result.openId)
+      uni.setStorageSync('Authorization', result.accessToken)
+      uni.setStorageSync('refreshToken', result.refreshToken)
+      getUserByopenId()
+      uni.reLaunch({
+        url: '/pages/mobile/video/index',
+      })
+    },
   })
 }
 
