@@ -27,7 +27,9 @@
               </div>
             </template>
             <!-- emby专用的首页 -->
-            <emby-home v-else :style="{ paddingTop: `calc(40rpx + ${navbarHeight + 'px'})` }"></emby-home>
+            <template v-else>
+              <emby-home :style="{ paddingTop: `calc(40rpx + ${navbarHeight + 'px'})` }" v-if="embyMovieTvList?.length"></emby-home>
+            </template>
           </scroll-view>
         </div>
         <div class="video-empty" v-if="selectType.type == 'Emby' ? !embyMovieTvList?.length : !localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length">
@@ -92,6 +94,7 @@ const {
   refreshLoading,
   movieTvData,
   localMovieTvData,
+  embyMovieTvList,
   tmdbKey,
   historyPlay,
   settingData,
@@ -115,7 +118,7 @@ let startCommandHeight = 0 //轮播海报的高度，在手机端和pad端表现
 
 const isConnected = ref(false) //手机是否连接网络
 
-const embyMovieTvList = ref(uni.getStorageSync('embyMovieTvList'))
+embyMovieTvList.value = uni.getStorageSync('embyMovieTvList')
 
 const pauseRefresh = () => {
   refreshData.value = { found: 0, toupdate: 0, updated: 0, success: 0, fail: 0 }

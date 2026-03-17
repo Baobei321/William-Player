@@ -69,6 +69,12 @@ const constantRoutes = [
         meta: { title: 'Emby所有' },
       },
       {
+        path: 'embyDetail',
+        component: () => import('@/pages/electron/emby/emby-detail'),
+        name: 'embyDetail',
+        meta: { title: '详情页' },
+      },
+      {
         path: 'embyAll-copy',
         component: () => import('@/pages/electron/emby/emby-all'),
         name: 'EmbyAllCopy',

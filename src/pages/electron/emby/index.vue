@@ -163,6 +163,7 @@ const refreshEmby = async (): Promise<void> => {
             poster: i?.ImageTags?.Primary
               ? `${selectMedia.value.protocol}://${selectMedia.value.address}:${selectMedia.value.port}/emby/Items/${i.Id}/Images/Primary?tag=${i.ImageTags.Primary}`
               : emptyBg,
+            type: i.Type,
           }
         })
         v.list = arr

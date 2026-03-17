@@ -27,6 +27,7 @@ export function useVideoIndex({ wil_modal }) {
   })
 
   const localMovieTvData = ref({})
+  const embyMovieTvList = ref([])
   const tmdbKey = ref('')
   const historyPlay = ref([])
   const selectMedia = ref({})
@@ -650,7 +651,7 @@ export function useVideoIndex({ wil_modal }) {
     scrollTop.value = 0
     refreshLoading.value = true
     let res1 = await getMainView(selectMedia.value)
-    let embyMovieTvList = res1.Items.map(v => {
+    embyMovieTvList.value = res1.Items.map(v => {
       return {
         name: v.Name,
         collectionType: v.CollectionType,
@@ -670,7 +671,7 @@ export function useVideoIndex({ wil_modal }) {
       ImageTypeLimit: '1',
     }
     await Promise.all(
-      embyMovieTvList.map(async v => {
+      embyMovieTvList.value.map(async v => {
         if (CollectionTypeArr.includes(v.collectionType)) {
           embyObj.ParentId = v.id
           let res2 = await getEmbyNewList(embyObj, selectMedia.value)
@@ -692,8 +693,8 @@ export function useVideoIndex({ wil_modal }) {
     )
     scrollTop.value = 0
     refreshLoading.value = false
-    setNavbarStyle(embyMovieTvList?.length)
-    uni.setStorageSync('embyMovieTvList', embyMovieTvList)
+    setNavbarStyle(embyMovieTvList.value?.length)
+    uni.setStorageSync('embyMovieTvList', embyMovieTvList.value)
   }
 
   const refreshVideo = async () => {
@@ -747,8 +748,8 @@ export function useVideoIndex({ wil_modal }) {
     settingData.value = uni.getStorageSync('settingData')
     if (showRecommend !== settingData.value.showRecommend) {
       //如果设置改变
-      let embyMovieTvList = uni.getStorageSync('embyMovieTvList')
-      let isEmpty = selectType.value.type === 'Emby' ? embyMovieTvList?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
+      embyMovieTvList.value = uni.getStorageSync('embyMovieTvList')
+      let isEmpty = selectType.value.type === 'Emby' ? embyMovieTvList.value?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
       if (!settingData.value.showRecommend) {
         setNavbarStyle(isEmpty)
       }
@@ -852,9 +853,7 @@ export function useVideoIndex({ wil_modal }) {
       if (isreload || prevPage == 'pages/mobile/backend/data-sync') {
         scrollTop.value = 0
         uni.removeStorageSync('isreload')
-        if (uni.getStorageSync('settingData').tmdbKey) {
-          video_navbar.value.showProgress()
-        }
+        video_navbar.value.showProgress()
       }
     }
     //初始化资源库列表
@@ -917,6 +916,7 @@ export function useVideoIndex({ wil_modal }) {
     refreshLoading,
     movieTvData,
     localMovieTvData,
+    embyMovieTvList,
     tmdbKey,
     navbarStyle,
     selectType,

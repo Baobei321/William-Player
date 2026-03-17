@@ -60,20 +60,32 @@ const removeExtension = filename => {
   }
   return name
 }
-
+const embyTypeMapping = {
+  'Series': 'tv',
+  'Movie': 'movie',
+}
 const typeMapping = {
   '电影': 'movie',
   '电视剧': 'tv',
 }
 const toVideoDetail = item => {
-  router.push({
-    path: `/homeDetail`,
-    query: { name: handleSeasonName(item.name, true), type: typeMapping[props.title], source: JSON.stringify(item.source), movieTvId: item.movieTvId },
-  })
+  console.log(item, 'ite,/type')
+
+  if (props.type === 'emby') {
+    router.push({
+      path: `/embyDetail`,
+      query: { name: handleSeasonName(item.name, true), type: embyTypeMapping[item.type], source: JSON.stringify(item.source), movieTvId: item.id },
+    })
+  } else {
+    router.push({
+      path: `/homeDetail`,
+      query: { name: handleSeasonName(item.name, true), type: typeMapping[props.title], source: JSON.stringify(item.source), movieTvId: item.movieTvId },
+    })
+  }
 }
 
 const toVideoAll = () => {
-  if (props.type == 'emby') {
+  if (props.type === 'emby') {
     emits('clickAll')
   } else {
     router.push({

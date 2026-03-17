@@ -8,7 +8,7 @@
       <wil-title :title="route.query.title"></wil-title>
       <div class="detail-info">
         <div class="detail-info-img">
-          <img :src="CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + nowMovieTv.poster" />
+          <img :src="imgData.poster" />
         </div>
         <div class="detail-info-right">
           <div class="detail-info-right__name">{{ imgData.title }}</div>
@@ -51,11 +51,6 @@
           <div :class="['source-item', 'source-active']">Emby</div>
         </div>
         <div class="detail-container-tabs" v-if="route.query.type === 'tv'">
-          <div class="detail-container-tabs__list">
-            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSeason">
-              <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource?.seasonArr" :key="item.season"></nut-tab-pane>
-            </nut-tabs>
-          </div>
           <div class="detail-container-tabs__arrow">
             <div class="arrow-left" @click="slideTv('left')">
               <img src="@/static/rect-leftblack.png" />
@@ -92,9 +87,11 @@
         </div>
         <actor-list
           ref="actor_list"
-          :routerParams="route.query"
-          :selectSource="{ ...selectSource, size: route.query.type == 'movie' ? selectSource?.size : tvList[0]?.size }"
-          :imgData="imgData"
+          :actorArr="actorArr"
+          type="emby"
+          v-if="showActor"
+          :selectSource="{ name: imgData.title, path: imgData.path, sourceName: 'Emby', size: null }"
+          :imgData="{ ...imgData, overview: overview }"
         ></actor-list>
       </div>
     </div>
@@ -121,6 +118,7 @@ import { useRoute } from 'vue-router'
 import * as CONFIG from '@/utils/config'
 import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTvList } from '@/utils/emby'
 import { calTime, handleSeasonName, handleSecond, debounce, parseTime } from '@/utils/scrape'
+import actorList from '../home/components/actor-list.vue'
 
 const route = useRoute()
 
@@ -389,22 +387,15 @@ onBeforeMount(async () => {
   judgeSelect()
   if (route.query.type == 'tv') {
     await getSeasonArr()
+    handleTv()
   }
   if (route.query.type == 'tv') {
-    handleTv()
   }
   if (seasonArr.value.length > 1) {
     await getMovieTvDetail()
     getMovieTvDetail('season')
   } else {
     getMovieTvDetail()
-  }
-  const localMovieTvData = uni.getStorageSync('localMovieTvData') || {}
-  if (route.query.type === 'tv') {
-    scrollIntoView.value = 'name1'
-    nowMovieTv.value = localMovieTvData.tv.find((i: Record<string, any>) => i.movieTvId == route.query.movieTvId)
-  } else if (route.query.type === 'movie') {
-    nowMovieTv.value = localMovieTvData.movie.find((i: Record<string, any>) => i.movieTvId == route.query.movieTvId)
   }
 })
 
@@ -679,8 +670,9 @@ onShow(() => {
 
       .detail-container-tabs {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
+        margin-bottom: 24rpx;
 
         .detail-container-tabs__list {
           flex: 0 0 50%;

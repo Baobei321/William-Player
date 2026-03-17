@@ -9,6 +9,7 @@ export type EmbyCollectionItem = {
   CollectionType: string
   ImageTags?: ImageTags
   EndDate?: string
+  Type?: string
 }
 
 export type ProcessedCollectionItem = {
@@ -126,7 +127,7 @@ export type HistoryItem = {
   sourceType: string
   title: string
   type: string
-  titlePlay?: string,
+  titlePlay?: string
   [key: string]: any
 }
 
