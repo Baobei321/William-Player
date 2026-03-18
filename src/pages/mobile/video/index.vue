@@ -45,7 +45,7 @@
             <template #icon>
               <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
             </template>
-            <span>添加新资源</span>
+            <span>添加新资源1</span>
           </nut-button>
           <nut-dialog title="api_key" v-model:visible="showDialog" @cancel="onCancel" @ok="onOk">
             <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
