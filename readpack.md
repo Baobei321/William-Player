@@ -29,7 +29,7 @@ pc:npm run dev:pc
 在开发者开发完自己的功能之后，想要生成安卓apk，安装在安卓手机上，那么此时就需要用到**Android Studio编译器**以及**Android SDK原生代码**，
 
 <div style="color:red">sdk安卓原生代码请在github点了star之后，进群联系群主或者管理员获取</div>
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
+<img src="https://gitee.com/waylon-chen/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 
 ### 第三步：运行Android Studio
 因为各个开发的同学肯定都是以前端为主，对于Android Studio运行安卓项目肯定会比较陌生，大家可以去往上找一下如何安装Android Studio以及相应的环境，我这里就不多做介绍了。

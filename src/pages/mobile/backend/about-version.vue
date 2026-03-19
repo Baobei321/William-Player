@@ -168,7 +168,7 @@ const handleSelect = item => {
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
+      imageUrl: 'https://gitee.com/waylon-chen/William-Player/raw/master/src/static/app-logo1.png',
     })
   } else if (item.name === '朋友圈') {
     uni.share({
@@ -179,7 +179,7 @@ const handleSelect = item => {
       summary:
         '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
-      imageUrl: 'https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png',
+      imageUrl: 'https://gitee.com/waylon-chen/William-Player/raw/master/src/static/app-logo1.png',
     })
   } else if (item.name === 'QQ') {
     uni.share({

@@ -1,4 +1,4 @@
-![WilliamPlayer](https://socialify.git.ci/chenweiliang6/William-Player/image?custom_description=%E4%B8%80%E6%AC%BE%E9%80%82%E9%85%8D%F0%9F%93%B1%20Android%20Phone%20%E5%92%8C%F0%9F%93%BA%20Android%20TV%E7%9A%84%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8%EF%BC%81&description=1&font=Source+Code+Pro&forks=1&issues=1&logo=https://gitee.com/CWLcwl0219/William-Player/raw/master/src/static/app-logo1.png&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Auto)
+![WilliamPlayer](https://socialify.git.ci/chenweiliang6/William-Player/image?custom_description=%E4%B8%80%E6%AC%BE%E9%80%82%E9%85%8D%F0%9F%93%B1%20Android%20Phone%20%E5%92%8C%F0%9F%93%BA%20Android%20TV%E7%9A%84%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8%EF%BC%81&description=1&font=Source+Code+Pro&forks=1&issues=1&logo=https://gitee.com/waylon-chen/webdav-video-player/raw/master/src/static/app-logo1.png&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Auto)
 ![android 8.0 or above](https://img.shields.io/badge/android-8.0_or_above-purple?logo=android)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/chenweiliang6/William-Player/release.yml?logo=github&label=android%20build)](https://github.com/chenweiliang6/William-Player/actions/workflows/release.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/chenweiliang6/William-Player)](https://github.com/chenweiliang6/William-Player/releases/latest)
@@ -17,7 +17,7 @@
 
 项目如果跑不起来的话，就在/utils下创建config.js，从develop分支获取/utils/config.js的代码。
 
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
+<img src="https://gitee.com/waylon-chen/image-hosting/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 
 ## Features
 
@@ -51,8 +51,8 @@
 
 | 架构          | APK                         | 说明                   |
 |-------------|-----------------------------|----------------------|
-| arm64-v8a   | [app-mobile.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/latest/app-mobile.apk)   | 适合大部分设备，手机和平板多数为此架构     |
-| armeabi-v7a   | [app-tv.apk](https://gitee.com/CWLcwl0219/William-Player/releases/download/latest/app-tv.apk)   | 适合大部分电视设备，TV多数为此架构     |
+| arm64-v8a   | [app-mobile.apk](https://gitee.com/waylon-chen/William-Player/releases/download/latest/app-mobile.apk)   | 适合大部分设备，手机和平板多数为此架构     |
+| armeabi-v7a   | [app-tv.apk](https://gitee.com/waylon-chen/William-Player/releases/download/latest/app-tv.apk)   | 适合大部分电视设备，TV多数为此架构     |
 
 ## 版本适配
 
@@ -110,7 +110,7 @@ Android 8+
 
 如果觉得此项目有用，可以考虑赞助我喝杯 ~~奶茶~~ 咖啡 ☕
 
-<img src="https://gitee.com/CWLcwl0219/drawing-bed/raw/master/img/zanshang.jpg" alt="Sponsor" width="240"/>
+<img src="https://gitee.com/waylon-chen/image-hosting/raw/master/img/zanshang.jpg" alt="Sponsor" width="240"/>
 
 
 ## Star History

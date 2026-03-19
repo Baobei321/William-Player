@@ -698,7 +698,7 @@ const toSendEmail = async (codeEncrypt, countDown, email) => {
 const getAppLatestVersion = () => {
   return new Promise((resolve) => {
     uni.request({
-      url: 'https://gitee.com/api/v5/repos/CWLcwl0219/William-Player/releases/latest',
+      url: 'https://gitee.com/api/v5/repos/waylon-chen/William-Player/releases/latest',
       method: "GET",
       success: (res) => {
         resolve(res.data);

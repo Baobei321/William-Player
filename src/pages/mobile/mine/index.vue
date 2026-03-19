@@ -128,7 +128,7 @@ const cellOptions = ref([
       leftIcon: iconFeedback,
       // path: null,
       // outside: true,
-      // outsideUrl: "https://gitee.com/CWLcwl0219/William-Player/issues",
+      // outsideUrl: "https://gitee.com/waylon-chen/William-Player/issues",
       path: '/pages/mobile/backend/index',
       query: {
         url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/question',
