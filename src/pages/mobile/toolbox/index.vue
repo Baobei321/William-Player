@@ -37,7 +37,7 @@ const toolboxArr = [
     icon: 'https://appimg-drcn.dbankcdn.com/application/icon144/950609aee81d49c38d3c5f1ad5fd5e87.png',
     path: '/pages/mobile/backend/index',
     query: {
-      url: 'https://www.xirumi.cn',
+      url: 'https://cx.sinopecsales.com/yjkqiantai/core/initCpb',
       title: '今日油价',
     },
   },
