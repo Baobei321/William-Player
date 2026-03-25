@@ -25,6 +25,7 @@ export default {
       routerParams: {},
       oldName: '',
       platform: '',
+      timer: null, // 用于保存定时器ID
     }
   },
   methods: {
@@ -104,6 +105,7 @@ export default {
             if (this.routerParams.isActive == '1') {
               uni.setStorageSync('isreload', true)
             } else if (this.routerParams.isActive == '0') {
+              this.clearTimer()
               setTimeout(() => {
                 uni.navigateBack({
                   delta: 1,
@@ -137,6 +139,7 @@ export default {
           addOperLog({ title: '登录天翼云盘', businessType: 12, operatorType: 2, operUrl: '' })
         }
         uni.setStorageSync('sourceList', this.sourceList)
+        this.clearTimer()
         setTimeout(() => {
           uni.navigateBack({
             delta: 2,
@@ -149,6 +152,18 @@ export default {
         })
       }
     },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+    startTimer() {
+      this.clearTimer()
+      this.timer = setInterval(() => {
+        this.handleConfirm()
+      }, 30000)
+    },
   },
   onLoad(options) {
     this.routerParams = options
@@ -159,6 +174,9 @@ export default {
     this.url = options.url ? decodeURIComponent(options.url) : ''
     this.platform = options.platform || ''
     this.debounceCookie = this.debounce(this.getCookieData, 8000)
+    if (this.platform === 'TV') {
+      this.startTimer()
+    }
   },
 }
 </script>

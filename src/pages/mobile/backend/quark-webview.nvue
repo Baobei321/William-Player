@@ -25,6 +25,7 @@ export default {
       routerParams: {},
       oldName: '',
       platform: '',
+      timer: null, // 用于保存定时器ID
     }
   },
   methods: {
@@ -91,6 +92,7 @@ export default {
             if (this.routerParams.isActive == '1') {
               uni.setStorageSync('isreload', true)
             } else if (this.routerParams.isActive == '0') {
+              this.clearTimer()
               setTimeout(() => {
                 uni.navigateBack({
                   delta: 1,
@@ -127,6 +129,7 @@ export default {
           }, 1800)
           addOperLog({ title: '登录夸克网盘', businessType: 12, operatorType: 2, operUrl: '' })
         }
+        this.clearTimer()
         setTimeout(() => {
           uni.navigateBack({
             delta: 2,
@@ -140,11 +143,26 @@ export default {
         return
       }
     },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+    startTimer() {
+      this.clearTimer()
+      this.timer = setInterval(() => {
+        this.handleConfirm()
+      }, 30000)
+    },
   },
   onLoad(options) {
     this.routerParams = options
     this.url = options.url ? decodeURIComponent(options.url) : ''
     this.platform = options.platform || ''
+    if (this.platform === 'TV') {
+      this.startTimer()
+    }
   },
 }
 </script>

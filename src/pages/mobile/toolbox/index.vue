@@ -7,6 +7,7 @@
           <image class="list-item-logo" :src="item.icon"></image>
           <span>{{ item.title }}</span>
         </div>
+        <div @click="handleChat">点击进入</div>
       </div>
     </div>
   </div>
@@ -120,6 +121,14 @@ const clickItem = async item => {
       animationType: 'slide-in-bottom',
     })
   }
+}
+
+const handleChat = () => {
+  console.log('丢啊')
+
+  uni.navigateTo({
+    url: '/pages/mobile/toolbox/chat/index',
+  })
 }
 </script>
 

@@ -7,7 +7,7 @@
           <div class="classify-title">{{ item.type }}</div>
           <div class="classify-list">
             <nut-swipe v-for="vitem in item.list" :key="vitem.name" :ref="el => setRefs(el, vitem.index)" :disabled="props.type === 'list' ? false : true">
-              <div :class="['classify-list-item', vitem.index === tabIndex ? 'classify-list-active' : '']">
+              <div :class="['classify-list-item', vitem.index === tabIndex ? 'classify-list-active' : '']" @click="handleChoose(vitem.index)">
                 <div class="item-left">
                   <div class="item-left-icon">
                     <image :src="item.img"></image>
@@ -184,6 +184,18 @@ const resetSelect = vitem => {
   clearAcitve()
   vitem.active = true
   uni.setStorageSync('sourceList', sourceList.value)
+}
+
+//点击选择
+const handleChoose = index => {
+  tabIndex.value = index
+  let { item, vitem } = getItemAndVitem()
+  //type是menu的逻辑，catelog-settings页面需要获取到当前选中的item，vitem
+  if (props.type === 'menu') {
+    emits('getSelectType', item, vitem)
+  } else {
+    selectSource(item, vitem)
+  }
 }
 
 //点击选中资源

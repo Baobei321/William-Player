@@ -60,6 +60,8 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-4070620250821001",
     "@dcloudio/uni-mp-xhs": "3.0.0-4070620250821001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-4070620250821001",
+    "@tdesign/uniapp": "^0.8.0",
+    "@tdesign/uniapp-chat": "^0.2.2",
     "dayjs": "^1.11.18",
     "nosleep.js": "^0.12.0",
     "nutui-uniapp": "^1.9.1",

@@ -1,0 +1,26 @@
+{
+    "id": "lingrb-aih-sse",
+    "name": "sse，APP+h5，使用renderjs ",
+    "displayName": "sse，APP+h5，使用renderjs ",
+    "version": "1.0.0",
+    "description": "使用renderjs实现sse功能，支持安卓，iOS和h5",
+    "keywords": [
+        "sse",
+        "fetch-event-source"
+    ],
+    "dcloudext": {
+        "type": "component-vue",
+        "sale": {
+            "regular": {
+                "price": "0.00"
+            },
+            "sourcecode": {
+                "price": "0.00"
+            }
+        }
+    },
+    "uni_modules": {
+        "dependencies": [],
+        "encrypt": []
+    }
+}
