@@ -86,6 +86,7 @@ import appLogo from '@/static/app-logo1.png'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex.js'
+import { initWebDAVClient } from '@/utils/webdav.js'
 
 const wil_modal = ref(null)
 const {
@@ -276,6 +277,31 @@ const setLocalCookie = () => {
 }
 onBeforeMount(() => {
   showNavbarColor()
+  // let webdavClientInstance = initWebDAVClient({
+  //   server: 'http://10.55.133.230:5244/dav/天翼云盘',
+  //   username: 'admin',
+  //   password: 'lovektc1314520',
+  //   options: {
+  //     deep: true, // 自动检测认证类型（默认）
+  //   },
+  // })
+  // webdavClientInstance
+  //   .getDirectoryContents('/')
+  //   .then(res => {
+  //     console.log(res, 'res111')
+  //     uni.showToast({
+  //       title: res,
+  //       icon: 'none',
+  //       duration: 10000,
+  //     })
+  //   })
+  //   .catch(err => {
+  //     uni.showToast({
+  //       title: err,
+  //       icon: 'none',
+  //       duration: 10000,
+  //     })
+  //   })
 })
 </script>
 

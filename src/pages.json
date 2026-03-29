@@ -226,12 +226,6 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },
-       {
-      "path": "pages/mobile/toolbox/chat/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
     }
   ],
   "globalStyle": {
