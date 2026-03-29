@@ -7,7 +7,7 @@
           <image class="list-item-logo" :src="item.icon"></image>
           <span>{{ item.title }}</span>
         </div>
-        <div @click="handleChat">点击进入</div>
+        <!-- <div @click="handleChat">点击进入</div> -->
       </div>
     </div>
   </div>

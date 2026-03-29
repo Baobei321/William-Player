@@ -4,7 +4,7 @@
     <!-- <span @click="openVideo">调试用</span> -->
     <template v-if="!refreshLoading">
       <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
-      <div class="home-container">
+      <div class="home-container" v-if="localMovieTvData?.movie || localMovieTvData?.tv">
         <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend" :showSwiper="showSwiper"></star-recommend>
         <div class="home-container-list">
           <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
@@ -12,6 +12,9 @@
           <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
           <Classify></Classify>
         </div>
+      </div>
+      <div class="home-empty" v-else>
+        <wil-empty type="data" text="暂无影片"></wil-empty>
       </div>
     </template>
     <Skeleton v-else></Skeleton>
@@ -28,6 +31,7 @@ import recentPlayed from './components/recent-played.vue'
 import hxList from './components/hx-list.vue'
 import Classify from './components/classify.vue'
 import wilModal from '@/components/mobile/wil-modal/index.vue'
+import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { nextTick, onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
@@ -152,6 +156,13 @@ onDeactivated(() => {
       padding: 0 100rpx;
       padding-bottom: 100rpx;
     }
+  }
+  .home-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

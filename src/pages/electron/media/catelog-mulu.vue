@@ -28,7 +28,7 @@
     <nut-dialog v-model:visible="showDialog" @closed="closedDialog">
       <template #header>
         <div class="header-left" @click="back">
-          <span> {{ dialogTitle }}</span>
+          <span>{{ dialogTitle }}</span>
         </div>
         <div class="header-right" @click="cancel">
           <img src="@/static/close-black.png" />
@@ -45,7 +45,8 @@
                     :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.name === selectMedia.name ? 'list-active' : '']"
                     v-for="vitem in item.list"
                     :key="vitem.name"
-                    @click="handleSelect(item, vitem)">
+                    @click="handleSelect(item, vitem)"
+                  >
                     <div class="list-item-img">
                       <img :src="item.img" />
                     </div>
@@ -71,7 +72,8 @@
               :showScrollBar="false"
               :responseAdapter="responseAdapter"
               @currentData="handleData"
-              :key="key">
+              :key="key"
+            >
               <template #default="item">
                 <div class="mulu-item" @click="clickCell(item)">
                   <div class="mulu-item-left">
@@ -333,14 +335,16 @@ page {
   }
 
   .catelog-mulu-container {
-    display: flex;
-    flex-wrap: wrap;
-    // align-items: flex-start;
-    align-content: flex-start;
     padding: 24rpx;
     width: 100%;
     height: 100%;
     overflow: hidden;
+    display: grid;
+    align-content: flex-start;
+    /* 关键：auto-fill自动填充，minmax确保每列最小宽度为固定值 */
+    grid-template-columns: repeat(auto-fill, 400rpx);
+    /* 设置间距：上下10px，左右15px */
+    gap: 24rpx 24rpx;
 
     .catelog-mulu-item {
       flex: 0 0 400rpx;
@@ -350,8 +354,8 @@ page {
       height: 278rpx;
       display: flex;
       flex-direction: column;
-      margin-top: 24rpx;
-      margin-left: 24rpx;
+      // margin-top: 24rpx;
+      // margin-left: 24rpx;
       cursor: pointer;
 
       .item-top {

@@ -5,16 +5,15 @@
         :src="
           userInfo.avatar ||
           'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
-        " />
+        "
+      />
       <div class="user-info-top__name">
         <span>{{ userInfo.name }}</span>
         <span>{{ userInfo.phonenumber }}</span>
       </div>
     </div>
     <div class="user-info-list">
-      <div class="user-info-list__item" :style="{ color: item.color }" v-for="item in options" :key="item.name" @click="handleClick(item.name)">
-        {{ item.name }}
-      </div>
+      <div class="user-info-list__item" :style="{ color: item.color }" v-for="item in options" :key="item.name" @click="handleClick(item.name)">{{ item.name }}</div>
     </div>
   </div>
 </template>
@@ -33,7 +32,7 @@ const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const options = [
   { name: '意见反馈', color: 'rgb(38,38,38)' },
   { name: '下载手机版', color: 'rgb(38,38,38)' },
-  { name: '退出登录', color: 'rgb(247,76,49)' },
+  { name: userInfo.value.phonenumber === '19994658532' || !userInfo.value.phonenumber ? '登录' : '退出登录', color: 'rgb(247,76,49)' },
 ]
 
 //跳转到登录页，缩小窗口
@@ -65,9 +64,15 @@ const handleClick = name => {
         })
       })
       break
+    case '登录':
+      uni.removeStorageSync('Authorization')
+      uni.removeStorageSync('refreshToken')
+      reduceWindow()
+      router.replace({
+        path: '/login',
+      })
+      break
   }
-  console.log("走到这");
-  
   emits('closePopover')
 }
 </script>
