@@ -7,6 +7,8 @@
       :connections="connectionsMap"
       :change:connectTrigger="renderScript.onConnectTrigger"
       :connectTrigger="connectTrigger"
+      :change:disconnectId="renderScript.onDisconnectId"
+      :disconnectId="disconnectId"
       :change:disconnectTrigger="renderScript.onDisconnectTrigger"
       :disconnectTrigger="disconnectTrigger"
       style="display: none"
@@ -43,6 +45,7 @@ export default {
       // 触发器
       connectTrigger: 0,
       disconnectTrigger: 0,
+      disconnectId: '',
     }
   },
   methods: {
@@ -144,12 +147,12 @@ export default {
         console.error(`连接 ${connectionId} 不存在`)
         return false
       }
-
+      // this.connections.delete(connectionId)
       connection.status = 'disconnecting'
       this.updateConnectionsMap()
       console.log(`关闭连接 ${connectionId}`)
+      this.disconnectId = connectionId
       this.disconnectTrigger = Date.now() // 触发renderjs关闭
-
       this.$emit('connectionClosing', { connectionId })
       return true
     },
@@ -416,7 +419,8 @@ export default {
     return {
       // 连接池 { connectionId: { controller, config } }
       connectionsRender: new Map(),
-      debugMode: false
+      debugMode: false,
+      disconnectRenderId:'',
     }
   },
   methods: {
@@ -437,9 +441,20 @@ export default {
 
     // 断开连接触发器
     async onDisconnectTrigger(newValue, oldValue, ownerInstance, instance) {
+      console.log("改变时间断开");
+
       if (newValue && newValue !== oldValue) {
-        console.log('收到断开连接触发器', newValue)
+        // console.log('收到断开连接触发器', newValue)
         // 这里不直接触发断开，断开由updateConnections处理
+        this.stopConnection(this.disconnectRenderId, ownerInstance)
+      }
+    },
+
+    //设置最新的断开连接的Id
+    async onDisconnectId(newValue, oldValue, ownerInstance, instance) {
+      console.log("改变id断开");
+      if (newValue && newValue !== oldValue) {
+        this.disconnectRenderId = newValue
       }
     },
 
@@ -487,8 +502,6 @@ export default {
       }
 
       this.connectionsRender.set(connectionId, connection)
-      console.log(this.connectionsRender.has(connectionId),'das2');
-
 
       try {
         const fes = await loadFetchEventSource()
@@ -512,8 +525,7 @@ export default {
       if (!connection) return
 
       console.log(`停止连接 ${connectionId}`)
-      console.log('停止连接');
-
+      connection.status='disconnected'
       if (connection.controller) {
         connection.controller.abort()
       }
@@ -521,7 +533,6 @@ export default {
       if (connection.eventSource) {
         connection.eventSource.close()
       }
-
       // this.connectionsRender.delete(connectionId)
       ownerInstance.callMethod('handleDisconnected', connectionId)
     },

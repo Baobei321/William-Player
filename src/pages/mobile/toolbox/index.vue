@@ -25,8 +25,8 @@ const toolboxArr = [
   { title: '下载管理', icon: downloadIcon, path: '/pages/mobile/toolbox/download/index' },
   { title: '快递查询', icon: expressSearch, path: '/pages/mobile/toolbox/express/search' },
   {
-    title: 'AI应用',
-    icon: 'https://img2.baidu.com/it/u=1301209709,4272401830&fm=253&fmt=auto&app=138&f=JPEG?w=437&h=437',
+    title: '千问',
+    icon: 'https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20260218/rs7abhxe/2026021810452118kcz.webp',
     path: '/pages/mobile/backend/index',
     query: {
       url: 'https://www.qianwen.com/',
@@ -62,7 +62,7 @@ const toolboxArr = [
   },
   {
     title: '同步观影',
-    icon: 'https://synctv.mofashi.ltd/web/favicon.svg',
+    icon: 'https://cdn.jsdelivr.net/gh/synctv-org/docs@main/logo/logo.png',
     path: 'https://synctv.mofashi.ltd/web/',
   },
   {
@@ -82,6 +82,11 @@ const toolboxArr = [
       url: '',
       title: '流量查询',
     },
+  },
+  {
+    title: 'AI问答',
+    icon: 'https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20231211/xnof23rl/202312111204047yhfu.webp',
+    path: '/pages/mobile/toolbox/chat/index',
   },
 ]
 

@@ -250,3 +250,13 @@ export const unbindWechat = data => {
     data: data,
   })
 }
+
+//调用ai接口生成图片
+export const generations = data => {
+  return request({
+    url: `/aiChat/generations`,
+    method: 'post',
+    data: data,
+    timeout: 100000,
+  })
+}

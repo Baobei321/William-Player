@@ -741,19 +741,8 @@ export function useVideoIndex({ wil_modal }) {
       }) || {}
   }
 
-  //页面显示执行的方法
-  const showPage = async () => {
+  const initSourceList = () => {
     sourceList.value = uni.getStorageSync('sourceList')
-    let showRecommend = settingData.value.showRecommend
-    settingData.value = uni.getStorageSync('settingData')
-    if (showRecommend !== settingData.value.showRecommend) {
-      //如果设置改变
-      embyMovieTvList.value = uni.getStorageSync('embyMovieTvList')
-      let isEmpty = selectType.value.type === 'Emby' ? embyMovieTvList.value?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
-      if (!settingData.value.showRecommend) {
-        setNavbarStyle(isEmpty)
-      }
-    }
     if (!sourceList.value) {
       sourceList.value = [
         { type: 'WebDAV', list: [], img: webdavFileIcon },
@@ -775,6 +764,22 @@ export function useVideoIndex({ wil_modal }) {
       ]
       uni.setStorageSync('sourceList', sourceList.value)
     }
+  }
+
+  //页面显示执行的方法
+  const showPage = async () => {
+    sourceList.value = uni.getStorageSync('sourceList')
+    let showRecommend = settingData.value.showRecommend
+    settingData.value = uni.getStorageSync('settingData')
+    if (showRecommend !== settingData.value.showRecommend) {
+      //如果设置改变
+      embyMovieTvList.value = uni.getStorageSync('embyMovieTvList')
+      let isEmpty = selectType.value.type === 'Emby' ? embyMovieTvList.value?.length : !localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length
+      if (!settingData.value.showRecommend) {
+        setNavbarStyle(isEmpty)
+      }
+    }
+    initSourceList()
     judgeSelect()
     localMovieTvData.value = uni.getStorageSync('localMovieTvData') || {}
     !localMovieTvData.value?.tv?.length && !localMovieTvData.value?.movie?.length ? (scrollTop.value = 0) : ''
@@ -861,6 +866,7 @@ export function useVideoIndex({ wil_modal }) {
 
   onBeforeMount(async () => {
     // setTmdbImgDomain();
+    initSourceList()
     judgeSelect()
     localMovieTvData.value = uni.getStorageSync('localMovieTvData') || {}
     setNavbarStyle(!localMovieTvData.value?.movie?.length && !localMovieTvData.value?.tv?.length)
@@ -886,7 +892,6 @@ export function useVideoIndex({ wil_modal }) {
         let res1 = await loginUser(selectMedia.value)
         selectMedia.value.token = res1.data.token
         uni.setStorageSync('sourceList', sourceList.value)
-
         let res = await getFolder({}, selectMedia.value)
         listData.value = res.data.content.map(item => {
           if (item.type == '1') {
