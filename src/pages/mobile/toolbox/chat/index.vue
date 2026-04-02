@@ -40,7 +40,7 @@
             </div>
             <div class="content-video" v-if="item.content[1].type === 'video'">
               <div class="content-video-empty" v-if="!item.content[1].data?.length && item.status === 'loading'"></div>
-              <video v-for="vitem in item.content[1].data || []" :key="vitem.url" :src="vitem.url" :poster="item.cover_image_url"></video>
+              <h5-video v-for="vitem in item.content[1].data || []" :key="vitem.url" :videoSrc="vitem.url" :poster="item.cover_image_url"></h5-video>
             </div>
           </template>
           <!-- <template #actionbar>
@@ -93,6 +93,7 @@ import TChatActionbar from '@tdesign/uniapp-chat/chat-actionbar/chat-actionbar.v
 import TIcon from '@tdesign/uniapp/icon/icon.vue'
 import wilSse from '@/components/mobile/wil-sse/index.vue'
 import chatSender from './components/chat-sender.vue'
+import h5Video from './components/h5-video.vue'
 import { ref } from 'vue'
 import * as CONFIG from '@/utils/config.js'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
@@ -151,11 +152,11 @@ const addNew = () => {
 }
 
 const previewImage = (item, arr) => {
-        uni.previewImage({
-          current:item.url,
-          urls: arr.map(i => i.url),
-          indicator: "none",
-        });
+  uni.previewImage({
+    current: item.url,
+    urls: arr.map(i => i.url),
+    indicator: 'none',
+  })
 }
 
 const sendMessage = async (value, fileList, abilityObj) => {
@@ -395,16 +396,6 @@ page {
                 height: 300rpx;
                 border-radius: 24rpx;
                 background: #f5f5f8;
-              }
-              video {
-                flex: 0 0 500rpx;
-                height: 300rpx;
-                border-radius: 24rpx;
-                margin-left: 24rpx;
-                background: #f5f5f8;
-                &:first-child {
-                  margin-left: 0;
-                }
               }
             }
           }

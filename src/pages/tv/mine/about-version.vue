@@ -35,8 +35,8 @@
         :app-name="upgradeInfo.appName"
         :appVersion="appVersion"
         @closed="closedPopup"
-        v-model:visible="showUpgrade">
-      </wil-upgrade>
+        v-model:visible="showUpgrade"
+      ></wil-upgrade>
     </div>
   </tv-page>
 </template>
@@ -67,7 +67,7 @@ const showButton = ref(true)
 const showUpgrade = ref(false)
 const versionData = ref({})
 
-const appVersion = ref(CONFIG.VERSIOIN)
+const appVersion = ref(CONFIG.VERSION)
 
 const tabIndex = ref(0)
 

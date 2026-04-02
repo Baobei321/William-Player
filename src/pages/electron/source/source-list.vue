@@ -407,11 +407,23 @@ const editSource = (item, vitem) => {
 //设置电视剧目录
 const setTvMulu = async (item, vitem) => {
   //后续写完目录设置页面加上路由跳转，跳转到目录设置页面，可以设置所有资源的目录
+  router.push({
+    path: '/catelog-mulu',
+    query: {
+      title: '电视剧',
+    },
+  })
 }
 
 //设置电影目录
 const setMovieMulu = async (item, vitem) => {
   //后续写完目录设置页面加上路由跳转，跳转到目录设置页面，可以设置所有资源的目录
+  router.push({
+    path: '/catelog-mulu',
+    query: {
+      title: '电影',
+    },
+  })
 }
 
 //删除资源

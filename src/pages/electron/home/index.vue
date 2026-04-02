@@ -4,7 +4,7 @@
     <!-- <span @click="openVideo">调试用</span> -->
     <template v-if="!refreshLoading">
       <under-img :imgArr="underImgArr" :swipeIndex="swipeIndex" :leave="leave"></under-img>
-      <div class="home-container" v-if="localMovieTvData?.movie || localMovieTvData?.tv">
+      <div class="home-container" v-if="localMovieTvData?.movie?.length || localMovieTvData?.tv?.length">
         <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend" :showSwiper="showSwiper"></star-recommend>
         <div class="home-container-list">
           <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
@@ -123,17 +123,19 @@ onUnmounted(() => {
 })
 
 onActivated(() => {
-  console.log(uni.getStorageSync('historyPlay'), 'historyPlay')
-
   let element = document.querySelector('.home-container')
-  element.scrollTop = scrollTop
+  if (element) {
+    element.scrollTop = scrollTop
+  }
   // setTimeout(() => {
   showPage()
   // }, 300);
 })
 onDeactivated(() => {
   let element = document.querySelector('.home-container')
-  scrollTop = element.scrollTop
+  if (element) {
+    scrollTop = element.scrollTop
+  }
 })
 </script>
 

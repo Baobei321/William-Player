@@ -117,7 +117,7 @@ const options = [
     icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/3e6732cec150494c975df84aae3c42ee.png',
   },
 ]
-const appVersion = ref(CONFIG.VERSIOIN)
+const appVersion = ref(CONFIG.VERSION)
 
 let num = 0
 

@@ -61,7 +61,7 @@
       :logo="upgradeInfo.logo"
       :app-name="upgradeInfo.appName"
       :enableControl="true"
-      :appVersion="CONFIG.VERSIOIN"
+      :appVersion="CONFIG.VERSION"
     ></wil-upgrade>
     <wil-modal ref="wil_modal"></wil-modal>
     <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>

@@ -68,7 +68,7 @@ const showButton = ref(true)
 const showUpgrade = ref(false)
 const versionData = ref({})
 
-const appVersion = ref(CONFIG.VERSIOIN)
+const appVersion = ref(CONFIG.VERSION)
 
 const tabIndex = ref(0)
 

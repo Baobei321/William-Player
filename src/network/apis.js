@@ -257,6 +257,6 @@ export const generations = data => {
     url: `/aiChat/generations`,
     method: 'post',
     data: data,
-    timeout: 100000,
+    timeout: 3000000,
   })
 }

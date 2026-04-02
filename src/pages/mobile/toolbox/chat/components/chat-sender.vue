@@ -27,7 +27,7 @@
           <template #content>
             <div class="popover-content-list">
               <div class="popover-content-item" v-for="item in moreOptions" :key="item.name" @click="selectMore(item)">
-                <custom-svg :class-name="item.className" color="#000000"></custom-svg>
+                <image :src="item.icon"></image>
                 <span>{{ item.name }}</span>
               </div>
             </div>
@@ -35,7 +35,7 @@
         </t-popover>
       </template>
       <div class="ability-item" v-else @click="closeAbility">
-        <custom-svg :class-name="moreOptions.find(i => i.name === abilityType).className" color="#0052d9"></custom-svg>
+        <image :src="moreOptions.find(i => i.name === abilityType).activeIcon" color="#0052d9"></image>
         <span>{{ abilityType }}</span>
         <t-icon name="close" size="32rpx" color="#0052d9" />
       </div>
@@ -80,10 +80,13 @@ import TChatSender from '@tdesign/uniapp-chat/chat-sender/chat-sender.vue'
 import TIcon from '@tdesign/uniapp/icon/icon.vue'
 import TPopover from '@tdesign/uniapp/popover/popover.vue'
 import wilUploader from '@/components/mobile/wil-uploader/index.vue'
-import customSvg from './svg.vue'
 import uploadimageIcon from '@/static/uploadimage-icon.png'
 import uploadfileIcon from '@/static/uploadfile-icon.png'
 import uploadcameraIcon from '@/static/uploadcamera-icon.png'
+import moreImage from '@/static/more-image.png'
+import moreVideo from '@/static/more-video.png'
+import moreImageActive from '@/static/more-image-active.png'
+import moreVideoActive from '@/static/more-video-active.png'
 import * as CONFIG from '@/utils/config.js'
 import { nextTick, ref } from 'vue'
 
@@ -118,8 +121,8 @@ const popoverOptions = [
 ]
 
 const moreOptions = [
-  { name: '图像生成', className: 'image' },
-  { name: '视频生成', className: 'video' },
+  { name: '图像生成', icon: moreImage, activeIcon: moreImageActive, className: 'image' },
+  { name: '视频生成', icon: moreVideo, activeIcon: moreVideoActive, className: 'video' },
 ]
 
 let uploadFileId = 0
@@ -307,7 +310,7 @@ const stopMessage = () => {
           padding: 0 16rpx;
           border-radius: 16rpx;
 
-          svg {
+          image {
             width: 36rpx;
             height: 36rpx;
             display: block;
@@ -343,7 +346,7 @@ const stopMessage = () => {
                 align-items: center;
                 padding: 12rpx 0;
                 cursor: pointer;
-                svg {
+                image {
                   width: 36rpx;
                   height: 36rpx;
                   display: block;
