@@ -163,17 +163,24 @@ export default params => {
     'Content-Type': 'application/json;charset=UTF-8',
     'Authorization': 'Bearer ' + uni.getStorageSync('Authorization'),
     'Tenant-Id': uni.getStorageSync('tenantId') || 'xxx', // avue配置相关
-    ...params.header,
+    // 'Host': '127.0.0.1', //用于修复请求域名接口时，被拦截的问题。
+    ...(params.header || {}),
   }
   if (method == 'post') {
     data = data ? JSON.stringify(data) : data
     header = {
       'Content-Type': 'application/json', // 自定义，跟后台约定好传什么格式的
       'Authorization': 'Bearer ' + uni.getStorageSync('Authorization'),
+      // 'Host': '127.0.0.1', //用于修复请求域名接口时，被拦截的问题。
     }
   }
   let requestTask = null
   const promise = new Promise((resolve, reject) => {
+    // let isProxy = plus.networkinfo.isSetProxy()
+    // if (isProxy) {
+    //   reject({ code: 404, msg: '请检查代理设置' })
+    //   return
+    // }
     requestTask = uni.request({
       url: base_url + url,
       method: method,

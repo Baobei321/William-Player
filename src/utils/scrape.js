@@ -583,7 +583,7 @@ let classifyList = [
     img: 'https://img1.baidu.com/it/u=3020374768,111332665&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=746',
     background: 'linear-gradient(to bottom, #d73c23, #f46e5b)',
   },
-  { id: '14', label: '奇幻', img: 'https://wx1.sinaimg.cn/large/0079wuTAly1gx7yuc7wzyj30ty16ojx9.jpg', background: 'linear-gradient(to bottom, #da243d, #dd626e)' },
+  { id: '14', label: '奇幻', img: 'https://pic.rmb.bdstatic.com/efe475e3323491a06e7446b2b6022c80.jpeg', background: 'linear-gradient(to bottom, #da243d, #dd626e)' },
 ]
 export {
   handleSecond,

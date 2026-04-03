@@ -2,6 +2,19 @@ import * as CONFIG from '@/utils/config.js'
 import { sendEmail } from "@/network/apis"
 // import { ipc } from "@/utils/ipcRenderer";
 // import { ipcApiRoute } from "@/utils/ipcApiRoute";
+
+// 工具函数：构建 Cookie 字符串
+const buildCookie = (cookieObj) => {
+  return Object.entries(cookieObj)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(';')
+}
+
+// 工具函数：生成随机数字字符串
+const generateRandomDigits = (length = 16) => {
+  return Array.from({ length }, () => Math.floor(Math.random() * 10)).join('')
+}
+
 //webdav
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {
@@ -79,18 +92,9 @@ const loginUser = (webdavInfo) => {
 
 //天翼云盘
 const get189Folder = (data, cookieInfo) => {
-  let cookie = { JSESSIONID: cookieInfo.JSESSIONID, COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER }
-  let cookieStr = ''
-  let arr = Object.keys(cookie)
-  arr.forEach((item, index) => {
-    let str = ''
-    if (index == arr.length - 1) {
-      str = `${item}=${cookie[item]}`
-      cookieStr = cookieStr + str
-    } else {
-      str = `${item}=${cookie[item]};`
-      cookieStr = cookieStr + str
-    }
+  const cookieStr = buildCookie({ 
+    JSESSIONID: cookieInfo.JSESSIONID, 
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
   })
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
@@ -157,23 +161,11 @@ const get189Folder = (data, cookieInfo) => {
 
 //天翼云盘获取视频链接
 const get189VideoUrl = (data, cookieInfo) => {
-  let cookieStr = "";
-  let randomDigits = "";
-  for (let i = 0; i < 16; i++) {
-    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
-  }
-  let cookie = { JSESSIONID: cookieInfo.JSESSIONID, COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER };
-  let arr = Object.keys(cookie);
-  arr.forEach((item, index) => {
-    let str = "";
-    if (index == arr.length - 1) {
-      str = `${item}=${cookie[item]}`;
-      cookieStr = cookieStr + str;
-    } else {
-      str = `${item}=${cookie[item]};`;
-      cookieStr = cookieStr + str;
-    }
-  });
+  const randomDigits = generateRandomDigits()
+  const cookieStr = buildCookie({ 
+    JSESSIONID: cookieInfo.JSESSIONID, 
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
+  })
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
       ipc.invoke(ipcApiRoute.httpRequest, {
@@ -239,10 +231,11 @@ const get189VideoUrl = (data, cookieInfo) => {
 
 //天翼云盘获取用户信息
 const get189User = (obj) => {
-  let randomDigits = "";
-  for (let i = 0; i < 16; i++) {
-    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
-  }
+  const randomDigits = generateRandomDigits()
+  const cookieStr = buildCookie({ 
+    JSESSIONID: obj.JSESSIONID, 
+    COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER 
+  })
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
       ipc.invoke(ipcApiRoute.httpRequest, {
@@ -252,7 +245,7 @@ const get189User = (obj) => {
           Accept: "application/json;charset=UTF-8",
           "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
           Connection: "keep-alive",
-          Cookie: `JSESSIONID=${obj.JSESSIONID};COOKIE_LOGIN_USER=${obj.COOKIE_LOGIN_USER}`,
+          Cookie: cookieStr,
           Host: "cloud.189.cn",
           Priority: "u=0",
           Referer: "https://cloud.189.cn/web/main/file/folder/-11",
@@ -282,7 +275,7 @@ const get189User = (obj) => {
           Accept: "application/json;charset=UTF-8",
           "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
           Connection: "keep-alive",
-          Cookie: `JSESSIONID=${obj.JSESSIONID};COOKIE_LOGIN_USER=${obj.COOKIE_LOGIN_USER}`,
+          Cookie: cookieStr,
           Host: "cloud.189.cn",
           Priority: "u=0",
           Referer: "https://cloud.189.cn/web/main/file/folder/-11",
@@ -305,22 +298,10 @@ const get189User = (obj) => {
 
 //天翼云盘获取文件下载链接
 const get189DownloadUrl = (data, cookieInfo) => {
-  let cookie = { JSESSIONID: cookieInfo.JSESSIONID, COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER }
-  let randomDigits = "";
-  for (let i = 0; i < 16; i++) {
-    randomDigits += Math.floor(Math.random() * 10); // 生成0-9的随机数
-  }
-  let cookieStr = ''
-  let arr = Object.keys(cookie)
-  arr.forEach((item, index) => {
-    let str = ''
-    if (index == arr.length - 1) {
-      str = `${item}=${cookie[item]}`
-      cookieStr = cookieStr + str
-    } else {
-      str = `${item}=${cookie[item]};`
-      cookieStr = cookieStr + str
-    }
+  const randomDigits = generateRandomDigits()
+  const cookieStr = buildCookie({ 
+    JSESSIONID: cookieInfo.JSESSIONID, 
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
   })
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
@@ -597,9 +578,9 @@ const getTvSeason = (data) => {
 const getMovieTvById = (data, type) => {
   let url = "";
   let obj = JSON.parse(JSON.stringify(data));
-  if (type == "movie") {
+  if (type === "movie") {
     url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`;
-  } else if (type == "tv") {
+  } else if (type === "tv") {
     url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`;
   }
   delete obj.movieTvId;
@@ -646,7 +627,7 @@ const getCutContent = () => {
         const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fa5，。；！？、]+)/g;
         const urls = res.data.match(urlRegex); // ["https://cloud.189.cn/t/uMfaErJFFrm2"]
         if (urls && (urls[0].startsWith("https://cloud.189.cn/") || urls[0].startsWith("https://pan.quark.cn/"))) {
-          if (uni.getStorageSync('shareUrl') == urls[0]) {
+          if (uni.getStorageSync('shareUrl') === urls[0]) {
             resolve(null)
           } else {
             uni.setStorageSync('shareUrl', urls[0])

@@ -15,7 +15,7 @@
 
 对于App使用有问题或者建议的，大家可以进交流群一起交流。
 
-项目如果跑不起来的话，就在/utils下创建config.js，从develop分支获取/utils/config.js的代码。
+项目如果跑不起来的话，就在/utils下创建config.js，从develop分支获取/utils/config.js的代码。获取进qq群联系我寻求帮助。
 
 <img src="https://gitee.com/waylon-chen/image-hosting/raw/master/img/qq-group.jpg" alt="Sponsor" width="240"/>
 

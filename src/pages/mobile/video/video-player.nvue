@@ -632,10 +632,6 @@ export default {
     // options.openingTime ? (this.config.initialTime = options.openingTime) : "";
     if (options.videoUrl) {
       this.config.url = decodeURIComponent(options.videoUrl)
-      uni.showToast({
-        title: this.cofig.url,
-        icon: 'none',
-      })
       this.config.title = options.liveTitle
       return
     }

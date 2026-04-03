@@ -22,3 +22,4 @@ nativeplugins
 *.njsproj
 *.sln
 *.sw?
+.qwen

@@ -239,7 +239,7 @@ export function useVideoAll({ wil_list, route = null }) {
           total: res.length,
         }
       } else if (routerParams.value.title == '电视剧' || routerParams.value.title == '电影') {
-        let res = uni.getStorageSync('localMovieTvData')
+        let res = uni.getStorageSync('localMovieTvData') || {}
         let arr = res[mapping[routerParams.value.title]]
         arr.forEach(item => {
           item.loadImg = true

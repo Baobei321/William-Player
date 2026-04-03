@@ -22,6 +22,7 @@ export const loginByPhone = data => {
     method: 'post',
     data: data,
     header: { 'Content-Type': 'application/json' },
+    timeout: 3000,
   })
 }
 //邮箱密码登录

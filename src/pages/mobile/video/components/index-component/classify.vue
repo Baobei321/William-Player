@@ -1,15 +1,20 @@
 <template>
   <div class="video-classify">
     <div class="video-classify-title">类别</div>
-    <div class="video-classify-list" :style="{'--line-number':lineNumber,'--line-height':lineHeight}">
-      <div class="list-item" v-for="(item,index) in listData" :key="item.id" :style="{ background: item.background,marginLeft:index % lineNumber == 0 ? 0 : '24rpx' }"
-        @click="toVideoAll(item)">
+    <div class="video-classify-list" :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
+      <div
+        class="list-item"
+        v-for="(item, index) in listData"
+        :key="item.id"
+        :style="{ background: item.background, marginLeft: index % lineNumber == 0 ? 0 : '24rpx' }"
+        @click="toVideoAll(item)"
+      >
         <div class="list-item-title">{{ item.label }}</div>
         <div class="list-item-img">
           <div class="img-one"></div>
           <div class="img-two"></div>
           <div class="img-three">
-            <image :src="!props.isConnected && !item.loadImg? emptyBg : item.img" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill" />
+            <image :src="!props.isConnected && !item.loadImg ? emptyBg : item.img" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill" />
           </div>
         </div>
       </div>
@@ -18,79 +23,79 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
-import { classifyList } from "@/utils/scrape.js";
-import emptyBg from "@/static/empty_bg.png";
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { classifyList } from '@/utils/scrape.js'
+import emptyBg from '@/static/empty_bg.png'
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
-});
+})
 
-const listData = ref([]);
+const listData = ref([])
 
-const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
+const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)))
 
-const lineNumber = ref(2);
-const lineHeight = ref("");
+const lineNumber = ref(2)
+const lineHeight = ref('')
 
 //获取当前缓存的影片的所有类别
 const getGenre = () => {
-  let idArr = [];
-  listData.value = [];
-  let movieTvData = uni.getStorageSync("localMovieTvData") || {};
-  movieTvData.movie?.forEach((item) => {
+  let idArr = []
+  listData.value = []
+  let movieTvData = uni.getStorageSync('localMovieTvData') || {}
+  movieTvData.movie?.forEach(item => {
     if (item.genre_ids) {
-      idArr.push(...item.genre_ids);
+      idArr.push(...item.genre_ids)
     }
-  });
-  movieTvData.tv?.forEach((item) => {
+  })
+  movieTvData.tv?.forEach(item => {
     if (item.genre_ids) {
-      idArr.push(...item.genre_ids);
+      idArr.push(...item.genre_ids)
     }
-  });
+  })
 
-  idArr = [...new Set(idArr)];
-  idArr.forEach((item) => {
-    let obj = classifyList1.value.find((i) => i.id == item);
+  idArr = [...new Set(idArr)]
+  idArr.forEach(item => {
+    let obj = classifyList1.value.find(i => i.id == item)
     if (obj) {
-      obj.loadImg = true;
-      listData.value.push(obj);
+      obj.loadImg = true
+      listData.value.push(obj)
     }
-  });
-};
+  })
+}
 
 const setItemWidth = () => {
-  let sysinfo = uni.getSystemInfoSync(); // 获取设备系统对象
-  let windowWidth = sysinfo.windowWidth;
+  let sysinfo = uni.getSystemInfoSync() // 获取设备系统对象
+  let windowWidth = sysinfo.windowWidth
   if (windowWidth > 700) {
-    lineNumber.value = Math.floor((windowWidth - 24) / 169.5);
-    let remain = windowWidth - 24 - lineNumber.value * 169.5;
+    lineNumber.value = Math.floor((windowWidth - 24) / 169.5)
+    let remain = windowWidth - 24 - lineNumber.value * 169.5
     if (remain < (lineNumber.value - 1) * 10) {
-      lineNumber.value--;
+      lineNumber.value--
     }
   }
-  const scale = uni.upx2px(100) / 100; // 获取1rpx对应的px比例
-  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + "rpx";
-};
-setItemWidth();
+  const scale = uni.upx2px(100) / 100 // 获取1rpx对应的px比例
+  lineHeight.value = (((windowWidth - uni.upx2px(24 * lineNumber.value + 24)) / lineNumber.value) * 170) / 339 / scale + 'rpx'
+}
+setItemWidth()
 
 //跳转到videoAll
-const toVideoAll = (item) => {
+const toVideoAll = item => {
   uni.navigateTo({
     url: `/pages/mobile/video/video-all?title=${item.label}&genreId=${item.id}&isConnected=${props.isConnected}`,
-  });
-};
-const imgError = (item) => {
-  item.loadImg = false;
-};
-const imgLoad = (item) => {
-  if (!props.isConnected && !item.loadImg) return;
-  item.loadImg = true;
-};
+  })
+}
+const imgError = item => {
+  item.loadImg = false
+}
+const imgLoad = item => {
+  if (!props.isConnected && !item.loadImg) return
+  item.loadImg = true
+}
 onShow(() => {
-  getGenre();
-});
+  getGenre()
+})
 </script>
 
 <style lang="scss" scoped>
