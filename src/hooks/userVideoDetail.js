@@ -504,122 +504,87 @@ export function useVideoDetail({ route, router }) {
   const toPlayVideo = (item, index) => {
     CONFIG.PLATFORM === 'PC' ? '' : uni.setStorageSync('tvList', tvList.value)
     let localMovieTvData = uni.getStorageSync('localMovieTvData')
-    let nowTv = {}
-    if (routerParams.value.movieTvId) {
-      nowTv = localMovieTvData.tv.find(i => i.movieTvId == routerParams.value.movieTvId)
-    } else {
-      nowTv = localMovieTvData.tv.find(i => i.path == routerParams.value.path)
-    }
-    let history = historyPlay.value?.find(
-      i =>
-        i.titlePlay == handleSeasonName(selectSource.value.name + (activeSeason.value.name == '第一季' ? '' : ' ' + activeSeason.value.name), true) && item.name == i.name
+    const nowTv = routerParams.value.movieTvId
+      ? localMovieTvData.tv?.find(i => i.movieTvId == routerParams.value.movieTvId)
+      : localMovieTvData.tv?.find(i => i.path == routerParams.value.path)
+    const seasonName = activeSeason.value.name === '第一季' ? '' : ' ' + aictiveSeason.value.name
+    const expectedTitle = handleSeasonName(selectSource.value.name + seasonName, true)
+    const history = historyPlay.value?.find(
+      i => i.titlePlay === expectedTitle && item.name === i.name && activeSeason.value.path + '/' + i.name === '/' + i.path && activeSeason.value.season === i.season
     )
-    if (history && activeSeason.value.path + '/' + history.name == '/' + history.path && activeSeason.value.season == history.season) {
-      //存在历史记录，同一路径的片源，同一季
-      let openEndTime = {}
-      routerParams.value.movieTvId ? '' : (openEndTime.noSetHistory = 0)
-      nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : ''
-      nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : ''
-      if (CONFIG.PLATFORM === 'PC') {
-        let query = {}
-        if (selectType.value.type == 'WebDAV') {
-          query = {
-            path: `${activeSeason.value.path.slice(1)}/${item.name}`,
-            type: 'tv',
-          }
-        } else {
-          query = {
-            path: `${activeSeason.value.path.slice(1)}/${item.name}`,
-            wjjId: activeSeason.value.folderFileId,
-            folderFileId: item.id,
-            type: 'tv',
-          }
+
+    // 构建播放参数
+    const basePath = `${activeSeason.value.path.slice(1)}/${item.name}`
+    const isWebDAV = selectType.value.type === 'WebDAV'
+    const historyItem = !history
+      ? {
+          path: basePath,
+          titlePlay: imgData.value.title,
+          ji: String(item.ji),
+          poster: item.poster || imgData.value.img,
+          type: 'tv',
+          name: item.name,
+          runtime: item.runtime,
+          title: item.title,
+          initialTime: '0',
+          movieTvId: routerParams.value.movieTvId,
+          season: activeSeason.value.season,
+          sourceType: selectType.value.type,
+          sourceName: selectMedia.value.name,
         }
-        let args = {
-          type: 'vue',
-          content: '/video',
-          windowName: 'Video',
-          windowTitle: `正在播放：`,
-          query: query,
-        }
-        ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
-          console.log('[createWindow] id:', id)
-        })
-      } else {
-        if (selectType.value.type == 'WebDAV') {
-          uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&type=tv${toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''}`,
-          })
-        } else {
-          uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&type=tv${toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''}`,
-          })
-        }
+      : null
+    const historyArr = uni.getStorageSync('historyPlay') || []
+    if (historyItem) {
+      isWebDAV ? '' : (historyItem.folderFileId = item.id)
+      uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
+    }
+    // 构建查询参数
+    const query = {
+      path: basePath,
+      type: 'tv',
+      ...(!isWebDAV && {
+        wjjId: activeSeason.value.folderFileId,
+        folderFileId: item.id,
+      }),
+      isEmby: '0'
+    }
+    // PC端打开MPV播放器
+    if (CONFIG.PLATFORM === 'PC') {
+      const args = {
+        type: 'vue',
+        content: '/video',
+        windowName: 'Video',
+        windowTitle: history ? '正在播放：' : 'William Player',
+        query,
+      }
+      ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+        console.log('[createWindow] id:', id)
+      })
+      return
+    }
+
+    // 移动端打开播放器
+    const openEndTime = {}
+    if (!routerParams.value.movieTvId) openEndTime.noSetHistory = 0
+    if (nowTv?.openingTime >= 0) openEndTime.openingTime = nowTv.openingTime
+    if (nowTv?.endTime >= 0) openEndTime.endTime = nowTv.endTime
+
+    let url = `/pages/mobile/video/video-player?path=${basePath}&type=tv`
+    if (!isWebDAV) {
+      url += `&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}`
+      if (historyItem) {
+        historyItem.folderFileId = item.id
+        uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
       }
     } else {
-      let historyItem = {
-        path: `${activeSeason.value.path.slice(1)}/${item.name}`,
-        titlePlay: imgData.value.title,
-        ji: String(item.ji),
-        poster: item.poster || imgData.value.img,
-        type: 'tv',
-        name: item.name,
-        runtime: item.runtime,
-        title: item.title,
-        initialTime: '0',
-        movieTvId: routerParams.value.movieTvId,
-        season: activeSeason.value.season,
-        sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
-        sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
-      }
-
-      let openEndTime = {}
-      routerParams.value.movieTvId ? '' : (openEndTime.noSetHistory = 0)
-      nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : ''
-      nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : ''
-      if (CONFIG.PLATFORM === 'PC') {
-        let query = {}
-        if (selectType.value.type == 'WebDAV') {
-          query = {
-            path: `${activeSeason.value.path.slice(1)}/${item.name}`,
-            item: encodeURIComponent(JSON.stringify(historyItem)),
-            type: 'tv',
-          }
-        } else {
-          query = {
-            path: `${activeSeason.value.path.slice(1)}/${item.name}`,
-            wjjId: activeSeason.value.folderFileId,
-            folderFileId: item.id,
-            item: JSON.stringify(historyItem),
-            type: 'tv',
-          }
-        }
-
-        let args = {
-          type: 'vue',
-          content: '/video',
-          windowName: 'Video',
-          windowTitle: `William Player`,
-          query: query,
-        }
-        ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
-          console.log('[createWindow] id:', id)
-        })
-      } else {
-        if (selectType.value.type == 'WebDAV') {
-          uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''}`,
-          })
-        } else {
-          historyItem.folderFileId = item.id
-          uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${item.name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}&item=${JSON.stringify(historyItem)}&type=tv${
-              toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''
-            }`,
-          })
-        }
+      if (historyItem) {
+        uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
       }
     }
+
+    const queryStr = toStringfy(openEndTime)
+    if (queryStr) url += `&${queryStr}`
+    uni.navigateTo({ url })
   }
 
   //设置按钮文字

@@ -106,4 +106,39 @@ const getPhoneCityAndCarrier = data => {
   })
 }
 
-export { parseM3UToArray, groupByGroupTitle, groupByName, getPhoneCityAndCarrier }
+//获取当前选择的是哪个资源，isEmby是true的话就获取选中的emby资源，不是就是正常资源
+const judgeSelect = (type = 'all') => {
+  let sourceList = uni.getStorageSync('sourceList') || []
+  let selectType = {}
+  let selectMedia = {}
+  if (type === 'emby') {
+    const embySource = sourceList.find(item => item.type === 'Emby')
+    const activeItem = embySource?.list?.find(item => item.active)
+    if (activeItem) {
+      selectMedia = activeItem
+      selectType = embySource
+    }
+    return { selectType, selectMedia }
+  } else if (type === 'normal') {
+    // 非Emby场景:遍历找有active的组
+    const nonEmbySource = sourceList.find(item => item.type !== 'Emby' && item.list?.some(i => i.active)) || {}
+    const activeItem = nonEmbySource?.list?.find(item => item.active)
+    if (activeItem) {
+      selectMedia.value = activeItem
+      selectType.value = nonEmbySource
+    }
+    return { selectType, selectMedia }
+  } else {
+    selectType =
+      sourceList.find(item => {
+        let select = item.list.find(i => i.active)
+        if (select) {
+          selectMedia = select
+        }
+        return !!select
+      }) || {}
+    return { selectType, selectMedia }
+  }
+}
+
+export { parseM3UToArray, groupByGroupTitle, groupByName, getPhoneCityAndCarrier, judgeSelect }

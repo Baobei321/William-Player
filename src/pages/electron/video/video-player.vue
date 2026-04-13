@@ -13,6 +13,7 @@ import { calTime, handleSeasonName, generateChineseNumberMapping } from '@/utils
 import { addOperLog } from '@/network/apis'
 import { IMG_DOMAIN } from '@/utils/config'
 import { getEmbyPlayerUrl } from '@/utils/emby'
+import { judgeSelect } from '@/utils/tools'
 
 const route = useRoute()
 
@@ -46,24 +47,10 @@ let sourceList = []
 let selectType = {}
 let selectMedia = {}
 let historyPlay = []
-//判断选择的是webdav还是天翼云盘还是夸克
-const judgeSelect = () => {
-  sourceList = uni.getStorageSync('sourceList') || []
-  const embySource = sourceList.find(item => (route.query.isEmby === 'true') === (item.type === 'Emby'))
-  if (!embySource?.list) {
-    selectType = {}
-    return
-  }
-  const activeItem = embySource.list.find(item => item.active)
-  if (activeItem) {
-    selectMedia = activeItem
-    selectType = embySource
-  } else {
-    selectType = {}
-  }
-}
 const getVideoUrl = async () => {
-  judgeSelect()
+  const { selectType: type, selectMedia: media } = judgeSelect(route.query.isEmby === 'true' ? 'emby' : 'normal')
+  selectMedia = media
+  selectType = type
   if (selectType.type == 'WebDAV') {
     if (selectMedia.name) {
       let res = await getWebDAVUrl(
@@ -248,7 +235,9 @@ const setInitialTime = () => {
   }
 }
 onBeforeMount(() => {
-  judgeSelect()
+  const { selectType: type, selectMedia: media } = judgeSelect(route.query.isEmby === 'true' ? 'emby' : 'normal')
+  selectMedia = media
+  selectType = type
   let systemInfo = uni.getSystemInfoSync()
   plateForm.value = systemInfo.platform
   uniPlatform.value = systemInfo.uniPlatform

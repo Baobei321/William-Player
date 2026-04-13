@@ -34,8 +34,8 @@ import recentPlayed from '../home/components/recent-played.vue'
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import { useRouter } from 'vue-router'
 import { getMainView, getEmbyList, getEmbyNewList, getHistoryList } from '@/utils/emby'
-import { onShow } from '@dcloudio/uni-app'
 import type { EmbyCollectionItem, ProcessedCollectionItem, EmbyQueryParams, ClassifyItem, SourceList, HistoryItem } from './types'
+import { judgeSelect } from '@/utils/tools'
 import dayjs from 'dayjs'
 const router = useRouter()
 
@@ -110,22 +110,6 @@ const clickAll = (item: ClassifyItem) => {
     },
   })
 }
-//判断选择的是哪个emby
-const judgeSelect = () => {
-  sourceList.value = uni.getStorageSync('sourceList') || []
-  const embySource = sourceList.value.find(item => item.type === 'Emby')
-  if (!embySource?.list) {
-    selectType.value = {}
-    return
-  }
-  const activeItem = embySource.list.find(item => item.active)
-  if (activeItem) {
-    selectMedia.value = activeItem
-    selectType.value = embySource
-  } else {
-    selectType.value = {}
-  }
-}
 //Emby的refresh
 const refreshEmby = async (): Promise<void> => {
   const CollectionTypeArr = ['movies', 'tvshows', 'music', 'games', 'books', 'musicvideos', 'homevideos', 'livetv', 'channels']
@@ -186,9 +170,16 @@ const getHistoryEmby = async (): Promise<void> => {
   let res = await getHistoryList(embyObj, selectMedia.value)
   historyPlay.value = res.rows
 }
+
+const initSelect = () => {
+  const { selectMedia: media, selectType: type }: { selectMedia: Record<string, any>; selectType: any } = judgeSelect('emby')
+  selectMedia.value = media
+  selectType.value = type
+}
+
 setUnderImg()
 setShowList()
-judgeSelect()
+initSelect()
 getHistoryEmby()
 refreshEmby()
 // onShow(() => {

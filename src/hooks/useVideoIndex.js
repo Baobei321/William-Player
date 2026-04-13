@@ -709,6 +709,7 @@ export function useVideoIndex({ wil_modal }) {
     }
     historyPlay.value = uni.getStorageSync('historyPlay') || []
     historyPlay.value = historyPlay.value.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
+    //从历史播放记录中筛选出当前影视中存在的
     historyPlay.value = historyPlay.value.filter(item => {
       return (
         localMovieTvData.value.movie?.some(v => handleSeasonName(v.name, true) == handleSeasonName(item.name, true) && v.movieTvId == item.movieTvId) ||

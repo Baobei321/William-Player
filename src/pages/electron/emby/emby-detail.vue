@@ -118,6 +118,7 @@ import { useRoute } from 'vue-router'
 import * as CONFIG from '@/utils/config'
 import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTvList } from '@/utils/emby'
 import { calTime, handleSeasonName, handleSecond, debounce, parseTime } from '@/utils/scrape'
+import { judgeSelect } from '@/utils/tools'
 import actorList from '../home/components/actor-list.vue'
 
 const route = useRoute()
@@ -144,23 +145,6 @@ const selectSource = ref<SourceItem | null>(null)
 const allDetail = ref<MovieTvDetailType>({}) //如果电视剧有很多季,这个参数就存放总的电视剧的详情，用于初始化
 const nowMovieTv = ref<any>({})
 let nowTime = 0
-
-//判断选择的是哪个emby
-const judgeSelect = () => {
-  nowSourceList.value = uni.getStorageSync('sourceList') || []
-  const embySource = nowSourceList.value.find(item => item.type === 'Emby')
-  if (!embySource?.list) {
-    selectType.value = {}
-    return
-  }
-  const activeItem = embySource.list.find(item => item.active)
-  if (activeItem) {
-    selectMedia.value = activeItem
-    selectType.value = embySource
-  } else {
-    selectType.value = {}
-  }
-}
 
 //获取影片详情
 const getMovieTvDetail = async (type = 'all') => {
@@ -384,12 +368,12 @@ const slideTv = (direction: string) => {
   nowTime = time
 }
 onBeforeMount(async () => {
-  judgeSelect()
+  const selectData = judgeSelect('emby')
+  selectMedia.value = selectData.selectMedia
+  selectType.value = selectData.selectType as any
   if (route.query.type == 'tv') {
     await getSeasonArr()
     handleTv()
-  }
-  if (route.query.type == 'tv') {
   }
   if (seasonArr.value.length > 1) {
     await getMovieTvDetail()

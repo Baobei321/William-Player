@@ -50,6 +50,7 @@ import emptyBg from '@/static/empty_bg.png'
 import { toStringfy } from '@/pages/mobile/mine/common'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
+import { judgeSelect } from '@/utils/tools'
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -83,23 +84,6 @@ const getMovieName = val => {
   const firstDotIndex = val.indexOf('.')
   let name = firstDotIndex === -1 ? val : val.substring(0, firstDotIndex)
   return name
-}
-
-//判断选择的是哪个emby
-const judgeSelect = () => {
-  let sourceList = uni.getStorageSync('sourceList') || []
-  const embySource = sourceList.find(item => (props.type === 'emby') === (item.type === 'Emby'))
-  if (!embySource?.list) {
-    selectType.value = {}
-    return
-  }
-  const activeItem = embySource.list.find(item => item.active)
-  if (activeItem) {
-    selectMedia.value = activeItem
-    selectType.value = embySource
-  } else {
-    selectType.value = {}
-  }
 }
 
 //将点击了的视频放置到数组的第一个去
@@ -196,7 +180,10 @@ const imgLoad = item => {
 }
 
 onShow(() => {
-  judgeSelect()
+  const { selectMedia: media, selectType: type } = judgeSelect(props.type === 'emby' ? 'emby' : 'normal')
+  selectMedia.value = media
+  selectType.value = type
+
   scrollData.value = [...props.listData]
   scrollData.value.forEach(item => {
     item.loadImg = true

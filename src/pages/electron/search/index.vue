@@ -52,6 +52,7 @@ import type { TabPaneName } from 'element-plus'
 import { getMainView, getEmbyList, setEmbyImg } from '@/utils/emby'
 import dayjs from 'dayjs'
 import type { EmbyCollectionItem, SourceList } from '../emby/types'
+import { judgeSelect } from '@/utils/tools'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,20 +94,10 @@ const removeExtension = (item: any) => {
 }
 
 //判断选择的是哪个emby
-const judgeSelect = () => {
-  sourceList.value = uni.getStorageSync('sourceList') || []
-  const embySource = sourceList.value.find(item => item.type === 'Emby')
-  if (!embySource?.list) {
-    selectType.value = {}
-    return
-  }
-  const activeItem = embySource.list.find(item => item.active)
-  if (activeItem) {
-    selectMedia.value = activeItem
-    selectType.value = embySource
-  } else {
-    selectType.value = {}
-  }
+const initSelect = () => {
+  const { selectMedia: media, selectType: type }: { selectMedia: Record<string, any>; selectType: any } = judgeSelect('emby')
+  selectMedia.value = media
+  selectType.value = type
 }
 //初始化tabsList
 const initTabsList = async () => {
@@ -205,7 +196,7 @@ const getList = async (params: { pageNum: number; pageSize: number }) => {
     return { total: res.TotalRecordCount, rows }
   }
 }
-judgeSelect()
+initSelect()
 initTabsList()
 </script>
 
