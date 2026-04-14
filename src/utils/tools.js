@@ -1,3 +1,6 @@
+import videoPlayerIcon from '@/static/video-player.png'
+import fileIcon from '@/static/file-icon.png'
+import imageFormat from '@/static/image-format.png'
 //处理iptv的m3u文件
 const parseM3UToArray = m3uContent => {
   const lines = m3uContent.split('\n')
@@ -141,4 +144,35 @@ const judgeSelect = (type = 'all') => {
   }
 }
 
-export { parseM3UToArray, groupByGroupTitle, groupByName, getPhoneCityAndCarrier, judgeSelect }
+//根据格式获取图标
+const getFormatIcon = format => {
+  const formatMapping = {
+    'docx': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/71725b30-c8f4-11ef-98f3-674d066e29a6.png',
+    'doc': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/71725b30-c8f4-11ef-98f3-674d066e29a6.png',
+    'xlsx': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/19e25220-c8f5-11ef-98f3-674d066e29a6.png',
+    'jpg': imageFormat,
+    'png': imageFormat,
+    'jpeg': imageFormat,
+    'pdf': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/b6132c60-c8f4-11ef-98f3-674d066e29a6.png',
+    'pptx': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/cd05a790-c8f4-11ef-98f3-674d066e29a6.png',
+    'mp3': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'aac': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'wma': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'ogg': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'flac': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'alac': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/835e41f0-c8f5-11ef-98f3-674d066e29a6.png',
+    'zip': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/e4210780-c8f4-11ef-98f3-674d066e29a6.png',
+    'rar': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/e4210780-c8f4-11ef-98f3-674d066e29a6.png',
+    'tar': 'https://image.quark.cn/s/uae/g/3o/broccoli/resource/202501/e4210780-c8f4-11ef-98f3-674d066e29a6.png',
+    'mp4': videoPlayerIcon,
+    'mkv': videoPlayerIcon,
+    'iso': videoPlayerIcon,
+  }
+  if (formatMapping[format]) {
+    return formatMapping[format]
+  } else {
+    return fileIcon
+  }
+}
+
+export { parseM3UToArray, groupByGroupTitle, groupByName, getPhoneCityAndCarrier, judgeSelect, getFormatIcon }

@@ -46,7 +46,8 @@ import { useRouter } from 'vue-router'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { ElImage } from 'element-plus'
-import { judgeSelect } from '@/utils/tools'
+import fileIcon from '@/static/file-icon.png'
+import { getFormatIcon } from '@/utils/tools'
 
 const router = useRouter()
 const title = ref('媒体库列表')
@@ -95,7 +96,6 @@ const clickMedia = async item => {
     let res = await loginUser(state.selectMedia)
     state.selectMedia.token = res.data.token
   }
-
   if (state.selectMedia.type === 'WebDAV') {
     let path = ''
     state.historyPath.forEach((v, vindex) => {
@@ -106,51 +106,103 @@ const clickMedia = async item => {
     state.historyPath.push({ name: item.name, path: state.historyPath.length >= 1 ? path + '/' + item.name : '' }) //将当前点击的文件夹加入历史路径
     load_list.value.reload()
   } else if (state.selectMedia.type === '天翼云盘') {
-    if (state.selectMedia.name) {
-      let path = ''
-      if (item.type === 1 || item.type === '天翼云盘') {
-        state.historyPath.forEach((v, vindex) => {
-          if (vindex !== 0) {
-            path += '/' + v.name
-          }
-        })
-        state.historyPath.push({
-          name: item.name,
-          folderFileId: state.historyPath.length >= 1 ? item.folderFileId : '-11',
-          path: state.historyPath.length >= 1 ? path + '/' + item.name : '',
-        }) //将当前点击的文件夹加入历史路径
-        load_list.value.reload()
-      } else {
-        let videoFormat = ['mp4', 'mkv', 'm2ts', 'avi', 'mov', 'ts', 'm3u8', 'iso']
-        let imgFormat = ['jpg', 'png', 'jpeg', 'raw', 'webp', 'gif']
-        if (videoFormat.some(i => item.name.includes(i))) {
-          const args = {
-            type: 'vue',
-            content: '/video',
-            windowName: 'Video',
-            windowTitle: 'William Player',
-            query: {
-              path: encodeURIComponent(path + '/' + item.name),
-              noSetHistory: '0',
-              folderFileId: item.folderFileId,
-            },
-          }
-          ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
-            console.log('[createWindow] id:', id)
-          })
-        } else if (imgFormat.some(i => item.name.includes(i))) {
-          let res = await get189DownloadUrl({ folderFileId: item.folderFileId }, state.selectMedia)
-          console.log(res, 'res1111')
-          previewList.value = [res.fileDownloadUrl]
-          nextTick(() => {
-            imageRef.value.showPreview()
-          })
-        }
-      }
+    handleCloudDiskItem(item)
+  } else if (state.selectMedia.type === '夸克网盘') {
+    handleCloudDiskItem(item)
+  }
+}
+
+// 通用处理方法
+const handleCloudDiskItem = async item => {
+  // 定义网盘策略配置
+  const cloudDiskStrategies = {
+    '天翼云盘': {
+      initialFolderId: '-11',
+      getMediaUrl: get189DownloadUrl,
+      parseImageUrl: res => res.fileDownloadUrl,
+    },
+    '夸克网盘': {
+      initialFolderId: '0',
+      getMediaUrl: getQuarkVideoUrl,
+      parseImageUrl: res => res.data[0].download_url,
+    },
+  }
+  if (!state.selectMedia.name) return
+
+  const strategy = cloudDiskStrategies[state.selectMedia.type]
+  if (!strategy) return
+
+  // 公共变量
+  const videoFormat = ['mp4', 'mkv', 'm2ts', 'avi', 'mov', 'ts', 'm3u8', 'iso']
+  const imgFormat = ['jpg', 'png', 'jpeg', 'raw', 'webp', 'gif']
+  // 处理文件夹
+  if (item.type === 1 || item.type === state.selectMedia.type) {
+    handleFolder(item, strategy.initialFolderId)
+    load_list.value.reload()
+  }
+  // 处理文件
+  else {
+    if (videoFormat.some(i => item.name.includes(i))) {
+      handleVideoFile(item)
+    } else if (imgFormat.some(i => item.name.includes(i))) {
+      await handleImageFile(item, strategy)
     }
   }
 }
 
+// 处理文件夹
+const handleFolder = (item, initialFolderId) => {
+  let path = ''
+  state.historyPath.forEach((v, vindex) => {
+    if (vindex !== 0) {
+      path += '/' + v.name
+    }
+  })
+
+  state.historyPath.push({
+    name: item.name,
+    folderFileId: state.historyPath.length >= 1 ? item.folderFileId : initialFolderId,
+    path: state.historyPath.length >= 1 ? path + '/' + item.name : '',
+  })
+}
+
+// 处理视频文件
+const handleVideoFile = item => {
+  let path = ''
+  state.historyPath.forEach((v, vindex) => {
+    if (vindex !== 0) {
+      path += '/' + v.name
+    }
+  })
+
+  const args = {
+    type: 'vue',
+    content: '/video',
+    windowName: 'Video',
+    windowTitle: 'William Player',
+    query: {
+      path: encodeURIComponent(path + '/' + item.name),
+      noSetHistory: '0',
+      folderFileId: item.folderFileId,
+      selectMedia: encodeURIComponent(JSON.stringify(state.selectMedia)),
+    },
+  }
+
+  ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
+    console.log('[createWindow] id:', id)
+  })
+}
+
+// 处理图片文件
+const handleImageFile = async (item, strategy) => {
+  const res = await strategy.getMediaUrl({ folderFileId: item.folderFileId }, state.selectMedia)
+  console.log(res, 'res111')
+
+  previewList.value = [strategy.parseImageUrl(res)]
+  nextTick(() => {
+    imageRef.value.showPreview()
+  })
+}
 const responseAdapter = result => {
   if (!result) {
     return {
@@ -181,7 +233,10 @@ const getFileList = async data => {
   } else if (state.selectMedia.type == '天翼云盘') {
     let res = await get189Folder({ ...data, folderId: state.historyPath[state.historyPath.length - 1]?.folderFileId }, state.selectMedia)
     res.fileListAO.fileList.forEach(v => {
-      v?.icon?.largeUrl ? (v.thumb = v.icon.largeUrl) : ''
+      const lastIndex = v.name.lastIndexOf('.')
+      const format = v.name.substring(lastIndex + 1)
+      v.thumb = v?.icon?.largeUrl ? v.icon.largeUrl : getFormatIcon(format)
+      //type为0表示不是文件夹，是文件
       v.type = 0
       v.folderFileId = v.id
     })
@@ -193,9 +248,16 @@ const getFileList = async data => {
   } else if (state.selectMedia.type == '夸克网盘') {
     let res = await getQuarkFolder({ ...data, fid: state.historyPath[state.historyPath.length - 1]?.folderFileId }, state.selectMedia)
     res.data.list.forEach(v => {
-      v.file_type == 0 ? (v.type = 1) : (v.type = 0)
+      if (v.file_type == 0) {
+        v.type = 1
+      } else {
+        //type为0表示不是文件夹，是文件
+        v.type = 0
+        const lastIndex = v.file_name.lastIndexOf('.')
+        const format = v.file_name.substring(lastIndex + 1)
+        v.thumb = getFormatIcon(format)
+      }
       v.name = v.file_name
-      v.big_thumbnail ? (v.thumb = v.big_thumbnail) : ''
       v.folderFileId = v.fid
     })
     return { data: { content: res.data.list, total: res.metadata._total } }

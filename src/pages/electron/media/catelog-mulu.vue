@@ -38,7 +38,7 @@
         <div class="dialog-content">
           <div class="dialog-content-left">
             <div class="source-list-item" v-for="item in sourceList" :key="item.type">
-              <template v-if="item.list.length">
+              <template v-if="item.list.length && item.type !== 'Emby'">
                 <div class="source-list-item__title">{{ item.type }}</div>
                 <div class="source-list-item__list">
                   <div
@@ -196,6 +196,7 @@ const handleSelect = async (item, vitem) => {
         uni.hideLoading()
         if (res.res_code == 0) {
           result.value = res
+          requestParams.value = {}
         } else {
           uni.showToast({
             title: '请重新登录天翼云盘',
@@ -216,6 +217,7 @@ const handleSelect = async (item, vitem) => {
         uni.hideLoading()
         if (res.status == 200) {
           result.value = res
+          requestParams.value = {}
         } else {
           uni.showToast({
             title: '请重新登录夸克网盘',

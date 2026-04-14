@@ -87,7 +87,7 @@ import fileSource from './components/file-source.vue'
 import { validateWebdav, validateEmby } from '@/utils/validate'
 import { useRoute, useRouter } from 'vue-router'
 import { toParse, toStringfy } from '@/pages/mobile/mine/common'
-import { loginUser, get189Folder, getQuarkFolder, get189User } from '@/utils/common'
+import { loginUser, get189Folder, getQuarkFolder, get189User, getQuarkUser } from '@/utils/common'
 import * as CONFIG from '@/utils/config'
 import wilTitle from '@/components/electron/wil-title/index.vue'
 
@@ -175,6 +175,16 @@ const options3 = [
   },
 ]
 
+const options4 = [
+  {
+    label: 'Cookie',
+    prop: 'cookie',
+    type: 'textarea',
+    formItemProps: { placeholder: '请输入夸克网盘的Cookie', type: 'text' },
+    rule: [{ required: true, message: '请输入Cookie' }],
+  },
+]
+
 const backRouter = () => {
   router.go(-1)
 }
@@ -184,6 +194,7 @@ const openDialog = () => {
   dialogTitle.value = '添加新文件源'
   showType.value = 'fileSource'
   transitionName.value = 'slide-left'
+  state.formData = { protocol: 'http' }
 }
 
 const changeFileSource = item => {
@@ -197,6 +208,8 @@ const changeFileSource = item => {
     state.options = options2
   } else if (item.name === '天翼云盘') {
     state.options = options3
+  } else if (item.name === '夸克网盘') {
+    state.options = options4
   }
 }
 
@@ -205,6 +218,8 @@ const back = () => {
   if (showType.value !== 'fileSource') {
     state.history.pop()
   }
+  console.log(state.history, 'state.histoy')
+
   setTimeout(() => {
     showType.value = state.history[state.history.length - 1]
   }, 0)
@@ -213,6 +228,7 @@ const back = () => {
 const cancel = () => {
   transitionName.value = ''
   showDialog.value = false
+  closedDialog()
 }
 
 const closedDialog = () => {
@@ -254,33 +270,67 @@ const confirm = () => {
       if (valid) {
         let obj = getCookieObject(state.formData.cookie)
         let cloud189 = sourceList.value.find(i => i.type === '天翼云盘')
-        let randomDigits = ''
-        for (let i = 0; i < 16; i++) {
-          randomDigits += Math.floor(Math.random() * 10) // 生成0-9的随机数
+        try {
+          let res = await get189User(obj)
+          if (dialogTitle.value === '添加天翼云盘') {
+            let isHaveData = !sourceList.value.every(item => {
+              return !item.list.length
+            })
+            let tyObj = { name: res.loginName, JSESSIONID: obj.JSESSIONID, COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER }
+            if (!isHaveData) {
+              cloud189.list.push({ ...tyObj, active: true })
+              uni.setStorageSync('isreload', true)
+            } else {
+              cloud189.list.push(tyObj)
+            }
+          } else if (dialogTitle.value === '修改天翼云盘') {
+            let same = cloud189.list.find(i => i.name === state.editObj.name)
+            same.name = res.loginName
+            same.JSESSIONID = obj.JSESSIONID
+            same.COOKIE_LOGIN_USER = obj.COOKIE_LOGIN_USER
+            if (state.editObj.active) {
+              uni.setStorageSync('isreload', true)
+            }
+          }
+          uni.setStorageSync('sourceList', sourceList.value)
+          judgeShow()
+        } catch (error) {
+          uni.showToast({ title: 'Cookie无效', icon: 'none' })
         }
-        let res = await get189User(obj)
-        if (dialogTitle.value === '添加天翼云盘') {
-          let isHaveData = !sourceList.value.every(item => {
-            return !item.list.length
+      }
+    })
+  } else if (showType.value === '夸克网盘') {
+    wil_form.value.confirmCommit().then(async valid => {
+      if (valid) {
+        let cloudQuark = sourceList.value.find(i => i.type === '夸克网盘')
+        try {
+          let res = await getQuarkUser({
+            Cookie: state.formData.cookie,
           })
-          let tyObj = { name: res.loginName, JSESSIONID: obj.JSESSIONID, COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER }
-          if (!isHaveData) {
-            cloud189.list.push({ ...tyObj, active: true })
-            uni.setStorageSync('isreload', true)
-          } else {
-            cloud189.list.push(tyObj)
+          if (dialogTitle.value === '添加夸克网盘') {
+            let isHaveData = !sourceList.value.every(item => {
+              return !item.list.length
+            })
+            let tyObj = { name: res.data.nickname, Cookie: state.formData.cookie }
+            if (!isHaveData) {
+              cloudQuark.list.push({ ...tyObj, active: true })
+              uni.setStorageSync('isreload', true)
+            } else {
+              cloudQuark.list.push(tyObj)
+            }
+          } else if (dialogTitle.value === '修改夸克网盘') {
+            let same = cloudQuark.list.find(i => i.name === state.editObj.name)
+            same.name = res.data.nickname
+            same.Cookie = obj.JSESSIONID
+            if (state.editObj.active) {
+              uni.setStorageSync('isreload', true)
+            }
           }
-        } else if (dialogTitle.value === '修改天翼云盘') {
-          let same = cloud189.list.find(i => i.name === state.editObj.name)
-          same.name = res.loginName
-          same.JSESSIONID = obj.JSESSIONID
-          same.COOKIE_LOGIN_USER = obj.COOKIE_LOGIN_USER
-          if (state.editObj.active) {
-            uni.setStorageSync('isreload', true)
-          }
+          uni.setStorageSync('sourceList', sourceList.value)
+          judgeShow()
+        } catch (error) {
+          uni.showToast({ title: 'Cookie无效', icon: 'none' })
         }
-        uni.setStorageSync('sourceList', sourceList.value)
-        judgeShow()
       }
     })
   }
@@ -400,6 +450,9 @@ const editSource = (item, vitem) => {
   } else if (item.type === '天翼云盘') {
     state.options = options3
     state.formData.cookie = `JSESSIONID=${vitem.JSESSIONID};COOKIE_LOGIN_USER=${vitem.COOKIE_LOGIN_USER}`
+  } else if (item.type === '夸克网盘') {
+    state.options = options4
+    state.formData.cookie = vitem.Cookie
   }
   showDialog.value = true
 }
@@ -448,8 +501,8 @@ const deleteSource = (item, vitem) => {
 
 const judgeShow = () => {
   sourceList.value = uni.getStorageSync('sourceList')
-  let embyObj = sourceList.value.find(i => (route.query.isEmby === '1' ? i.type === 'Emby' : i.type !== 'Emby'))
-  show.value = Boolean(embyObj.list.length)
+  let embyArr = sourceList.value.filter(i => (route.query.isEmby === '1' ? i.type === 'Emby' : i.type !== 'Emby'))
+  show.value = embyArr.some(i => i.list?.length)
 }
 judgeShow()
 </script>

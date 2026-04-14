@@ -1,10 +1,10 @@
 import * as CONFIG from '@/utils/config.js'
-import { sendEmail } from "@/network/apis"
-// import { ipc } from "@/utils/ipcRenderer";
-// import { ipcApiRoute } from "@/utils/ipcApiRoute";
+import { sendEmail } from '@/network/apis'
+// import { ipc } from '@/utils/ipcRenderer'
+// import { ipcApiRoute } from '@/utils/ipcApiRoute'
 
 // 工具函数：构建 Cookie 字符串
-const buildCookie = (cookieObj) => {
+const buildCookie = cookieObj => {
   return Object.entries(cookieObj)
     .map(([key, value]) => `${key}=${value}`)
     .join(';')
@@ -19,279 +19,245 @@ const generateRandomDigits = (length = 16) => {
 const getFolder = (data, webdavInfo) => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: webdavInfo.protocol + "://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/list",
+      url: webdavInfo.protocol + '://' + webdavInfo.address + ':' + webdavInfo.port + '/api/fs/list',
       data: JSON.stringify({ ...data, page: 1, per_page: 1000, refresh: false }),
       timeout: 10000,
-      method: "POST",
+      method: 'POST',
       header: {
         Authorization: webdavInfo.token,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      success: (res) => {
-        resolve(res.data);
+      success: res => {
+        resolve(res.data)
       },
-      fail: (error) => {
-        reject(error);
+      fail: error => {
+        reject(error)
       },
-    });
-  });
-};
+    })
+  })
+}
 
 //webdav获取视频链接
 const getWebDAVUrl = (data, webdavInfo) => {
-  let requestUrl = webdavInfo.protocol + "://" + webdavInfo.address + ":" + webdavInfo.port + "/api/fs/get";
+  let requestUrl = webdavInfo.protocol + '://' + webdavInfo.address + ':' + webdavInfo.port + '/api/fs/get'
   return new Promise((resolve, reject) => {
     uni.request({
       url: requestUrl,
       data: JSON.stringify({
-        path: "/" + data.path,
-        password: "",
+        path: '/' + data.path,
+        password: '',
       }),
       timeout: 10000,
-      method: "POST",
+      method: 'POST',
       header: {
         Authorization: webdavInfo.token,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      success: (res) => {
-        resolve(res.data);
+      success: res => {
+        resolve(res.data)
       },
-      fail: (error) => {
-        reject(error);
+      fail: error => {
+        reject(error)
       },
-    });
-  });
+    })
+  })
 }
 
 //webdav登录
-const loginUser = (webdavInfo) => {
+const loginUser = webdavInfo => {
   return new Promise((resolve, reject) => {
     uni.request({
-      url: webdavInfo.protocol +
-        "://" +
-        webdavInfo.address +
-        ":" +
-        webdavInfo.port +
-        "/api/auth/login",
+      url: webdavInfo.protocol + '://' + webdavInfo.address + ':' + webdavInfo.port + '/api/auth/login',
       data: JSON.stringify({
         username: webdavInfo.username,
         password: webdavInfo.password,
       }),
       timeout: 10000,
-      method: "POST",
-      header: { "Content-Type": "application/json" },
-      success: (res) => {
-        resolve(res.data);
+      method: 'POST',
+      header: { 'Content-Type': 'application/json' },
+      success: res => {
+        resolve(res.data)
       },
-      fail: (error) => {
-        reject(error);
+      fail: error => {
+        reject(error)
       },
-    });
-  });
-};
+    })
+  })
+}
 
 //天翼云盘
 const get189Folder = (data, cookieInfo) => {
-  const cookieStr = buildCookie({ 
-    JSESSIONID: cookieInfo.JSESSIONID, 
-    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
+  const cookieStr = buildCookie({
+    JSESSIONID: cookieInfo.JSESSIONID,
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER,
   })
+  const header = {
+    'Accept': 'application/json;charset=UTF-8',
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    'Connection': 'keep-alive',
+    'Cookie': cookieStr,
+    'Host': 'cloud.189.cn',
+    'Priority': 'u=0',
+    // 'Referer': 'https://cloud.189.cn/web/main/file/folder/-11',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sign-Type': '1',
+    'TE': 'trailers',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: `${CONFIG.Folder189Url}&folderId=${data.folderId}&pageNum=${data.pageNum || 1}&pageSize=${data.pageSize || 1000}`,
-        method: "GET",
-        header: {
-          "Accept": "application/json;charset=UTF-8",
-          "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-          'Connection': 'keep-alive',
-          'Cookie': cookieStr,
-          "Host": 'cloud.189.cn',
-          'Priority': 'u=0',
-          // 'Referer': 'https://cloud.189.cn/web/main/file/folder/-11',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin',
-          'Sign-Type': '1',
-          'TE': 'trailers',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0'
-        },
-        options: {
-          timeout: 3000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: `${CONFIG.Folder189Url}&folderId=${data.folderId}&pageNum=${data.pageNum || 1}&pageSize=${data.pageSize || 1000}`,
+          method: 'GET',
+          header,
+          options: {
+            timeout: 3000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: `${CONFIG.Folder189Url}&folderId=${data.folderId}&pageNum=${data.pageNum || 1}&pageSize=${data.pageSize || 1000}`,
         timeout: 3000,
-        method: "GET",
-        header: {
-          "Accept": "application/json;charset=UTF-8",
-          "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-          'Connection': 'keep-alive',
-          'Cookie': cookieStr,
-          "Host": 'cloud.189.cn',
-          'Priority': 'u=0',
-          // 'Referer': 'https://cloud.189.cn/web/main/file/folder/-11',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin',
-          'Sign-Type': '1',
-          'TE': 'trailers',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0'
+        method: 'GET',
+        header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //天翼云盘获取视频链接
 const get189VideoUrl = (data, cookieInfo) => {
   const randomDigits = generateRandomDigits()
-  const cookieStr = buildCookie({ 
-    JSESSIONID: cookieInfo.JSESSIONID, 
-    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
+  const cookieStr = buildCookie({
+    JSESSIONID: cookieInfo.JSESSIONID,
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER,
   })
+  const header = {
+    Accept: 'application/json;charset=UTF-8',
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'keep-alive',
+    Cookie: cookieStr,
+    Host: 'cloud.189.cn',
+    Priority: 'u=0',
+    // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sign-Type': '1',
+    TE: 'trailers',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: `${CONFIG.Video189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
-        method: "GET",
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          "Sign-Type": "1",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
-        },
-        options: {
-          timeout: 5000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: `${CONFIG.Video189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
+          method: 'GET',
+          header,
+          options: {
+            timeout: 5000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: `${CONFIG.Video189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}&type=2`,
         timeout: 5000,
-        method: "GET",
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          // Referer: "https://cloud.189.cn/web/main/file/folder/-11",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          "Sign-Type": "1",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+        method: 'GET',
+        header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //天翼云盘获取用户信息
-const get189User = (obj) => {
+const get189User = obj => {
   const randomDigits = generateRandomDigits()
-  const cookieStr = buildCookie({ 
-    JSESSIONID: obj.JSESSIONID, 
-    COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER 
+  const cookieStr = buildCookie({
+    JSESSIONID: obj.JSESSIONID,
+    COOKIE_LOGIN_USER: obj.COOKIE_LOGIN_USER,
   })
+  const header = {
+    Accept: 'application/json;charset=UTF-8',
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'keep-alive',
+    Cookie: cookieStr,
+    Host: 'cloud.189.cn',
+    Priority: 'u=0',
+    Referer: 'https://cloud.189.cn/web/main/file/folder/-11',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    TE: 'trailers',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: `${CONFIG.User189Url}?noCache=0.${randomDigits}`,
-        method: 'GET',
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          Referer: "https://cloud.189.cn/web/main/file/folder/-11",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
-        },
-        options: {
-          timeout: 3000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: `${CONFIG.User189Url}?noCache=0.${randomDigits}`,
+          method: 'GET',
+          header,
+          options: {
+            timeout: 3000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: `${CONFIG.User189Url}?noCache=0.${randomDigits}`,
         timeout: 3000,
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          Referer: "https://cloud.189.cn/web/main/file/folder/-11",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
-        },
-        success: (res) => {
+        header,
+        success: res => {
           resolve(res.data)
         },
-        fail: (error) => {
-          reject(error);
+        fail: error => {
+          reject(error)
         },
-      });
+      })
     }
   })
 }
@@ -299,309 +265,315 @@ const get189User = (obj) => {
 //天翼云盘获取文件下载链接
 const get189DownloadUrl = (data, cookieInfo) => {
   const randomDigits = generateRandomDigits()
-  const cookieStr = buildCookie({ 
-    JSESSIONID: cookieInfo.JSESSIONID, 
-    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER 
+  const cookieStr = buildCookie({
+    JSESSIONID: cookieInfo.JSESSIONID,
+    COOKIE_LOGIN_USER: cookieInfo.COOKIE_LOGIN_USER,
   })
+  const header = {
+    Accept: 'application/json;charset=UTF-8',
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'keep-alive',
+    Cookie: cookieStr,
+    Host: 'cloud.189.cn',
+    Priority: 'u=0',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sign-Type': '1',
+    TE: 'trailers',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: `${CONFIG.Download189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}`,
-        method: "GET",
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          "Sign-Type": "1",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
-        },
-        options: {
-          timeout: 5000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: `${CONFIG.Download189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}`,
+          method: 'GET',
+          header,
+          options: {
+            timeout: 5000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: `${CONFIG.Download189Url}?noCache=0.${randomDigits}&fileId=${data.folderFileId}`,
         timeout: 5000,
-        method: "GET",
-        header: {
-          Accept: "application/json;charset=UTF-8",
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          Cookie: cookieStr,
-          Host: "cloud.189.cn",
-          Priority: "u=0",
-          "Sec-Fetch-Dest": "empty",
-          "Sec-Fetch-Mode": "cors",
-          "Sec-Fetch-Site": "same-origin",
-          "Sign-Type": "1",
-          TE: "trailers",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+        method: 'GET',
+        header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //夸克网盘
 const getQuarkFolder = (data, cookieInfo) => {
-  let cookieStr = cookieInfo.Cookie;
+  let cookieStr = cookieInfo.Cookie
+  const header = {
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    'Connection': 'Keep-Alive',
+    'Cookie': cookieStr,
+    'Host': 'drive-pc.quark.cn',
+    'Referer': 'https://pan.quark.cn/',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}&_page=${data.pageNum || 1}&_size=${data.pageSize || 1000}`,
-        method: "GET",
-        header: {
-          "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-          'Connection': 'Keep-Alive',
-          'Cookie': cookieStr,
-          "Host": 'drive-pc.quark.cn',
-          'Referer': 'https://pan.quark.cn/',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
-        },
-        options: {
-          timeout: 3000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}&_page=${data.pageNum || 1}&_size=${data.pageSize || 1000}`,
+          method: 'GET',
+          header: header,
+          options: {
+            timeout: 3000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: `${CONFIG.QuarkFolderUrl}&pdir_fid=${data.fid}&_page=${data.pageNum || 1}&_size=${data.pageSize || 1000}`,
         timeout: 3000,
-        method: "GET",
-        header: {
-          "Accept-Language": 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-          'Connection': 'Keep-Alive',
-          'Cookie': cookieStr,
-          "Host": 'drive-pc.quark.cn',
-          'Referer': 'https://pan.quark.cn/',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
+        method: 'GET',
+        header: header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //夸克网盘获取视频或者文件下载链接
 const getQuarkVideoUrl = (data, cookieInfo) => {
+  const header = {
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'keep-alive',
+    'Content-Type': 'application/json;charset=utf-8',
+    Cookie: cookieInfo.Cookie,
+    Host: 'drive-pc.quark.cn',
+    Referer: 'https://pan.quark.cn/',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: CONFIG.QuarkVideoUrl,
-        timeout: 5000,
-        data: JSON.stringify({ fids: [data.folderFileId], speedup_session: "" }),
-        method: "POST",
-        header: {
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          "Content-Type": "application/json;charset=utf-8",
-          Cookie: cookieInfo.Cookie,
-          Host: "drive-pc.quark.cn",
-          Referer: "https://pan.quark.cn/",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
-        },
-        options: {
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: CONFIG.QuarkVideoUrl,
           timeout: 5000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+          data: JSON.stringify({ fids: [data.folderFileId], speedup_session: '' }),
+          method: 'POST',
+          header,
+          options: {
+            timeout: 5000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: CONFIG.QuarkVideoUrl,
         timeout: 5000,
-        data: JSON.stringify({ fids: [data.folderFileId], speedup_session: "" }),
-        method: "POST",
-        header: {
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          "Content-Type": "application/json;charset=utf-8",
-          Cookie: cookieInfo.Cookie,
-          Host: "drive-pc.quark.cn",
-          Referer: "https://pan.quark.cn/",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
+        data: JSON.stringify({ fids: [data.folderFileId], speedup_session: '' }),
+        method: 'POST',
+        header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //夸克网盘获取不同清晰度的视频链接
 const getQuarkResolutionUrl = (data, cookieInfo) => {
+  const header = {
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'keep-alive',
+    'Content-Type': 'application/json;charset=utf-8',
+    Cookie: cookieInfo.Cookie,
+    Host: 'drive-pc.quark.cn',
+    Referer: 'https://pan.quark.cn/',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch',
+  }
   return new Promise((resolve, reject) => {
     if (CONFIG.PLATFORM === 'PC') {
-      ipc.invoke(ipcApiRoute.httpRequest, {
-        url: CONFIG.QuarkResolutionUrl,
-        data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: "fmp4,m3u8" }),
-        method: "POST",
-        header: {
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          "Content-Type": "application/json;charset=utf-8",
-          Cookie: cookieInfo.Cookie,
-          Host: "drive-pc.quark.cn",
-          Referer: "https://pan.quark.cn/",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
-        },
-        options: {
-          timeout: 5000,
-        }
-      }).then(res => {
-        if (res.code === 200) {
-          resolve(res.data)
-        } else {
-          reject(res)
-        }
-      }).catch(error => {
-        reject(error)
-      })
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: CONFIG.QuarkResolutionUrl,
+          data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: 'fmp4,m3u8' }),
+          method: 'POST',
+          header,
+          options: {
+            timeout: 5000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
     } else {
       uni.request({
         url: CONFIG.QuarkResolutionUrl,
         timeout: 5000,
-        data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: "fmp4,m3u8" }),
-        method: "POST",
-        header: {
-          "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-          Connection: "keep-alive",
-          "Content-Type": "application/json;charset=utf-8",
-          Cookie: cookieInfo.Cookie,
-          Host: "drive-pc.quark.cn",
-          Referer: "https://pan.quark.cn/",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch",
+        data: JSON.stringify({ fid: data.folderFileId, resolutions: 'normal,low,high,super,2k,4k', supports: 'fmp4,m3u8' }),
+        method: 'POST',
+        header,
+        success: res => {
+          resolve(res.data)
         },
-        success: (res) => {
-          resolve(res.data);
+        fail: error => {
+          reject(error)
         },
-        fail: (error) => {
-          reject(error);
-        },
-      });
+      })
     }
-  });
+  })
 }
 
 //夸克网盘获取用户信息
-const getQuarkUser = (obj) => {
-  let cookieStr = obj.Cookie;
+const getQuarkUser = obj => {
+  let cookieStr = obj.Cookie
+  const header = {
+    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    Connection: 'Keep-Alive',
+    'Cookie': cookieStr,
+    'Host': 'pan.quark.cn',
+    Referer: 'https://pan.quark.cn/list',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch',
+  }
   return new Promise((resolve, reject) => {
-    uni.request({
-      url: CONFIG.QuarkUserUrl,
-      header: {
-        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-        Connection: "Keep-Alive",
-        'Cookie': cookieStr,
-        "Host": 'pan.quark.cn',
-        Referer: "https://pan.quark.cn/list",
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.2.7 Chrome/100.0.4896.160 Electron/18.3.5.17-1a44cfa97d Safari/537.36 Channel/pckk_other_ch'
-      },
-      success: (res) => {
-        resolve(res.data)
-      },
-      fail: (error) => {
-        reject(error);
-      },
-    });
+    if (CONFIG.PLATFORM === 'PC') {
+      ipc
+        .invoke(ipcApiRoute.httpRequest, {
+          url: CONFIG.QuarkUserUrl,
+          method: 'GET',
+          header,
+          options: {
+            timeout: 5000,
+          },
+        })
+        .then(res => {
+          if (res.code === 200) {
+            resolve(res.data)
+          } else {
+            reject(res)
+          }
+        })
+        .catch(error => {
+          reject(error)
+        })
+    } else {
+      uni.request({
+        url: CONFIG.QuarkUserUrl,
+        header,
+        success: res => {
+          resolve(res.data)
+        },
+        fail: error => {
+          reject(error)
+        },
+      })
+    }
   })
-
 }
 
 //获取第几季的详情
-const getTvSeason = (data) => {
+const getTvSeason = data => {
   return new Promise((resolve, reject) => {
     uni.request({
       url: `https://api.tmdb.org/3/tv/${data.movieTvId}/season/${data.season}`,
       data: {
-        language: "zh-CN",
-        api_key: uni.getStorageSync("settingData").tmdbKey,
+        language: 'zh-CN',
+        api_key: uni.getStorageSync('settingData').tmdbKey,
       },
-      method: "GET",
+      method: 'GET',
       header: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      success: (res) => {
-        resolve(res.data);
+      success: res => {
+        resolve(res.data)
       },
-      fail: (error) => {
-        reject(error);
-      }
-    });
-  });
-};
+      fail: error => {
+        reject(error)
+      },
+    })
+  })
+}
 //通过tmdb接口获取更详细的信息
 const getMovieTvById = (data, type) => {
-  let url = "";
-  let obj = JSON.parse(JSON.stringify(data));
-  if (type === "movie") {
-    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`;
-  } else if (type === "tv") {
-    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`;
+  let url = ''
+  let obj = JSON.parse(JSON.stringify(data))
+  if (type === 'movie') {
+    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`
+  } else if (type === 'tv') {
+    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`
   }
-  delete obj.movieTvId;
-  return new Promise((resolve) => {
+  delete obj.movieTvId
+  return new Promise(resolve => {
     uni.request({
       url: url,
       data: {
         ...obj,
-        language: "zh-CN",
-        api_key: uni.getStorageSync("settingData").tmdbKey,
+        language: 'zh-CN',
+        api_key: uni.getStorageSync('settingData').tmdbKey,
       },
-      method: "GET",
+      method: 'GET',
       header: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      success: (res) => {
-        resolve(res.data);
+      success: res => {
+        resolve(res.data)
       },
-    });
-  });
-};
+    })
+  })
+}
 
 // //设置tmdb图片的域名
 // const setTmdbImgDomain = () => {
@@ -623,10 +595,10 @@ const getMovieTvById = (data, type) => {
 const getCutContent = () => {
   return new Promise((resolve, reject) => {
     uni.getClipboardData({
-      success: (res) => {
-        const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fa5，。；！？、]+)/g;
-        const urls = res.data.match(urlRegex); // ["https://cloud.189.cn/t/uMfaErJFFrm2"]
-        if (urls && (urls[0].startsWith("https://cloud.189.cn/") || urls[0].startsWith("https://pan.quark.cn/"))) {
+      success: res => {
+        const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fa5，。；！？、]+)/g
+        const urls = res.data.match(urlRegex) // ["https://cloud.189.cn/t/uMfaErJFFrm2"]
+        if (urls && (urls[0].startsWith('https://cloud.189.cn/') || urls[0].startsWith('https://pan.quark.cn/'))) {
           if (uni.getStorageSync('shareUrl') === urls[0]) {
             resolve(null)
           } else {
@@ -639,7 +611,7 @@ const getCutContent = () => {
       },
       fail: () => {
         resolve(null)
-      }
+      },
     })
   })
 }
@@ -649,11 +621,11 @@ let timer = null
 const toSendEmail = async (codeEncrypt, countDown, email) => {
   if (countDown.value < 61) return //如果正在倒计时，那么点击不进行任何响应
   if (email) {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(email)) {
       uni.showToast({
         title: '请输入有效的邮箱地址',
-        icon: 'none'
+        icon: 'none',
       })
     } else {
       timer = setInterval(() => {
@@ -663,32 +635,46 @@ const toSendEmail = async (codeEncrypt, countDown, email) => {
           clearInterval(timer)
           timer = null
         }
-      }, 1000);
+      }, 1000)
       let res = await sendEmail({ email: email })
       codeEncrypt.value = res.codeEncrypt
     }
   } else {
     uni.showToast({
       title: '请先输入邮箱',
-      icon: 'none'
+      icon: 'none',
     })
   }
 }
 
 //获取gitee的app的最新release版本
 const getAppLatestVersion = () => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     uni.request({
       url: 'https://gitee.com/api/v5/repos/waylon-chen/William-Player/releases/latest',
-      method: "GET",
-      success: (res) => {
-        resolve(res.data);
+      method: 'GET',
+      success: res => {
+        resolve(res.data)
       },
-    });
-  });
+    })
+  })
 }
 
 export {
-  getFolder, getWebDAVUrl, loginUser, get189Folder, get189VideoUrl, get189User, get189DownloadUrl, getQuarkFolder, getQuarkVideoUrl,
-  getQuarkResolutionUrl, getQuarkUser, getTvSeason, getMovieTvById, getCutContent, toSendEmail, getAppLatestVersion
-};
+  getFolder,
+  getWebDAVUrl,
+  loginUser,
+  get189Folder,
+  get189VideoUrl,
+  get189User,
+  get189DownloadUrl,
+  getQuarkFolder,
+  getQuarkVideoUrl,
+  getQuarkResolutionUrl,
+  getQuarkUser,
+  getTvSeason,
+  getMovieTvById,
+  getCutContent,
+  toSendEmail,
+  getAppLatestVersion,
+}
