@@ -196,8 +196,6 @@ const handleVideoFile = item => {
 // 处理图片文件
 const handleImageFile = async (item, strategy) => {
   const res = await strategy.getMediaUrl({ folderFileId: item.folderFileId }, state.selectMedia)
-  console.log(res, 'res111')
-
   previewList.value = [strategy.parseImageUrl(res)]
   nextTick(() => {
     imageRef.value.showPreview()

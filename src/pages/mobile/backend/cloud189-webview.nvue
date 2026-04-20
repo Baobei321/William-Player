@@ -71,7 +71,7 @@ export default {
       })
       if (!this.cookieObj.JSESSIONID || !this.cookieObj.COOKIE_LOGIN_USER) {
         uni.showToast({
-          title: '正在加载，请稍后再试',
+          title: '正在加载，请稍后',
           icon: 'none',
         })
         return
@@ -147,7 +147,7 @@ export default {
         }, 1500)
       } else {
         uni.showToast({
-          title: '正在加载，请稍后再试',
+          title: '正在加载，请稍后',
           icon: 'none',
         })
       }
@@ -175,8 +175,15 @@ export default {
     this.platform = options.platform || ''
     this.debounceCookie = this.debounce(this.getCookieData, 8000)
     if (this.platform === 'TV') {
+      uni.showToast({
+        title: '请等待,每隔30秒刷新登录状态',
+        icon: 'none',
+      })
       this.startTimer()
     }
+  },
+  beforeDestroy() {
+    this.clearTimer()
   },
 }
 </script>

@@ -51,7 +51,7 @@ export default {
       })
       if (!this.quarkCookie) {
         uni.showToast({
-          title: '权限校验失败，请稍后再试',
+          title: '权限校验失败，请稍后',
           icon: 'none',
         })
         return
@@ -137,7 +137,7 @@ export default {
         }, 1500)
       } else {
         uni.showToast({
-          title: '权限校验失败，请稍后再试',
+          title: '权限校验失败，请稍后',
           icon: 'none',
         })
         return
@@ -161,8 +161,15 @@ export default {
     this.url = options.url ? decodeURIComponent(options.url) : ''
     this.platform = options.platform || ''
     if (this.platform === 'TV') {
+      uni.showToast({
+        title: '请等待,每隔30秒刷新登录状态',
+        icon: 'none',
+      })
       this.startTimer()
     }
+  },
+  beforeDestroy() {
+    this.clearTimer()
   },
 }
 </script>
