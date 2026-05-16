@@ -1,5 +1,5 @@
 <template>
-  <div class="video-list">
+  <div :class="['video-list', themeClass]">
     <wil-list
       :requestFn="getFileList"
       ref="load_list"
@@ -36,7 +36,11 @@ import videoPlayer from '@/static/video-player.png'
 import photoIcon from '@/static/photo-icon.png'
 import { get189Folder, getQuarkFolder, getWebDAVUrl, get189DownloadUrl, getQuarkVideoUrl } from '@/utils/common.js'
 import { onShow, onLoad } from '@dcloudio/uni-app'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
+useThemeNavbar()
+const themeClass = useThemeClass()
 const webdavInfo = ref({})
 const data = ref({})
 const load_list = ref(null)
@@ -214,7 +218,7 @@ page {
 .video-list {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg);
   box-sizing: border-box;
   margin-top: 0;
   display: flex;
@@ -247,13 +251,13 @@ page {
                 .nut-cell {
                   margin: 0;
                   padding: 24rpx;
-                  background: #fff;
+                  background: var(--app-bg-card);
                   align-items: center;
                   box-shadow: none;
                   border-radius: 0;
 
                   &::after {
-                    border-bottom: 2rpx solid #f5f6f7 !important;
+                    border-bottom: 2rpx solid var(--app-border) !important;
                     /* position: absolute !important;
           box-sizing: border-box !important;
           content: " " !important;
@@ -291,7 +295,7 @@ page {
                   .nut-cell__title {
                     justify-content: center;
                     font-size: 30rpx;
-                    color: #353a45;
+                    color: var(--app-text-primary);
                     line-height: normal;
 
                     .wil-cell__title {

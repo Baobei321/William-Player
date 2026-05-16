@@ -314,5 +314,27 @@ page {
     --nut-timeselect-timedetail-item-height: 100rpx;
     --nut-timeselect-timedetail-item-line-height: 100rpx;
     --nut-timeselect-timedetail-item-border-radius: 10rpx;
-    
+}
+
+.dark {
+    .nut-picker {
+        background: var(--app-bg-card) !important;
+
+        .nut-picker__title,
+        .nut-picker-roller-item-title {
+            color: var(--app-text-primary);
+        }
+
+        .nut-picker-roller-mask {
+            background-image: linear-gradient(180deg, rgba(47, 47, 47, 0.9), rgba(47, 47, 47, 0.4)), linear-gradient(0deg, rgba(47, 47, 47, 0.9), rgba(47, 47, 47, 0.4));
+            background-repeat: no-repeat;
+            background-position: top, bottom;
+        }
+    }
+
+    .nut-searchbar {
+        .nut-searchbar__right-search-icon {
+            color: var(--app-text-primary);
+        }
+    }
 }

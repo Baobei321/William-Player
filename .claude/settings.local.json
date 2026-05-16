@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api *)",
+      "WebFetch(domain:api.github.com)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(curl *)",
+      "Bash(npm -v)",
+      "Bash(PATH=\"/d/nodejs:$PATH\" npm run *)"
+    ]
+  }
+}

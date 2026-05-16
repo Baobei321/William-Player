@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbox">
+  <div :class="['toolbox', themeClass]">
     <wil-navbar title="工具箱"></wil-navbar>
     <div class="toolbox-container">
       <div class="toolbox-container-list">
@@ -20,6 +20,9 @@ import downloadIcon from '@/static/download-manage.png'
 import { toStringfy, toParse } from '@/pages/mobile/mine/common'
 import { getPhoneCityAndCarrier } from '@/utils/tools'
 import * as CONFIG from '@/utils/config'
+import { useThemeClass } from '@/hooks/useThemeClass'
+
+const themeClass = useThemeClass()
 
 const toolboxArr = [
   { title: '下载管理', icon: downloadIcon, path: '/pages/mobile/toolbox/download/index' },
@@ -149,7 +152,7 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
+  background: var(--app-gradient-mine);
   position: relative;
 
   .toolbox-container {
@@ -181,7 +184,7 @@ page {
           width: 100%;
           display: block;
           font-size: 28rpx;
-          color: #000;
+          color: var(--app-text-primary);
           padding-top: 16rpx;
           overflow: hidden;
           text-overflow: ellipsis;

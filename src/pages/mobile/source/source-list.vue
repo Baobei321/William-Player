@@ -1,8 +1,8 @@
 <template>
-  <div class="source-list">
+  <div :class="['source-list', themeClass]">
     <wil-navbar title="资源库" :leftShow="true">
       <template #right>
-        <nut-icon name="uploader" custom-color="#000" @click="toAddFile"></nut-icon>
+        <nut-icon name="uploader" :custom-color="iconColor" @click="toAddFile"></nut-icon>
       </template>
     </wil-navbar>
     <div class="source-list-container" v-if="show">
@@ -17,7 +17,7 @@
               </div>
               <div class="list-item-name" :class="[vitem.active ? 'list-item-activeName' : '']">{{ vitem.name }}</div>
               <image class="list-item-button"
-                :src="vitem.active ? moreOrange : theme == 'light' ? moreBlack : moreWhite"
+                :src="vitem.active ? moreOrange : isDark ? moreWhite : moreBlack"
                 @click.stop="toShowMoreButton(item, vitem)">
               </image>
             </div>
@@ -28,11 +28,11 @@
     <div class="source-list-empty" v-else>
       <image src="@/static/no-data.png" class="source-list-empty__img"></image>
       <span class="source-list-empty__tip">添加完资源之后，请为此资源添加电影、电视剧目录！！！</span>
-      <nut-button custom-color="#090909" @click="toAddFile">
+      <nut-button :custom-color="primaryBtnColor" @click="toAddFile">
         <template #icon>
-          <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
+          <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
         </template>
-        <span>添加新资源</span>
+        <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
       </nut-button>
     </div>
     <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消"
@@ -52,15 +52,18 @@ import wilModal from "@/components/mobile/wil-modal/index.vue";
 import moreBlack from "@/static/more-black.png";
 import moreWhite from "@/static/more-white.png";
 import moreOrange from "@/static/more-orange.png";
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const sourceList = ref([]);
 const selectMedia = ref({});
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor, iconColor, isDark } = useThemeColors()
 
 const show = ref(true);
 const wil_modal = ref(null);
 
 const showBottom = ref(false);
-const theme = ref(uni.getSystemInfoSync().theme);
 
 const operationList = ref([{ name: '设置电影目录' }, { name: '设置电视剧目录' }, { name: "修改" }, { name: "删除" }])
 let selectType = {};
@@ -236,13 +239,6 @@ onShow(() => {
   sourceList.value = uni.getStorageSync("sourceList");
   judgeShow();
 });
-const changeTheme = () => {
-  theme.value = uni.getSystemInfoSync().theme;
-};
-uni.onThemeChange(changeTheme);
-onUnload(() => {
-  uni.offThemeChange(changeTheme);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -252,7 +248,7 @@ page {
 }
 
 .source-list {
-  background: #f6f7f8;
+  background: var(--app-bg);
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -260,7 +256,7 @@ page {
   flex-direction: column;
 
   ::v-deep .wil-navbar {
-    background-color: #fff;
+    background-color: var(--app-bg-card);
 
     .nut-navbar {
       .nut-navbar__right {
@@ -281,16 +277,16 @@ page {
 
       .source-list-item__title {
         font-size: 28rpx;
-        color: #6d6d6d;
+        color: var(--app-text-tertiary);
         padding: 16rpx 0;
       }
 
       .source-list-item__list {
-        background: #fff;
+        background: var(--app-bg-card);
         border-radius: 14rpx;
 
         .list-item {
-          background: #fff;
+          background: var(--app-bg-card);
           padding: 6rpx 24rpx;
           display: flex;
           align-items: center;
@@ -301,14 +297,14 @@ page {
             position: absolute;
             content: "";
             height: 2rpx;
-            background: rgb(241, 241, 241);
+            background: var(--app-bg-secondary);
             width: 100%;
             left: 0;
             top: 0;
           }
 
           &:active {
-            background: rgb(241, 241, 241);
+            background: var(--app-bg-secondary);
           }
 
           &:first-child {
@@ -347,7 +343,7 @@ page {
           .list-item-name {
             padding-left: 10rpx;
             font-size: 32rpx;
-            color: #000;
+            color: var(--app-text-primary);
           }
 
           .list-item-activeName {
@@ -393,7 +389,7 @@ page {
       text-align: center;
       padding: 0 50rpx;
       padding-bottom: 24rpx;
-      color: #000;
+      color: var(--app-text-primary);
     }
 
     ::v-deep .nut-button {
@@ -409,7 +405,7 @@ page {
 
       .nut-action-sheet__menu {
         .nut-action-sheet__item {
-          border-top: 2rpx solid #f6f6f6;
+          border-top: 2rpx solid var(--app-border);
 
           &:first-child {
             border-top: none;
@@ -418,7 +414,7 @@ page {
       }
 
       .nut-action-sheet__cancel {
-        border-top: 20rpx solid #f6f7f8;
+        border-top: 20rpx solid var(--app-bg-secondary);
       }
     }
   }

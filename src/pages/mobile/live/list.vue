@@ -1,11 +1,11 @@
 <template>
-  <div class="live">
+  <div :class="['live', themeClass]">
     <wil-category-list type="category" :list="listData" :list-props="listProps" v-if="listData.length && !loading">
       <template #custom="scope">
         <div class="right-list">
           <div
             class="right-list-item"
-            :style="{ backgroundColor: item.active ? '#dce1ff' : '#f7f6fa' }"
+            :style="{ backgroundColor: item.active ? (isDark ? 'rgba(255, 103, 1, 0.15)' : '#dce1ff') : 'var(--app-bg-secondary)' }"
             v-for="item in scope.row.childList"
             :key="item.name"
             @click="clickItem(item, scope.row.childList)"
@@ -29,7 +29,13 @@ import { parseM3UToArray, groupByGroupTitle } from '@/utils/tools.js'
 import wilCategoryList from '@/components/mobile/wil-category-list/index.vue'
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import { onLoad } from '@dcloudio/uni-app'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+useThemeNavbar()
+const themeClass = useThemeClass()
+const { isDark } = useThemeColors()
 const listProps = ref({
   children: 'childList',
 })
@@ -104,13 +110,13 @@ page {
 .live {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg);
   ::v-deep .category-list {
     .category-list-wrap {
       .category-list-container {
-        background-color: #f7f6fa;
+        background-color: var(--app-bg-secondary);
         .category-list-container-item {
-          background-color: #f7f6fa;
+          background-color: var(--app-bg-secondary);
           .right-list {
             .right-list-item {
               display: flex;

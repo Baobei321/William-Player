@@ -1,0 +1,16 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://10.55.133.230:8317",
+    "ANTHROPIC_AUTH_TOKEN": "sk-YHZBQQkZTBSW22x9O",
+    "ANTHROPIC_MODEL": "z-ai/glm-5.1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "z-ai/glm-5.1",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "z-ai/glm-5.1",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "z-ai/glm-5.1"
+  },
+  "model": "sonnet",
+  "language": "chinese",
+  "skipAutoPermissionPrompt": true,
+  "worktree": {
+    "baseRef": "head"
+  }
+}

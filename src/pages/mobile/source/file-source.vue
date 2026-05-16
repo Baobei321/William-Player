@@ -1,5 +1,5 @@
 <template>
-  <div class="fileSource">
+  <div :class="['fileSource', themeClass]">
     <div class="fileSource-item" v-for="item in sourceList" :key="item.type">
       <div class="fileSource-item__title">{{ item.type }}</div>
       <div class="fileSource-item__list">
@@ -8,7 +8,7 @@
             <image :src="vitem.img"></image>
           </div>
           <div class="list-item-name">{{ vitem.name }}</div>
-          <image :src="theme=='light' ? icIntoBlack : icIntoWhite" class="list-item-button" />
+          <image :src="isDark ? icIntoWhite : icIntoBlack" class="list-item-button" />
         </div>
       </div>
     </div>
@@ -22,8 +22,13 @@ import icIntoBlack from "@/static/ic-intoblack.png";
 import icIntoWhite from "@/static/ic-intowhite.png";
 import { toParse, toStringfy } from "../mine/common";
 import { onUnload } from "@dcloudio/uni-app";
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
-const theme = ref(uni.getSystemInfoSync().theme);
+useThemeNavbar()
+const themeClass = useThemeClass()
+const { isDark } = useThemeColors()
 
 const sourceList = ref([
   {
@@ -80,14 +85,6 @@ const toPath = (vitem) => {
     });
   }
 };
-const changeTheme = () => {
-  theme.value = uni.getSystemInfoSync().theme;
-};
-uni.onThemeChange(changeTheme);
-
-onUnload(() => {
-  uni.offThemeChange(changeTheme);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -97,7 +94,7 @@ page {
 }
 
 .fileSource {
-  background: #f6f7f8;
+  background: var(--app-bg);
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -109,26 +106,26 @@ page {
 
     .fileSource-item__title {
       font-size: 28rpx;
-      color: #6d6d6d;
+      color: var(--app-text-tertiary);
       padding: 16rpx 0;
     }
 
     .fileSource-item__list {
-      background: #fff;
+      background: var(--app-bg-card);
       border-radius: 14rpx;
 
       .list-item {
-        background: #fff;
+        background: var(--app-bg-card);
         padding: 10rpx 24rpx;
         display: flex;
         align-items: center;
         position: relative;
-        border-top: 2rpx solid rgb(241, 241, 241);
+        border-top: 2rpx solid var(--app-border);
         .list-item-name {
-          color: #000;
+          color: var(--app-text-primary);
         }
         &:active {
-          background: rgb(241, 241, 241);
+          background: var(--app-bg-secondary);
         }
         &:first-child {
           border-radius: 14rpx 14rpx 0 0;

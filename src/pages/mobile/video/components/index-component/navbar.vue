@@ -489,12 +489,17 @@ onMounted(() => {
 
             .nut-input {
               padding: 10px 15px;
+              background: var(--app-bg-input);
 
               .nut-input-value {
                 .nut-input-inner {
                   .nut-input-box {
                     .uni-input-input {
-                      color: #000;
+                      color: var(--app-text-primary);
+                    }
+
+                    .uni-input-placeholder {
+                      color: var(--app-text-placeholder);
                     }
                   }
                 }

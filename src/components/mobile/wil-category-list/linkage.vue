@@ -219,16 +219,16 @@ onMounted(() => {
     .category-list-menu {
       width: 228rpx;
       height: 100%;
-      background: rgba(246, 247, 248, 1);
+      background: var(--app-bg-secondary);
       .category-list-tab-item {
         height: 110rpx;
-        background: rgba(246, 247, 248, 1);
+        background: var(--app-bg-secondary);
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 28rpx;
-        color: #353a45;
+        color: var(--app-text-secondary);
         position: relative;
 
         // &__line{
@@ -245,7 +245,7 @@ onMounted(() => {
         font-size: 28rpx;
         color: #ff6701;
         font-weight: 500;
-        background: #fff;
+        background: var(--app-bg-card);
         border-left: 6rpx solid #ff6701;
         // .category-list-tab-item__line{
         //     display: block;
@@ -256,11 +256,11 @@ onMounted(() => {
       }
     }
     .category-list-container {
-      background-color: rgb(250, 250, 250);
+      background-color: var(--app-bg-secondary);
       flex: 1;
       &-item {
         // margin-bottom: 15px;
-        background-color: #fff;
+        background-color: var(--app-bg-card);
         padding: 16rpx;
         border-radius: 8rpx;
         box-sizing: border-box;
@@ -272,11 +272,11 @@ onMounted(() => {
           &__line {
             width: 100rpx;
             height: 2rpx;
-            background: rgb(231, 231, 231);
+            background: var(--app-border-strong);
           }
           &__name {
             font-size: 28rpx;
-            color: #353a45;
+            color: var(--app-text-secondary);
             padding: 0 20rpx;
           }
         }
@@ -285,7 +285,7 @@ onMounted(() => {
         }
         &__title {
           font-size: 28rpx;
-          color: #353a45;
+          color: var(--app-text-secondary);
           font-weight: bold;
         }
         &__content {
@@ -309,7 +309,7 @@ onMounted(() => {
             }
             &-name {
               font-size: 13px;
-              color: #353a45;
+              color: var(--app-text-secondary);
               padding-top: 8rpx;
             }
           }
@@ -327,7 +327,7 @@ onMounted(() => {
   margin-top: 8rpx;
   font-weight: normal;
   font-size: 24rpx;
-  color: #000;
+  color: var(--app-text-primary);
 }
 
 .item-container {

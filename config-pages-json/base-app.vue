@@ -1,17 +1,29 @@
 <script>
+import { useThemeStore } from '@/stores/theme'
+
 export default {
   onLaunch: function () {
     console.log('App Launch')
+    const themeStore = useThemeStore()
+    themeStore.init()
+
+    if (uni.onThemeChange) {
+      uni.onThemeChange(res => {
+        themeStore.onSystemThemeChange(res.theme)
+      })
+    }
+
     // #ifdef APP-PLUS
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
       //生产环境 禁用log
-      console.log = function () { };
+      console.log = function () {}
     }
     // #endif
-
   },
   onShow: function () {
     console.log('App Show')
+    const themeStore = useThemeStore()
+    // themeStore.applyTheme();
   },
   onHide: function () {
     console.log('App Hide')
@@ -20,8 +32,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import "nutui-uniapp/styles/index.scss";
-@import "./styles/nutui.scss";
+@import 'nutui-uniapp/styles/index.scss';
+@import './styles/nutui.scss';
+@import './styles/theme-vars.scss';
 
 /*每个页面公共css */
 .nut-button {

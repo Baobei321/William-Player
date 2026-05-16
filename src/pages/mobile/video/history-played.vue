@@ -1,5 +1,5 @@
 <template>
-    <div class="history-played">
+    <div :class="['history-played', themeClass]">
         <wil-navbar :title="routerParams.title" :leftShow="true">
             <template #right>
                 <span style="color: #2457fd;font-weight: bold;" @click="editHistory()">{{
@@ -48,9 +48,11 @@ import wilModal from "@/components/mobile/wil-modal/index.vue";
 import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import { useHistoryPlayed } from "@/hooks/useHistoryPlayed";
 import { ref } from 'vue'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
 const wil_list = ref(null);
 const wil_modal = ref(null);
+const themeClass = useThemeClass()
 
 const { requestParams, isClearAll, routerParams, lineNumber, lineHeight, changeItemFn,
     isSelect, windowWidth, recentSelect,
@@ -170,7 +172,7 @@ page {
                                 height: 30rpx;
                                 box-sizing: border-box;
                                 border: 2rpx solid #ff6701;
-                                background: #fff;
+                                background: var(--app-bg-card);
                                 position: absolute;
                                 top: 20rpx;
                                 right: 20rpx;
@@ -181,7 +183,7 @@ page {
                         .item-name {
                             font-size: 28rpx;
                             font-weight: bold;
-                            color: #000;
+                            color: var(--app-text-primary);
                         }
 
                         .item-time {

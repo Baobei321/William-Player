@@ -14,14 +14,14 @@
     <template #footer-prefix>
       <template v-if="!abilityType">
         <div :class="['deep-think', deepThinkActive ? 'deep-think-active' : '']" @click="deepThinkActive = !deepThinkActive">
-          <t-icon name="system-sum" size="32rpx" />
+          <t-icon name="system-sum" size="32rpx" :color="deepThinkActive ? activeIconColor : iconColor" />
         </div>
         <div :class="['internet-search', netSearchActive ? 'internet-search-active' : '']" @click="netSearchActive = !netSearchActive">
-          <t-icon name="internet" size="32rpx" />
+          <t-icon name="internet" size="32rpx" :color="netSearchActive ? activeIconColor : iconColor" />
         </div>
-        <t-popover v-model:visible="showMorePopover" placement="top" theme="light" data-target="light">
+        <t-popover v-model:visible="showMorePopover" placement="top" :theme="popoverTheme" :data-target="popoverTheme">
           <div class="more-button" @click="showMorePopover = true">
-            <t-icon name="ai-tool" size="32rpx" />
+            <t-icon name="ai-tool" size="32rpx" :color="iconColor" />
             <span>更多</span>
           </div>
           <template #content>
@@ -37,7 +37,7 @@
       <div class="ability-item" v-else @click="closeAbility">
         <image :src="moreOptions.find(i => i.name === abilityType).activeIcon" color="#0052d9"></image>
         <span>{{ abilityType }}</span>
-        <t-icon name="close" size="32rpx" color="#0052d9" />
+        <t-icon name="close" size="32rpx" :color="activeIconColor" />
       </div>
     </template>
     <template #suffix>
@@ -49,9 +49,9 @@
           @success="uploadeSuccess"
           style="width: 0; height: 0; opacity: 0; display: none"
         ></wil-uploader>
-        <t-popover v-model:visible="showPopover" placement="top" theme="light" data-target="light" v-if="!abilityType">
+        <t-popover v-model:visible="showPopover" placement="top" :theme="popoverTheme" :data-target="popoverTheme" v-if="!abilityType">
           <div class="upload-btn-icon" @click="openPopover">
-            <t-icon name="attach" size="32rpx" />
+            <t-icon name="attach" size="32rpx" :color="iconColor" />
           </div>
           <template #content>
             <div class="popover-content-list">
@@ -64,10 +64,10 @@
         </t-popover>
         <div :class="'send-btn-icon' + ' ' + (inputValue || props.loading ? 'active' : 'disabled') + ' ' + (props.loading ? 'stop' : '')" @click.stop="handleSend">
           <template v-if="!props.loading">
-            <t-icon name="send-filled" size="32rpx" />
+            <t-icon name="send-filled" size="32rpx" :color="primaryBtnTextColor" />
           </template>
           <template v-else>
-            <view style="width: 24rpx; height: 24rpx; background-color: #ffffff" />
+            <view class="stop-icon" />
           </template>
         </div>
       </div>
@@ -88,7 +88,8 @@ import moreVideo from '@/static/more-video.png'
 import moreImageActive from '@/static/more-image-active.png'
 import moreVideoActive from '@/static/more-video-active.png'
 import * as CONFIG from '@/utils/config.js'
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const props = defineProps({
   loading: {
@@ -98,6 +99,9 @@ const props = defineProps({
 })
 
 const emits = defineEmits(['send', 'stop'])
+const { isDark, iconColor, primaryBtnTextColor } = useThemeColors()
+const popoverTheme = computed(() => (isDark.value ? 'dark' : 'light'))
+const activeIconColor = computed(() => (isDark.value ? '#6f9cff' : '#0052d9'))
 const chatSenderRef = ref(null)
 const wilUploaderRef = ref(null)
 const inputValue = defineModel('value')
@@ -262,9 +266,20 @@ const stopMessage = () => {
 .chat-sender {
   :deep(.t-chat-sender) {
     margin-bottom: 24rpx;
+    background-color: var(--app-bg-card);
+    border-color: var(--app-border-strong);
+    box-shadow: none;
     .t-chat-sender__textarea {
+      color: var(--app-text-primary);
+
       .t-chat-sender__textarea--control {
         overflow: auto;
+        color: var(--app-text-primary);
+        background: transparent;
+      }
+
+      .t-chat-sender__textarea--placeholder {
+        color: var(--app-text-placeholder);
       }
     }
     .t-chat-sender__footer {
@@ -278,12 +293,12 @@ const stopMessage = () => {
           width: 64rpx;
           height: 64rpx;
           border-radius: 50%;
-          border: 2rpx solid #e9ebed;
+          border: 2rpx solid var(--app-border-strong);
         }
         .deep-think-active {
-          background: #f2f3ff;
+          background: var(--app-link-soft);
           color: #0052d9;
-          border: 2rpx solid #f2f3ff;
+          border: 2rpx solid var(--app-link-soft);
         }
         .internet-search {
           display: flex;
@@ -293,19 +308,19 @@ const stopMessage = () => {
           height: 64rpx;
           border-radius: 50%;
           margin-left: 12rpx;
-          border: 2rpx solid #e9ebed;
+          border: 2rpx solid var(--app-border-strong);
         }
         .internet-search-active {
-          background: #f2f3ff;
+          background: var(--app-link-soft);
           color: #0052d9;
-          border: 2rpx solid #f2f3ff;
+          border: 2rpx solid var(--app-link-soft);
         }
         .ability-item {
           display: flex;
           align-items: center;
-          background: #f2f3ff;
+          background: var(--app-link-soft);
           color: #0052d9;
-          border: 2rpx solid #f2f3ff;
+          border: 2rpx solid var(--app-link-soft);
           height: 64rpx;
           padding: 0 16rpx;
           border-radius: 16rpx;
@@ -326,7 +341,7 @@ const stopMessage = () => {
           .more-button {
             display: flex;
             align-items: center;
-            border: 2rpx solid #e9ebed;
+            border: 2rpx solid var(--app-border-strong);
             border-radius: 16rpx;
             height: 64rpx;
             padding: 0 16rpx;
@@ -334,12 +349,17 @@ const stopMessage = () => {
             span {
               font-size: 28rpx;
               padding-left: 10rpx;
+              color: var(--app-text-primary);
             }
           }
         }
         .t-popover {
           position: fixed;
           .t-popover__content {
+            background: var(--app-bg-card);
+            color: var(--app-text-primary);
+            border: 2rpx solid var(--app-border-strong);
+
             .popover-content-list {
               .popover-content-item {
                 display: flex;
@@ -366,6 +386,23 @@ const stopMessage = () => {
           }
         }
       }
+      .t-attachments__file {
+        background-color: var(--app-bg-secondary);
+      }
+
+      .t-attachments__title {
+        color: var(--app-text-primary);
+      }
+
+      .t-attachments__desc {
+        color: var(--app-text-tertiary);
+      }
+
+      .t-attachments__remove {
+        background-color: var(--app-text-primary);
+        color: var(--app-bg);
+      }
+
       .t-chat-sender__sendbtn {
         .suffix-button {
           display: flex;
@@ -373,6 +410,9 @@ const stopMessage = () => {
           .t-popover {
             position: fixed;
             .t-popover__content {
+              background: var(--app-bg-card);
+              color: var(--app-text-primary);
+              border: 2rpx solid var(--app-border-strong);
               .popover-content-list {
                 .popover-content-item {
                   display: flex;
@@ -405,7 +445,7 @@ const stopMessage = () => {
             align-items: center;
             justify-content: center;
             border-radius: 16rpx;
-            border: 1px solid #e9ebed;
+            border: 1px solid var(--app-border-strong);
           }
           .send-btn-icon {
             width: 64rpx;
@@ -418,12 +458,17 @@ const stopMessage = () => {
             transform: rotate(-90deg);
             transition: all 0.3s ease;
             &.disabled {
-              background-color: #cac9c9;
-              color: #ffffff;
+              background-color: var(--app-text-placeholder);
+              color: var(--app-text-inverse);
             }
             &.active {
-              background-color: #0052d9;
-              color: #ffffff;
+              background-color: var(--app-link);
+              color: var(--app-text-inverse);
+            }
+            .stop-icon {
+              width: 24rpx;
+              height: 24rpx;
+              background-color: var(--app-text-inverse);
             }
           }
         }

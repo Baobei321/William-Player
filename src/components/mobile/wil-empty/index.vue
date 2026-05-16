@@ -40,7 +40,7 @@ const imageMapping = {
     height: 400rpx;
   }
   span {
-    color: #9b9b9b;
+    color: var(--app-text-placeholder);
   }
 }
 </style>

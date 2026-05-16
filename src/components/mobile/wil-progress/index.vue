@@ -82,7 +82,7 @@ watch(
     .wil-progress-outer {
         flex: 1;
         border-radius: 24rpx;
-        background-color: #f3f3f3;
+        background-color: var(--app-bg-input);
         height: var(--bar-height);
 
         .wil-progress-inner {
@@ -140,6 +140,7 @@ watch(
     .wil-progress-text {
         padding: 0 10rpx;
         font-size: 26rpx;
+        color: var(--app-text-secondary);
     }
 }
 </style>

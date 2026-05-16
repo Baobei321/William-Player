@@ -9,9 +9,9 @@
         <span>{{ props.title }}</span>
       </div>
       <div class="hxList-title-right" @click="toVideoAll">
-        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'gray' }">全部</span>
+        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'var(--app-text-tertiary)' }">全部</span>
         <span v-if="props.type != 'emby'">{{ props.listData.length }}</span>
-        <nut-icon name="rect-right" size="10" :custom-color="props.type == 'emby' ? '#52b54b' : 'gray'"></nut-icon>
+        <nut-icon name="rect-right" size="10" :custom-color="props.type == 'emby' ? '#52b54b' : 'var(--app-text-tertiary)'"></nut-icon>
       </div>
     </div>
     <div class="hxList-list">
@@ -155,7 +155,7 @@ onShow(() => {
       span {
         font-size: 36rpx;
         font-weight: bold;
-        color: #000;
+        color: var(--app-text-primary);
       }
     }
 
@@ -166,7 +166,7 @@ onShow(() => {
       span {
         font-size: 30rpx;
         line-height: 30rpx;
-        color: gray;
+        color: var(--app-text-tertiary);
       }
 
       span:nth-child(2) {
@@ -200,13 +200,13 @@ onShow(() => {
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: var(--app-text-primary);
             display: block;
           }
 
           &-time {
             font-size: 24rpx;
-            color: gray;
+            color: var(--app-text-tertiary);
             padding-top: 6rpx;
             display: block;
           }

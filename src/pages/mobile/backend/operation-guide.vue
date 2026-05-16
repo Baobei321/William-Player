@@ -21,6 +21,9 @@
 </template>
 
 <script setup>
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+
+useThemeNavbar()
 const answerArr1 = ["手机与智能电视或电视盒子没有连接同一个WiFi，或者手机可能连接了移动网络。", "智能电视或电视盒子机型本身不支持DLNA投屏协议。"];
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="video">
+  <div :class="['video', themeClass]">
     <div class="video-refresh" @click="refreshModule">
       <span>{{ isRefresh?'正在同步：':'最近更新：' }}</span>
       <span :class="['video-refresh-time',isRefresh?'hide-span':'show-span']" :style="{width:refreshWidth>=0?refreshWidth+'px':'auto'}">{{ date }}</span>
@@ -36,10 +36,16 @@ import Folder from "@/static/folder.png";
 import dayjs from 'dayjs';
 import { getFolder, get189Folder, getQuarkFolder } from "@/utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
 
+useThemeNavbar()
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor, iconColor } = useThemeColors()
 const date = ref("暂未更新");
 
 const moduleList = ref([
@@ -404,7 +410,7 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f6f7f8;
+  background: var(--app-bg);
   box-sizing: border-box;
   &-refresh {
     display: inline-flex;
@@ -449,7 +455,7 @@ page {
     box-sizing: border-box;
     &-item {
       flex: 1;
-      background: #fff;
+      background: var(--app-bg-card);
       border-radius: 12rpx;
       margin-left: 24rpx;
       display: flex;
@@ -464,11 +470,11 @@ page {
         font-weight: bold;
         padding-bottom: 8rpx;
         font-size: 32rpx;
-        color: #000;
+        color: var(--app-text-primary);
       }
       &__name {
         font-size: 26rpx;
-        color: #797979;
+        color: var(--app-text-tertiary);
       }
     }
   }
@@ -478,7 +484,7 @@ page {
     padding: 0 24rpx;
     box-sizing: border-box;
     &-title {
-      color: #797979;
+      color: var(--app-text-tertiary);
       font-size: 28rpx;
     }
     &-container {
@@ -528,7 +534,7 @@ page {
   }
   .video-link {
     border-radius: 25rpx;
-    background: #315ffd;
+    background: var(--app-brand);
     width: 100rpx;
     height: 100rpx;
     display: flex;
@@ -544,7 +550,7 @@ page {
     }
   }
   ::v-deep .nut-popup {
-    background: #f3f2f7;
+    background: var(--app-bg-secondary);
     .video-popup-title {
       position: relative;
       display: flex;
@@ -562,7 +568,7 @@ page {
     .video-popup-container {
       padding: 0 24rpx;
       &__webdav {
-        background: #fff;
+        background: var(--app-bg-card);
         border-radius: 16rpx;
         display: flex;
         align-items: center;
@@ -582,12 +588,12 @@ page {
           span {
             padding-left: 20rpx;
             font-size: 28rpx;
-            color: #000;
+            color: var(--app-text-primary);
           }
         }
       }
       &__add {
-        background: #fff;
+        background: var(--app-bg-card);
         border-radius: 16rpx;
         display: flex;
         align-items: center;
@@ -609,7 +615,7 @@ page {
           span {
             padding-left: 30rpx;
             font-size: 28rpx;
-            color: #000;
+            color: var(--app-text-primary);
           }
         }
       }

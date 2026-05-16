@@ -1,5 +1,5 @@
 <template>
-  <div class="userInfo">
+  <div :class="['userInfo', themeClass]">
     <div class="userInfo-avatar">
       <wil-uploader @success="uploadSuccess">
         <image
@@ -16,7 +16,7 @@
           {{ item.title }}
         </template>
         <template #title="item">
-          <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }">{{ item.value || item.placeholder }}</span>
+          <span :style="{ color: item.value ? textSecondaryColor : textPlaceholderColor }">{{ item.value || item.placeholder }}</span>
         </template>
       </wil-cell>
       <wil-cell :options="options2" @clickItem="clickItem">
@@ -24,7 +24,7 @@
           {{ item.title }}
         </template>
         <template #title="item">
-          <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }">{{ item.value || item.placeholder }}</span>
+          <span :style="{ color: item.value ? textSecondaryColor : textPlaceholderColor }">{{ item.value || item.placeholder }}</span>
         </template>
       </wil-cell>
       <wil-cell :options="options3" @clickItem="clickItem">
@@ -34,9 +34,9 @@
         <template #title="item">
           <div class="alipay-cell" v-if="bindOne.includes(item.title)">
             <image :src="userInfo?.[item.prop] ? bindedIcon : nobindedIcon"></image>
-            <span :style="{ color: userInfo?.[item.prop] ? '#00c286' : '#FE4344' }">{{ userInfo?.[item.prop] ? '已绑定' : '未绑定' }}</span>
+            <span :style="{ color: userInfo?.[item.prop] ? successColor : dangerColor }">{{ userInfo?.[item.prop] ? '已绑定' : '未绑定' }}</span>
           </div>
-          <span :style="{ color: item.value ? '#353a45' : '#bbbbbb' }" v-else>{{ item.value || item.placeholder }}</span>
+          <span :style="{ color: item.value ? textSecondaryColor : textPlaceholderColor }" v-else>{{ item.value || item.placeholder }}</span>
         </template>
         <template #link="item">
           <span class="unbind-button" v-if="bindOne.includes(item.title) && userInfo?.[item.prop]" @click.stop="unBind(item)">解除绑定</span>
@@ -57,7 +57,13 @@ import { editUserInfo } from '@/network/apis.js'
 import bindedIcon from '@/static/binded-icon.png'
 import nobindedIcon from '@/static/nobinded-icon.png'
 import { bindAlipay, unbindAlipay, bindQQ, unbindQQ, bindWechat, unbindWechat } from '@/network/apis'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+useThemeNavbar()
+const themeClass = useThemeClass()
+const { textSecondaryColor, textPlaceholderColor, successColor, dangerColor } = useThemeColors()
 const userInfo = ref({})
 const wil_modal = ref(null)
 const genderDict = {
@@ -266,7 +272,8 @@ page {
 .userInfo {
   width: 100%;
   height: 100%;
-  background: #f5f5f5;
+  background: var(--app-bg);
+  color: var(--app-text-primary);
   padding: 0 24rpx;
   display: flex;
   flex-direction: column;
@@ -296,7 +303,7 @@ page {
           .nut-cell__icon {
             flex: 0 0 200rpx;
             margin-right: 0;
-            color: #949494;
+            color: var(--app-text-tertiary);
             font-weight: 500;
           }
 
@@ -318,20 +325,20 @@ page {
                 height: 30rpx;
               }
               span {
-                color: #fe4344;
+                color: var(--app-danger);
                 font-size: 30rpx;
                 padding-left: 12rpx;
               }
 
               .alipay-cell-right {
                 font-size: 30rpx;
-                color: #fe4344;
+                color: var(--app-danger);
               }
             }
           }
           .unbind-button {
             font-size: 30rpx;
-            color: #fe4344;
+            color: var(--app-danger);
             position: relative;
             z-index: 9999;
           }

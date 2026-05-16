@@ -1,5 +1,5 @@
 <template>
-    <div class="forget">
+    <div :class="['forget', themeClass]">
         <wil-navbar @getHeight="getHeight"></wil-navbar>
         <div class="forget-title">
             <div class="forget-title-top">
@@ -23,7 +23,7 @@
             </base-form>
         </div>
         <div class="forget-button">
-            <nut-button custom-color="#ff6701" @click="confirmEdit">确认修改</nut-button>
+            <nut-button :custom-color="primaryBtnColor" @click="confirmEdit">确认修改</nut-button>
         </div>
     </div>
 </template>
@@ -33,9 +33,13 @@ import baseForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue"
 import { ref } from "vue";
 import { sendEmail, editPwd } from "@/network/apis";
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+const { primaryBtnColor } = useThemeColors()
 const navbarHeight = ref('')
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
+const themeClass = useThemeClass()
 let timer = null
 const formData = ref({})
 //手机号校验
@@ -127,13 +131,13 @@ page {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 100%);
+    background: var(--app-gradient-mine);
     background-size: 100% 100%;
 
     &-title {
         font-weight: bold;
         // font-size: 48rpx;
-        color: #262424;
+        color: var(--app-text-primary);
         margin-bottom: 64rpx;
         padding: 0 48rpx;
         padding-top: calc(150rpx - v-bind(navbarHeight));
@@ -173,7 +177,7 @@ page {
 
         :deep(.base-form) {
             padding: 48rpx 40rpx;
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--app-bg-card);
             border-radius: 30rpx;
 
             .nut-cell-group {
@@ -236,7 +240,7 @@ page {
                         justify-content: flex-start;
 
                         span {
-                            color: #353a45;
+                            color: var(--app-text-secondary);
                             font-size: 28rpx;
                             padding-left: 20rpx;
                         }

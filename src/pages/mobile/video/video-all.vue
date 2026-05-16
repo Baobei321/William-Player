@@ -1,10 +1,10 @@
 <template>
-  <div class="video-all">
+  <div :class="['video-all', themeClass]">
     <wil-navbar :title="routerParams.title" :leftShow="true">
       <template #right>
         <nut-icon
           name="more-x"
-          custom-color="#000"
+          :custom-color="iconColor"
           size="20"
           @click="showPopover = true"
           v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"
@@ -62,8 +62,12 @@ import wilTabs from '@/components/mobile/wil-tabs/index.vue'
 import { ref, onBeforeUnmount } from 'vue'
 import { useVideoAll } from '@/hooks/useVideoAll'
 import { onUnload } from '@dcloudio/uni-app'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const wil_list = ref(null)
+const themeClass = useThemeClass()
+const { iconColor } = useThemeColors()
 
 const show = ref(true)
 
@@ -102,6 +106,7 @@ page {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--app-bg);
 
   ::v-deep .wil-navbar {
     .nut-navbar {
@@ -163,13 +168,13 @@ page {
             .item-name {
               font-size: 28rpx;
               font-weight: bold;
-              color: #000;
+              color: var(--app-text-primary);
               display: block;
             }
 
             .item-time {
               font-size: 24rpx;
-              color: gray;
+              color: var(--app-text-tertiary);
               padding-top: 6rpx;
               display: block;
             }
@@ -253,7 +258,7 @@ page {
                 height: 30rpx;
                 box-sizing: border-box;
                 border: 2rpx solid #ff6701;
-                background: #fff;
+                background: var(--app-bg-card);
                 position: absolute;
                 top: 20rpx;
                 right: 20rpx;
@@ -264,12 +269,12 @@ page {
             .item-name {
               font-size: 28rpx;
               font-weight: bold;
-              color: #000;
+              color: var(--app-text-primary);
             }
 
             .item-time {
               font-size: 24rpx;
-              color: gray;
+              color: var(--app-text-tertiary);
               padding-top: 6rpx;
             }
           }
@@ -290,15 +295,15 @@ page {
     font-size: 32rpx;
     font-weight: bold;
     height: 120rpx;
-    border-top: 2rpx solid rgb(227, 227, 227);
+    border-top: 2rpx solid var(--app-border-strong);
     box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3);
 
     &__left {
-      color: #2457fd;
+      color: var(--app-brand);
     }
 
     &__right {
-      color: rgb(188, 188, 188);
+      color: var(--app-text-tertiary);
     }
   }
 }
@@ -359,7 +364,7 @@ page {
 //       font-size: 32rpx;
 //       font-weight: bold;
 //       height: 120rpx;
-//       border-top: 2rpx solid rgb(227, 227, 227);
+//       border-top: 2rpx solid var(--app-border-strong);
 //       box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3);
 
 //       &__left {

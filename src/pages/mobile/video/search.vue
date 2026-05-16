@@ -1,18 +1,18 @@
 <template>
-  <div class="video-search">
+  <div :class="['video-search', themeClass]">
     <wil-navbar>
       <template #content>
         <nut-searchbar v-model="searchValue" placeholder="输入影片名称搜索" @search="toSearch" @clear="toCancel">
           <template #leftin>
-            <nut-icon name="search" custom-color="#000"></nut-icon>
+            <nut-icon name="search" :custom-color="iconColor"></nut-icon>
           </template>
           <template #rightout>
-            <span :style="{ color: searchValue ? '#315ffd' : '#d0d0d0' }" @click="toSearch">搜索</span>
+            <span :style="{ color: searchValue ? 'var(--app-brand)' : 'var(--app-text-tertiary)' }" @click="toSearch">搜索</span>
           </template>
         </nut-searchbar>
       </template>
     </wil-navbar>
-    <div class="video-search-list" v-if="selectType.type == 'Emby'" v-show="listData.length">
+    <div class="video-search-list" v-if="isEmby" v-show="listData.length">
       <wil-list
         :requestFn="getSearchEmbyList"
         :request-params="requestParams"
@@ -29,7 +29,7 @@
         </template>
       </wil-list>
     </div>
-    <div class="video-search-list" v-if="listData.length && selectType.type != 'Emby'">
+    <div class="video-search-list" v-if="listData.length && !isEmby">
       <searchBox :data="item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)" :oldValue="oldValue" :isEmby="false"></searchBox>
     </div>
     <wil-empty v-if="!listData.length" text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import wilList from '@/components/mobile/wil-list/index.vue'
@@ -46,32 +46,37 @@ import { onLoad } from '@dcloudio/uni-app'
 import searchBox from './components/index-component/search-box.vue'
 import { getEmbyList, setEmbyImg } from '@/utils/emby'
 import dayjs from 'dayjs'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const oldValue = ref('')
 const searchValue = ref('')
+const themeClass = useThemeClass()
+const { iconColor } = useThemeColors()
 const listData = ref([])
 
-const selectType = ref({})
+const selectType = ref(null)
 const selectMedia = ref({})
+const isEmby = computed(() => selectType.value?.type === 'Emby')
 const wil_list = ref(null)
 const requestParams = ref(null)
 
 const toSearch = () => {
   if (oldValue.value == searchValue.value || !searchValue.value) return
-  if (selectType.value.type == 'Emby') {
+  if (isEmby.value) {
     requestParams.value = {}
     wil_list.value.reload()
   } else {
-    let data = uni.getStorageSync('localMovieTvData')
-    let movieArr = data.movie.filter(item => item.name.indexOf(searchValue.value) > -1)
-    let tvArr = data.tv.filter(item => item.name.indexOf(searchValue.value) > -1)
+    let data = uni.getStorageSync('localMovieTvData') || {}
+    let movieArr = (data.movie || []).filter(item => item.name.indexOf(searchValue.value) > -1)
+    let tvArr = (data.tv || []).filter(item => item.name.indexOf(searchValue.value) > -1)
     listData.value = [...movieArr, ...tvArr]
   }
   oldValue.value = searchValue.value
 }
 
 const toCancel = () => {
-  if (selectType.value.type == 'Emby') {
+  if (isEmby.value) {
     wil_list.value.clearList()
   } else {
     searchValue.value = ''
@@ -85,7 +90,7 @@ const currentData = data => {
 }
 
 const toVideoDetail = item => {
-  if (selectType.value.type == 'Emby') {
+  if (isEmby.value) {
     uni.navigateTo({
       url: `/pages/mobile/video/emby/emby-detail?name=${handleSeasonName(item.name, true)}&type=${item.type == '1' ? 'tv' : 'movie'}&movieTvId=${item.id}`,
     })
@@ -98,16 +103,17 @@ const toVideoDetail = item => {
 
 //判断选择的是webdav还是天翼云盘还是夸克还是Emby
 const judgeSelect = () => {
-  let sourceList = uni.getStorageSync('sourceList')
-  selectType.value = sourceList.find(item => {
-    let select = item.list.find(i => i.active)
-    if (select) {
-      selectMedia.value = select
-      return true
-    } else {
-      return false
-    }
-  })
+  let sourceList = uni.getStorageSync('sourceList') || []
+  selectType.value =
+    sourceList.find(item => {
+      let select = item.list?.find(i => i.active)
+      if (select) {
+        selectMedia.value = select
+        return true
+      } else {
+        return false
+      }
+    }) || {}
 }
 
 //emby分页查询影视
@@ -148,6 +154,7 @@ judgeSelect()
 page {
   width: 100%;
   height: 100%;
+  background: var(--app-bg);
 }
 
 .video-search {
@@ -155,9 +162,10 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--app-bg);
 
   ::v-deep .wil-navbar {
-    background: #fff;
+    background: var(--app-bg);
 
     .nut-navbar {
       padding-right: 0;
@@ -174,7 +182,7 @@ page {
             overflow: hidden;
 
             .nut-searchbar__input-bar {
-              color: #000;
+              color: var(--app-text-primary);
               min-height: 0;
             }
           }

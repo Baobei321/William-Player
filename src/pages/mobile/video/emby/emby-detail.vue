@@ -1,5 +1,5 @@
 <template>
-  <div class="emby-detail">
+  <div :class="['emby-detail', themeClass]">
     <wil-navbar style="position: fixed; z-index: 999" arrow-color="#fff"></wil-navbar>
     <div class="emby-detail-container">
       <div class="emby-detail-container__img" :style="{ backgroundImage: `url(${imgData.img})` }">
@@ -26,11 +26,11 @@
         </div>
       </div>
       <div class="emby-detail-container__content">
-        <nut-button custom-color="#090909" @click="clickPlayButton">
+        <nut-button :custom-color="primaryBtnColor" @click="clickPlayButton">
           <template #icon>
             <image src="/static/play.png" />
           </template>
-          <span>{{ buttonText }}</span>
+          <span :style="{ color: primaryBtnTextColor }">{{ buttonText }}</span>
         </nut-button>
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
@@ -43,7 +43,7 @@
             <div class="tv-version-tabs__cloud">
               <div class="tv-version-tabs__cloud-item">Emby</div>
             </div>
-            <nut-tabs v-model="activeSeason.season" :title-scroll="true" custom-color="#090909" background="#fff" @change="changeTvSeason">
+            <nut-tabs v-model="activeSeason.season" :title-scroll="true" :custom-color="iconColor" background="var(--app-bg)" @change="changeTvSeason">
               <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in seasonArr" :key="item.season"></nut-tab-pane>
             </nut-tabs>
             <div class="tv-version-tabs__disabled" v-if="!tvList.length && !showRehandleButton" @click="disabledTip"></div>
@@ -73,7 +73,7 @@
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
-            <nut-button custom-color="#090909" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
+            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
             <span v-else>加载中...</span>
           </div>
         </div>
@@ -98,7 +98,11 @@ import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import actorList from '../components/detail-component/actor-list.vue'
 import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTvList } from '@/utils/emby'
 import { parseTime, calTime, formatNanoseconds, handleSecond, handleSeasonName, generateChineseNumberMapping } from '@/utils/scrape'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor, iconColor } = useThemeColors()
 const imgData = ref({}) //图片内的信息
 const overview = ref('') //剧情简介
 const actor_list = ref(null)
@@ -401,7 +405,7 @@ page {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--app-bg);
   overflow: auto;
 
   ::v-deep .wil-navbar {
@@ -430,12 +434,12 @@ page {
             transform: translateY(-100%);
             border-left: 12rpx solid transparent;
             border-right: 12rpx solid transparent;
-            border-bottom: 16rpx solid #fff;
+            border-bottom: 16rpx solid var(--app-bg-card);
           }
 
           .more-popover {
             width: 360rpx;
-            background: #fff;
+            background: var(--app-bg-card);
             border-radius: 16rpx;
 
             .more-popover-item {
@@ -451,7 +455,7 @@ page {
               .more-popover-item__text {
                 flex: 1;
                 padding-left: 15rpx;
-                color: #000;
+                color: var(--app-text-primary);
               }
             }
           }
@@ -659,7 +663,7 @@ page {
         .movie-version-title {
           font-size: 32rpx;
           font-weight: bold;
-          color: #000;
+          color: var(--app-text-primary);
           padding-bottom: 20rpx;
         }
 
@@ -723,7 +727,7 @@ page {
               }
 
               .nut-tabs-active {
-                color: #090909;
+                color: var(--app-text-primary);
 
                 .nut-tabs__titles-item__line {
                   width: 100%;
@@ -803,7 +807,7 @@ page {
               width: 100%;
               // aspect-ratio: 169.5/85;
               height: var(--line-height);
-              background: rgb(212, 212, 212);
+              background: var(--app-bg-secondary);
               background-position: center;
               background-repeat: no-repeat;
               background-size: cover;
@@ -842,7 +846,7 @@ page {
 
             .item-title {
               font-size: 28rpx;
-              color: #000;
+              color: var(--app-text-primary);
               font-weight: bold;
               padding-top: 12rpx;
               width: 100%;

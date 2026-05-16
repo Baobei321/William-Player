@@ -1,13 +1,13 @@
 <template>
-  <div class="search-match">
+  <div :class="['search-match', themeClass]">
     <div class="search-match-title">搜索并匹配影片</div>
     <nut-searchbar v-model="searchValue" placeholder="输入影片名称搜索" @search="toSearch" @clear="toCancel">
       <template #leftin>
-        <nut-icon name="search" custom-color="#000"></nut-icon>
+        <nut-icon name="search" :custom-color="iconColor"></nut-icon>
       </template>
       <template #rightout>
-        <span :style="{color:searchValue?'#315ffd':'#d0d0d0'}" @click="toSearch" v-if="!requestParams.query">搜索</span>
-        <span v-else style="color:#315ffd" @click="toCancel">取消</span>
+        <span :style="{color:searchValue?'var(--app-brand)':'var(--app-text-tertiary)'}" @click="toSearch" v-if="!requestParams.query">搜索</span>
+        <span v-else :style="{color:'var(--app-brand)'}" @click="toCancel">取消</span>
       </template>
     </nut-searchbar>
     <div class="search-match-list">
@@ -65,7 +65,13 @@ import wilModal from "@/components/mobile/wil-modal/index.vue";
 import { generateChineseNumberMapping } from "@/utils/scrape";
 import { onLoad } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+useThemeNavbar({ variant: 'secondary' })
+const themeClass = useThemeClass()
+const { iconColor } = useThemeColors()
 const searchValue = ref("");
 const requestParams = ref({});
 const activeIndex = ref(null);
@@ -261,7 +267,7 @@ page {
 }
 .search-match {
   padding: 24rpx 24rpx 0 24rpx;
-  background: #fff;
+  background: var(--app-bg);
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -278,7 +284,7 @@ page {
       align-items: center;
       overflow: hidden;
       .nut-searchbar__input-bar {
-        color: #000;
+        color: var(--app-text-primary);
         min-height: 0;
       }
     }
@@ -303,7 +309,7 @@ page {
       .search-match-list__item {
         margin-bottom: 24rpx;
         border-radius: 16rpx;
-        border: 2rpx solid rgb(235, 235, 235);
+        border: 2rpx solid var(--app-border);
         display: flex;
         align-items: center;
         .item-left {
@@ -345,7 +351,7 @@ page {
           box-sizing: border-box;
           .item-right-name {
             font-size: 30rpx;
-            color: #000;
+            color: var(--app-text-primary);
             font-weight: bold;
             display: -webkit-box; /* 启用弹性盒子布局 */
             -webkit-box-orient: vertical; /* 设置子元素垂直排列 */
@@ -356,7 +362,7 @@ page {
           .item-right-content {
             display: flex;
             align-items: center;
-            color: #7a787b;
+            color: var(--app-text-tertiary);
             font-size: 28rpx;
             margin-top: 20rpx;
             .item-right-content__date {
@@ -369,7 +375,7 @@ page {
             .item-right-content__line {
               height: 28rpx;
               width: 2rpx;
-              background: #cecece;
+              background: var(--app-border-strong);
               margin: 0 20rpx;
             }
           }
@@ -381,7 +387,7 @@ page {
             text-overflow: ellipsis;
             width: 100%;
             font-size: 28rpx;
-            color: #7a787b;
+            color: var(--app-text-tertiary);
             padding-top: 16rpx;
           }
         }

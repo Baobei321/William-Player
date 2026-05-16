@@ -20,7 +20,7 @@
             </div>
             <div class="item-right-content">
                 <div class="item-right-content__date">
-                    <nut-icon name="date" size="14" custom-color="#7a787b"></nut-icon>
+                    <nut-icon name="date" size="14" custom-color="var(--app-text-tertiary)"></nut-icon>
                     <span>{{ props.data.releaseTime }}</span>
                 </div>
                 <div class="item-right-content__line"></div>
@@ -46,7 +46,7 @@ const handleName = (name) => {
     let arr = [];
     name = handleSeasonName(name);
     arr.push({ label: name.split(props.oldValue)[0] });
-    arr.push({ label: props.oldValue, color: "#315bfe" });
+    arr.push({ label: props.oldValue, color: "var(--app-brand)" });
     arr.push({ label: name.split(props.oldValue)[1] });
     arr = arr.filter((i) => i.label);
     return arr;
@@ -116,14 +116,14 @@ const setEmptyImg = (poster) => {
             display: flex;
             align-items: baseline;
             font-size: 30rpx;
-            color: #000;
+            color: var(--app-text-primary);
             font-weight: bold;
         }
 
         .item-right-content {
             display: flex;
             align-items: center;
-            color: #7a787b;
+            color: var(--app-text-tertiary);
             font-size: 28rpx;
             margin-top: 20rpx;
 
@@ -139,7 +139,7 @@ const setEmptyImg = (poster) => {
             .item-right-content__line {
                 height: 28rpx;
                 width: 2rpx;
-                background: #cecece;
+                background: var(--app-border);
                 margin: 0 20rpx;
             }
         }

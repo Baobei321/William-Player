@@ -1,44 +1,50 @@
 import { watch, ref } from 'vue';
-import { useThemeStore } from '@/stores/theme'; // 替换为你的 Pinia Store 路径
-import { onShow } from "@dcloudio/uni-app";
-
+import { useThemeStore } from '@/stores/theme';
+import { onShow } from '@dcloudio/uni-app';
 
 export function useThemeTabbar(options) {
-    const themeStore = useThemeStore();
-    const currentTheme = ref("");
-    let options1 = options || { customNav: false }
-    onShow(() => {
-        if (currentTheme.value === "dark") {
-            if (options1.customNav) {
-                uni.setNavigationBarColor({
-                    frontColor: "#ffffff",
-                    backgroundColor: "transparent",
-                });
-            }
-            uni.setTabBarStyle({
-                backgroundColor: "#1e1e20", // TabBar 背景色
-                borderStyle: "black",
-            });
-        } else {
-            if (options1.customNav) {
-                uni.setNavigationBarColor({
-                    frontColor: "#000000",
-                    backgroundColor: "transparent",
-                });
-            }
-            uni.setTabBarStyle({
-                backgroundColor: "#ffffff", // TabBar 背景色
-                borderStyle: "white",
-            });
-        }
-    })
-    watch(
-        () => themeStore.theme,
-        (val) => {
-            currentTheme.value = themeStore.getThemeUi();
-        },
-        { immediate: true }
-    );
+  const themeStore = useThemeStore();
+  const currentTheme = ref(themeStore.getResolvedTheme());
+  const options1 = options || { customNav: false };
 
-    return { currentTheme };
+  const applyTabbar = () => {
+    const theme = themeStore.getResolvedTheme();
+    currentTheme.value = theme;
+
+    if (theme === 'dark') {
+      if (options1.customNav) {
+        uni.setNavigationBarColor({
+          frontColor: '#ffffff',
+          backgroundColor: 'transparent',
+        });
+      }
+
+      uni.setTabBarStyle({
+        backgroundColor: '#1e1e20',
+        borderStyle: 'black',
+      });
+    } else {
+      if (options1.customNav) {
+        uni.setNavigationBarColor({
+          frontColor: '#000000',
+          backgroundColor: 'transparent',
+        });
+      }
+
+      uni.setTabBarStyle({
+        backgroundColor: '#ffffff',
+        borderStyle: 'white',
+      });
+    }
+  };
+
+  onShow(applyTabbar);
+
+  watch(
+    () => themeStore.resolvedTheme,
+    applyTabbar,
+    { immediate: true }
+  );
+
+  return { currentTheme };
 }

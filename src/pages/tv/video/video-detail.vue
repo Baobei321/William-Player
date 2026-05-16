@@ -57,6 +57,7 @@ import cloudList from './components/detail-component/cloud-list.vue'
 import seasonList from './components/detail-component/season-list.vue'
 import tvListd from './components/detail-component/tv-list.vue'
 import actorList from './components/detail-component/actor-list.vue'
+import { buildSourceName } from '@/utils/providerMap'
 
 const { getUntokenDict } = useDict()
 const showPopover = ref(false)
@@ -824,20 +825,9 @@ onBeforeMount(async () => {
   judgeSelect()
   // historyPlay.value = uni.getStorageSync('historyPlay') || []
   historyPlay.value = historyPlay.value.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
-  let dict = [
-    { value: '189CloudPC', label: '天翼云盘' },
-    { value: 'Quark', label: '夸克网盘' },
-    { value: 'WoPan', label: '联通云盘' },
-    { value: 'unknown', label: '未知' },
-  ]
   let source = JSON.parse(routerParams.value.source)
   sourceList.value = source.map(i => {
-    if (source.filter(v => v.provider == i.provider).length > 1) {
-      let label = dict.find(v => v.value == i.provider)?.label
-      i.sourceName = label ? label + `(${i.name})` : i.provider
-    } else {
-      i.sourceName = dict.find(v => v.value == i.provider)?.label || i.provider
-    }
+    i.sourceName = buildSourceName(i, source)
     return i
   })
   selectSource.value = sourceList.value[0]

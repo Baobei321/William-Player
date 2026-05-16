@@ -1,67 +1,70 @@
 <template>
-  <div class="add-webdav-form">
+  <div :class="['add-webdav-form', themeClass]">
     <wil-navbar :title="title"></wil-navbar>
     <div class="add-webdav-form__container">
       <wil-form v-model="state.formData" :options="options" ref="base_form">
         <template #protocol>
-          <nut-cell :title="protoColumns.find(i => i.value == state.formData.protocol)?.text" is-link
-            @click="openPopup"></nut-cell>
+          <nut-cell :title="protoColumns.find(i => i.value == state.formData.protocol)?.text" is-link @click="openPopup"></nut-cell>
         </template>
       </wil-form>
-      <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title == '添加WebDAV' ? '添加' : '修改' }}</nut-button>
+      <nut-button :custom-color="primaryBtnColor" @click="confirmSubmit">
+        <span :style="{ color: primaryBtnTextColor }">确认{{ title == '添加WebDAV' ? '添加' : '修改' }}</span>
+      </nut-button>
       <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
       <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
-        <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker"
-          @cancel="showProtocol = false">
-        </nut-picker>
+        <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker" @cancel="showProtocol = false"></nut-picker>
       </nut-popup>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onBeforeMount, reactive, ref } from "vue";
-import wilForm from "@/components/mobile/wil-form/index.vue";
-import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
-import { onLoad } from "@dcloudio/uni-app";
-import { validateWebdav } from "@/utils/validate";
+import { onBeforeMount, reactive, ref } from 'vue'
+import wilForm from '@/components/mobile/wil-form/index.vue'
+import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { validateWebdav } from '@/utils/validate'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 const state = reactive({
   formData: {
-    protocol: "http",
+    protocol: 'http',
   },
   oldData: {},
-});
+})
 
-const base_form = ref(null);
+const base_form = ref(null)
 // const showLoginPopup = ref(false)
 
-const routerParams = ref({});
+const routerParams = ref({})
 
-const title = ref("");
+const title = ref('')
 
 const options = ref([
-  { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
-  { label: "协议", prop: "protocol", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请选择协议" }] },
+  { label: '名称', prop: 'name', type: 'input', formItemProps: { placeholder: '请输入', type: 'text' }, rule: [{ required: true, message: '请输入名称' }] },
+  { label: '协议', prop: 'protocol', formItemProps: { placeholder: '请输入', type: 'text' }, rule: [{ required: true, message: '请选择协议' }] },
 
-  { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
-  { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "选填,例如:5244", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
+  { label: '地址', prop: 'address', type: 'input', formItemProps: { placeholder: '例如:127.0.0.1', type: 'text' }, rule: [{ required: true, message: '请输入地址' }] },
+  { label: '端口', prop: 'port', type: 'input', formItemProps: { placeholder: '选填,例如:5244', type: 'number' }, rule: [{ required: true, message: '请输入端口' }] },
   {
-    label: "用户名",
-    prop: "username",
-    type: "input",
-    formItemProps: { placeholder: "alist用户名,例如:admin", type: "text" },
-    rule: [{ required: true, message: "请输入用户名" }],
+    label: '用户名',
+    prop: 'username',
+    type: 'input',
+    formItemProps: { placeholder: 'alist用户名,例如:admin', type: 'text' },
+    rule: [{ required: true, message: '请输入用户名' }],
   },
-  { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "alist密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
+  { label: '密码', prop: 'password', type: 'input', formItemProps: { placeholder: 'alist密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
   // { label: "路径", prop: "path", type: "input", formItemProps: { placeholder: "选填,例如:/dav", type: "text" }, rule: [{ required: true, message: "请输入路径" }] },
-]);
+])
 
-const showProtocol = ref(false);
-const protoValue = ref(["HTTP"]);
+const showProtocol = ref(false)
+const protoValue = ref(['HTTP'])
 const protoColumns = ref([
-  { text: "HTTP", value: "http" },
-  { text: "HTTPS", value: "https" },
-]);
+  { text: 'HTTP', value: 'http' },
+  { text: 'HTTPS', value: 'https' },
+])
 
 //修改webdav的时候，同步修改电视剧电影目录
 const editMulu = () => {
@@ -78,32 +81,32 @@ const editMulu = () => {
 }
 
 const confirmSubmit = () => {
-  base_form.value.confirmCommit().then(async (valid) => {
+  base_form.value.confirmCommit().then(async valid => {
     if (valid) {
       validateWebdav(title.value, state.formData, state.oldData, routerParams.value) //校验，抽成一个方法了
     }
-  });
-};
+  })
+}
 
 const openPopup = () => {
-  showProtocol.value = true;
-};
+  showProtocol.value = true
+}
 const confirmPicker = ({ selectedValue, selectedOptions }) => {
-  console.log(selectedOptions);
-  state.formData.protocol = selectedValue[0];
-  showProtocol.value = false;
-};
+  console.log(selectedOptions)
+  state.formData.protocol = selectedValue[0]
+  showProtocol.value = false
+}
 
-onLoad((options) => {
-  routerParams.value = options;
-  title.value = decodeURIComponent(routerParams.value.title);
-  if (title.value == "修改WebDAV") {
-    let sourceList = uni.getStorageSync("sourceList");
-    state.formData = sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == routerParams.value.address);
-    state.formData.protocol ? "" : (state.formData.protocol = "http");
-    state.oldData = JSON.parse(JSON.stringify(state.formData));
+onLoad(options => {
+  routerParams.value = options
+  title.value = decodeURIComponent(routerParams.value.title)
+  if (title.value == '修改WebDAV') {
+    let sourceList = uni.getStorageSync('sourceList')
+    state.formData = sourceList.find(i => i.type == 'WebDAV').list.find(i => i.address == routerParams.value.address)
+    state.formData.protocol ? '' : (state.formData.protocol = 'http')
+    state.oldData = JSON.parse(JSON.stringify(state.formData))
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>
@@ -117,7 +120,7 @@ page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
+  background: var(--app-gradient-mine);
   background-size: 100% 100%;
   box-sizing: border-box;
 
@@ -143,7 +146,7 @@ page {
                     padding: 0;
                     height: 100%;
                     box-shadow: none;
-                    color: #353a45;
+                    color: var(--app-text-secondary);
 
                     .nut-cell__title {
                       font-size: 28rpx;
@@ -162,7 +165,7 @@ page {
     }
   }
 
-  ::v-deep .nut-button {
+  :deep(.nut-button) {
     margin-top: 80rpx;
   }
 }

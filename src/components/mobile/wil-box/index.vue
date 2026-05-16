@@ -16,7 +16,7 @@
       <div class="wil-box-center__container">
         <div class="wil-box-center-item" v-for="(item,index) in getData(props.data)" :key="index">
           <span class="name" :style="{minWidth:props.minWidth?props.minWidth*2+'rpx':''}">{{ item.name }}：</span>
-          <span :class="['value']" :style="{color:item.color ? item.color : '#1a1a1a'}">{{ item.label|| '-' }}</span>
+          <span :class="['value']" :style="item.color ? { color: item.color } : {}">{{ item.label|| '-' }}</span>
         </div>
         <div class="wil-box-center-item" v-if="$slots.center">
           <slot name="center" v-bind="props.data"></slot>
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="wil-box-bottom" v-if="$slots.bottom">
-      <nut-divider style="color: #D8D8D8;" />
+      <nut-divider class="wil-box-divider" />
       <div class="wil-box-bottom-item">
         <slot name="bottom" v-bind="props.data"></slot>
       </div>
@@ -71,7 +71,7 @@ const getData = (data) => {
 
 <style lang="scss" scoped>
 .wil-box {
-  background: #ffffff;
+  background: var(--app-bg-card);
   border-radius: 8px;
   padding: 11px 0 11px 13px;
   margin-bottom: 12px;
@@ -86,7 +86,7 @@ const getData = (data) => {
         justify-content: center;
         font-size: 16px;
         font-weight: bold;
-        color: #343434;
+        color: var(--app-text-primary);
       }
     }
     .tag {
@@ -150,12 +150,12 @@ const getData = (data) => {
         }
 
         .name {
-          color: #86909c;
+          color: var(--app-text-placeholder);
           // min-width: 75px;
         }
 
         .value {
-          color: #1a1a1a;
+          color: var(--app-text-primary);
           flex: 1;
 
           &.blue {
@@ -179,6 +179,9 @@ const getData = (data) => {
       // margin: 11px 0;
       // margin-top: 0;
       margin: 0;
+    }
+    .wil-box-divider {
+      color: var(--app-border-strong);
     }
   }
 }

@@ -1,0 +1,74 @@
+// ========== 浅色模式（默认值）==========
+:root,
+page,
+.dark {
+  // --- 项目级语义化 token ---
+  --app-bg: #ffffff;
+  --app-bg-secondary: #f6f7f8;
+  --app-bg-card: #ffffff;
+  --app-bg-input: #ffffff;
+  --app-text-primary: #000000;
+  --app-text-secondary: #353a45;
+  --app-text-tertiary: #808080;
+  --app-text-placeholder: #86909c;
+  --app-text-inverse: #ffffff;
+  --app-border: #f5f6f7;
+  --app-border-strong: #e9e9e9;
+  --app-brand: #ff6701;
+  --app-danger: #fe4344;
+  --app-success: #00c286;
+  --app-link: #0052d9;
+  --app-link-soft: #f2f3ff;
+  --app-btn-primary: #090909;
+  --app-btn-primary-text: #ffffff;
+  --app-icon: #000000;
+  --app-icon-muted: #bbbbbb;
+  --app-gradient-mine: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
+  --app-navbar-bg: #ffffff;
+  --app-tabbar-bg: #ffffff;
+
+  // --- NutUI 关键变量对接 ---
+  --nut-title-color: var(--app-text-secondary);
+  --nut-title-color2: var(--app-text-tertiary);
+  --nut-text-color: var(--app-text-tertiary);
+  --nut-help-color: var(--app-bg-secondary);
+  --nut-cell-background: var(--app-bg-card);
+  --nut-cell-color: var(--app-text-secondary);
+}
+
+// ========== 深色模式（通过 .dark 类名触发）==========
+.dark {
+  --app-bg: #1e1e20;
+  --app-bg-secondary: #131313;
+  --app-bg-card: #2f2f2f;
+  --app-bg-input: #2f2f2f;
+  --app-text-primary: #ffffff;
+  --app-text-secondary: #e0e0e0;
+  --app-text-tertiary: #a0a0a0;
+  --app-text-placeholder: #707070;
+  --app-text-inverse: #000000;
+  --app-border: #494949;
+  --app-border-strong: #494949;
+  --app-brand: #ff6701;
+  --app-danger: #fe4344;
+  --app-success: #00c286;
+  --app-link: #6f9cff;
+  --app-link-soft: #24345c;
+  --app-btn-primary: #ffffff;
+  --app-btn-primary-text: #090909;
+  --app-icon: #ffffff;
+  --app-icon-muted: #ffffff;
+  --app-gradient-mine: var(--app-bg);
+  --app-navbar-bg: #1e1e20;
+  --app-tabbar-bg: #1e1e20;
+
+  // --- NutUI 深色变量覆写 ---
+  --nut-title-color: var(--app-text-secondary);
+  --nut-title-color2: var(--app-text-tertiary);
+  --nut-text-color: var(--app-text-tertiary);
+  --nut-help-color: var(--app-bg-secondary);
+  --nut-cell-background: var(--app-bg-card);
+  --nut-cell-color: var(--app-text-secondary);
+  --nut-searchbar-background: var(--app-bg);
+  --nut-searchbar-input-background: var(--app-bg-input);
+}

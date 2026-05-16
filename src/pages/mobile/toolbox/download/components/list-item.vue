@@ -18,9 +18,9 @@
         </div>
       </div>
       <div class="container-right">
-        <image src="@/static/pause-black.png" @click.stop="pauseById(props.data.id)" v-if="props.data.status === 'DOWNLOADING'"></image>
-        <image src="@/static/play-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'PAUSED'"></image>
-        <image src="@/static/reload-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'ERROR'"></image>
+        <image class="theme-icon" src="@/static/pause-black.png" @click.stop="pauseById(props.data.id)" v-if="props.data.status === 'DOWNLOADING'"></image>
+        <image class="theme-icon" src="@/static/play-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'PAUSED'"></image>
+        <image class="theme-icon" src="@/static/reload-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'ERROR'"></image>
         <image src="@/static/delete-icon.png" @click.stop="deleteById(item)"></image>
       </div>
     </div>
@@ -59,7 +59,7 @@ const deleteById = item => {
   display: flex;
   flex-direction: column;
   &:active {
-    background: #f6f6f6;
+    background: var(--app-bg-secondary);
   }
   .list-item__container {
     display: flex;
@@ -81,10 +81,11 @@ const deleteById = item => {
         .container-left-info__name {
           font-size: 32rpx;
           font-weight: bold;
+          color: var(--app-text-primary);
         }
         .container-left-info__size {
           font-size: 28rpx;
-          color: gray;
+          color: var(--app-text-tertiary);
           margin-top: 16rpx;
           display: flex;
           align-items: center;
@@ -95,13 +96,13 @@ const deleteById = item => {
             width: 8rpx;
             height: 8rpx;
             border-radius: 50%;
-            background: gray;
+            background: var(--app-text-tertiary);
             margin: 0 12rpx;
           }
         }
         .container-left-info__error {
           font-size: 28rpx;
-          color: #fe4344;
+          color: var(--app-danger);
           margin-top: 16rpx;
         }
       }
@@ -116,6 +117,12 @@ const deleteById = item => {
           margin-left: 24rpx;
         }
       }
+    }
+  }
+  &.dark,
+  :global(.dark) & {
+    .theme-icon {
+      filter: invert(1);
     }
   }
   .list-item__progress {

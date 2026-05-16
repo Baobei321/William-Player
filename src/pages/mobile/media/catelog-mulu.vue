@@ -1,5 +1,5 @@
 <template>
-  <div class="catelog-mulu">
+  <div :class="['catelog-mulu', themeClass]">
     <div class="catelog-mulu-item" v-for="item in listData" :key="item.name" @click="event => clickItem(event, item)">
       <div class="item-top">
         <image :src="routerParams.title == '电视剧' ? xspBlack : dyBlack"></image>
@@ -15,7 +15,7 @@
     </div>
     <div class="catelog-mulu-add catelog-mulu-item" @click="toSelectSource">
       <div class="catelog-mulu-add__icon">
-        <nut-icon name="uploader" custom-color="#94939a"></nut-icon>
+        <nut-icon name="uploader" :custom-color="iconColorMuted"></nut-icon>
       </div>
     </div>
     <nut-popup v-model:visible="showBottom" position="bottom" round @closed="showModel = 'source'">
@@ -45,7 +45,13 @@ import Popover from './components/popover.vue'
 import tongbuIcon from '@/static/tongbu-icon.png'
 import editIcon from '@/static/edit_icon.png'
 import deleteIcon from '@/static/delete-icon.png'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
+useThemeNavbar()
+const themeClass = useThemeClass()
+const { iconColorMuted } = useThemeColors()
 const muluData = ref(uni.getStorageSync('muluData') || {})
 const listData = ref([])
 const showBottom = ref(false)
@@ -146,11 +152,13 @@ page {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: var(--app-bg);
+  color: var(--app-text-primary);
 
   .catelog-mulu-item {
     flex: 0 0 calc(50% - 12rpx);
     overflow: hidden;
-    background: #f9f8ff;
+    background: var(--app-bg-card);
     border-radius: 16rpx;
     height: 250rpx;
     display: flex;
@@ -163,7 +171,7 @@ page {
       align-items: center;
       justify-content: center;
       flex: 0 0 150rpx;
-      background: #eae9f0;
+      background: var(--app-bg-secondary);
       border-radius: 16rpx 16rpx 0 0;
 
       image {
@@ -175,6 +183,7 @@ page {
         font-size: 40rpx;
         font-weight: bold;
         padding-left: 20rpx;
+        color: var(--app-text-primary);
       }
     }
 
@@ -200,6 +209,7 @@ page {
 
         .right-name {
           font-size: 28rpx;
+          color: var(--app-text-secondary);
           display: -webkit-box;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
@@ -212,6 +222,7 @@ page {
         .right-path {
           font-size: 24rpx;
           margin-top: 8rpx;
+          color: var(--app-text-tertiary);
           display: -webkit-box;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
@@ -241,12 +252,12 @@ page {
     justify-content: center;
 
     &:active {
-      background: #ebe9f0;
+      background: var(--app-bg-secondary);
     }
 
     .catelog-mulu-add__icon {
       border-radius: 50%;
-      background: #dedde4;
+      background: var(--app-border-strong);
       width: 70rpx;
       height: 70rpx;
       display: flex;
@@ -258,6 +269,13 @@ page {
   :deep(.nut-popup) {
     height: 50%;
     overflow: hidden;
+    background: var(--app-bg);
+  }
+
+  &.dark {
+    .item-top image {
+      filter: invert(1);
+    }
   }
 }
 </style>

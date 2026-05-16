@@ -60,11 +60,13 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
   }
 
   const toBack = (isTip = false) => {
-    if (unref(selectType).type == 'WebDAV') {
+    if (unref(selectType).type === 'WebDAV') {
       if (path.value) {
         path.value = removeLastSegment(path.value)
         key.value === '1' ? (key.value = '2') : (key.value = '1')
       } else {
+        console.log(isTip,'istup');
+        
         if (isTip) {
           uni.showToast({
             title: '已到顶层目录',

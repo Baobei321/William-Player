@@ -1,5 +1,5 @@
 <template>
-  <div class="download">
+  <div :class="['download', themeClass]">
     <wil-navbar title="下载管理" :rightShow="true"></wil-navbar>
     <div class="download-container">
       <template v-if="downloadList?.length">
@@ -30,7 +30,9 @@ import { ref } from 'vue'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import listItem from './components/list-item.vue'
 import { handleSize } from '@/utils/emby.js'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
+const themeClass = useThemeClass()
 const taskList = ref([])
 const downloadList = ref([])
 const completedList = ref([])
@@ -163,8 +165,12 @@ queryAll()
 
 <style lang="scss" scoped>
 .download {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--app-bg);
+  color: var(--app-text-primary);
   .download-container {
     flex: 1;
     overflow: auto;

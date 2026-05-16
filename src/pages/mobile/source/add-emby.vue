@@ -1,5 +1,5 @@
 <template>
-    <div class="add-emby-form">
+    <div :class="['add-emby-form', themeClass]">
         <wil-navbar :title="title"></wil-navbar>
         <div class="add-emby-form__container">
             <wil-form v-model="state.formData" :options="options" ref="base_form">
@@ -8,8 +8,9 @@
                         @click="openPopup"></nut-cell>
                 </template>
             </wil-form>
-            <nut-button custom-color="#ff6701" @click="confirmSubmit">确认{{ title == '添加Emby' ? '添加' : '修改'
-            }}</nut-button>
+            <nut-button :custom-color="primaryBtnColor" @click="confirmSubmit">
+                <span :style="{ color: primaryBtnTextColor }">确认{{ title == '添加Emby' ? '添加' : '修改' }}</span>
+            </nut-button>
             <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
             <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
                 <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker"
@@ -26,6 +27,10 @@ import wilForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { validateEmby } from "@/utils/validate";
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 const state = reactive({
     formData: {
         protocol: "https",
@@ -119,7 +124,7 @@ page {
     width: 100%;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
+    background: var(--app-gradient-mine);
     background-size: 100% 100%;
     box-sizing: border-box;
 
@@ -145,7 +150,7 @@ page {
                                         padding: 0;
                                         height: 100%;
                                         box-shadow: none;
-                                        color: #353a45;
+                                        color: var(--app-text-secondary);
 
                                         .nut-cell__title {
                                             font-size: 28rpx;

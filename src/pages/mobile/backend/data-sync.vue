@@ -1,5 +1,5 @@
 <template>
-  <div class="data-sync">
+  <div :class="['data-sync', themeClass]">
     <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
     <div class="scan-text">每隔10秒刷新一次同步状态</div>
     <div class="scan-tip">请点击下方按钮，扫描其他设备的二维码将数据同步到被扫描的设备</div>
@@ -14,7 +14,11 @@ import appLogo from "@/static/app-logo1.png";
 import { setShareData, deleteShareData, getShareData } from "@/network/apis";
 import { onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from '@/utils/config'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
+useThemeNavbar()
+const themeClass = useThemeClass()
 const wilQrcodeRef = ref(null);
 const port = ref("");
 let timer = null;
@@ -200,7 +204,7 @@ page {
 .data-sync {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -209,7 +213,7 @@ page {
 
   .scan-text {
     font-size: 32rpx;
-    color: #000;
+    color: var(--app-text-primary);
   }
 
   .scan-tip {

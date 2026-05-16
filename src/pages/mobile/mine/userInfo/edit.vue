@@ -1,8 +1,8 @@
 <template>
-    <div class="edit">
+    <div :class="['edit', themeClass]">
         <wil-navbar :title="'编辑' + routerParams.title" :right-show="true">
             <template #right>
-                <span style="color: #ff6701;font-weight: 500;" @click="handleSave">保存</span>
+                <span style="color: var(--app-brand);font-weight: 500;" @click="handleSave">保存</span>
             </template>
         </wil-navbar>
         <div class="edit-container">
@@ -81,7 +81,9 @@ import * as CONFIG from '@/utils/config.js'
 import { editUserInfo, editUserPhone, editUserEmail } from '@/network/apis.js'
 import { toSendEmail } from '@/utils/common.js'
 import { ref } from 'vue';
+import { useThemeClass } from '@/hooks/useThemeClass'
 const routerParams = ref({})
+const themeClass = useThemeClass()
 const userInfo = ref({})
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
 const countDownOld = ref(61) //编辑邮箱的时候使用
@@ -274,7 +276,7 @@ page {
 .edit {
     width: 100%;
     height: 100%;
-    background: #f5f5f5;
+    background: var(--app-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -295,7 +297,7 @@ page {
 
             .edit-container-name__tip {
                 font-size: 26rpx;
-                color: #949494;
+                color: var(--app-text-tertiary);
                 margin-top: 24rpx;
             }
         }
@@ -304,7 +306,7 @@ page {
             :deep(.nut-radio-group) {
                 .nut-radio {
                     .nut-radio__button {
-                        background: #ffffff;
+                        background: var(--app-bg-card);
                     }
                 }
             }

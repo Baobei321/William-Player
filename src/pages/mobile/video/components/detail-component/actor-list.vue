@@ -127,7 +127,7 @@ onBeforeMount(() => {
     .story-introduction-title {
       font-size: 32rpx;
       font-weight: bold;
-      color: #000;
+      color: var(--app-text-primary);
       padding-bottom: 20rpx;
     }
 
@@ -138,7 +138,7 @@ onBeforeMount(() => {
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 28rpx;
-      color: #000;
+      color: var(--app-text-primary);
     }
   }
 
@@ -148,7 +148,7 @@ onBeforeMount(() => {
     .related-actors-title {
       font-size: 32rpx;
       font-weight: bold;
-      color: #000;
+      color: var(--app-text-primary);
       padding-bottom: 20rpx;
     }
 
@@ -178,7 +178,7 @@ onBeforeMount(() => {
 
           .item-name {
             font-size: 28rpx;
-            color: #000;
+            color: var(--app-text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -188,9 +188,9 @@ onBeforeMount(() => {
 
           .item-job {
             padding: 4rpx 6rpx;
-            border: 2rpx solid #c2c5c6;
+            border: 2rpx solid var(--app-border-strong);
             font-size: 20rpx;
-            color: #c2c5c6;
+            color: var(--app-text-tertiary);
             border-radius: 6rpx;
             height: 35rpx;
             box-sizing: border-box;
@@ -200,7 +200,7 @@ onBeforeMount(() => {
             height: 35rpx;
             line-height: 35rpx;
             font-size: 24rpx;
-            color: #c2c5c6;
+            color: var(--app-text-tertiary);
             width: 100%;
             white-space: nowrap;
             overflow: hidden;
@@ -215,17 +215,17 @@ onBeforeMount(() => {
   .tip-footer {
     margin-top: 50rpx;
     padding-top: 20rpx;
-    border-top: 2rpx solid #c2c5c6;
+    border-top: 2rpx solid var(--app-border-strong);
     width: 100%;
 
     .tip-footer-name {
       font-size: 24rpx;
-      color: #c2c5c6;
+      color: var(--app-text-tertiary);
     }
 
     .tip-footer-webdav {
       font-size: 24rpx;
-      color: #c2c5c6;
+      color: var(--app-text-tertiary);
       padding-top: 20rpx;
       word-break: break-all;
       /* 允许在任意字符间断行 */
@@ -233,7 +233,7 @@ onBeforeMount(() => {
 
     .tip-footer-timesize {
       font-size: 24rpx;
-      color: #acacac;
+      color: var(--app-text-placeholder);
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -277,7 +277,7 @@ onBeforeMount(() => {
 //               height: 35rpx;
 //               line-height: 35rpx;
 //               font-size: 24rpx;
-//               color: #c2c5c6;
+//               color: var(--app-text-tertiary);
 //               width: 100%;
 //               white-space: nowrap;
 //               overflow: hidden;
@@ -291,23 +291,23 @@ onBeforeMount(() => {
 //     .tip-footer {
 //       margin-top: 50rpx;
 //       padding-top: 20rpx;
-//       border-top: 2rpx solid #c2c5c6;
+//       border-top: 2rpx solid var(--app-border-strong);
 //       width: 100%;
 //       .tip-footer-name {
 //         font-size: 24rpx;
-//         color: #c2c5c6;
+//         color: var(--app-text-tertiary);
 //       }
 
 //       .tip-footer-webdav {
 //         font-size: 24rpx;
-//         color: #c2c5c6;
+//         color: var(--app-text-tertiary);
 //         padding-top: 20rpx;
 //         word-break: break-all; /* 允许在任意字符间断行 */
 //       }
 
 //       .tip-footer-timesize {
 //         font-size: 24rpx;
-//         color: #acacac;
+//         color: var(--app-text-placeholder);
 //         font-weight: bold;
 //         display: flex;
 //         align-items: center;

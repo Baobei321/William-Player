@@ -5,7 +5,12 @@
 </template>
 
 <script>
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+
 export default {
+  setup() {
+    useThemeNavbar()
+  },
   data() {
     return {
       url: '',

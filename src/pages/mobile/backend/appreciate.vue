@@ -1,5 +1,5 @@
 <template>
-  <div class="appreciate">
+  <div :class="['appreciate', themeClass]">
     <div class="appreciate-img">
       <image src="@/static/zanshang.jpg"></image>
     </div>
@@ -21,6 +21,11 @@
 <script setup>
 import { ref } from "vue";
 import { getUntokenDicts,getDicts } from "@/network/apis";
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useThemeClass } from '@/hooks/useThemeClass'
+
+useThemeNavbar()
+const themeClass = useThemeClass()
 const appreciateList = ref([]);
 const getAppreciateUser = async () => {
   let res = await getDicts("appreciate_user");
@@ -37,7 +42,7 @@ page {
 .appreciate {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg);
   display: flex;
   flex-direction: column;
   // justify-content: center;
@@ -45,7 +50,7 @@ page {
   padding-top: 50rpx;
   box-sizing: border-box;
   .appreciate-img {
-    background: #fff;
+    background: var(--app-bg-card);
     border-radius: 24rpx;
     width: 500rpx;
     height: 500rpx;
@@ -62,13 +67,13 @@ page {
     padding: 0 50rpx;
     text-align: center;
     font-weight: bold;
-    color: #000;
+    color: var(--app-text-primary);
   }
   .appreciate-title {
     margin-top: 50rpx;
     align-self: flex-start;
     padding: 24rpx;
-    border-bottom: 2rpx solid rgb(219, 219, 219);
+    border-bottom: 2rpx solid var(--app-border-strong);
     width: 100%;
     box-sizing: border-box;
     span:first-child {
@@ -89,7 +94,7 @@ page {
     width: 100%;
     box-sizing: border-box;
     .appreciate-list-item {
-      color: #000;
+      color: var(--app-text-primary);
     }
   }
 }
@@ -103,7 +108,7 @@ page {
 //       color: #fff;
 //     }
 //     .appreciate-title {
-//       border-bottom: 2rpx solid rgb(219, 219, 219);
+//       border-bottom: 2rpx solid var(--app-border-strong);
 //       color: #fff;
 //     }
 //     .appreciate-list {

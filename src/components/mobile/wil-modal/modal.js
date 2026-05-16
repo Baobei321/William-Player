@@ -1,5 +1,7 @@
 import Modal from './index.vue';
 import { createApp } from 'vue';
+import { useThemeStore } from '@/stores/theme';
+
 function showModal({ title, confirmText, cancelColor, confirmColor, cancelText, content, cancel, confirm }) {
     const modalInstance = createApp(Modal, {
         title: title || '温馨提示',
@@ -23,6 +25,10 @@ function showModal({ title, confirmText, cancelColor, confirmColor, cancelText, 
         document.body.removeChild(parentNode);
     };
     const parentNode = document.createElement('div');
+    const themeStore = useThemeStore();
+    if (themeStore.getResolvedTheme() === 'dark') {
+        parentNode.classList.add('dark');
+    }
     document.body.appendChild(parentNode);
     modalInstance.mount(parentNode);
 }

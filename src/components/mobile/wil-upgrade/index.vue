@@ -13,7 +13,7 @@
       <div class="wil-upgrade-container">
         <div class="wil-upgrade-title">
           <div class="wil-upgrade-title__logo">
-            <image :src="props.logo"></image>
+            <image :src="props.logo" />
           </div>
           <div class="wil-upgrade-title__info">
             <div class="wil-upgrade-title__info-name">{{ props.appName }}</div>
@@ -35,7 +35,7 @@
             下载中断，继续下载
           </nut-button>
           <template v-if="showProgress">
-            <nut-progress :percentage="percent" stroke-color="#ff6701" text-color="#000" />
+            <nut-progress :percentage="percent" stroke-color="#ff6701" :text-color="iconColor" />
             <div class="wil-upgrade-button__tip">{{ tipText }}</div>
           </template>
         </div>
@@ -49,9 +49,12 @@ import { ref, onBeforeMount, watch } from 'vue'
 import { onHide } from '@dcloudio/uni-app'
 import { addOperLog } from '@/network/apis'
 import dayjs from 'dayjs'
+import { useThemeColors } from '@/hooks/useThemeColors'
+
+const { iconColor } = useThemeColors()
 
 const props = defineProps({
-  type: { type: String, default: 'outApp' }, //inApp是在应用内更新，outApp是跳转到外部浏览器下载安装包更新
+  type: { type: String, default: 'outApp' },
   logo: { type: String, default: '' },
   appName: { type: String, default: '' },
   appVersion: { type: String, default: '' },
@@ -71,10 +74,10 @@ const props = defineProps({
 const showBottom = ref(false)
 const newVersion = ref({})
 const tipText = ref('等待下载')
-const percent = ref(0) //下载进度
+const percent = ref(0)
 const showProgress = ref(false)
 
-const downStatus = ref(-1) //下载状态,-1是初始化，0是下载失败，1是下载成功
+const downStatus = ref(-1)
 const systemUrl = ref('')
 const dFileName = ref('')
 const dTask = ref(null)
@@ -84,21 +87,19 @@ const emits = defineEmits(['closed', 'update:visible'])
 
 const compareVersions = (newBb, oldBb) => {
   if (newBb) {
-    const v1 = newBb?.split('.').map(Number) // 将版本号拆分成数字
-    const v2 = oldBb?.split('.').map(Number) // 同样拆分另一个版本号
+    const v1 = newBb?.split('.').map(Number)
+    const v2 = oldBb?.split('.').map(Number)
 
     for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
-      // 如果 v1 的当前部分小于 v2 对应的部分，返回 -1
       if ((v1[i] || 0) < (v2[i] || 0)) {
         return -1
       }
-      // 如果 v1 的当前部分大于 v2 对应的部分，返回 1
       if ((v1[i] || 0) > (v2[i] || 0)) {
         return 1
       }
     }
   }
-  return 0 // 如果两个版本号完全相同，返回 0
+  return 0
 }
 
 const judegeShow = () => {
@@ -119,12 +120,10 @@ const judegeShow = () => {
 }
 
 const getUpdateInfo = async () => {
-  // if (systemInfo.platform != 'android') return
   let res = await props.updateFunction()
   newVersion.value = res
   let version = props.appVersion
   if (compareVersions(newVersion.value.tag_name, version) == 1) {
-    //此时后台设置已有新版本
     if (props.enableControl) {
       let remindTime = uni.getStorageSync('remindTime')
       if (!remindTime) {
@@ -168,7 +167,6 @@ const toDownLoad = apkUrl => {
         }
       })
     } else {
-      //如果没有下载链接，就让用户跳到gitee的release那里，自己下载
       plus.runtime.openURL('https://gitee.com/waylon-chen/William-Player/releases/latest', error => {
         if (error) {
           uni.showToast({ title: '打开浏览器失败', icon: 'none' })
@@ -182,7 +180,6 @@ const toDownLoad = apkUrl => {
 const downloadInstallApp = apkUrl => {
   showProgress.value = true
   let dtask = plus.downloader.createDownload(apkUrl, { filename: '_downloads/' }, function (d, status) {
-    // 下载完成
     if (status == 200) {
       downStatus.value = 1
       showProgress.value = false
@@ -210,13 +207,12 @@ const downloadInstallApp = apkUrl => {
 // 下载进度
 const downloadProgress = dtask => {
   try {
-    dtask.start() //开启下载任务
+    dtask.start()
     uni.showToast({
       title: '开始下载',
       icon: 'none',
     })
     dtask.addEventListener('statechanged', function (task, status) {
-      // 给下载任务设置监听
       switch (task.state) {
         case 1:
           tipText.value = '等待下载'
@@ -230,7 +226,6 @@ const downloadProgress = dtask => {
           tipText.value = '安装包下载中，请稍后（' + handleSize(task.downloadedSize) + '/' + handleSize(task.totalSize) + '）'
           break
         case 4:
-          // 下载完成
           plus.nativeUI.closeWaiting()
           break
       }
@@ -264,14 +259,10 @@ const closedPopup = () => {
             dFileName.value = ''
             systemUrl.value = ''
           },
-          function (e) {
-            // console.log('删除文件失败: ' + e.message);
-          }
+          function (e) {}
         )
       },
-      function (e) {
-        // console.log('无法解析文件路径: ' + e.message);
-      }
+      function (e) {}
     )
     plus.downloader.clear()
   }
@@ -340,14 +331,11 @@ onHide(() => {
       &__logo {
         width: 100rpx;
         height: 100rpx;
-        // border: 2rpx solid rgb(181, 181, 181);
-        // border-radius: 20rpx;
         box-sizing: border-box;
 
         image {
           width: 100%;
           height: 100%;
-          // border-radius: 20rpx;
         }
       }
 
@@ -357,12 +345,12 @@ onHide(() => {
         }
 
         &-version {
-          color: #555555;
+          color: var(--app-text-tertiary);
           font-size: 24rpx;
         }
 
         &-time {
-          color: #555555;
+          color: var(--app-text-tertiary);
           font-size: 24rpx;
         }
       }
@@ -413,7 +401,6 @@ onHide(() => {
       padding: 0 60rpx;
       box-sizing: border-box;
       padding-top: 24rpx;
-      // height: 150px;
 
       ::v-deep .nut-button {
         width: 100%;
@@ -423,7 +410,7 @@ onHide(() => {
       .wil-upgrade-button__tip {
         padding-top: 10rpx;
         font-size: 28rpx;
-        color: #000;
+        color: var(--app-text-primary);
       }
     }
   }

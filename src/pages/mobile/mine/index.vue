@@ -1,5 +1,5 @@
 <template>
-  <div class="mine">
+  <div :class="['mine', themeClass]">
     <wil-navbar title="我的" :leftShow="false" :rightShow="true">
       <template #right>
         <nut-icon name="scan" custom-color="#ff6701" size="16" @click="openUrl"></nut-icon>
@@ -9,7 +9,7 @@
       <div class="mine-notLog" v-if="!isLogin">
         <div class="mine-notLog__left">
           <wil-image
-            backgroundColor="#efefef"
+            backgroundColor="var(--app-bg-secondary)"
             src="https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png"
           ></wil-image>
           <div class="mine-notLog__left-info">
@@ -23,7 +23,7 @@
         <div class="mine-loged__left">
           <div class="left-img" @click="enterUserInfo">
             <wil-image
-              backgroundColor="#efefef"
+              backgroundColor="var(--app-bg-secondary)"
               :src="
                 userInfo.avatar ||
                 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
@@ -74,9 +74,13 @@ import showModal from '@/components/mobile/wil-modal/modal.js'
 import wilModal from '@/components/mobile/wil-modal/index.vue'
 import wilImage from '@/components/mobile/wil-image/index.vue'
 import { setShareData, doLogout } from '@/network/apis'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeTabbar } from '@/hooks/useThemeTabbar'
 
 // const { getUntokenDict } = useDict()
 
+const themeClass = useThemeClass()
+useThemeTabbar()
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const Authorization = ref(uni.getStorageSync('Authorization'))
 const isLogin = ref(false)
@@ -338,7 +342,7 @@ page {
 .mine {
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 30%, #f6f7f8 70%);
+  background: var(--app-gradient-mine);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -363,12 +367,11 @@ page {
 
   .mine-notLog {
     padding: 24rpx 30rpx 24rpx 24rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-card);
     border-radius: 16rpx;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    // margin-top: 34rpx;
     margin-top: 0;
 
     .mine-notLog__left {
@@ -388,14 +391,14 @@ page {
         span:first-child {
           display: block;
           font-size: 32rpx;
-          color: #353a45;
+          color: var(--app-text-primary);
           font-weight: bold;
         }
 
         span:last-child {
           display: block;
           font-size: 24rpx;
-          color: gray;
+          color: var(--app-text-tertiary);
           padding-top: 10rpx;
         }
       }
@@ -403,18 +406,16 @@ page {
 
     &__right {
       height: 32px;
-      // padding: 0 17.5px;
     }
   }
 
   &-loged {
     padding: 24rpx 44rpx 24rpx 24rpx;
-    background-color: #fff;
+    background-color: var(--app-bg-card);
     border-radius: 16rpx;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    // margin-top: 34rpx;
     margin-top: 0;
 
     &__left {
@@ -438,7 +439,7 @@ page {
         .left-info-name {
           font-weight: bold;
           font-size: 32rpx;
-          color: #353a45;
+          color: var(--app-text-primary);
           display: flex;
           align-items: center;
 
@@ -463,7 +464,7 @@ page {
 
         .left-info-phone {
           font-size: 28rpx;
-          color: #86909c;
+          color: var(--app-text-placeholder);
           margin-top: 6rpx;
         }
       }
@@ -471,28 +472,7 @@ page {
 
     &__right {
       height: 32px;
-      // padding: 0 17.5px;
     }
-    // &__right {
-    //   display: flex;
-    //   align-items: center;
-    //   justify-content: center;
-    //   width: 136rpx;
-    //   height: 48rpx;
-    //   background: linear-gradient(180deg, #ffae35 0%, #ff9900 100%);
-    //   border-radius: 80rpx;
-
-    //   img {
-    //     width: 28rpx;
-    //     height: 28rpx;
-    //   }
-
-    //   span {
-    //     font-size: 24rpx;
-    //     color: #ffffff;
-    //     margin-left: 16rpx;
-    //   }
-    // }
   }
   .mine-cell {
     :deep(.wil-cell) {
@@ -500,44 +480,4 @@ page {
     }
   }
 }
-
-// @media (prefers-color-scheme: dark) {
-//   .mine {
-//     background: #1e1e20;
-
-//     .mine-notLog {
-//       background-color: #2f2f2f;
-
-//       .mine-notLog__left {
-//         .mine-notLog__left-info {
-//           span:first-child {
-//             color: #fff;
-//           }
-
-//           span:last-child {
-//             color: gray;
-//           }
-//         }
-//       }
-//     }
-
-//     &-loged {
-//       background-color: #2f2f2f;
-
-//       &__left {
-//         display: flex;
-
-//         .left-info {
-//           .left-info-name {
-//             color: #fff;
-//           }
-
-//           .left-info-phone {
-//             color: #86909c;
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
 </style>

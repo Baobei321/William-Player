@@ -371,7 +371,7 @@ $b: load-list;
     line-height: 40rpx;
     font-size: 28rpx;
     text-align: center;
-    color: #86909c;
+    color: var(--app-text-tertiary);
     // padding-bottom: constant(safe-area-inset-bottom);
     // padding-bottom: env(safe-area-inset-bottom);
     padding-bottom: 68rpx;
@@ -387,7 +387,7 @@ $b: load-list;
 
     span {
       font-size: 28rpx;
-      color: #666;
+      color: var(--app-text-secondary);
     }
   }
 }

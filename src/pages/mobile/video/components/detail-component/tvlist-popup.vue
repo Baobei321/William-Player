@@ -122,6 +122,8 @@ getH5NavbarHeight()
   :deep(.nut-popup) {
     width: 100%;
     height: 100%;
+    background: var(--app-bg);
+    color: var(--app-text-primary);
     .tvlist-popup-wrapper {
       display: flex;
       flex-direction: column;
@@ -150,7 +152,7 @@ getH5NavbarHeight()
           span {
             font-size: 32rpx;
             font-weight: bold;
-            color: #000;
+            color: var(--app-text-primary);
           }
           .content-right {
             position: absolute;
@@ -160,10 +162,10 @@ getH5NavbarHeight()
               color: #ff6701;
             }
             .content-right-cancel {
-              color: #000;
+              color: var(--app-text-primary);
             }
             .content-right-confirm {
-              color: #315ffd;
+              color: var(--app-brand);
               margin-left: 24rpx;
             }
           }
@@ -172,17 +174,17 @@ getH5NavbarHeight()
       .tvlist-popup-wrapper__list {
         flex: 1;
         overflow: auto;
-        border-top: 2rpx solid #ebebeb;
+        border-top: 2rpx solid var(--app-border);
         .tvlist-popup-wrapper__list-item {
           display: flex;
           padding: 24rpx;
-          border-bottom: 1px solid #ebebeb;
+          border-bottom: 1px solid var(--app-border);
           .item-img {
             flex: 0 0 150rpx;
             height: 224rpx;
             position: relative;
             .item-img-poster {
-              background: rgb(212, 212, 212);
+              background: var(--app-bg-secondary);
             }
             image {
               display: block;
@@ -220,7 +222,7 @@ getH5NavbarHeight()
               .star-runtime {
                 padding-left: 16rpx;
                 font-size: 28rpx;
-                color: #000;
+                color: var(--app-text-primary);
               }
             }
             .item-info-desc {
@@ -231,7 +233,7 @@ getH5NavbarHeight()
               overflow: hidden;
               text-overflow: ellipsis;
               font-size: 28rpx;
-              color: #848484;
+              color: var(--app-text-tertiary);
               line-height: normal;
             }
           }

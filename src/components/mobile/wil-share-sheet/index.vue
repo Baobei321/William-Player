@@ -52,7 +52,7 @@ const handleSelect = (item: ShareSheetOption) => {
       .wrapper-title {
         padding: 24rpx 32rpx 0 32rpx;
         font-weight: bold;
-        color: #222222;
+        color: var(--app-text-primary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -96,7 +96,7 @@ const handleSelect = (item: ShareSheetOption) => {
           }
           .wrapper-list-item__name {
             font-size: 24rpx;
-            color: #646566;
+            color: var(--app-text-secondary);
             padding-top: 16rpx;
           }
         }

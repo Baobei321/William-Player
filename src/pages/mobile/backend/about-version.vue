@@ -1,8 +1,8 @@
 <template>
-  <div class="about-version">
+  <div :class="['about-version', themeClass]">
     <wil-navbar title="关于" :rightShow="true">
       <template #right>
-        <nut-icon name="share" custom-color="#000" @click="showShare = true"></nut-icon>
+        <nut-icon name="share" :custom-color="iconColor" @click="showShare = true"></nut-icon>
       </template>
     </wil-navbar>
     <div class="about-version-wrapper">
@@ -58,6 +58,8 @@ import * as CONFIG from '@/utils/config'
 import { toParse, toStringfy } from '../mine/common'
 import { getAppLatestVersion } from '@/utils/common'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 import wilShareSheet from '@/components/mobile/wil-share-sheet/index.vue'
 import weiboIcon from '@/static/weibo-icon.png'
 import copyLink from '@/static/copy-link.png'
@@ -65,6 +67,8 @@ import moreIcon from '@/static/more-icon.png'
 import saveImage from '@/static/save-image.png'
 
 const url = ref('')
+const themeClass = useThemeClass()
+const { iconColor } = useThemeColors()
 
 const status = ref(['总是'])
 const showShare = ref(false)
@@ -292,7 +296,7 @@ page {
 .about-version {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -326,7 +330,7 @@ page {
           span:first-child {
             font-weight: bold;
             font-size: 36rpx;
-            color: #000;
+            color: var(--app-text-primary);
           }
 
           span:last-child {
@@ -361,12 +365,12 @@ page {
 
         .nut-cell__title {
           font-size: 32rpx;
-          color: #000;
+          color: var(--app-text-primary);
         }
 
         .nut-cell__value {
           font-size: 32rpx;
-          color: #000;
+          color: var(--app-text-primary);
         }
 
         .nut-cell__link {

@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div :class="['login', themeClass]">
     <div class="login-title">
       <div class="login-title-top">
         <span>HI</span>
@@ -20,8 +20,8 @@
       </nut-tabs>
     </div>
     <div class="login-button">
-      <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">登录</nut-button>
-      <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
+      <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">登录</nut-button>
+      <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
       <div class="register-button">
         <div @click="touristEnter">游客进入</div>
         <div class="register-button-line"></div>
@@ -65,8 +65,13 @@ import * as CONFIG from '@/utils/config'
 import { getUserByopenId } from './common.js'
 import tabsLeft from '@/static/tabs-left.png'
 import tabsRight from '@/static/tabs-right.png'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const tabValue = ref('1')
+const themeClass = useThemeClass()
+const { primaryBtnColor, isDark } = useThemeColors()
+const disabledBtnColor = computed(() => (isDark.value ? '#3a3a3d' : '#C9CDD4'))
 
 const tabBg = computed(() => {
   if (tabValue.value === '1') {
@@ -300,7 +305,7 @@ page {
   flex-direction: column;
   // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
   //   center no-repeat;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 70%);
+  background: var(--app-gradient-mine);
   background-size: 100% 100%;
   padding: 150rpx 48rpx 68rpx 48rpx;
   position: relative;
@@ -308,7 +313,7 @@ page {
   &-title {
     font-weight: bold;
     // font-size: 48rpx;
-    color: #262424;
+    color: var(--app-text-primary);
     margin-bottom: 64rpx;
 
     &-top {
@@ -352,7 +357,7 @@ page {
         background: transparent;
 
         .nut-tab-pane {
-          background: rgba(255, 255, 255, 0.6);
+          background: var(--app-bg-card);
           border-radius: 0 0 30rpx 30rpx;
           padding: 48rpx 40rpx;
           padding-bottom: 32rpx;
@@ -405,7 +410,7 @@ page {
                   justify-content: flex-start;
 
                   span {
-                    color: #353a45;
+                    color: var(--app-text-secondary);
                     font-size: 28rpx;
                     padding-left: 20rpx;
                   }
@@ -508,7 +513,7 @@ page {
 
         span {
           display: inline;
-          color: #86909c;
+          color: var(--app-text-tertiary);
           font-size: 26rpx;
         }
 

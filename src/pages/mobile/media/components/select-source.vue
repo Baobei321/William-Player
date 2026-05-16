@@ -1,5 +1,5 @@
 <template>
-    <div class="select-source">
+    <div :class="['select-source', themeClass]">
         <div class="select-source-title">选择资源</div>
         <div class="select-source-container" v-if="show">
             <div class="select-source-item" v-for="item in sourceList" :key="item.type">
@@ -19,11 +19,11 @@
         </div>
         <div class="select-source-empty" v-else>
             <image src="@/static/no-data.png" class="select-source-empty__img"></image>
-            <nut-button custom-color="#090909" @click="toAddFile">
+            <nut-button :custom-color="primaryBtnColor" @click="toAddFile">
                 <template #icon>
-                    <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
+                    <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
                 </template>
-                <span>添加新资源</span>
+                <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
             </nut-button>
         </div>
     </div>
@@ -32,8 +32,12 @@
 <script setup>
 import { ref } from 'vue'
 import { loginUser, get189Folder, getQuarkFolder } from "@/utils/common";
+import { useThemeColors } from '@/hooks/useThemeColors'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
 const emits = defineEmits(['openFolder'])
+const themeClass = useThemeClass()
+const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 const show = ref(true);
 const sourceList = ref([])
 const judegeShow = () => {
@@ -110,6 +114,8 @@ const handleSelect = async (item, vitem) => {
 .select-source {
     height: 100%;
     display: flex;
+    background: var(--app-bg);
+    color: var(--app-text-primary);
     flex-direction: column;
 
     .select-source-title {
@@ -118,6 +124,7 @@ const handleSelect = async (item, vitem) => {
         padding-top: 24rpx;
         font-size: 34rpx;
         font-weight: bold;
+        color: var(--app-text-primary);
     }
 
     .select-source-container {
@@ -130,16 +137,16 @@ const handleSelect = async (item, vitem) => {
 
             .select-source-item__title {
                 font-size: 28rpx;
-                color: #6d6d6d;
+                color: var(--app-text-tertiary);
                 padding: 16rpx 0;
             }
 
             .select-source-item__list {
-                background: #fff;
+                background: var(--app-bg-card);
                 border-radius: 14rpx;
 
                 .list-item {
-                    background: #fff;
+                    background: var(--app-bg-card);
                     padding: 6rpx 24rpx;
                     display: flex;
                     align-items: center;
@@ -150,14 +157,14 @@ const handleSelect = async (item, vitem) => {
                         position: absolute;
                         content: "";
                         height: 2rpx;
-                        background: rgb(241, 241, 241);
+                        background: var(--app-bg-secondary);
                         width: 100%;
                         left: 0;
                         top: 0;
                     }
 
                     &:active {
-                        background: rgb(241, 241, 241);
+                        background: var(--app-bg-secondary);
                     }
 
                     &:first-child {
@@ -196,11 +203,11 @@ const handleSelect = async (item, vitem) => {
                     .list-item-name {
                         padding-left: 10rpx;
                         font-size: 32rpx;
-                        color: #000;
+                        color: var(--app-text-primary);
                     }
 
                     .list-item-activeName {
-                        color: #ff6701;
+                        color: var(--app-brand);
                     }
 
                     .list-item-button {
@@ -219,7 +226,7 @@ const handleSelect = async (item, vitem) => {
                 }
 
                 .list-active {
-                    border: 2rpx solid #ff6701 !important;
+                    border: 2rpx solid var(--app-brand) !important;
                 }
             }
         }
@@ -242,7 +249,7 @@ const handleSelect = async (item, vitem) => {
             text-align: center;
             padding: 0 50rpx;
             padding-bottom: 24rpx;
-            color: #000;
+            color: var(--app-text-primary);
         }
 
         ::v-deep .nut-button {

@@ -1,5 +1,5 @@
 <template>
-  <div class="video">
+  <div :class="['video', themeClass]">
     <!-- <div style="background: #efefef;width: 375px;height: 812px;"></div> -->
     <video-navbar
       @refresh="refreshVideo"
@@ -41,11 +41,11 @@
             <div>从网盘添加资源到媒体库中</div>
             <div>即可打造私人影院，随时观看</div>
           </div>
-          <nut-button custom-color="#090909" @click="toAddWebdav">
+          <nut-button :custom-color="primaryBtnColor" @click="toAddWebdav">
             <template #icon>
-              <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
+              <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
             </template>
-            <span>添加新资源</span>
+            <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
           </nut-button>
           <nut-dialog title="api_key" v-model:visible="showDialog" @cancel="onCancel" @ok="onOk">
             <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import videoNavbar from './components/index-component/navbar.vue'
 import Skeleton from './components/index-component/skeleton.vue'
 import starRecommend from './components/index-component/star-recommend.vue'
@@ -87,6 +87,10 @@ import { onShow, onUnload } from '@dcloudio/uni-app'
 import * as CONFIG from '@/utils/config'
 import { useVideoIndex } from '@/hooks/useVideoIndex.js'
 import { initWebDAVClient } from '@/utils/webdav.js'
+import { useThemeStore } from '@/stores/theme'
+import { useThemeColors } from '@/hooks/useThemeColors'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeTabbar } from '@/hooks/useThemeTabbar'
 
 const wil_modal = ref(null)
 const {
@@ -108,6 +112,10 @@ const {
 const showDialog = ref(false)
 const showShareModal = ref(false)
 const shareUrl = ref('')
+const themeStore = useThemeStore()
+const themeClass = useThemeClass()
+useThemeTabbar({ customNav: true })
+const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 
 const upgradeInfo = ref({
   logo: appLogo,
@@ -161,6 +169,44 @@ const getAppUpdateInfo = async () => {
   return res
 }
 
+const getSolidNavbarStyle = () => {
+  const isDark = themeStore.getResolvedTheme() === 'dark'
+  return isDark
+    ? {
+        background: `rgba(30,30,32,1)`,
+        color: `rgb(255,255,255)`,
+        borderColor: `rgba(73,73,73,1)`,
+      }
+    : {
+        background: `rgba(255,255,255,1)`,
+        color: `rgb(0,0,0)`,
+        borderColor: `rgba(246,247,248,1)`,
+      }
+}
+
+const getTransparentNavbarStyle = () => ({
+  background: `rgba(255,255,255,0)`,
+  color: `rgb(255,255,255)`,
+  borderColor: `rgba(246,247,248,0)`,
+})
+
+const getNavbarStyleByOpacity = opacity => {
+  const isDark = themeStore.getResolvedTheme() === 'dark'
+  if (isDark) {
+    return {
+      background: `rgba(30,30,32,${opacity.toFixed(2)})`,
+      color: `rgb(255,255,255)`,
+      borderColor: `rgba(73,73,73,${opacity})`,
+    }
+  }
+  const cval = (255 - opacity * 255).toFixed(2)
+  return {
+    background: `rgba(255,255,255,${opacity.toFixed(2)})`,
+    color: `rgb(${cval},${cval},${cval})`,
+    borderColor: `rgba(246,247,248,${opacity})`,
+  }
+}
+
 //获取标题加状态栏的高度
 const getNavbarHeight = val => {
   navbarHeight.value = +val.split('px')[0]
@@ -178,14 +224,9 @@ const getNavbarHeight = val => {
 const handlePageScroll = event => {
   let opacity = event.detail.scrollTop / startCommandHeight >= 1 ? 1 : event.detail.scrollTop / startCommandHeight
   scrollTop.value = event.detail.scrollTop
-  let cval = (255 - opacity * 255).toFixed(2)
   if (settingData.value.showRecommend && selectType.value.type !== 'Emby') {
     //如果展示影视推荐轮播图，才根据滚动渐变
-    navbarStyle.value = {
-      background: `rgba(255,255,255,${opacity.toFixed(2)})`,
-      color: `rgb(${cval},${cval},${cval})`,
-      borderColor: `rgba(246, 247, 248, ${opacity})`,
-    }
+    navbarStyle.value = getNavbarStyleByOpacity(opacity)
   }
 }
 
@@ -194,16 +235,8 @@ const showNavbarColor = () => {
   const { movie, tv } = localMovieTvData.value || {}
   const hasData = movie?.length || tv?.length
   const isEmby = selectType.value.type === 'Emby'
-  const transparentStyle = {
-    background: `rgba(255,255,255,0)`,
-    color: `rgb(255,255,255)`,
-    borderColor: `rgba(246, 247, 248, 0)`,
-  }
-  const solidStyle = {
-    background: `rgba(255,255,255,1)`,
-    color: `rgb(0,0,0)`,
-    borderColor: `rgba(246, 247, 248, 1)`,
-  }
+  const transparentStyle = getTransparentNavbarStyle()
+  const solidStyle = getSolidNavbarStyle()
   if (isEmby) {
     navbarStyle.value = solidStyle
   } else if (scrollTop.value === 0) {
@@ -212,6 +245,9 @@ const showNavbarColor = () => {
     } else {
       navbarStyle.value = hasData ? transparentStyle : solidStyle
     }
+  } else {
+    const opacity = scrollTop.value / startCommandHeight >= 1 ? 1 : scrollTop.value / startCommandHeight
+    navbarStyle.value = getNavbarStyleByOpacity(opacity)
   }
 }
 onShow(async () => {
@@ -223,6 +259,13 @@ onShow(async () => {
   }
 })
 
+watch(
+  () => themeStore.resolvedTheme,
+  () => {
+    showNavbarColor()
+  }
+)
+
 const listenerNetwork = res => {
   scrollTop.value = 0
   isConnected.value = res.isConnected
@@ -230,11 +273,7 @@ const listenerNetwork = res => {
     judgeSelect()
     showNavbarColor()
   } else {
-    navbarStyle.value = {
-      background: `rgba(255,255,255,1)`,
-      color: `rgb(0,0,0)`,
-      borderColor: `rgba(246, 247, 248, 1)`,
-    }
+    navbarStyle.value = getSolidNavbarStyle()
   }
 }
 uni.getNetworkType({
@@ -246,11 +285,7 @@ uni.getNetworkType({
       showNavbarColor()
     } else {
       isConnected.value = false
-      navbarStyle.value = {
-        background: `rgba(255,255,255,1)`,
-        color: `rgb(0,0,0)`,
-        borderColor: `rgba(246, 247, 248, 1)`,
-      }
+      navbarStyle.value = getSolidNavbarStyle()
     }
   },
 })
@@ -286,23 +321,6 @@ onBeforeMount(() => {
   //     deep: true, // 自动检测认证类型（默认）
   //   },
   // })
-  // webdavClientInstance
-  //   .getDirectoryContents('/')
-  //   .then(res => {
-  //     console.log(res, 'res111')
-  //     uni.showToast({
-  //       title: res,
-  //       icon: 'none',
-  //       duration: 10000,
-  //     })
-  //   })
-  //   .catch(err => {
-  //     uni.showToast({
-  //       title: err,
-  //       icon: 'none',
-  //       duration: 10000,
-  //     })
-  //   })
 })
 </script>
 
@@ -318,7 +336,7 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f6f7f8;
+  background: var(--app-bg-secondary);
   box-sizing: border-box;
 
   :deep(.video-navbar) {
@@ -327,8 +345,6 @@ page {
 
     .nut-navbar--placeholder {
       .nut-navbar {
-        // background: v-bind('navbarStyle.background');
-
         .nut-navbar__left {
           span {
             color: v-bind('navbarStyle.color') !important;
@@ -345,21 +361,21 @@ page {
   }
 
   :deep(.navbar-white) {
-    background: #fff;
+    background: var(--app-navbar-bg);
 
     .nut-navbar--placeholder {
       .nut-navbar {
-        background: #fff;
+        background: var(--app-navbar-bg);
 
         .nut-navbar__left {
           span {
-            color: #000 !important;
+            color: var(--app-text-primary) !important;
           }
         }
 
         .nut-navbar__right {
           .navbar-icon {
-            color: #000 !important;
+            color: var(--app-text-primary) !important;
           }
         }
       }
@@ -369,7 +385,6 @@ page {
   .video-container {
     flex: 1;
     overflow: hidden;
-    // padding: 0 12px;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -395,7 +410,7 @@ page {
     flex: 1;
     position: relative;
     z-index: 1;
-    background: #fff;
+    background: var(--app-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -415,7 +430,7 @@ page {
       span {
         font-size: 36rpx;
         font-weight: bold;
-        color: #000;
+        color: var(--app-text-primary);
         padding-top: 10rpx;
       }
     }
@@ -423,16 +438,13 @@ page {
     .video-empty-tip {
       padding: 60rpx 0 40rpx 0;
       text-align: center;
-      color: #000;
+      color: var(--app-text-secondary);
     }
 
     ::v-deep .nut-button {
       border-radius: 12rpx;
     }
 
-    // .nut-overlay{
-    //   background: transparent;
-    // }
     ::v-deep .nut-popup--center {
       background: #315ffd;
 
@@ -465,7 +477,7 @@ page {
     }
   }
   .video-nowifi {
-    background: #fff;
+    background: var(--app-bg);
     width: 100%;
     height: 100%;
     display: flex;
@@ -473,42 +485,4 @@ page {
     justify-content: center;
   }
 }
-
-// @media (prefers-color-scheme: dark) {
-//   .video {
-//     background: #1e1e20;
-
-//     .video-empty {
-//       background: #1e1e20;
-
-//       .video-empty-logo {
-//         span {
-//           color: #fff;
-//         }
-//       }
-
-//       .video-empty-tip {
-//         color: #fff;
-//       }
-
-//       ::v-deep .nut-button {
-//         background-color: #fff !important;
-
-//         .nut-button__wrap {
-//           .nut-icon-uploader {
-//             color: #000 !important;
-//           }
-
-//           .nut-button__text {
-//             color: #000 !important;
-//           }
-//         }
-
-//         &::before {
-//           background-color: #fff !important;
-//         }
-//       }
-//     }
-//   }
-// }
 </style>

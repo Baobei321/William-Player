@@ -15,7 +15,7 @@ import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     tabsList: { type: Array, default: [] },
-    lineColor: { type: String, default: '#ff6701' },
+    lineColor: { type: String, default: 'var(--app-brand)' },
     fixedWidth: { type: Boolean, default: true },
     modelValue: { type: String, default: '' }
 })
@@ -86,11 +86,11 @@ onMounted(() => {
 
     .wil-tabs-item {
         padding: 24rpx;
-        color: #646566;
+        color: var(--app-text-tertiary);
     }
 
     .wil-tabs-active {
-        color: #1a1a1a;
+        color: var(--app-text-primary);
         font-weight: bold;
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="live">
+  <div :class="['live', themeClass]">
     <nut-cell-group>
       <nut-swipe v-for="(item, index) in liveList" :key="item.name" :disabled="item.name == '默认直播源' ? true : false">
         <nut-cell :title="item.name" is-link @click="toLiveList(item)"></nut-cell>
@@ -26,7 +26,13 @@ import shareDialog from '../video/components/index-component/share-dialog.vue'
 import { parseM3UToArray, groupByGroupTitle } from '@/utils/tools.js'
 import { getCutContent } from '@/utils/common'
 import { onShow } from '@dcloudio/uni-app'
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeTabbar } from '@/hooks/useThemeTabbar'
+import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 
+const themeClass = useThemeClass()
+useThemeNavbar()
+useThemeTabbar()
 const liveList = ref([])
 const wil_modal = ref(null)
 const base_form = ref(null)
@@ -185,9 +191,9 @@ page {
 .live {
   width: 100%;
   height: 100%;
-  background: #f6f7f8;
+  background: var(--app-bg-secondary);
   box-sizing: border-box;
-  border-top: 2rpx solid #f6f7f8;
+  border-top: 2rpx solid var(--app-bg-secondary);
 
   ::v-deep .nut-cell-group {
     .nut-cell-group__wrap {
@@ -198,20 +204,20 @@ page {
         .nut-swipe__content {
           .nut-cell {
             margin: 0;
-            background-color: #fff;
+            background-color: var(--app-bg-card);
             box-shadow: none;
             border-radius: 0;
 
             .nut-cell__title {
-              color: #000;
+              color: var(--app-text-primary);
             }
 
             .nut-icon {
-              color: #000;
+              color: var(--app-icon);
             }
 
             &::after {
-              border-bottom: 2rpx solid #eaeaea;
+              border-bottom: 2rpx solid var(--app-border);
             }
           }
         }
@@ -262,54 +268,4 @@ page {
     }
   }
 }
-
-// @media (prefers-color-scheme: dark) {
-//   .live {
-//     background: #1e1e20;
-//     border-top: 2rpx solid #1e1e20;
-
-//     ::v-deep .nut-cell-group {
-//       .nut-cell-group__wrap {
-//         .nut-swipe {
-//           .nut-swipe__content {
-//             .nut-cell {
-//               background-color: #2f2f2f;
-
-//               .nut-cell__title {
-//                 color: #fff;
-//               }
-
-//               .nut-icon {
-//                 color: #fff;
-//               }
-
-//               &::after {
-//                 border-bottom: 2rpx solid rgb(73, 73, 73);
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-
-//     .live-add {
-//       width: 120rpx;
-//       height: 120rpx;
-//       background: #ff6701;
-//       border-radius: 50%;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       position: fixed;
-//       bottom: 180rpx;
-//       right: 24rpx;
-//       box-shadow: 0 8rpx 12rpx #5b73a01a;
-
-//       image {
-//         width: 50rpx;
-//         height: 50rpx;
-//       }
-//     }
-//   }
-// }
 </style>

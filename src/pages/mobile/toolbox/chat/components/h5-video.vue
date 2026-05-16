@@ -30,7 +30,7 @@ const videoHtml = ref(`
   flex: 0 0 500rpx;
   border-radius: 24rpx;
   margin-left: 24rpx;
-  background: #f5f5f8;
+  background: var(--app-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +39,7 @@ const videoHtml = ref(`
     width: 100%;
     border-radius: 24rpx;
     height: 100% !important;
-    background: #f5f5f8;
+    background: var(--app-bg-secondary);
     display: block;
     object-fit: cover;
     &:first-child {

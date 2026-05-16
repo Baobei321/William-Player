@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat">
+  <div :class="['ai-chat', themeClass]">
     <wil-navbar title="AI问答" :right-show="true">
       <template #right>
         <image src="@/static/add-conversation.png" @click="addNew"></image>
@@ -98,7 +98,9 @@ import { ref } from 'vue'
 import * as CONFIG from '@/utils/config.js'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import { generations } from '@/network/apis.js'
+import { useThemeClass } from '@/hooks/useThemeClass'
 
+const themeClass = useThemeClass()
 let uniqueId = 0
 const wil_sse = ref(null)
 const tChatListRef = ref(null)
@@ -319,6 +321,8 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--app-bg);
+  color: var(--app-text-primary);
   :deep(.wil-navbar) {
     .nut-navbar--placeholder {
       .nut-navbar {
@@ -350,11 +354,11 @@ page {
           span:first-child {
             font-size: 60rpx;
             font-weight: bold;
-            color: #c1c7e9;
+            color: var(--app-link);
           }
           span:last-child {
             font-size: 32rpx;
-            color: rgba(17, 17, 51, 0.3);
+            color: var(--app-text-tertiary);
             padding-top: 24rpx;
           }
         }
@@ -378,7 +382,7 @@ page {
                 height: 256rpx;
                 border-radius: 24rpx;
                 margin-left: 24rpx;
-                background: #f5f5f8;
+                background: var(--app-bg-secondary);
                 &:first-child {
                   margin-left: 0;
                 }
@@ -395,7 +399,7 @@ page {
                 flex: 0 0 500rpx;
                 height: 300rpx;
                 border-radius: 24rpx;
-                background: #f5f5f8;
+                background: var(--app-bg-secondary);
               }
             }
           }

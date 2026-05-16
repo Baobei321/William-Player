@@ -1,5 +1,5 @@
 <template>
-  <div class="register">
+  <div :class="['register', themeClass]">
     <wil-navbar @getHeight="getHeight"></wil-navbar>
     <div class="register-container">
       <div class="register-title">
@@ -22,8 +22,8 @@
           </template>
         </wil-form>
         <div class="register-form-button">
-          <nut-button custom-color="#ff6701" @click="confirmCommit" v-if="userAgree">注册并登录</nut-button>
-          <nut-button custom-color="#C9CDD4" v-else @click="clickNoAgree" class="no-agree">注册并登录</nut-button>
+          <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">注册并登录</nut-button>
+          <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">注册并登录</nut-button>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import checkIcon from "@/static/check.png";
@@ -51,8 +51,13 @@ import { registerUser, getWeUserByopenId, loginByPhone, sendEmail } from "@/netw
 import * as CONFIG from "@/utils/config";
 import { encrypt } from "@/utils/jsencrypt.js";
 import { getUserByopenId } from "./common.js";
+import { useThemeClass } from '@/hooks/useThemeClass'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 const codeEncrypt = ref('')
+const themeClass = useThemeClass()
+const { primaryBtnColor, isDark } = useThemeColors()
+const disabledBtnColor = computed(() => (isDark.value ? '#3a3a3d' : '#C9CDD4'))
 const navbarHeight = ref('')
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
 let timer = null
@@ -199,13 +204,13 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #ffd3b1 0%, #fff5ec 50%, #f6f7f8 100%);
+  background: var(--app-gradient-mine);
   background-size: 100% 100%;
 
   &-title {
     font-weight: bold;
     // font-size: 48rpx;
-    color: #262424;
+    color: var(--app-text-primary);
     margin-bottom: 64rpx;
     padding: 0 48rpx;
 
@@ -257,7 +262,7 @@ page {
 
       :deep(.base-form) {
         padding: 48rpx 40rpx;
-        background: rgba(255, 255, 255, 0.6);
+        background: var(--app-bg-card);
         border-radius: 30rpx;
 
         .nut-cell-group {
@@ -320,7 +325,7 @@ page {
               justify-content: flex-start;
 
               span {
-                color: #353a45;
+                color: var(--app-text-secondary);
                 font-size: 28rpx;
                 padding-left: 20rpx;
               }
@@ -382,7 +387,7 @@ page {
 
         span {
           display: inline;
-          color: #86909c;
+          color: var(--app-text-tertiary);
           font-size: 26rpx;
         }
 

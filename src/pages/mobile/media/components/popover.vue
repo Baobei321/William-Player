@@ -24,7 +24,7 @@ const props = defineProps({
     options: { type: Array, default: [] },
     visible: { type: Boolean, default: false },
     position: { type: Object, default: {} },
-    background: { type: String, default: '#fff' },
+    background: { type: String, default: 'var(--app-bg-card)' },
     width: { type: String, default: 'auto' },
     height: { type: String, default: 'auto' }
 })
@@ -138,11 +138,11 @@ onBeforeUnmount(() => {
     // left: 50%;
     // top: 50%;
     // transform: translateX(-50%);
-    background: #fff;
+    background: var(--app-bg-card);
     z-index: 999;
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.11);
     border-radius: 8px 8px 8px 8px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--app-border-strong);
     padding: 4px;
     overflow-y: auto;
 
@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
         }
 
         &:active {
-            background: #F6F6F6;
+            background: var(--app-bg-secondary);
             border-radius: 6px 6px 6px 6px;
         }
     }
@@ -190,11 +190,11 @@ onBeforeUnmount(() => {
     // left: 50%;
     // top: 50%;
     // transform: translateX(-50%);
-    background: #fff;
+    background: var(--app-bg-card);
     z-index: 999;
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.11);
     border-radius: 8px 8px 8px 8px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--app-border-strong);
     padding: 4px;
 
     .popover-item {
@@ -217,7 +217,7 @@ onBeforeUnmount(() => {
         }
 
         &:active {
-            background: #F6F6F6;
+            background: var(--app-bg-secondary);
             border-radius: 6px 6px 6px 6px;
         }
     }
