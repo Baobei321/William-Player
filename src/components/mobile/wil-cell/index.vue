@@ -14,7 +14,7 @@ v-bind="item"
 </template>
 <template #icon v-if="$slots.icon || item[props.defaultProps.leftIcon]">
 <slot name="icon" v-if="$slots.icon" v-bind="item"></slot>
-<image :src="item[props.defaultProps.leftIcon]" v-if="item[props.defaultProps.leftIcon] && !$slots.icon" />
+<image :src="item[props.defaultProps.leftIcon]" v-if="item[props.defaultProps.leftIcon] && !$slots.icon"  />
 </template>
 <template #link>
 <slot v-if="$slots.link" name="link" v-bind="item"></slot>

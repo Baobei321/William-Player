@@ -1,5 +1,7 @@
 import * as CONFIG from '@/utils/config.js'
 import { sendEmail } from '@/network/apis'
+import { i18n } from '@/i18n/index.js'
+import { getTvSeasonDetail, getMovieTvDetailById } from '@/utils/tmdb'
 // import { ipc } from '@/utils/ipcRenderer'
 // import { ipcApiRoute } from '@/utils/ipcApiRoute'
 
@@ -525,55 +527,9 @@ const getQuarkUser = obj => {
 }
 
 //获取第几季的详情
-const getTvSeason = data => {
-  return new Promise((resolve, reject) => {
-    uni.request({
-      url: `https://api.tmdb.org/3/tv/${data.movieTvId}/season/${data.season}`,
-      data: {
-        language: 'zh-CN',
-        api_key: uni.getStorageSync('settingData').tmdbKey,
-      },
-      method: 'GET',
-      header: {
-        'Content-Type': 'application/json',
-      },
-      success: res => {
-        resolve(res.data)
-      },
-      fail: error => {
-        reject(error)
-      },
-    })
-  })
-}
+const getTvSeason = data => getTvSeasonDetail(data)
 //通过tmdb接口获取更详细的信息
-const getMovieTvById = (data, type) => {
-  let url = ''
-  let obj = JSON.parse(JSON.stringify(data))
-  if (type === 'movie') {
-    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}`
-  } else if (type === 'tv') {
-    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}`
-  }
-  delete obj.movieTvId
-  return new Promise(resolve => {
-    uni.request({
-      url: url,
-      data: {
-        ...obj,
-        language: 'zh-CN',
-        api_key: uni.getStorageSync('settingData').tmdbKey,
-      },
-      method: 'GET',
-      header: {
-        'Content-Type': 'application/json',
-      },
-      success: res => {
-        resolve(res.data)
-      },
-    })
-  })
-}
+const getMovieTvById = (data, type) => getMovieTvDetailById(data, type)
 
 // //设置tmdb图片的域名
 // const setTmdbImgDomain = () => {
@@ -624,7 +580,7 @@ const toSendEmail = async (codeEncrypt, countDown, email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(email)) {
       uni.showToast({
-        title: '请输入有效的邮箱地址',
+        title: i18n.global.t('auth.emailInvalid'),
         icon: 'none',
       })
     } else {
@@ -641,7 +597,7 @@ const toSendEmail = async (codeEncrypt, countDown, email) => {
     }
   } else {
     uni.showToast({
-      title: '请先输入邮箱',
+      title: i18n.global.t('auth.pleaseInputEmailFirst'),
       icon: 'none',
     })
   }

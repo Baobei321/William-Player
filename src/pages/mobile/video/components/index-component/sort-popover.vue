@@ -3,13 +3,12 @@
     <nut-transition :show="showPopover" name="fade" :duration="200">
       <div class="more-arrow"></div>
       <div class="more-popover">
-        <div class="more-popover-item" v-for="item in popoverArr" :key="item.title">
+        <div class="more-popover-item" v-for="item in popoverArr" :key="item.key">
           <span class="more-popover-item__title">{{ item.title }}</span>
           <div class="more-popover-item__list">
-            <div class="list-item" v-for="sitem in item.list" :key="sitem.value" @click="changeTypeOrWay(sitem,item.title)">
+            <div class="list-item" v-for="sitem in item.list" :key="sitem.value" @click="changeTypeOrWay(sitem, item.key)">
               <div class="list-item-bingo">
-                <image src="@/static/ic_player_check.png" v-if="item.title =='排序依据' ? sitem.value == sortWay[props.type].type : sitem.value == sortWay[props.type].way">
-                </image>
+                <image src="@/static/ic_player_check.png" v-if="item.key == 'type' ? sitem.value == sortWay[props.type].type : sitem.value == sortWay[props.type].way"  />
               </div>
               <div class="list-item-name">{{ sitem.name }}</div>
             </div>
@@ -22,10 +21,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onBeforeMount } from "vue";
+import { computed, ref, watch, onBeforeMount } from "vue";
 import dayjs from 'dayjs';
 import { chineseToPinYin } from "@/utils/pinyin.js";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   type: { type: String, default: "tv" },
@@ -33,24 +34,26 @@ const props = defineProps({
 const emits = defineEmits(["update:modelValue", "changeSort"]);
 const showPopover = ref(false);
 const sortWay = ref({});
-const popoverArr = [
+const popoverArr = computed(() => [
   {
-    title: "排序依据",
+    key: 'type',
+    title: t('video.sortBy'),
     list: [
-      { name: "影片名称", value: "1" },
-      { name: "更新时间", value: "2" },
-      { name: "添加时间", value: "3" },
-      { name: "上映时间", value: "4" },
+      { name: t('video.videoName'), value: "1" },
+      { name: t('video.updateTime'), value: "2" },
+      { name: t('video.addTime'), value: "3" },
+      { name: t('video.releaseTime'), value: "4" },
     ],
   },
   {
-    title: "排序方式",
+    key: 'way',
+    title: t('video.sortWay'),
     list: [
-      { name: "升序", value: "1" },
-      { name: "降序", value: "2" },
+      { name: t('video.ascending'), value: "1" },
+      { name: t('video.descending'), value: "2" },
     ],
   },
-];
+]);
 
 const clickOverlay = () => {
   showPopover.value = false;
@@ -135,11 +138,11 @@ const handleSort = (type, way) => {
   uni.setStorageSync("localMovieTvData", localMovieTvData);
 };
 
-const changeTypeOrWay = (item, title) => {
-  if (title == "排序依据") {
+const changeTypeOrWay = (item, key) => {
+  if (key == "type") {
     sortWay.value[props.type].type = item.value;
     handleSort(item.value, sortWay.value[props.type].way);
-  } else if (title == "排序方式") {
+  } else if (key == "way") {
     sortWay.value[props.type].way = item.value;
     handleSort(sortWay.value[props.type].type, item.value);
   }

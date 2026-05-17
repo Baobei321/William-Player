@@ -1,10 +1,13 @@
 <template>
   <div class="share-dialog">
-    <nut-dialog title="查看复制的分享链接" ok-text="立即查看" v-bind="$attrs" @ok="confirmLook" />
+    <nut-dialog :title="t('video.viewCopiedShareLink')" :ok-text="t('video.immediatelyView')" v-bind="$attrs" @ok="confirmLook" />
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const props = defineProps({
   shareUrl: { type: String, default: "" },
 });

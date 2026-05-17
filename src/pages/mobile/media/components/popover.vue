@@ -3,7 +3,7 @@
         <div class="popover"
             :style="{ left: positionObj.left, top: positionObj.top, background: props.background, width: props.width }">
             <div class="popover-item" v-for="item in props.options" :key="item.label" @click="clickItem(item)">
-                <image :src="item.icon" v-if="item.icon"></image>
+                <image :src="item.icon" v-if="item.icon"  />
                 <span :style="{ color: item.color }">{{ item.label }}</span>
             </div>
         </div>
@@ -11,7 +11,7 @@
     <div class="popover-overlay" v-show="showPopover" @click="closePopover"></div>
     <div class="seat-popover" ref="seat_popover">
         <div class="popover-item" v-for="item in props.options" :key="item.label">
-            <image :src="item.icon" v-if="item.icon"></image>
+            <image :src="item.icon" v-if="item.icon"  />
             <span :style="{ color: item.color }">{{ item.label }}</span>
         </div>
     </div>

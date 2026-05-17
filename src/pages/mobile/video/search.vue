@@ -2,12 +2,12 @@
   <div :class="['video-search', themeClass]">
     <wil-navbar>
       <template #content>
-        <nut-searchbar v-model="searchValue" placeholder="输入影片名称搜索" @search="toSearch" @clear="toCancel">
+        <nut-searchbar v-model="searchValue" :placeholder="t('video.inputVideoNameSearch')" @search="toSearch" @clear="toCancel">
           <template #leftin>
             <nut-icon name="search" :custom-color="iconColor"></nut-icon>
           </template>
           <template #rightout>
-            <span :style="{ color: searchValue ? 'var(--app-brand)' : 'var(--app-text-tertiary)' }" @click="toSearch">搜索</span>
+            <span :style="{ color: searchValue ? 'var(--app-brand)' : 'var(--app-text-tertiary)' }" @click="toSearch">{{ t('video.search') }}</span>
           </template>
         </nut-searchbar>
       </template>
@@ -32,7 +32,7 @@
     <div class="video-search-list" v-if="listData.length && !isEmby">
       <searchBox :data="item" v-for="item in listData" :key="item.movieTvId" @click="toVideoDetail(item)" :oldValue="oldValue" :isEmby="false"></searchBox>
     </div>
-    <wil-empty v-if="!listData.length" text="仅支持搜索影片名，暂不支持搜索演员"></wil-empty>
+    <wil-empty v-if="!listData.length" :text="t('video.onlySearchVideoName')"></wil-empty>
   </div>
 </template>
 
@@ -48,7 +48,9 @@ import { getEmbyList, setEmbyImg } from '@/utils/emby'
 import dayjs from 'dayjs'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const oldValue = ref('')
 const searchValue = ref('')
 const themeClass = useThemeClass()

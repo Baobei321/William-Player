@@ -280,6 +280,7 @@ function modifyMainJs() {
 } from "vue";
 import { createPinia } from 'pinia'
 import App from "./App.vue";
+import i18n from './i18n'
 import router from "./router/index.js";
 import 'virtual:svg-icons-register'
 import 'element-plus/dist/index.css'
@@ -288,6 +289,7 @@ export function createApp() {
 \tconst app = createSSRApp(App);
 \tconst pinia = createPinia()
 \tapp.use(pinia)
+\tapp.use(i18n)
 \tapp.use(router)
 \tapp.mount('#app1')
 \treturn {
@@ -302,11 +304,13 @@ export function createApp() {
 } from "vue";
 import { createPinia } from 'pinia'
 import App from "./App.vue";
+import i18n from './i18n'
 
 export function createApp() {
 \tconst app = createSSRApp(App);
 \tconst pinia = createPinia()
 \tapp.use(pinia)
+\tapp.use(i18n)
 \t// 非PC平台直接挂载，不需要路由
 \treturn {
 \t\tapp,

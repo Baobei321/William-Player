@@ -3,14 +3,13 @@
     <nut-swiper @change="changeItem" v-bind="$attrs" ref="nut_swiper">
       <nut-swiper-item v-for="item in props.options" :key="item.img">
         <slot name="item" v-bind="item" v-if="$slots.item"></slot>
-        <image :src="item.img" style="width:100%" :mode="props.imgMode" v-if="!$slots.item && item.img" />
+        <image :src="item.img" style="width:100%" :mode="props.imgMode" v-if="!$slots.item && item.img"  />
       </nut-swiper-item>
     </nut-swiper>
     <template v-if="isAllUnder">
       <template v-for="(bgc, index) in props.options" :key="bgc.underImg">
         <image :class="['swiper-image-now', swipeIndex == index ? leave ? 'leave' : 'enter' : '']" :src="bgc.underImg"
-          :mode="props.imgMode" :style="{ zIndex: swipeIndex == index ? '2' : '1' }">
-        </image>
+          :mode="props.imgMode" :style="{ zIndex: swipeIndex == index ? '2' : '1' }"  />
       </template>
     </template>
   </div>

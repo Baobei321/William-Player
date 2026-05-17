@@ -7,29 +7,29 @@
             <nut-icon name="rect-down" @click="close"></nut-icon>
             <span>{{ props.title }}</span>
             <div class="content-right">
-              <span class="content-right-download" v-if="!isDownload" @click="openDownload(true)">下载</span>
-              <span class="content-right-cancel" v-if="isDownload" @click="openDownload(false)">取消</span>
-              <span class="content-right-confirm" v-if="isDownload" @click="confirmDownload">确认</span>
+              <span class="content-right-download" v-if="!isDownload" @click="openDownload(true)">{{ t('video.download') }}</span>
+              <span class="content-right-cancel" v-if="isDownload" @click="openDownload(false)">{{ t('common.cancel') }}</span>
+              <span class="content-right-confirm" v-if="isDownload" @click="confirmDownload">{{ t('common.confirm') }}</span>
             </div>
           </div>
         </div>
         <div class="tvlist-popup-wrapper__list">
           <div class="tvlist-popup-wrapper__list-item" v-for="(item, index) in props.tvList" :key="item.name" @click="playVideo(item, index)">
             <div class="item-img">
-              <image :src="item.poster" mode="aspectFill" class="item-img-poster"></image>
+              <image :src="item.poster" mode="aspectFill" class="item-img-poster"  />
               <template v-if="isDownload">
-                <image src="@/static/check-active.png" class="select-icon" v-if="selectArr.some(i => i.id === item.id)"></image>
-                <image src="@/static/check.png" class="select-icon" v-else></image>
+                <image src="@/static/check-active.png" class="select-icon" v-if="selectArr.some(i => i.id === item.id)" />
+                <image src="@/static/check.png" class="select-icon" v-else  />
               </template>
             </div>
             <div class="item-info">
-              <div class="item-info-title">{{ item.ji + '.' + (item.title || `第${item.ji}集`) }}</div>
+              <div class="item-info-title">{{ item.ji + '.' + (item.title || t('video.episodeTitle', { episode: item.ji })) }}</div>
               <div class="item-info-star">
-                <image src="@/static/star-fill.png"></image>
+                <image src="@/static/star-fill.png"  />
                 <span class="star-score">{{ item.vote_average?.toFixed(1) || 10 }}</span>
-                <span class="star-runtime">{{ item.runtimeOrg ? calTime(item.runtimeOrg, 'cn') : '暂无时长' }}</span>
+                <span class="star-runtime">{{ item.runtimeOrg ? calTime(item.runtimeOrg, 'cn') : t('video.noDuration') }}</span>
               </div>
-              <div class="item-info-desc">{{ item.overview || '暂无简介' }}</div>
+              <div class="item-info-desc">{{ item.overview || t('video.noIntroduction') }}</div>
             </div>
           </div>
         </div>
@@ -43,7 +43,9 @@ import { ref } from 'vue'
 import { calTime } from '@/utils/scrape'
 import { getWebDAVUrl, get189VideoUrl, getQuarkResolutionUrl, getQuarkVideoUrl } from '@/utils/common'
 import { queryAll, createDownload } from '@/utils/download'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   tvList: { type: Array, default: [] },
   title: { type: String, default: '' },
@@ -95,7 +97,7 @@ const playVideo = (item, index) => {
     if (selectArr.value.some(i => i.id === item.id)) {
       selectArr.value = selectArr.value.filter(i => i.id !== item.id)
     } else {
-      selectArr.value.push({ saveName: `${props.title} 第${item.ji}集.${format}`, ...item })
+      selectArr.value.push({ saveName: `${props.title} ${t('video.episodeTitle', { episode: item.ji })}.${format}`, ...item })
       if (selectType.type === 'WebDAV') {
         selectArr.value.forEach(v => {
           v.webdavPath = decodeURIComponent(props.activeSeason.path.slice(1) + '/' + v.name)

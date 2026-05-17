@@ -1,9 +1,9 @@
 <template>
   <div :class="['download', themeClass]">
-    <wil-navbar title="下载管理" :rightShow="true"></wil-navbar>
+    <wil-navbar :title="t('navbar.downloadManagement')" :rightShow="true"></wil-navbar>
     <div class="download-container">
       <template v-if="downloadList?.length">
-        <div class="download-title">正在下载：{{ downloadList?.length }}</div>
+        <div class="download-title">{{ t('toolbox.downloadingCount', { count: downloadList?.length }) }}</div>
         <div class="download-list">
           <list-item
             v-for="item in downloadList"
@@ -16,7 +16,7 @@
         </div>
       </template>
       <template v-if="completedList?.length">
-        <div class="completed-title">下载完成：{{ completedList?.length }}</div>
+        <div class="completed-title">{{ t('toolbox.completedDownloadCount', { count: completedList?.length }) }}</div>
         <div class="completed-list">
           <list-item v-for="item in completedList" :key="item.id" :data="item" @click="openDocument(item)"></list-item>
         </div>
@@ -31,8 +31,12 @@ import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import listItem from './components/list-item.vue'
 import { handleSize } from '@/utils/emby.js'
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18n } from 'vue-i18n'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 
 const themeClass = useThemeClass()
+const { t } = useI18n()
+useI18nNavbar('navbar.downloadManagement')
 const taskList = ref([])
 const downloadList = ref([])
 const completedList = ref([])

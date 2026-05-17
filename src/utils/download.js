@@ -1,4 +1,6 @@
 //该js文件用于下载方法
+import { i18n } from '@/i18n/index.js'
+
 let DownloaderManager = null
 let downloadList = [] //下载列表
 //初始化安卓原生下载器
@@ -38,7 +40,7 @@ export const queryAll = (callback, selectArr) => {
             downloadList = arr.filter(i => i.status === 'DOWNLOADING' || i.status === 'PAUSED' || i.status === 'CONNECTING' || i.status === 'ERROR')
             if (downloadList?.length + downloadArr?.length >= 3) {
                 uni.showToast({
-                    title: `已存在${downloadList?.length}个下载任务,最多同时下载三个`,
+                    title: i18n.global.t('toolbox.downloadTaskLimit', { count: downloadList?.length }),
                     icon: 'none',
                 })
             } else {
@@ -119,7 +121,7 @@ export const createDownload = (selectArr) => {//第一个参数是要下载的�
             },
             () => {
                 uni.showToast({
-                    title: '开始下载',
+                    title: i18n.global.t('toolbox.startDownload'),
                     icon: 'none'
                 })
             }

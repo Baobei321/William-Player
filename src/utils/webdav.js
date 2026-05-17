@@ -1,18 +1,19 @@
 import { createClient } from './webdav-client.js'
+import { i18n } from '@/i18n/index.js'
 let webdavClientInstance = null
 //todo此文件目前还未使用，发现webdav模块不支持分页只能全量返回，后续可以前端分页
 
 //创建webdav服务器实例
 export const initWebDAVClient = config => {
   if (webdavClientInstance) {
-    console.warn('WebDAV客户端已初始化，将返回现有实例')
+    console.warn(i18n.global.t('request.webdavInitialized'))
     return webdavClientInstance
   }
 
   const { server, username, password, options = {} } = config
 
   if (!server) {
-    throw new Error('WebDAV服务器地址不能为空')
+    throw new Error(i18n.global.t('request.webdavServerRequired'))
   }
 
   webdavClientInstance = createClient(server, {

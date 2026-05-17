@@ -1,32 +1,32 @@
 <template>
   <div class="actor-list">
     <div class="story-introduction" v-if="imgData.overview">
-      <div class="story-introduction-title">剧情简介</div>
+      <div class="story-introduction-title">{{ t('video.storyIntroduction') }}</div>
       <div class="story-introduction-text">{{ imgData.overview }}</div>
     </div>
     <div class="related-actors" v-if="actors.length">
-      <div class="related-actors-title">相关演员</div>
+      <div class="related-actors-title">{{ t('video.relatedActors') }}</div>
       <scroll-view class="related-actors-scroll" :scroll-x="true" style="width: 100%" :enhanced="true"
         :showScrollbar="false">
         <div class="related-actors-list">
           <div class="related-actors-list__item" v-if="director.name">
             <image class="item-avatar" backgroundColor='#efefef'
               :src="director.profile_path ? CONFIG.IMG_DOMAIN + '/t/p/w100_and_h100_bestv2' + director.profile_path : 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'"
-              mode="aspectFill" />
+              mode="aspectFill"  />
             <div class="item-name">{{ director.name }}</div>
-            <div class="item-job">导演</div>
+            <div class="item-job">{{ t('video.director') }}</div>
           </div>
           <div class="related-actors-list__item" v-for="item in actors" :key="item.name">
-            <image class="item-avatar" backgroundColor='#efefef' :src="setActorAvatar(item.profile_path)" mode="aspectFill" />
+            <image class="item-avatar" backgroundColor='#efefef' :src="setActorAvatar(item.profile_path)" mode="aspectFill"  />
             <div class="item-name">{{ item.name }}</div>
-            <div class="item-role">饰 {{ item.character }}</div>
+            <div class="item-role">{{ t('video.rolePrefix') }} {{ item.character }}</div>
           </div>
         </div>
       </scroll-view>
     </div>
     <div class="tip-footer">
       <span class="tip-footer-name">{{ handleSeasonName(props.selectSource.name, true) + '-' }}</span>
-      <span class="tip-footer-webdav">路径：{{ props.selectSource.path }}</span>
+      <span class="tip-footer-webdav">{{ t('video.pathPrefix') }}{{ props.selectSource.path }}</span>
       <div class="tip-footer-timesize">
         <span v-if="imgData.runtime">{{ imgData.runtime }}</span><span>{{ props.selectSource.sourceName }}</span>
         <span v-if="props.selectSource.size">{{ props.routerParams.type == 'movie' ? props.selectSource.size :
@@ -40,7 +40,10 @@
 import { ref, onBeforeMount } from "vue";
 import { handleSeasonName } from "@/utils/scrape";
 import * as CONFIG from "@/utils/config";
+import { getActorById } from '@/utils/tmdb'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   routerParams: { type: Object, default: {} },
   selectSource: { type: Object, default: {} },
@@ -57,33 +60,6 @@ const handleSize = (size) => {
   const i = Math.floor(Math.log(size) / Math.log(1024));
   const formatted = parseFloat((size / Math.pow(1024, i)).toFixed(2));
   return formatted + " " + sizes[i];
-};
-//获取演员表
-const getActorById = (data, type) => {
-  let url = "";
-  let obj = JSON.parse(JSON.stringify(data));
-  if (!data.movieTvId || !obj.movieTvId) return Promise.reject();
-  if (type == "movie") {
-    url = `https://api.tmdb.org/3/movie/${obj.movieTvId}/credits`;
-  } else if (type == "tv") {
-    url = `https://api.tmdb.org/3/tv/${obj.movieTvId}/credits`;
-  }
-  return new Promise((resolve) => {
-    uni.request({
-      url: url,
-      data: {
-        language: "zh-CN",
-        api_key: uni.getStorageSync("settingData").tmdbKey,
-      },
-      method: "GET",
-      header: {
-        "Content-Type": "application/json",
-      },
-      success: (res) => {
-        resolve(res.data);
-      },
-    });
-  });
 };
 const getActorList = async () => {
   let res = await getActorById(

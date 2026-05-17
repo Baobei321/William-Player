@@ -1,16 +1,16 @@
 <template>
   <div class="operation-guide">
-    <div class="operation-guide-title">投屏步骤</div>
+    <div class="operation-guide-title">{{ t('backend.screencastSteps') }}</div>
     <div class="guide-first">
-      <div class="guide-first-title">步骤一：打开智能电视或电视盒子，保持智能电视、电视盒子、手机连接同一WiFi。</div>
-      <image src="https://www.iqiyipic.com/common/fix/h5-throwScreen/help-1.png" class="guide-first-img" mode="widthFix"></image>
+      <div class="guide-first-title">{{ t('backend.screencastStepOne') }}</div>
+      <image src="https://www.iqiyipic.com/common/fix/h5-throwScreen/help-1.png" class="guide-first-img" mode="widthFix"  />
     </div>
     <div class="guide-second">
-      <div class="guide-second-title">步骤二：点击视频播放器上的“投屏”按钮后，在菜单中选择搜索到的投屏设备。</div>
-      <image src="https://www.iqiyipic.com/common/fix/h5-throwScreen/help-2.png" class="guide-second-img" mode="widthFix"></image>
+      <div class="guide-second-title">{{ t('backend.screencastStepTwo') }}</div>
+      <image src="https://www.iqiyipic.com/common/fix/h5-throwScreen/help-2.png" class="guide-second-img" mode="widthFix"  />
     </div>
-    <div class="operation-guide-title">投屏相关问题</div>
-    <div class="guide-question">为什么投屏失败？</div>
+    <div class="operation-guide-title">{{ t('backend.screencastQuestions') }}</div>
+    <div class="guide-question">{{ t('backend.whyScreencastFailed') }}</div>
     <div class="guide-answer">
       <div class="guide-answer-item" v-for="(item,index) in answerArr1" :key="item">
         <span style="color:#ff6701;font-weight: bold;">{{ index+1 }}.</span>
@@ -21,10 +21,15 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
-const answerArr1 = ["手机与智能电视或电视盒子没有连接同一个WiFi，或者手机可能连接了移动网络。", "智能电视或电视盒子机型本身不支持DLNA投屏协议。"];
+useI18nNavbar('navbar.operationGuide')
+const answerArr1 = computed(() => [t('backend.screencastFailReasonNetwork'), t('backend.screencastFailReasonDlna')]);
 </script>
 
 <style lang="scss" scoped>

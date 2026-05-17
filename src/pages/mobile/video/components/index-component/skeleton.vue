@@ -7,10 +7,10 @@
       <view class="h5-div video-container" style="overflow: hidden;">
         <view class="h5-div recent-played">
           <view class="h5-div recent-played-title">
-            <view class="h5-div recent-played-title-left sk-transparent sk-text-14-2857-459 sk-text">最近观看
+            <view class="h5-div recent-played-title-left sk-transparent sk-text-14-2857-459 sk-text">{{ t('video.recentPlayed') }}
             </view>
             <view class="h5-div recent-played-title-right">
-              <view class="h5-span sk-transparent sk-text-14-2857-474 sk-text">全部
+              <view class="h5-span sk-transparent sk-text-14-2857-474 sk-text">{{ t('common.all') }}
               </view>
               <view class="h5-span sk-transparent sk-opacity">2</view>
               <text class="h5-i nutui-iconfont nut-icon nut-icon-rect-right sk-pseudo sk-pseudo-circle"
@@ -24,7 +24,7 @@
                 <view class="h5-div recent-played-list-movie__item" v-for="item in 4" :key="item">
                   <view class="h5-div recent-played-list-movie__item-img sk-image"></view>
                   <view class="h5-span recent-played-list-movie__item-name sk-transparent sk-text-14-2857-57 sk-text">
-                    我们一起摇太阳</view>
+                    </view>
                 </view>
               </view>
             </view>
@@ -32,9 +32,9 @@
         </view>
         <view class="h5-div hxList">
           <view class="h5-div hxList-title">
-            <view class="h5-div hxList-title-left sk-transparent sk-text-14-2857-375 sk-text">电影</view>
+            <view class="h5-div hxList-title-left sk-transparent sk-text-14-2857-375 sk-text">{{ t('video.movie') }}</view>
             <view class="h5-div hxList-title-right">
-              <view class="h5-span sk-transparent sk-text-14-2857-432 sk-text">全部
+              <view class="h5-span sk-transparent sk-text-14-2857-432 sk-text">{{ t('common.all') }}
               </view>
               <view class="h5-span sk-transparent sk-opacity">8</view>
               <text class="h5-i nutui-iconfont nut-icon nut-icon-rect-right sk-pseudo sk-pseudo-circle"
@@ -45,9 +45,9 @@
             <view class="hxList-list-scroll" style="overflow: hidden;">
               <view class="h5-div hxList-list-movie" style="scroll-snap-align: none;overflow: hidden;width: 100%;">
                 <view class="h5-div hxList-list-movie__item" v-for="item in 8" :key="item">
-                  <image class="h5-img sk-image" mode="aspectFill"></image>
+                  <image class="h5-img sk-image" mode="aspectFill"  />
                   <view class="h5-span hxList-list-movie__item-name sk-transparent sk-text-14-2857-799 sk-text">
-                    无名之火</view>
+                    </view>
                   <view class="h5-span hxList-list-movie__item-time sk-transparent sk-text-14-2857-681 sk-text">
                     2024-07-24</view>
                 </view>
@@ -57,9 +57,9 @@
         </view>
         <view class="h5-div hxList">
           <view class="h5-div hxList-title">
-            <view class="h5-div hxList-title-left sk-transparent sk-text-14-2857-706 sk-text">电视剧</view>
+            <view class="h5-div hxList-title-left sk-transparent sk-text-14-2857-706 sk-text">{{ t('video.tv') }}</view>
             <view class="h5-div hxList-title-right">
-              <view class="h5-span sk-transparent sk-text-14-2857-346 sk-text">全部
+              <view class="h5-span sk-transparent sk-text-14-2857-346 sk-text">{{ t('common.all') }}
               </view>
               <view class="h5-span sk-transparent sk-opacity">9</view>
               <text class="h5-i nutui-iconfont nut-icon nut-icon-rect-right sk-pseudo sk-pseudo-circle"
@@ -70,7 +70,7 @@
             <view class="hxList-list-scroll" style="overflow: hidden;">
               <view class="h5-div hxList-list-movie" style="scroll-snap-align: none;overflow: hidden;width: 100%;">
                 <view class="h5-div hxList-list-movie__item" v-for="item in 8" :key="item">
-                  <image class="h5-img sk-image" mode="aspectFill"></image>
+                  <image class="h5-img sk-image" mode="aspectFill"  />
                 </view>
               </view>
             </view>
@@ -83,7 +83,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const navBarHeight = ref('')
 //计算设备navBar高度
 const getNavHeight = () => {

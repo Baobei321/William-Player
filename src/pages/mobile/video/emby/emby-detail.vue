@@ -7,15 +7,15 @@
           <div class="img-title">{{ imgData.title }}</div>
           <div class="img-mid" v-if="imgData.releaseTime">
             <div class="img-mid-score">
-              <image src="@/static/star-fill.png"></image>
+              <image src="@/static/star-fill.png"  />
               <span>{{ imgData.score }}</span>
             </div>
             <div class="img-mid-date">
-              <image src="@/static/date-icon.png"></image>
+              <image src="@/static/date-icon.png"  />
               <span>{{ imgData.releaseTime }}</span>
             </div>
             <div class="img-mid-runtime">
-              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'"></image>
+              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'"  />
               <span>{{ imgData.runtime }}</span>
             </div>
           </div>
@@ -28,13 +28,13 @@
       <div class="emby-detail-container__content">
         <nut-button :custom-color="primaryBtnColor" @click="clickPlayButton">
           <template #icon>
-            <image src="/static/play.png" />
+            <image src="/static/play.png"  />
           </template>
           <span :style="{ color: primaryBtnTextColor }">{{ buttonText }}</span>
         </nut-button>
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
-          <div class="movie-version-title">影片版本</div>
+          <div class="movie-version-title">{{ t('video.movieVersion') }}</div>
           <div class="movie-version-item">Emby</div>
         </div>
         <!-- 电视专用 -->
@@ -61,7 +61,7 @@
           >
             <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + (index + 1)" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
-                <image src="@/static/playVideo-button.png" />
+                <image src="@/static/playVideo-button.png"  />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div
                   class="item-img-process"
@@ -69,12 +69,12 @@
                   v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"
                 ></div>
               </div>
-              <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
+              <div class="item-title">{{ index + 1 + '.' + (item.title || t('video.episodeTitle', { episode: index + 1 })) }}</div>
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
-            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
-            <span v-else>加载中...</span>
+            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">{{ t('video.reload') }}</nut-button>
+            <span v-else>{{ t('common.loadingEllipsis') }}</span>
           </div>
         </div>
         <actor-list
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, nextTick } from 'vue'
+import { computed, ref, onBeforeMount, nextTick, watch } from 'vue'
 import { onShow, onLoad } from '@dcloudio/uni-app'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import actorList from '../components/detail-component/actor-list.vue'
@@ -100,7 +100,11 @@ import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTv
 import { parseTime, calTime, formatNanoseconds, handleSecond, handleSeasonName, generateChineseNumberMapping } from '@/utils/scrape'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 
+const { t } = useI18n()
+const localeStore = useLocaleStore()
 const themeClass = useThemeClass()
 const { primaryBtnColor, primaryBtnTextColor, iconColor } = useThemeColors()
 const imgData = ref({}) //图片内的信息
@@ -110,7 +114,9 @@ const activeSeason = ref({})
 const seasonFirst = ref({})
 const tvList = ref([]) //目前Emby所拥有的电视集数列表
 const historyPlay = ref(uni.getStorageSync('historyPlay') || []) //历史播放
-const buttonText = ref('播放')
+const buttonTextKey = ref('video.play')
+const buttonTextParams = ref({})
+const buttonText = computed(() => t(buttonTextKey.value, buttonTextParams.value))
 const firstEnter = ref(true)
 const routerParams = ref({})
 const selectMedia = ref({})
@@ -197,7 +203,7 @@ const getMovieTvDetail = async (type = 'all') => {
     res.production_companies ? (imgData.value.production_companies = res.production_companies) : ''
     res.overview ? (imgData.value.overview = res.overview) : ''
     res.path ? (imgData.value.path = res.path) : ''
-    res.number_of_episodes ? (imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）`) : ''
+    res.number_of_episodes ? (imgData.value.runtime = t('video.totalEpisodesInLibrary', { total: res.number_of_episodes || 0, count: res.number_of_episodes || 0 })) : ''
   }
   return res
 }
@@ -252,19 +258,20 @@ const handleTv = async () => {
       poster: setEmbyImg(i, selectMedia.value),
     }
   })
-  console.log(tvList.value, '电视剧列表')
+  console.log(tvList.value, 'tvList')
 }
 
 //设置按钮文字
 const setButtonText = () => {
   historyPlay.value = uni.getStorageSync('historyPlay') || []
   historyPlay.value = historyPlay.value.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
+  buttonTextKey.value = 'video.play'
+  buttonTextParams.value = {}
   if (routerParams.value.type == 'movie') {
     let history = historyPlay.value?.find(i => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true))
     if (history && selectSource.value.path == '/' + history.path) {
-      buttonText.value = '播放 ' + handleSecond(history.initialTime)
-    } else {
-      buttonText.value = '播放'
+      buttonTextKey.value = 'video.playWithTime'
+      buttonTextParams.value = { time: handleSecond(history.initialTime) }
     }
   } else if (routerParams.value.type == 'tv') {
     let history = historyPlay.value?.find(i => {
@@ -276,10 +283,8 @@ const setButtonText = () => {
     })
     historyTv.value = history || {}
     if (history && activeSeason.value.path + '/' + history.name == '/' + history.path && history.season == activeSeason.value.season) {
-      let time = handleSecond(history.initialTime)
-      buttonText.value = `第${history.ji}集 ${time}`
-    } else {
-      buttonText.value = '播放'
+      buttonTextKey.value = 'video.episodeTitleWithTime'
+      buttonTextParams.value = { episode: history.ji, time: handleSecond(history.initialTime) }
     }
   }
 }
@@ -356,6 +361,13 @@ onBeforeMount(async () => {
     getMovieTvDetail()
   }
 })
+
+watch(
+  () => localeStore.locale,
+  () => {
+    setButtonText()
+  }
+)
 
 onShow(() => {
   setTimeout(() => {

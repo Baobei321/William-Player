@@ -1,9 +1,9 @@
 <template>
     <div :class="['history-played', themeClass]">
-        <wil-navbar :title="routerParams.title" :leftShow="true">
+        <wil-navbar :title="getTitleText()" :leftShow="true">
             <template #right>
                 <span style="color: #2457fd;font-weight: bold;" @click="editHistory()">{{
-                    isSelect ? '取消' : '编辑' }}</span>
+                    isSelect ? t('common.cancel') : t('common.edit') }}</span>
             </template>
         </wil-navbar>
         <div class="history-played-list" v-if="!isClearAll">
@@ -17,10 +17,9 @@
                             <image
                                 :src="(!routerParams.isConnected && !item.loadImg) ? posterEmpty : setRecentImg(item.poster)"
                                 class="item-poster-image" mode="aspectFill" @error="imgError(item)"
-                                @load="imgLoad(item)">
-                            </image>
+                                @load="imgLoad(item)"  />
                             <div :class="[item.select ? 'item-poster-check' : 'item-poster-nocheck']" v-if="isSelect">
-                                <image src="@/static/check-active.png" v-if="item.select"></image>
+                                <image src="@/static/check-active.png" v-if="item.select"  />
                             </div>
                         </div>
                         <span class="item-name">{{ removeExtension(item) }}</span>
@@ -28,12 +27,12 @@
                 </template>
             </wil-list>
         </div>
-        <wil-empty v-else text="没有更多了"></wil-empty>
+        <wil-empty v-else :text="t('common.noMore')"></wil-empty>
         <div class="history-played-bottom" v-if="isSelect">
-            <div class="history-played-bottom__left" @click="clearAll">全部清空</div>
+            <div class="history-played-bottom__left" @click="clearAll">{{ t('common.clearAll') }}</div>
             <div class="history-played-bottom__right"
                 :style="{ color: recentSelect.length ? 'rgb(255, 44, 44)' : 'rgb(188, 188, 188)' }" @click="clearPart">
-                {{ recentSelect.length ? '删除' : '取消' }}</div>
+                {{ recentSelect.length ? t('common.delete') : t('common.cancel') }}</div>
         </div>
         <wil-modal ref="wil_modal"></wil-modal>
     </div>
@@ -49,12 +48,14 @@ import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import { useHistoryPlayed } from "@/hooks/useHistoryPlayed";
 import { ref } from 'vue'
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const wil_list = ref(null);
 const wil_modal = ref(null);
 const themeClass = useThemeClass()
 
-const { requestParams, isClearAll, routerParams, lineNumber, lineHeight, changeItemFn,
+const { requestParams, isClearAll, routerParams, getTitleText, lineNumber, lineHeight, changeItemFn,
     isSelect, windowWidth, recentSelect,
     editHistory, getHistoryList, listItemStyle, toPlayHistory, longPress,
     setRecentImg, imgError, imgLoad, removeExtension, clearAll, clearPart } = useHistoryPlayed({ wil_list, wil_modal })

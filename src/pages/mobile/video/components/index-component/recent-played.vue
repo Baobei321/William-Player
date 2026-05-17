@@ -1,9 +1,9 @@
 <template>
   <div class="recent-played">
     <div class="recent-played-title">
-      <div class="recent-played-title-left">最近观看</div>
+      <div class="recent-played-title-left">{{ t('video.recentPlayed') }}</div>
       <div class="recent-played-title-right" @click="toHistoryPlayed">
-        <span>全部</span>
+        <span>{{ t('common.all') }}</span>
         <span>{{ props.listData?.length }}</span>
         <nut-icon name="rect-right" size="10" custom-color="gray"></nut-icon>
       </div>
@@ -16,11 +16,11 @@
             @click="toVideoPlayer(item)">
             <div class="recent-played-list-movie__item-img">
               <image :src="!props.isConnected && !item.loadImg ? emptyBg : setEmptyImg(item.poster)" @error="imgError(item)"
-                @load="imgLoad(item)" style="width: 100%;height: 100%;position: static;" mode="aspectFill"></image>
+                @load="imgLoad(item)" style="width: 100%;height: 100%;position: static;" mode="aspectFill"  />
               <!-- <span style="color: red;font-size: 30px;">
                 {{ item.loadImg }}
               </span> -->
-              <image :src="playVideoButton" class="img-button" />
+              <image :src="playVideoButton" class="img-button"  />
               <span class="img-runtime">{{ handleSecond(item.initialTime) + '/' + (item.runtime || '00:00') }}</span>
               <div class="img-process"
                 :style="{ width: item.runtime ? (Number(item.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%') : '0' }">
@@ -29,7 +29,7 @@
             <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{
               handleSeasonName(removeExtension(item.name)) }}</span>
             <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">{{
-              removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title || '第' + item.ji + '集'}`) }}</span>
+              removeExtension(`${item.titlePlay} ${t('video.episodeTitle', { episode: item.ji })} ${item.title || t('video.episodeTitle', { episode: item.ji })}`) }}</span>
           </div>
         </div>
       </scroll-view>
@@ -44,7 +44,9 @@ import { handleSecond, parseTime, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import emptyBg from "@/static/empty_bg.png";
 import { toStringfy } from "../../../mine/common";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
   listData: { type: Array, default: [] },
@@ -157,7 +159,7 @@ const toVideoPlayer = async (item) => {
 
 const toHistoryPlayed = () => {
   uni.navigateTo({
-    url: `/pages/mobile/video/history-played?title=最近观看&isConnected1=${props.isConnected}`,
+    url: `/pages/mobile/video/history-played?title=${t('video.recentPlayed')}&isConnected1=${props.isConnected}`,
   });
 };
 const imgError = (item) => {

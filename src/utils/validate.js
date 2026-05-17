@@ -1,20 +1,22 @@
 import { loginUser } from "@/utils/common";
 import { loginEmby, getEmbyInfo } from "@/utils/emby";
+import { i18n } from '@/i18n/index.js';
 
 //校验webdav
-export const validateWebdav = async (title, formData, oldData, routerParams, back = true) => {
-    let sourceList = uni.getStorageSync("sourceList");    
-    if (title == "添加WebDAV") {
+export const validateWebdav = async (action, formData, oldData, routerParams, back = true) => {
+    const isAdd = typeof action === 'boolean' ? action : action == "添加WebDAV";
+    let sourceList = uni.getStorageSync("sourceList");
+    if (isAdd) {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address)) {
             uni.showToast({
-                title: "存在重复的WebDAV地址，请修改",
+                title: i18n.global.t('source.duplicateWebdavAddress'),
                 icon: "none",
             });
             return;
         }
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == formData.name)) {
             uni.showToast({
-                title: "存在同名的WebDAV，请修改",
+                title: i18n.global.t('source.duplicateWebdavName'),
                 icon: "none",
             });
             return;
@@ -44,21 +46,21 @@ export const validateWebdav = async (title, formData, oldData, routerParams, bac
             return res
         } catch (error) {
             uni.showToast({
-                title: "权限校验失败，请检查",
+                title: i18n.global.t('source.authCheckFailed'),
                 icon: "none",
             });
         }
-    } else if (title == "修改WebDAV") {
+    } else {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address) && oldData.address != formData.address) {
             uni.showToast({
-                title: "存在重复的WebDAV地址，请修改",
+                title: i18n.global.t('source.duplicateWebdavAddress'),
                 icon: "none",
             });
             return;
         }
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.name == formData.name) && oldData.name != formData.name) {
             uni.showToast({
-                title: "存在同名的WebDAV，请修改",
+                title: i18n.global.t('source.duplicateWebdavName'),
                 icon: "none",
             });
             return;
@@ -88,7 +90,7 @@ export const validateWebdav = async (title, formData, oldData, routerParams, bac
             return res
         } catch (error) {
             uni.showToast({
-                title: "权限校验失败，请检查",
+                title: i18n.global.t('source.authCheckFailed'),
                 icon: "none",
             });
         }
@@ -96,28 +98,29 @@ export const validateWebdav = async (title, formData, oldData, routerParams, bac
 }
 
 //校验emby
-export const validateEmby = async (title, formData, oldData, routerParams) => {
+export const validateEmby = async (action, formData, oldData, routerParams) => {
+    const isAdd = typeof action === 'boolean' ? action : action == "添加Emby";
     let sourceList = uni.getStorageSync("sourceList");
     if (!sourceList.find((i) => i.type == "Emby")) {
         sourceList.push({ type: "Emby", list: [], img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc" })
     }
-    if (title == "添加Emby") {
+    if (isAdd) {
         if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == formData.address)) {
             uni.showToast({
-                title: "存在重复的Emby地址，请修改",
+                title: i18n.global.t('source.duplicateEmbyAddress'),
                 icon: "none",
             });
             return;
         }
         if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == formData.name)) {
             uni.showToast({
-                title: "存在同名的Emby，请修改",
+                title: i18n.global.t('source.duplicateEmbyName'),
                 icon: "none",
             });
             return;
         }
         uni.showLoading({
-            title: '加载中'
+            title: i18n.global.t('common.loading')
         })
         await loginEmby(formData)
             .then(async (res) => {
@@ -146,27 +149,27 @@ export const validateEmby = async (title, formData, oldData, routerParams) => {
             .catch(() => {
                 uni.hideLoading()
                 uni.showToast({
-                    title: "权限校验失败，请检查",
+                    title: i18n.global.t('source.authCheckFailed'),
                     icon: "none",
                 });
             });
-    } else if (title == "修改Emby") {
+    } else {
         if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.address == formData.address) && oldData.address != formData.address) {
             uni.showToast({
-                title: "存在重复的Emby地址，请修改",
+                title: i18n.global.t('source.duplicateEmbyAddress'),
                 icon: "none",
             });
             return;
         }
         if (sourceList.find((i) => i.type == "Emby").list.find((i) => i.name == formData.name) && oldData.name != formData.name) {
             uni.showToast({
-                title: "存在同名的Emby，请修改",
+                title: i18n.global.t('source.duplicateEmbyName'),
                 icon: "none",
             });
             return;
         }
         uni.showLoading({
-            title: '加载中'
+            title: i18n.global.t('common.loading')
         })
         await loginEmby(formData)
             .then((res) => {
@@ -193,7 +196,7 @@ export const validateEmby = async (title, formData, oldData, routerParams) => {
             .catch(() => {
                 uni.hideLoading()
                 uni.showToast({
-                    title: "权限校验失败，请检查",
+                    title: i18n.global.t('source.authCheckFailed'),
                     icon: "none",
                 });
             });

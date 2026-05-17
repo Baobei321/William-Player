@@ -7,7 +7,7 @@
             userInfo.avatar ||
             'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/2AFA742_427A_user-avatar_20241225150546694newMediaImage.png'
           "
-        ></image>
+          />
       </wil-uploader>
     </div>
     <div class="userInfo-cell">
@@ -32,14 +32,14 @@
           {{ item.title }}
         </template>
         <template #title="item">
-          <div class="alipay-cell" v-if="bindOne.includes(item.title)">
-            <image :src="userInfo?.[item.prop] ? bindedIcon : nobindedIcon"></image>
-            <span :style="{ color: userInfo?.[item.prop] ? successColor : dangerColor }">{{ userInfo?.[item.prop] ? '已绑定' : '未绑定' }}</span>
+          <div class="alipay-cell" v-if="bindOne.includes(item.key)">
+            <image :src="userInfo?.[item.prop] ? bindedIcon : nobindedIcon"  />
+            <span :style="{ color: userInfo?.[item.prop] ? successColor : dangerColor }">{{ userInfo?.[item.prop] ? t('mine.bound') : t('mine.unbound') }}</span>
           </div>
           <span :style="{ color: item.value ? textSecondaryColor : textPlaceholderColor }" v-else>{{ item.value || item.placeholder }}</span>
         </template>
         <template #link="item">
-          <span class="unbind-button" v-if="bindOne.includes(item.title) && userInfo?.[item.prop]" @click.stop="unBind(item)">解除绑定</span>
+          <span class="unbind-button" v-if="bindOne.includes(item.key) && userInfo?.[item.prop]" @click.stop="unBind(item)">{{ t('mine.unbind') }}</span>
         </template>
       </wil-cell>
     </div>
@@ -60,82 +60,94 @@ import { bindAlipay, unbindAlipay, bindQQ, unbindQQ, bindWechat, unbindWechat } 
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
 const themeClass = useThemeClass()
 const { textSecondaryColor, textPlaceholderColor, successColor, dangerColor } = useThemeColors()
 const userInfo = ref({})
 const wil_modal = ref(null)
-const genderDict = {
-  '0': '男',
-  '1': '女',
-  '2': '未知',
-}
+const genderDict = computed(() => ({
+  '0': t('common.male'),
+  '1': t('common.female'),
+  '2': t('common.unknown'),
+}))
 
-const bindOne = ['微信', '支付宝', 'QQ']
+const bindOne = ['wechat', 'alipay', 'qq']
 const options1 = computed(() => [
   {
-    title: '用户ID',
+    key: 'userId',
+    title: t('mine.userId'),
     path: null,
-    tip: '无法修改用户ID',
+    tip: t('mine.cannotModifyUserId'),
     value: uni.getStorageSync(CONFIG.USER_ID),
   },
   {
-    title: '昵称',
+    key: 'nickname',
+    title: t('mine.nickname'),
     path: null,
     value: userInfo.value.name,
   },
   {
-    title: '性别',
+    key: 'gender',
+    title: t('mine.gender'),
     path: null,
-    value: genderDict[userInfo.value.gender],
+    value: genderDict.value[userInfo.value.gender],
   },
 ])
 const options2 = computed(() => [
   {
-    title: '简介',
+    key: 'introduction',
+    title: t('mine.introduction'),
     path: null,
     value: userInfo.value.remark,
-    placeholder: '介绍一下自己',
+    placeholder: t('mine.introduceYourself'),
   },
 ])
 const options3 = computed(() => [
   {
-    title: '账号',
+    key: 'account',
+    title: t('auth.account'),
     path: null,
-    tip: '无法修改账号',
+    tip: t('mine.cannotModifyAccount'),
     value: userInfo.value.userName,
   },
   {
-    title: '手机号',
+    key: 'phoneNumber',
+    title: t('auth.phoneNumber'),
     path: null,
     value: userInfo.value.phonenumber,
   },
   {
-    title: '邮箱',
+    key: 'email',
+    title: t('auth.email'),
     path: null,
     value: userInfo.value.email,
-    placeholder: '请绑定邮箱',
+    placeholder: t('mine.bindEmail'),
   },
   {
-    title: '微信',
+    key: 'wechat',
+    title: t('mine.wechat'),
     path: null,
     value: '',
-    placeholder: '请绑定微信',
+    placeholder: t('mine.bindWechat'),
     prop: 'isBindWechat',
   },
   {
-    title: '支付宝',
+    key: 'alipay',
+    title: t('mine.alipay'),
     path: null,
     value: '',
-    placeholder: '请绑定支付宝',
+    placeholder: t('mine.bindAlipay'),
     prop: 'isBindAlipay',
   },
   {
-    title: 'QQ',
+    key: 'qq',
+    title: t('mine.qq'),
     path: null,
     value: '',
-    placeholder: '请绑定QQ',
+    placeholder: t('mine.bindQq'),
     prop: 'isBindQQ',
   },
   //   {
@@ -158,15 +170,15 @@ const clickItem = item => {
       icon: 'none',
     })
   } else {
-    if (item.title === '微信') {
+    if (item.key === 'wechat') {
       toBindWechat()
-    } else if (item.title === '支付宝') {
+    } else if (item.key === 'alipay') {
       toBindAlipay()
-    } else if (item.title === 'QQ') {
+    } else if (item.key === 'qq') {
       toBindQQ()
     } else {
       uni.navigateTo({
-        url: `/pages/mobile/mine/userInfo/edit?title=${item.title}`,
+        url: `/pages/mobile/mine/userInfo/edit?title=${item.title}&key=${item.key}`,
       })
     }
   }
@@ -223,10 +235,10 @@ const toBindQQ = async () => {
 
 //解除绑定
 const unBind = item => {
-  if (item.title === '微信') {
+  if (item.key === 'wechat') {
     wil_modal.value.showModal({
-      title: '温馨提示',
-      content: '是否确认解绑微信？',
+      title: t('modal.warmTip'),
+      content: t('mine.unbindWechatConfirm'),
       confirmColor: '#ff6701',
       confirm: async () => {
         await unbindWechat({})
@@ -234,10 +246,10 @@ const unBind = item => {
         uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
       },
     })
-  } else if (item.title === '支付宝') {
+  } else if (item.key === 'alipay') {
     wil_modal.value.showModal({
-      title: '温馨提示',
-      content: '是否确认解绑支付宝？',
+      title: t('modal.warmTip'),
+      content: t('mine.unbindAlipayConfirm'),
       confirmColor: '#ff6701',
       confirm: async () => {
         await unbindAlipay({})
@@ -245,10 +257,10 @@ const unBind = item => {
         uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
       },
     })
-  } else if (item.title === 'QQ') {
+  } else if (item.key === 'qq') {
     wil_modal.value.showModal({
-      title: '温馨提示',
-      content: '是否确认解绑QQ？',
+      title: t('modal.warmTip'),
+      content: t('mine.unbindQqConfirm'),
       confirmColor: '#ff6701',
       confirm: async () => {
         await unbindQQ({})

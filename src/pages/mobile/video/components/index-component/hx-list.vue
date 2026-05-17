@@ -5,11 +5,11 @@
         <image
           v-if="props.type == 'emby'"
           src="https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc"
-        ></image>
+          />
         <span>{{ props.title }}</span>
       </div>
       <div class="hxList-title-right" @click="toVideoAll">
-        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'var(--app-text-tertiary)' }">全部</span>
+        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'var(--app-text-tertiary)' }">{{ t('common.all') }}</span>
         <span v-if="props.type != 'emby'">{{ props.listData.length }}</span>
         <nut-icon name="rect-right" size="10" :custom-color="props.type == 'emby' ? '#52b54b' : 'var(--app-text-tertiary)'"></nut-icon>
       </div>
@@ -24,9 +24,9 @@
               @error="imgError(item)"
               @load="imgLoad(item)"
               mode="aspectFill"
-            ></image>
+              />
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-            <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime || t('video.noReleaseTime') }}</span>
           </div>
         </div>
       </scroll-view>
@@ -40,9 +40,11 @@ import posterEmpty from '@/static/poster-empty.png'
 import { onShow } from '@dcloudio/uni-app'
 import { handleSeasonName } from '@/utils/scrape'
 import * as CONFIG from '@/utils/config'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
-  title: { type: String, default: '电影' },
+  title: { type: String, default: '' },
   type: { type: String, default: '' },
   listData: { type: Array, default: [] },
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -66,9 +68,14 @@ const embyTypeMapping = {
   'Series': 'tv',
   'Movie': 'movie',
 }
-const typeMapping = {
-  '电影': 'movie',
-  '电视剧': 'tv',
+const getTypeByTitle = () => {
+  const typeMapping = {
+    [t('video.movie')]: 'movie',
+    [t('video.tv')]: 'tv',
+    '电影': 'movie',
+    '电视剧': 'tv',
+  }
+  return typeMapping[props.title]
 }
 const toVideoDetail = item => {
   if (props.type == 'emby') {
@@ -77,7 +84,7 @@ const toVideoDetail = item => {
     })
   } else {
     uni.navigateTo({
-      url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+      url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${getTypeByTitle()}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
     })
   }
 }

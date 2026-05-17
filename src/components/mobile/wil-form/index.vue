@@ -27,7 +27,7 @@ v-bind="{ ...item.formItemProps, customBlurValidate }" @blur="customBlurValidate
 </nut-form>
 </div>
 <div class="base-form-bottom" v-if="showButton">
-<nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText
+<nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText || t('common.confirmAndPublish')
 }}</nut-button>
 <slot name="bottom" v-if="$slots.bottom"></slot>
 </div>
@@ -36,6 +36,9 @@ v-bind="{ ...item.formItemProps, customBlurValidate }" @blur="customBlurValidate
 
 <script setup>
 import { computed, ref, watch } from "vue";
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
 title: { type: String, default: "" },
@@ -44,7 +47,7 @@ options: { type: Array, default: [] },
 labelPosition: { type: String, default: "left" },
 showButton: { type: Boolean, default: false },
 modelValue: { type: Object, default: {} },
-buttonText: { type: String, default: "确认并发布" },
+buttonText: { type: String, default: "" },
 });
 
 const formRef = ref(null);

@@ -5,8 +5,10 @@ import videoPlayer from '@/static/video-player.png'
 import photoIcon from '@/static/photo-icon.png'
 import fileIcon from '@/static/file-icon.png'
 import { onBeforeMount } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export function useSelectFolder({ selectType, selectMedia, result, title, emits }) {
+  const { t } = useI18n()
   const muluData = ref(uni.getStorageSync('muluData') || { tv: [], movie: [] })
   const isInit = ref(true)
   const path = ref('')
@@ -16,9 +18,10 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
   const folderFileIdArr = ref([])
   const selectName = ref('') //选中的文件夹的name
 
-  const mapping = {
-    '电视剧': 'tv',
-    '电影': 'movie',
+  const getCatalogType = value => {
+    if (['tv', '电视剧', t('video.tv')].includes(value)) return 'tv'
+    if (['movie', '电影', t('video.movie')].includes(value)) return 'movie'
+    return value
   }
 
   const responseAdapter = res11 => {
@@ -69,7 +72,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
         
         if (isTip) {
           uni.showToast({
-            title: '已到顶层目录',
+            title: t('source.reachedTopDirectory'),
             icon: 'none',
           })
         } else {
@@ -86,7 +89,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
       } else {
         if (isTip) {
           uni.showToast({
-            title: '已到顶层目录',
+            title: t('source.reachedTopDirectory'),
             icon: 'none',
           })
         } else {
@@ -179,7 +182,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
       }
     } else {
       uni.showToast({
-        title: '请选择文件夹',
+        title: t('source.pleaseSelectFolder'),
         icon: 'none',
       })
     }
@@ -203,7 +206,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
   const confirm = () => {
     if (!selectName.value) {
       uni.showToast({
-        title: '请选择目录',
+        title: t('source.pleaseSelectDirectory'),
         icon: 'none',
       })
       return
@@ -211,42 +214,42 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
     muluData.value = uni.getStorageSync('muluData') || { tv: [], movie: [] }
     if (unref(selectType).type == 'WebDAV') {
       //这块逻辑有问题，不能存在就替换，像webdav可能挂载多个网盘
-      // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
+      // let exit = muluData.value[getCatalogType(unref(title))].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
       // //已存在就替换，不存在就新增
-      // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
-      let exit = muluData.value[mapping[unref(title)]]?.find(
+      // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[getCatalogType(unref(title))].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
+      let exit = muluData.value[getCatalogType(unref(title))]?.find(
         v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value
       )
       if (exit) {
         uni.showToast({
-          title: '已存在该目录',
+          title: t('source.directoryAlreadyExists'),
           icon: 'none',
         })
       } else {
-        muluData.value[mapping[unref(title)]].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
+        muluData.value[getCatalogType(unref(title))].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
       }
     } else {
-      // let exit = muluData.value[mapping[unref(title)]].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
+      // let exit = muluData.value[getCatalogType(unref(title))].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
       // //已存在就替换，不存在就新增
       // if (exit) {
       //     exit.path = path.value + '/' + selectName.value || '/'
       //     exit.folderFileId = folderFileId.value
       // } else {
       //     let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
-      //     muluData.value[mapping[unref(title)]].push(obj)
+      //     muluData.value[getCatalogType(unref(title))].push(obj)
       // }
-      let exit = muluData.value[mapping[unref(title)]]?.find(
+      let exit = muluData.value[getCatalogType(unref(title))]?.find(
         v =>
           v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value && v.folderFileId == folderFileId.value
       )
       if (exit) {
         uni.showToast({
-          title: '已存在该目录',
+          title: t('source.directoryAlreadyExists'),
           icon: 'none',
         })
       } else {
         let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
-        muluData.value[mapping[unref(title)]].push(obj)
+        muluData.value[getCatalogType(unref(title))].push(obj)
       }
     }
     console.log(muluData.value)

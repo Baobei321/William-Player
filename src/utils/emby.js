@@ -2,6 +2,7 @@
 import { toStringfy, toParse } from '@/pages/mobile/mine/common'
 import dayjs from 'dayjs'
 import { classifyList, formatNanoseconds, formatSecondTime } from '@/utils/scrape'
+import { i18n } from '@/i18n/index.js'
 import posterEmpty from '@/static/poster-empty.png'
 const playbackInfo = {
   'DeviceProfile': {
@@ -459,8 +460,8 @@ const getEmbyMovieTv = async (data, selectMedia) => {
       }
     }),
     genres: res.GenreItems.map(item => {
-      let obj = classifyList.find(v => v.labelEn == item.Name || v.label == item.Name) || { label: item.Name, id: item.Id }
-      return { name: obj.label, id: obj.id }
+      let obj = classifyList.find(v => v.labelEn == item.Name || (v.labelKey && i18n.global.t(v.labelKey) == item.Name)) || { labelKey: '', label: item.Name, id: item.Id }
+      return { name: obj.labelKey ? i18n.global.t(obj.labelKey) : obj.label, id: obj.id }
     }),
     backdrop_path: res.BackdropImageTags.length
       ? `${selectMedia.protocol}://${selectMedia.address}:${selectMedia.port}/emby/Items/${res.Id}/Images/Backdrop?tag=${res.BackdropImageTags[0]}`

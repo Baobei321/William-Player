@@ -2,8 +2,8 @@
   <div :class="['select-folder', themeClass]">
     <div class="select-folder-title">
       <nut-icon name="rect-left" :custom-color="iconColor" @click="toBack(false)"></nut-icon>
-      <span>添加{{ props.title }}目录</span>
-      <span class="title-right" @click="confirm">确认</span>
+      <span>{{ t('source.addMovieDirectory', { title: props.title }) }}</span>
+      <span class="title-right" @click="confirm">{{ t('common.confirm') }}</span>
     </div>
     <wil-list
       :requestFn="getFileList"
@@ -22,8 +22,8 @@
           </template>
           <template #icon>
             <div class="cell-icon">
-              <image :src="selectName == item.name ? checkActive : checkIcon" @click.stop="chooseName(item)" v-if="item.type == '1'"></image>
-              <image :src="setImg(item)" />
+              <image :src="selectName == item.name ? checkActive : checkIcon" @click.stop="chooseName(item)" v-if="item.type == '1'"  />
+              <image :src="setImg(item)"  />
             </div>
           </template>
           <template #link>
@@ -37,6 +37,7 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import wilList from '@/components/mobile/wil-list/index.vue'
 import checkIcon from '@/static/check.png'
 import checkActive from '@/static/check-active.png'
@@ -44,6 +45,7 @@ import { useSelectFolder } from '@/hooks/useSelectFolder'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { useThemeClass } from '@/hooks/useThemeClass'
 
+const { t } = useI18n()
 const themeClass = useThemeClass()
 const props = defineProps({
   selectType: { type: Object, default: {} },

@@ -1,6 +1,6 @@
 <template>
     <div :class="['add-emby-form', themeClass]">
-        <wil-navbar :title="title"></wil-navbar>
+        <wil-navbar :title="titleText"></wil-navbar>
         <div class="add-emby-form__container">
             <wil-form v-model="state.formData" :options="options" ref="base_form">
                 <template #protocol>
@@ -9,11 +9,11 @@
                 </template>
             </wil-form>
             <nut-button :custom-color="primaryBtnColor" @click="confirmSubmit">
-                <span :style="{ color: primaryBtnTextColor }">确认{{ title == '添加Emby' ? '添加' : '修改' }}</span>
+                <span :style="{ color: primaryBtnTextColor }">{{ t('source.confirmAddOrModify', { action: isAdd ? t('common.add') : t('common.modify') }) }}</span>
             </nut-button>
             <!-- <loginPopup v-model:visible="showLoginPopup" @loginSuccess="loginSuccess"></loginPopup> -->
             <nut-popup v-model:visible="showProtocol" position="bottom" safe-area-inset-bottom round>
-                <nut-picker v-model="protoValue" :columns="protoColumns" title="选择协议" @confirm="confirmPicker"
+                <nut-picker v-model="protoValue" :columns="protoColumns" :title="t('source.selectProtocol')" @confirm="confirmPicker"
                     @cancel="showProtocol = false">
                 </nut-picker>
             </nut-popup>
@@ -22,13 +22,16 @@
 </template>
 
 <script setup>
-import { onBeforeMount, reactive, ref } from "vue";
+import { computed, onBeforeMount, reactive, ref } from "vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { validateEmby } from "@/utils/validate";
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const themeClass = useThemeClass()
 const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 const state = reactive({
@@ -44,21 +47,23 @@ const base_form = ref(null);
 const routerParams = ref({});
 
 const title = ref("");
+const isAdd = computed(() => title.value == '添加Emby' || title.value == t('navbar.addEmby'))
+const titleText = computed(() => isAdd.value ? t('navbar.addEmby') : t('navbar.modifyEmby'))
 
-const options = ref([
-    { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "选填（自动获取）", type: "text" } },
-    { label: "协议", prop: "protocol", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请选择协议" }] },
+const options = computed(() => [
+    { label: t('source.name'), prop: "name", type: "input", formItemProps: { placeholder: t('source.optionalAutoFetch'), type: "text" } },
+    { label: t('source.protocol'), prop: "protocol", formItemProps: { placeholder: t('common.input'), type: "text" }, rule: [{ required: true, message: t('source.pleaseSelectProtocol') }] },
 
-    { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
-    { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "选填,例如:443", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
+    { label: t('source.address'), prop: "address", type: "input", formItemProps: { placeholder: t('source.exampleLocalhost'), type: "text" }, rule: [{ required: true, message: t('source.pleaseInputAddress') }] },
+    { label: t('source.port'), prop: "port", type: "input", formItemProps: { placeholder: t('source.examplePort443'), type: "number" }, rule: [{ required: true, message: t('source.pleaseInputPort') }] },
     {
-        label: "用户名",
+        label: t('source.username'),
         prop: "Username",
         type: "input",
-        formItemProps: { placeholder: "必填", type: "text" },
-        rule: [{ required: true, message: "请输入用户名" }],
+        formItemProps: { placeholder: t('source.required'), type: "text" },
+        rule: [{ required: true, message: t('source.pleaseInputUsername') }],
     },
-    { label: "密码", prop: "Pw", type: "input", formItemProps: { placeholder: "选填", type: "password" } },
+    { label: t('source.password'), prop: "Pw", type: "input", formItemProps: { placeholder: t('source.optional'), type: "password" } },
 ]);
 
 const showProtocol = ref(false);
@@ -85,7 +90,7 @@ const editMulu = () => {
 const confirmSubmit = () => {
     base_form.value.confirmCommit().then(async (valid) => {
         if (valid) {
-            validateEmby(title.value, state.formData, state.oldData, routerParams.value) //校验，抽成一个方法了
+            validateEmby(isAdd.value, state.formData, state.oldData, routerParams.value) //校验，抽成一个方法了
         }
     });
 };

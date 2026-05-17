@@ -1,28 +1,28 @@
 <template>
     <div :class="['edit', themeClass]">
-        <wil-navbar :title="'编辑' + routerParams.title" :right-show="true">
+        <wil-navbar :title="t('navbar.editTitle', { title: routerParams.title })" :right-show="true">
             <template #right>
-                <span style="color: var(--app-brand);font-weight: 500;" @click="handleSave">保存</span>
+                <span style="color: var(--app-brand);font-weight: 500;" @click="handleSave">{{ t('common.save') }}</span>
             </template>
         </wil-navbar>
         <div class="edit-container">
-            <div class="edit-container-name" v-if="routerParams.title === '昵称'">
+            <div class="edit-container-name" v-if="editType === 'nickname'">
                 <nut-input show-word-limit :max-length="24" v-model="formData.name"></nut-input>
                 <div class="edit-container-name__tip">
-                    请设置2-24个字符，不包括@/等无效的字符。
+                    {{ t('mine.editNicknameTip') }}
                 </div>
             </div>
-            <div class="edit-container-gender" v-else-if="routerParams.title === '性别'">
+            <div class="edit-container-gender" v-else-if="editType === 'gender'">
                 <nut-radio-group v-model="formData.gender" direction="horizontal">
-                    <nut-radio label="0" shape="button">男</nut-radio>
-                    <nut-radio label="1" shape="button">女</nut-radio>
-                    <nut-radio label="2" shape="button">未知</nut-radio>
+                    <nut-radio label="0" shape="button">{{ t('common.male') }}</nut-radio>
+                    <nut-radio label="1" shape="button">{{ t('common.female') }}</nut-radio>
+                    <nut-radio label="2" shape="button">{{ t('common.unknown') }}</nut-radio>
                 </nut-radio-group>
             </div>
-            <div class="edit-container-remark" v-else-if="routerParams.title === '简介'">
-                <nut-textarea v-model="formData.remark" limit-show :max-length="100" placeholder="请输入简介" />
+            <div class="edit-container-remark" v-else-if="editType === 'introduction'">
+                <nut-textarea v-model="formData.remark" limit-show :max-length="100" :placeholder="t('mine.pleaseInputIntroduction')" />
             </div>
-            <div class="edit-container-phonenumber" v-else-if="routerParams.title === '手机号'">
+            <div class="edit-container-phonenumber" v-else-if="editType === 'phoneNumber'">
                 <wil-form :options="formOptions1" v-model="phoneForm" ref="wil_form">
                     <template #phonenumberOld>
                         <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ phoneForm.phonenumber }}</div>
@@ -36,13 +36,13 @@
                             <span class="authcode-button"
                                 :style="{ color: countDown < 61 ? 'rgba(204,204,204,1)' : 'rgb(255, 103, 1)' }"
                                 @click="handlePhoneSendEmail">{{
-                                    countDown > 60 ? '发送验证码' : `${countDown}s后重新发送`
+                                    countDown > 60 ? t('auth.sendVerificationCode') : t('auth.resendAfterSeconds', { seconds: countDown })
                                 }}</span>
                         </div>
                     </template>
                 </wil-form>
             </div>
-            <div class="edit-container-email" v-else-if="routerParams.title === '邮箱'">
+            <div class="edit-container-email" v-else-if="editType === 'email'">
                 <wil-form :options="formOptions2" v-model="emailForm" ref="wil_form">
                     <template #emailOld v-if="emailForm.emailOld">
                         <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ emailForm.emailOld }}</div>
@@ -53,7 +53,7 @@
                             <span class="authcode-button"
                                 :style="{ color: countDownOld < 61 ? 'rgba(204,204,204,1)' : 'rgb(255, 103, 1)' }"
                                 @click="handleSendOldEmail">{{
-                                    countDownOld > 60 ? '发送验证码' : `${countDownOld}s后重新发送`
+                                    countDownOld > 60 ? t('auth.sendVerificationCode') : t('auth.resendAfterSeconds', { seconds: countDownOld })
                                 }}</span>
                         </div>
                     </template>
@@ -63,7 +63,7 @@
                             <span class="authcode-button"
                                 :style="{ color: countDown < 61 ? 'rgba(204,204,204,1)' : 'rgb(255, 103, 1)' }"
                                 @click="handleSendEmail">{{
-                                    countDown > 60 ? '发送验证码' : `${countDown}s后重新发送`
+                                    countDown > 60 ? t('auth.sendVerificationCode') : t('auth.resendAfterSeconds', { seconds: countDown })
                                 }}</span>
                         </div>
                     </template>
@@ -80,9 +80,27 @@ import { onLoad } from '@dcloudio/uni-app';
 import * as CONFIG from '@/utils/config.js'
 import { editUserInfo, editUserPhone, editUserEmail } from '@/network/apis.js'
 import { toSendEmail } from '@/utils/common.js'
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const routerParams = ref({})
+const editType = computed(() => {
+    const mapping = {
+        [t('mine.nickname')]: 'nickname',
+        [t('mine.gender')]: 'gender',
+        [t('mine.introduction')]: 'introduction',
+        [t('auth.phoneNumber')]: 'phoneNumber',
+        [t('auth.email')]: 'email',
+        '昵称': 'nickname',
+        '性别': 'gender',
+        '简介': 'introduction',
+        '手机号': 'phoneNumber',
+        '邮箱': 'email',
+    }
+    return routerParams.value.key || mapping[routerParams.value.title]
+})
 const themeClass = useThemeClass()
 const userInfo = ref({})
 const countDown = ref(61)//是否展示验证码倒计时,61为不展示
@@ -111,30 +129,30 @@ const emailForm = ref({
     email: ''
 })
 
-const formOptions1 = [
-    { label: "旧手机号", prop: "phonenumberOld", formItemProps: {} },
-    { label: "邮箱", prop: "email", formItemProps: {} },
-    { label: "新手机号", prop: "newPhoneNumber", type: 'input', formItemProps: { placeholder: "请输入新手机号", type: "text" } },
-    { label: "邮箱验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
-]
+const formOptions1 = computed(() => [
+    { label: t('mine.oldPhoneNumber'), prop: "phonenumberOld", formItemProps: {} },
+    { label: t('auth.email'), prop: "email", formItemProps: {} },
+    { label: t('mine.newPhoneNumber'), prop: "newPhoneNumber", type: 'input', formItemProps: { placeholder: t('mine.pleaseInputNewPhone'), type: "text" } },
+    { label: t('mine.emailVerificationCode'), prop: "authCode", formItemProps: { placeholder: t('auth.pleaseInputCode'), type: "number" } },
+])
 
-const formOptions2 = userInfo.value.email ? [
-    { label: "旧邮箱", prop: "emailOld", formItemProps: {} },
-    { label: "新邮箱", prop: "email", type: 'input', formItemProps: { placeholder: "请输入新邮箱", type: "text" } },
-    { label: "旧邮箱验证码", prop: "authCodeOld", formItemProps: { placeholder: "请输入验证码", type: "number" } },
-    { label: "新邮箱验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
+const formOptions2 = computed(() => userInfo.value.email ? [
+    { label: t('mine.oldEmail'), prop: "emailOld", formItemProps: {} },
+    { label: t('mine.newEmail'), prop: "email", type: 'input', formItemProps: { placeholder: t('mine.pleaseInputNewEmail'), type: "text" } },
+    { label: t('mine.oldEmailVerificationCode'), prop: "authCodeOld", formItemProps: { placeholder: t('auth.pleaseInputCode'), type: "number" } },
+    { label: t('mine.newEmailVerificationCode'), prop: "authCode", formItemProps: { placeholder: t('auth.pleaseInputCode'), type: "number" } },
 ] : [
-    { label: "邮箱", prop: "email", type: 'input', formItemProps: { placeholder: "请输入邮箱", type: "text" } },
-    { label: "验证码", prop: "authCode", formItemProps: { placeholder: "请输入验证码", type: "number" } },
-]
+    { label: t('auth.email'), prop: "email", type: 'input', formItemProps: { placeholder: t('auth.pleaseInputEmail'), type: "text" } },
+    { label: t('auth.verificationCode'), prop: "authCode", formItemProps: { placeholder: t('auth.pleaseInputCode'), type: "number" } },
+])
 
 const handleSave = async () => {
-    switch (routerParams.value.title) {
-        case '昵称':
+    switch (editType.value) {
+        case 'nickname':
             let value = formData.value.name.replace(/\s+/g, '')
             if (value.length < 2) {
                 uni.showToast({
-                    title: '字数不够',
+                    title: t('mine.wordCountNotEnough'),
                     icon: 'none'
                 })
             } else {
@@ -144,13 +162,13 @@ const handleSave = async () => {
                 uni.navigateBack()
             }
             break;
-        case '性别':
+        case 'gender':
             await editUserInfo({ gender: formData.value.gender })
             userInfo.value.gender = formData.value.gender
             uni.setStorageSync(CONFIG.USER_KEY, userInfo.value)
             uni.navigateBack()
             break;
-        case '简介':
+        case 'introduction':
             if (formData.value.remark) {
                 await editUserInfo({ remark: formData.value.remark })
                 userInfo.value.remark = formData.value.remark
@@ -158,28 +176,28 @@ const handleSave = async () => {
                 uni.navigateBack()
             } else {
                 uni.showToast({
-                    title: '请输入简介',
+                    title: t('mine.pleaseInputIntroduction'),
                     icon: 'none'
                 })
             }
             break;
-        case '手机号':
+        case 'phoneNumber':
             if (!phoneForm.value.newPhoneNumber) {
                 uni.showToast({
-                    title: '手机号码不能为空',
+                    title: t('auth.phoneRequired'),
                     icon: 'none'
                 })
             } else {
                 const reg = /^1[3-9][0-9]\d{8}$/; // 手机号正则表达式
                 if (!reg.test(phoneForm.value.newPhoneNumber)) {
                     uni.showToast({
-                        title: '手机号码格式错误',
+                        title: t('auth.phoneInvalid'),
                         icon: 'none'
                     })
                 } else {
                     if (phoneForm.value.authCode?.length !== 6) {
                         uni.showToast({
-                            title: '验证码为6位',
+                            title: t('auth.codeSixDigits'),
                             icon: 'none'
                         })
                     } else {
@@ -195,19 +213,19 @@ const handleSave = async () => {
                 }
             }
             break;
-        case '邮箱':
+        case 'email':
             if (emailForm.value.email) {
                 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                 if (!emailRegex.test(emailForm.value.email)) {
                     uni.showToast({
-                        title: '请输入有效的邮箱地址',
+                        title: t('auth.emailInvalid'),
                         icon: 'none'
                     })
                 } else {
                     if (userInfo.value.email) {
                         if (emailForm.value.authCode?.length !== 6 || emailForm.value.authCodeOld?.length !== 6) {
                             uni.showToast({
-                                title: '验证码为6位',
+                                title: t('auth.codeSixDigits'),
                                 icon: 'none'
                             })
                         } else {
@@ -225,7 +243,7 @@ const handleSave = async () => {
                     } else {
                         if (emailForm.value.authCode?.length !== 6) {
                             uni.showToast({
-                                title: '验证码为6位',
+                                title: t('auth.codeSixDigits'),
                                 icon: 'none'
                             })
                         } else {
@@ -242,7 +260,7 @@ const handleSave = async () => {
                 }
             } else {
                 uni.showToast({
-                    title: '请输入新的邮箱地址',
+                    title: t('mine.pleaseInputNewEmailAddress'),
                     icon: 'none'
                 })
             }

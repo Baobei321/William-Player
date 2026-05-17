@@ -23,6 +23,9 @@
 
 <script setup>
 import { watch, ref, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 import * as CONFIG from '@/utils/config.js'
 
 const emit = defineEmits(['update:modelValue', 'success', 'delete'])
@@ -99,7 +102,7 @@ const uploadeSuccess = e => {
 }
 
 const onOversize = e => {
-  uni.showToast({ title: `图片超过${props.limitSize}M`, icon: 'error' })
+  uni.showToast({ title: t('common.fileTooLarge', { size: props.limitSize }), icon: 'error' })
 }
 const deleteFile = e => {
   fileList.value.splice(e.index, 1)

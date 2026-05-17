@@ -7,12 +7,20 @@ import posterEmpty from '@/static/poster-empty.png'
 import * as CONFIG from '@/utils/config'
 import { getEmbyList, getGenresList } from '../utils/emby'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 
 export function useVideoAll({ wil_list, route = null }) {
+  const { t } = useI18n()
   const requestParams = ref({})
-  const mapping = {
-    '电影': 'movie',
-    '电视剧': 'tv',
+  const titleKey = ref('')
+  const getTypeByTitle = title => {
+    const mapping = {
+      [t('video.movie')]: 'movie',
+      [t('video.tv')]: 'tv',
+      电影: 'movie',
+      电视剧: 'tv',
+    }
+    return mapping[title]
   }
 
   const routerParams = ref({})
@@ -21,6 +29,7 @@ export function useVideoAll({ wil_list, route = null }) {
   const selectMedia = ref({})
   const tabList = ref([])
   const embyActiveTab = ref('')
+  const embyActiveTabKey = ref('')
 
   const showPopover = ref(false)
 
@@ -28,6 +37,8 @@ export function useVideoAll({ wil_list, route = null }) {
   const lineHeight = ref('')
 
   const windowWidth = ref(375)
+  const getTitleText = () => (titleKey.value ? t(titleKey.value) : routerParams.value.title)
+
   const changeSort = () => {
     wil_list.value.reload()
   }
@@ -202,19 +213,19 @@ export function useVideoAll({ wil_list, route = null }) {
     if (routerParams.value.type == 'emby') {
       //如果是emby，通过请求接口分页加载
       if (routerParams.value.embyIncludeItemTypes == 'Series') {
-        if (embyActiveTab.value == '剧集') {
+        if (embyActiveTabKey.value == 'episode') {
           return await getEmbyJjList(params)
-        } else if (embyActiveTab.value == '流派') {
+        } else if (embyActiveTabKey.value == 'genre') {
           return await getEmbyGenreList(params)
-        } else if (embyActiveTab.value == '文件夹') {
+        } else if (embyActiveTabKey.value == 'folder') {
           return await getEmbyFolderList(params)
         }
       } else if (routerParams.value.embyIncludeItemTypes == 'Movie') {
-        if (embyActiveTab.value == '电影') {
+        if (embyActiveTabKey.value == 'movie') {
           return await getEmbyJjList(params)
-        } else if (embyActiveTab.value == '流派') {
+        } else if (embyActiveTabKey.value == 'genre') {
           return await getEmbyGenreList(params)
-        } else if (embyActiveTab.value == '文件夹') {
+        } else if (embyActiveTabKey.value == 'folder') {
           return await getEmbyFolderList(params)
         }
       } else if (routerParams.value.embyIncludeItemTypes == 'Genres') {
@@ -227,7 +238,7 @@ export function useVideoAll({ wil_list, route = null }) {
         return await getEmbyFolderList(params)
       }
     } else {
-      if (routerParams.value.title == '最近观看') {
+      if (routerParams.value.title == t('video.recentPlayed') || routerParams.value.title == '最近观看') {
         let res = uni.getStorageSync('historyPlay') || []
         res = res.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
         res.forEach(item => {
@@ -238,9 +249,9 @@ export function useVideoAll({ wil_list, route = null }) {
           rows: res.slice((params.pageNum - 1) * params.pageSize, params.pageNum * params.pageSize),
           total: res.length,
         }
-      } else if (routerParams.value.title == '电视剧' || routerParams.value.title == '电影') {
+      } else if ([t('video.tv'), t('video.movie'), '电视剧', '电影'].includes(routerParams.value.title)) {
         let res = uni.getStorageSync('localMovieTvData') || {}
-        let arr = res[mapping[routerParams.value.title]]
+        let arr = res[getTypeByTitle(routerParams.value.title)]
         arr.forEach(item => {
           item.loadImg = true
         })
@@ -350,33 +361,55 @@ export function useVideoAll({ wil_list, route = null }) {
   //emby切换tab
   const changeTab = async title => {
     embyActiveTab.value = title
+    embyActiveTabKey.value = tabList.value.find(item => item.title == title)?.key || ''
     wil_list.value.reload()
   }
 
   onLoad(options => {
     judgeSelect()
     routerParams.value = options
+    const titleMapping = {
+      最近观看: 'video.recentPlayed',
+      电视剧: 'video.tv',
+      电影: 'video.movie',
+      [t('video.recentPlayed')]: 'video.recentPlayed',
+      [t('video.tv')]: 'video.tv',
+      [t('video.movie')]: 'video.movie',
+    }
+    titleKey.value = titleMapping[routerParams.value.title] || ''
     routerParams.value.isConnected = routerParams.value.isConnected1 == 'true' ? true : false
     if (CONFIG.PLATFORM === 'PC') {
       routerParams.value = route.query
     }
     if (routerParams.value.embyIncludeItemTypes == 'Series') {
-      embyActiveTab.value = '剧集'
-      tabList.value = [{ title: '剧集' }, { title: '流派' }, { title: '文件夹' }]
+      embyActiveTabKey.value = 'episode'
+      embyActiveTab.value = t('video.episode')
+      tabList.value = [
+        { key: 'episode', title: t('video.episode') },
+        { key: 'genre', title: t('video.genre') },
+        { key: 'folder', title: t('video.folder') },
+      ]
     } else if (routerParams.value.embyIncludeItemTypes == 'Movie') {
-      embyActiveTab.value = '电影'
-      tabList.value = [{ title: '电影' }, { title: '流派' }, { title: '文件夹' }]
+      embyActiveTabKey.value = 'movie'
+      embyActiveTab.value = t('video.movie')
+      tabList.value = [
+        { key: 'movie', title: t('video.movie') },
+        { key: 'genre', title: t('video.genre') },
+        { key: 'folder', title: t('video.folder') },
+      ]
     }
     setItemWidth()
     uni.setNavigationBarTitle({
-      title: routerParams.value.title,
+      title: getTitleText(),
     })
   })
 
   return {
     routerParams,
+    titleKey,
+    getTitleText,
     showPopover,
-    mapping,
+    getTypeByTitle,
     changeSort,
     tabList,
     changeTab,
@@ -388,6 +421,7 @@ export function useVideoAll({ wil_list, route = null }) {
     lineNumber,
     lineHeight,
     embyActiveTab,
+    embyActiveTabKey,
     toVideoDetail,
     setEmptyImg,
     imgError,

@@ -1,15 +1,15 @@
 <template>
   <div :class="['video-all', themeClass]">
-    <wil-navbar :title="routerParams.title" :leftShow="true">
+    <wil-navbar :title="getTitleText()" :leftShow="true">
       <template #right>
         <nut-icon
           name="more-x"
           :custom-color="iconColor"
           size="20"
           @click="showPopover = true"
-          v-if="routerParams.title == '电影' || routerParams.title == '电视剧'"
+          v-if="[t('video.movie'), t('video.tv'), '电影', '电视剧'].includes(routerParams.title)"
         ></nut-icon>
-        <sort-popover :type="mapping[routerParams.title]" v-model="showPopover" @changeSort="changeSort"></sort-popover>
+        <sort-popover :type="getTypeByTitle(routerParams.title)" v-model="showPopover" @changeSort="changeSort"></sort-popover>
       </template>
     </wil-navbar>
     <div class="video-all-list">
@@ -41,10 +41,10 @@
                 mode="aspectFill"
                 @error="imgError(item)"
                 @load="imgLoad(item)"
-              ></image>
+                />
             </div>
             <span class="item-name">{{ removeExtension(item) }}</span>
-            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
+            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || t('video.noReleaseTime') }}</span>
           </div>
         </template>
       </wil-list>
@@ -64,7 +64,9 @@ import { useVideoAll } from '@/hooks/useVideoAll'
 import { onUnload } from '@dcloudio/uni-app'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const wil_list = ref(null)
 const themeClass = useThemeClass()
 const { iconColor } = useThemeColors()
@@ -73,8 +75,10 @@ const show = ref(true)
 
 const {
   routerParams,
+  titleKey,
+  getTitleText,
   showPopover,
-  mapping,
+  getTypeByTitle,
   changeSort,
   tabList,
   changeTab,

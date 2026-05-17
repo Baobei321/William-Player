@@ -361,7 +361,7 @@ export default {
           timestamp: Date.now(),
           ...obj,
         },
-        '你好'
+        'message'
       )
 
       // 发送带连接ID的事件

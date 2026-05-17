@@ -16,7 +16,7 @@
             {{ item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name }}
           </template>
           <template #icon>
-            <image :src="setImg(item)" />
+            <image :src="setImg(item)"  />
           </template>
           <template #link>
             <span v-if="item.type != '1'">{{ handleSize(item.size) }}</span>
@@ -30,6 +30,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import wilList from '@/components/mobile/wil-list/index.vue'
 import Folder from '@/static/folder.png'
 import videoPlayer from '@/static/video-player.png'
@@ -39,6 +40,7 @@ import { onShow, onLoad } from '@dcloudio/uni-app'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 
+const { t } = useI18n()
 useThemeNavbar()
 const themeClass = useThemeClass()
 const webdavInfo = ref({})
@@ -191,7 +193,7 @@ const clickCell = async item => {
       }
     } else {
       uni.showToast({
-        title: '无法打开此类型文件',
+        title: t('media.unableOpenFileType'),
         icon: 'none',
       })
     }

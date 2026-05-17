@@ -10,15 +10,15 @@
             :key="item.name"
             @click="clickItem(item, scope.row.childList)"
           >
-            <image :src="item.logo"></image>
+            <image :src="item.logo"  />
             <span>{{ item.name }}</span>
           </div>
         </div>
       </template>
     </wil-category-list>
-    <wil-empty text="加载中..." v-if="loading"></wil-empty>
+    <wil-empty :text="t('common.loadingEllipsis')" v-if="loading"></wil-empty>
     <nut-popup v-model:visible="showLine" position="bottom" round safe-area-inset-bottom>
-      <nut-picker v-model="popupValue" :columns="lineColumns" title="选择线路" @confirm="confirmPicker" @cancel="showLine = false"></nut-picker>
+      <nut-picker v-model="popupValue" :columns="lineColumns" :title="t('live.selectLine')" @confirm="confirmPicker" @cancel="showLine = false"></nut-picker>
     </nut-popup>
   </div>
 </template>
@@ -30,10 +30,14 @@ import wilCategoryList from '@/components/mobile/wil-category-list/index.vue'
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.liveList')
 const themeClass = useThemeClass()
 const { isDark } = useThemeColors()
 const listProps = ref({
@@ -78,7 +82,7 @@ const clickItem = (item, row) => {
     let obj = v.childList.find(i => i.name == item.name)
     if (obj) {
       lineColumns.value = obj.childList.map((h, hindex) => {
-        return { value: h.url, text: `线路${hindex + 1}` }
+        return { value: h.url, text: t('live.lineNumber', { number: hindex + 1 }) }
       })
       showLine.value = true
     }
@@ -95,7 +99,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
 
 onLoad(async options => {
   let liveList = uni.getStorageSync('liveList')
-  let nowLive = liveList.find(item => item.name == options.name)
+  let nowLive = liveList.find(item => item.name == options.name || (item.isDefault && options.name === '默认直播源'))
   let res = await getIptv(nowLive.url)
   listData.value = groupByGroupTitle(res)
   staticData.value = groupByGroupTitle(res, '3')

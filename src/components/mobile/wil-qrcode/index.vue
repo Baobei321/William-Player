@@ -1,7 +1,7 @@
 <template>
   <view class="wil-qrcode">
     <canvas id="qrcode" canvas-id='myCanvas' style="height: 300px;width: 300px;opacity: 0;"></canvas>
-    <image :src="qrcodeSrc"></image>
+    <image :src="qrcodeSrc"  />
   </view>
 </template>
 

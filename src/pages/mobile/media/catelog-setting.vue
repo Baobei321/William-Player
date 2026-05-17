@@ -2,16 +2,16 @@
     <div :class="['catelog-setting', themeClass]">
         <wil-form :options="settings2" :show-button="true" ref="base_form2" v-model="formData" :showButton="false">
             <template #tvCatelog>
-                <nut-cell title="电视剧目录设置" is-link @click="toMuluList('tv')">
+                <nut-cell :title="t('navbar.tvCatelogSetting')" is-link @click="toMuluList('tv')">
                     <template #icon>
-                        <image :src="isDark ? xspGray : xspBlack"></image>
+                        <image :src="isDark ? xspGray : xspBlack"  />
                     </template>
                 </nut-cell>
             </template>
             <template #movieCatelog>
-                <nut-cell title="电影目录设置" is-link @click="toMuluList('movie')">
+                <nut-cell :title="t('navbar.movieCatelogSetting')" is-link @click="toMuluList('movie')">
                     <template #icon>
-                        <image :src="isDark ? dyGray : dyBlack"></image>
+                        <image :src="isDark ? dyGray : dyBlack"  />
                     </template>
                 </nut-cell>
             </template>
@@ -23,14 +23,18 @@
 //目录设置
 import wilForm from "@/components/mobile/wil-form/index.vue";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import xspBlack from '@/static/xsp-black.png'
 import dyBlack from '@/static/dy-black.png'
 import xspGray from '@/static/xsp-gray.png'
 import dyGray from '@/static/dy-gray.png'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.catelogSetting')
 const themeClass = useThemeClass()
 const { isDark } = useThemeColors()
 const settings2 = [
@@ -40,7 +44,7 @@ const settings2 = [
 
 const toMuluList = (type) => {
     uni.navigateTo({
-        url: `/pages/mobile/media/catelog-mulu?title=${type === 'tv' ? '电视剧' : '电影'}`
+        url: `/pages/mobile/media/catelog-mulu?title=${type === 'tv' ? t('video.tv') : t('video.movie')}`
     })
 }
 </script>

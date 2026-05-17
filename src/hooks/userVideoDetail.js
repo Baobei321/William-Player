@@ -1,4 +1,4 @@
-import { onBeforeMount, ref, nextTick } from 'vue'
+import { computed, onBeforeMount, ref, nextTick, watch } from 'vue'
 import { loginUser, getFolder, get189Folder, getQuarkFolder, getTvSeason, getMovieTvById } from '@/utils/common'
 import { parseTime, calTime, handleSecond, handleSeasonName, generateChineseNumberMapping } from '@/utils/scrape'
 import { onShow, onLoad } from '@dcloudio/uni-app'
@@ -10,13 +10,28 @@ import * as CONFIG from '@/utils/config'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { queryAll, createDownload } from '@/utils/download'
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 
 export function useVideoDetail({ route, router }) {
+  const { t } = useI18n()
+  const localeStore = useLocaleStore()
   const showPopover = ref(false)
-  const popoverArr = ref([{ icon: editIcon, text: '手动编辑' }])
+  const getPopoverArr = () => {
+    const list = [
+      { icon: editIcon, key: 'manualEdit', text: t('video.manualEdit') },
+      { icon: downloadIcon, key: 'downloadCenter', text: t('navbar.downloadCenter') },
+    ]
+    if (routerParams.value.type === 'tv') {
+      list.push({ icon: timeIcon, key: 'skipIntro', text: t('video.skipIntroTime') }, { icon: timeIcon, key: 'skipOutro', text: t('video.skipOutroTime') })
+    }
+    return list
+  }
+  const popoverArr = computed(getPopoverArr)
 
   const showTimePicker = ref(false)
   const pickerTitle = ref('')
+  const pickerType = ref('')
   const pickerVal = ref(['0', '0'])
   const pickerColumns = ref([[], []])
 
@@ -34,7 +49,9 @@ export function useVideoDetail({ route, router }) {
   const tvList = ref([]) //目前网盘所拥有的电视集数列表
 
   const historyPlay = ref(uni.getStorageSync('historyPlay') || []) //历史播放
-  const buttonText = ref('播放')
+  const buttonTextKey = ref('video.play')
+  const buttonTextParams = ref({})
+  const buttonText = computed(() => t(buttonTextKey.value, buttonTextParams.value))
   const firstEnter = ref(true)
 
   const routerParams = ref({})
@@ -52,14 +69,14 @@ export function useVideoDetail({ route, router }) {
   const lineHeight = ref(0)
 
   const toSelect = item => {
-    if (item.text == '手动编辑') {
+    if (item.key == 'manualEdit') {
       showPopover.value = false
       //获取当前源里面的最大季数
       const maxSeasonArrLength = Math.max(...sourceList.value.map(v => v.seasonArr.length))
       uni.navigateTo({
         url: `/pages/mobile/video/search-match?type=${routerParams.value.type}&maxSeasonLength=${maxSeasonArrLength}`,
       })
-    } else if (item.text == '设置跳过片头时间') {
+    } else if (item.key == 'skipIntro') {
       let localMovieTvData = uni.getStorageSync('localMovieTvData')
       let nowTv = localMovieTvData.tv.find(i => i.movieTvId == routerParams.value.movieTvId)
       console.log(nowTv, 'nowTv')
@@ -72,18 +89,19 @@ export function useVideoDetail({ route, router }) {
       }
       showPopover.value = false
       pickerTitle.value = item.text
+      pickerType.value = item.key
       let arr1 = []
       let arr2 = []
       for (let i = 0; i <= 15; i++) {
-        arr1.push({ text: String(i) + '分', value: String(i) })
+        arr1.push({ text: String(i) + t('video.minute'), value: String(i) })
       }
       for (let i = 0; i <= 59; i++) {
-        arr2.push({ text: String(i) + '秒', value: String(i) })
+        arr2.push({ text: String(i) + t('video.second'), value: String(i) })
       }
       pickerColumns.value[0] = arr1
       pickerColumns.value[1] = arr2
       showTimePicker.value = true
-    } else if (item.text == '设置跳过片尾时间') {
+    } else if (item.key == 'skipOutro') {
       let localMovieTvData = uni.getStorageSync('localMovieTvData')
       let nowTv = localMovieTvData.tv.find(i => i.movieTvId == routerParams.value.movieTvId)
       if (nowTv.endTime) {
@@ -95,18 +113,19 @@ export function useVideoDetail({ route, router }) {
       }
       showPopover.value = false
       pickerTitle.value = item.text
+      pickerType.value = item.key
       let arr1 = []
       let arr2 = []
       for (let i = 0; i <= 180; i++) {
-        arr1.push({ text: String(i) + '分', value: String(i) })
+        arr1.push({ text: String(i) + t('video.minute'), value: String(i) })
       }
       for (let i = 0; i <= 59; i++) {
-        arr2.push({ text: String(i) + '秒', value: String(i) })
+        arr2.push({ text: String(i) + t('video.second'), value: String(i) })
       }
       pickerColumns.value[0] = arr1
       pickerColumns.value[1] = arr2
       showTimePicker.value = true
-    } else if (item.text == '下载中心') {
+    } else if (item.key == 'downloadCenter') {
       uni.navigateTo({
         url: '/pages/mobile/toolbox/download/index',
       })
@@ -117,9 +136,9 @@ export function useVideoDetail({ route, router }) {
     let time = Number(selectedValue[0]) * 60 + Number(selectedValue[1])
     let localMovieTvData = uni.getStorageSync('localMovieTvData')
     let nowTv = localMovieTvData.tv.find(i => i.movieTvId == routerParams.value.movieTvId)
-    if (pickerTitle.value == '设置跳过片头时间') {
+    if (pickerType.value == 'skipIntro') {
       nowTv.openingTime = time
-    } else if (pickerTitle.value == '设置跳过片尾时间') {
+    } else if (pickerType.value == 'skipOutro') {
       nowTv.endTime = time
     }
     uni.setStorageSync('localMovieTvData', localMovieTvData)
@@ -129,6 +148,17 @@ export function useVideoDetail({ route, router }) {
   const getValue = (data, prop) => {
     return prop.split('.').reduce((obj, key) => obj?.[key], data)
   }
+
+  const getSourceLabel = provider => {
+    const mapping = {
+      '189CloudPC': t('source.tianyiCloudDriveLabel'),
+      Quark: t('source.quarkCloudDriveLabel'),
+      WoPan: t('source.unicomCloudDrive'),
+      unknown: t('common.unknown'),
+    }
+    return mapping[provider] || provider
+  }
+
   //从对象或者名称中提取第几季
   const determineSeason = () => {
     let season = ''
@@ -163,14 +193,14 @@ export function useVideoDetail({ route, router }) {
       tvList.value.forEach((v, vindex) => {
         let jiIndex = +v.ji - 1
         if (res.episodes) {
-          v.title = res.episodes[jiIndex]?.name || '暂无标题'
+          v.title = res.episodes[jiIndex]?.name || t('video.noTitle')
           v.poster = res.episodes[jiIndex]?.still_path ? CONFIG.IMG_DOMAIN + '/t/p/w533_and_h300_bestv2' + res.episodes[jiIndex]?.still_path : imgData.value.img
           v.runtime = res.episodes[jiIndex]?.runtime ? calTime(res.episodes[jiIndex]?.runtime, 'en') : '00:00'
           v.runtimeOrg = res.episodes[jiIndex]?.runtime || 0
           v.vote_average = res.episodes[jiIndex]?.vote_average || res.vote_average
           v.overview = res.episodes[jiIndex]?.overview || res.overview
         } else {
-          v.title = `第${jiIndex + 1}集`
+          v.title = t('video.episodeTitle', { episode: jiIndex + 1 })
           // v.vote_average = res.vote_average
         }
       })
@@ -189,7 +219,7 @@ export function useVideoDetail({ route, router }) {
       res1 = seasonData1
     }
     imgData.value.releaseTime = res1.air_date
-    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`
+    imgData.value.runtime = t('video.totalEpisodesInLibrary', { total: res1?.episodes?.length || 0, count: tvList.value?.length || 0 })
     if (season != '1') {
       imgData.value.img = CONFIG.IMG_DOMAIN + '/t/p/w1920_and_h1080_bestv2' + res1.poster_path
       overview.value = res1.overview
@@ -217,7 +247,7 @@ export function useVideoDetail({ route, router }) {
     let result = {}
     let videoFormat = ['mp4', 'mkv', 'm2ts', 'avi', 'mov', 'ts', 'm3u8', 'iso']
     const apiMapping = {
-      'WebDAV': {
+      WebDAV: {
         apiFunction: getFolder,
         params: { path: activeSeason.value.path },
         prop: 'data.content',
@@ -296,7 +326,7 @@ export function useVideoDetail({ route, router }) {
       res1 = seasonRes
     })
     await getTvlist(selectType.value.type)
-    imgData.value.runtime = `共${res1?.episodes?.length || 0}集（库中有${tvList.value?.length || 0}集）`
+    imgData.value.runtime = t('video.totalEpisodesInLibrary', { total: res1?.episodes?.length || 0, count: tvList.value?.length || 0 })
     //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
     processTvlist(res1)
     nextTick(() => {
@@ -342,7 +372,7 @@ export function useVideoDetail({ route, router }) {
       imgData.value.score = res.vote_average.toFixed(1)
       imgData.value.genres = res.genres.map(i => i.name).join(' ')
       imgData.value.releaseTime = res.first_air_date
-      imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有0集）`
+      imgData.value.runtime = t('video.totalEpisodesInLibrary', { total: res.number_of_episodes || 0, count: 0 })
       imgData.value.networks = res.networks
     }
     return res
@@ -388,7 +418,7 @@ export function useVideoDetail({ route, router }) {
   //电视集数还在加载中，点击提示
   const disabledTip = () => {
     uni.showToast({
-      title: '等待加载完成后，再继续操作',
+      title: t('video.waitLoadComplete'),
       icon: 'none',
     })
   }
@@ -436,7 +466,7 @@ export function useVideoDetail({ route, router }) {
     } else if (routerParams.value.type == 'tv') {
       if (!tvList.value.length) {
         uni.showToast({
-          title: '请查看网盘是否登录或者webdav是否已经开启！',
+          title: t('video.pleaseCheckCloudOrWebdav'),
           icon: 'none',
         })
         return
@@ -507,7 +537,7 @@ export function useVideoDetail({ route, router }) {
     const nowTv = routerParams.value.movieTvId
       ? localMovieTvData.tv?.find(i => i.movieTvId == routerParams.value.movieTvId)
       : localMovieTvData.tv?.find(i => i.path == routerParams.value.path)
-    const seasonName = activeSeason.value.name === '第一季' ? '' : ' ' + aictiveSeason.value.name
+    const seasonName = activeSeason.value.season === '1' ? '' : ' ' + activeSeason.value.name
     const expectedTitle = handleSeasonName(selectSource.value.name + seasonName, true)
     const history = historyPlay.value?.find(
       i => i.titlePlay === expectedTitle && item.name === i.name && activeSeason.value.path + '/' + i.name === '/' + i.path && activeSeason.value.season === i.season
@@ -554,7 +584,7 @@ export function useVideoDetail({ route, router }) {
         type: 'vue',
         content: '/video',
         windowName: 'Video',
-        windowTitle: history ? '正在播放：' : 'William Player',
+        windowTitle: history ? t('video.nowPlaying') : 'William Player',
         query,
       }
       ipc.invoke(ipcApiRoute.createMpv, args).then(id => {
@@ -591,12 +621,13 @@ export function useVideoDetail({ route, router }) {
   const setButtonText = () => {
     historyPlay.value = uni.getStorageSync('historyPlay') || []
     historyPlay.value = historyPlay.value.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
+    buttonTextKey.value = 'video.play'
+    buttonTextParams.value = {}
     if (routerParams.value.type == 'movie') {
       let history = historyPlay.value?.find(i => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value.name, true))
       if (history && selectSource.value.path == '/' + history.path) {
-        buttonText.value = '播放 ' + handleSecond(history.initialTime)
-      } else {
-        buttonText.value = '播放'
+        buttonTextKey.value = 'video.playWithTime'
+        buttonTextParams.value = { time: handleSecond(history.initialTime) }
       }
     } else if (routerParams.value.type == 'tv') {
       let history = historyPlay.value?.find(i => {
@@ -608,10 +639,8 @@ export function useVideoDetail({ route, router }) {
       })
       historyTv.value = history || {}
       if (history && activeSeason.value.path + '/' + history.name == '/' + history.path && history.season == activeSeason.value.season) {
-        let time = handleSecond(history.initialTime)
-        buttonText.value = `第${history.ji}集 ${time}`
-      } else {
-        buttonText.value = '播放'
+        buttonTextKey.value = 'video.episodeTitleWithTime'
+        buttonTextParams.value = { episode: history.ji, time: handleSecond(history.initialTime) }
       }
     }
   }
@@ -639,7 +668,7 @@ export function useVideoDetail({ route, router }) {
       handleTv()
     } else {
       uni.showToast({
-        title: '请重新登录网盘',
+        title: t('video.pleaseReloginCloudDrive'),
         icon: 'none',
       })
     }
@@ -734,12 +763,6 @@ export function useVideoDetail({ route, router }) {
 
   //设置selectSource，也就是选中的影片来源
   const setSelectSource = async () => {
-    let dict = [
-      { value: '189CloudPC', label: '天翼云盘' },
-      { value: 'Quark', label: '夸克网盘' },
-      { value: 'WoPan', label: '联通云盘' },
-      { value: 'unknown', label: '未知' },
-    ]
     if (CONFIG.PLATFORM === 'PC') {
       routerParams.value = route.query
     }
@@ -750,10 +773,10 @@ export function useVideoDetail({ route, router }) {
     }
     sourceList.value = source.map(i => {
       if (source.filter(v => v.provider == i.provider).length > 1) {
-        let label = dict.find(v => v.value == i.provider)?.label || ''
+        let label = getSourceLabel(i.provider)
         i.sourceName = label ? label + `(${i.name})` : i.provider
       } else {
-        i.sourceName = dict.find(v => v.value == i.provider)?.label || i.provider
+        i.sourceName = getSourceLabel(i.provider)
       }
       return i
     })
@@ -772,7 +795,9 @@ export function useVideoDetail({ route, router }) {
         } else {
           const chineseNumber = generateChineseNumberMapping(40, 'number')
           let sameSource = sourceList.value.find(
-            v => i.titlePlay == handleSeasonName(v.name, true) + ` 第${chineseNumber[i.season]}季` && v.seasonArr.find(h => h.path + '/' + i.name == '/' + i.path)
+            v =>
+              i.titlePlay == handleSeasonName(v.name, true) + ' ' + t('video.seasonTitle', { season: chineseNumber[i.season] }) &&
+              v.seasonArr.find(h => h.path + '/' + i.name == '/' + i.path)
           )
           if (sameSource) {
             selectSource.value = sameSource
@@ -835,24 +860,18 @@ export function useVideoDetail({ route, router }) {
     resetMovieTvData()
   })
 
+  watch(
+    () => localeStore.locale,
+    () => {
+      setButtonText()
+    }
+  )
+
   onLoad(options => {
     judgeSelect()
     routerParams.value = options
     if (options.movieTvId == 'undefined') {
       routerParams.value.movieTvId = undefined
-    }
-    if (routerParams.value.type == 'movie') {
-      popoverArr.value = [
-        { icon: editIcon, text: '手动编辑' },
-        { icon: downloadIcon, text: '下载中心' },
-      ]
-    } else if (routerParams.value.type == 'tv') {
-      popoverArr.value = [
-        { icon: editIcon, text: '手动编辑' },
-        { icon: downloadIcon, text: '下载中心' },
-        { icon: timeIcon, text: '设置跳过片头时间' },
-        { icon: timeIcon, text: '设置跳过片尾时间' },
-      ]
     }
     setSelectSource()
   })

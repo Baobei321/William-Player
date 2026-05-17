@@ -1,18 +1,18 @@
 <template>
   <div :class="['appreciate', themeClass]">
     <div class="appreciate-img">
-      <image src="@/static/zanshang.jpg"></image>
+      <image src="@/static/zanshang.jpg"  />
     </div>
     <div class="appreciate-tip">
-      开发维护不易，如果您觉得此App有用，不妨使用微信扫描上方二维码，也可以在github上⭐一下，支持本软件！App完全免费！
+      {{ t('backend.appreciateDescription') }}
     </div>
     <div class="appreciate-title">
-      <span>❤特别感谢以下小伙伴的打赏！</span>
-      <span>若有遗漏请在qq交流群联系我补充，qq群：477326591</span>
+      <span>{{ t('backend.specialThanksDonation') }}</span>
+      <span>{{ t('backend.donationMissingTip') }}</span>
     </div>
     <div class="appreciate-list">
       <div class="appreciate-list-item" v-for="item in appreciateList" :key="item.dictValue">
-        {{ `${item.dictLabel}（${item.cssClass}元）` }}
+        {{ t('backend.donationAmount', { name: item.dictLabel, amount: item.cssClass }) }}
       </div>
     </div>
   </div>
@@ -23,8 +23,12 @@ import { ref } from "vue";
 import { getUntokenDicts,getDicts } from "@/network/apis";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.appreciate')
 const themeClass = useThemeClass()
 const appreciateList = ref([]);
 const getAppreciateUser = async () => {

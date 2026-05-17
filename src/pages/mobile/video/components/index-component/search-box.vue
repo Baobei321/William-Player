@@ -3,12 +3,12 @@
         <div class="item-left" :style="{ backgroundImage: `url(${setEmptyImg(props.data.poster)})` }">
             <div :class="['item-left-logo', props.data.type == '1' ? 'item-left-tv' : '']">
                 <template v-if="props.data.type == '1'">
-                    <image :src="tvLittle" />
-                    <span>电视剧</span>
+                    <image :src="tvLittle"  />
+                    <span>{{ t('video.tv') }}</span>
                 </template>
                 <template v-else>
-                    <image :src="movieLittle" />
-                    <span>电影</span>
+                    <image :src="movieLittle"  />
+                    <span>{{ t('video.movie') }}</span>
                 </template>
             </div>
         </div>
@@ -24,7 +24,7 @@
                     <span>{{ props.data.releaseTime }}</span>
                 </div>
                 <div class="item-right-content__line"></div>
-                <div class="item-right-content__type">{{ props.data.type == '1' ? '电视剧' : '电影' }}</div>
+                <div class="item-right-content__type">{{ props.data.type == '1' ? t('video.tv') : t('video.movie') }}</div>
             </div>
         </div>
     </div>
@@ -36,7 +36,9 @@ import tvLittle from "@/static/tv-little.png";
 import posterEmpty from "@/static/poster-empty.png";
 import * as CONFIG from "@/utils/config";
 import { handleSeasonName } from "@/utils/scrape.js";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
     isEmby: { type: Boolean, default: false },
     data: { type: Object, default: {} },
@@ -45,6 +47,7 @@ const props = defineProps({
 const handleName = (name) => {
     let arr = [];
     name = handleSeasonName(name);
+    if (!props.oldValue) return [{ label: name }]
     arr.push({ label: name.split(props.oldValue)[0] });
     arr.push({ label: props.oldValue, color: "var(--app-brand)" });
     arr.push({ label: name.split(props.oldValue)[1] });

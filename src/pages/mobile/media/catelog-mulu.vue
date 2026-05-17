@@ -2,11 +2,11 @@
   <div :class="['catelog-mulu', themeClass]">
     <div class="catelog-mulu-item" v-for="item in listData" :key="item.name" @click="event => clickItem(event, item)">
       <div class="item-top">
-        <image :src="routerParams.title == '电视剧' ? xspBlack : dyBlack"></image>
-        <span>{{ routerParams.title }}</span>
+        <image :src="titleType == 'tv' ? xspBlack : dyBlack"  />
+        <span>{{ titleText }}</span>
       </div>
       <div class="item-bottom">
-        <image :src="mapping[item.type]"></image>
+        <image :src="mapping[item.type]"  />
         <div class="item-bottom-right">
           <div class="right-name">{{ item.name }}</div>
           <div class="right-path">{{ item.path }}</div>
@@ -25,7 +25,7 @@
         :selectType="selectType"
         :selectMedia="selectMedia"
         :result="res"
-        :title="routerParams.title"
+        :title="titleText"
         @openSource="openSource"
         @confirm="confirm"></select-folder>
     </nut-popup>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import selectSource from './components/select-source.vue'
 import selectFolder from './components/select-folder.vue'
@@ -48,7 +48,9 @@ import deleteIcon from '@/static/delete-icon.png'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
 const themeClass = useThemeClass()
 const { iconColorMuted } = useThemeColors()
@@ -64,10 +66,16 @@ const routerParams = ref({})
 const showPopover = ref(false)
 const selectItem = ref({})
 const position = ref({})
-const mapping1 = {
-  '电视剧': 'tv',
-  '电影': 'movie',
-}
+const titleType = computed(() => {
+  const mapping = {
+    [t('video.tv')]: 'tv',
+    [t('video.movie')]: 'movie',
+    '电视剧': 'tv',
+    '电影': 'movie',
+  }
+  return mapping[routerParams.value.title]
+})
+const titleText = computed(() => (titleType.value == 'tv' ? t('video.tv') : t('video.movie')))
 
 const handleGx = () => {}
 
@@ -75,14 +83,14 @@ const handleGx = () => {}
 
 const handleDelete = () => {
   listData.value = listData.value.filter(item => item.name != selectItem.value.name || item.path != selectItem.value.path)
-  muluData.value[mapping1[routerParams.value.title]] = listData.value
+  muluData.value[titleType.value] = listData.value
   uni.setStorageSync('muluData', muluData.value)
 }
 
-const popoverOptions = ref([
+const popoverOptions = computed(() => [
   // { icon: tongbuIcon, label: '刮削', color: '#1B1B1B', func: handleGx },
   // { icon: editIcon, label: '修改', color: '#1B1B1B', func: handleEdit },
-  { icon: deleteIcon, label: '删除', color: '#FE4344', func: handleDelete },
+  { icon: deleteIcon, label: t('common.delete'), color: '#FE4344', func: handleDelete },
 ])
 
 const mapping = {
@@ -120,7 +128,7 @@ const confirm = data => {
   showBottom.value = false
   showModel.value = 'source'
   muluData.value = data
-  listData.value = muluData.value[mapping1[routerParams.value.title]]
+  listData.value = muluData.value[titleType.value]
 }
 
 onLoad(options => {
@@ -128,10 +136,10 @@ onLoad(options => {
   muluData.value?.tv ? '' : (muluData.value.tv = [])
   muluData.value?.movie ? '' : (muluData.value.movie = [])
   routerParams.value = options
-  listData.value = muluData.value[mapping1[routerParams.value.title]]
+  listData.value = muluData.value[titleType.value]
   setTimeout(() => {
     uni.setNavigationBarTitle({
-      title: options.title + '目录设置',
+      title: titleType.value == 'tv' ? t('navbar.tvCatelogSetting') : t('navbar.movieCatelogSetting'),
     })
   }, 40)
 })

@@ -7,7 +7,7 @@
           <div class="more-arrow"></div>
           <div class="more-popover">
             <div class="more-popover-item" @click="toSelect(item)" v-for="item in popoverArr" :key="item.text">
-              <image :src="item.icon"></image>
+              <image :src="item.icon"  />
               <span class="more-popover-item__text">{{ item.text }}</span>
             </div>
           </div>
@@ -21,15 +21,15 @@
           <div class="img-title">{{ imgData.title }}</div>
           <div class="img-mid" v-if="imgData.releaseTime">
             <div class="img-mid-score">
-              <image src="@/static/star-fill.png"></image>
+              <image src="@/static/star-fill.png"  />
               <span>{{ imgData.score }}</span>
             </div>
             <div class="img-mid-date">
-              <image src="@/static/date-icon.png"></image>
+              <image src="@/static/date-icon.png"  />
               <span>{{ imgData.releaseTime }}</span>
             </div>
             <div class="img-mid-runtime">
-              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'"></image>
+              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'"  />
               <span>{{ imgData.runtime }}</span>
             </div>
           </div>
@@ -42,17 +42,17 @@
       <div class="video-detail-container__content">
         <nut-button :custom-color="primaryBtnColor" @click="clickPlayButton">
           <template #icon>
-            <image src="@/static/play.png" />
+            <image src="@/static/play.png"  />
           </template>
           <span :style="{ color: primaryBtnTextColor }">{{ buttonText }}</span>
         </nut-button>
         <!-- 电影专用 -->
         <div class="movie-version" v-if="routerParams.type == 'movie'">
           <div class="movie-version-title">
-            <span>影片版本</span>
+            <span>{{ t('video.movieVersion') }}</span>
             <div class="movie-version-title__download" @click="downloadMovie">
-              <image src="@/static/download-icon.png"></image>
-              <span>下载</span>
+              <image src="@/static/download-icon.png"  />
+              <span>{{ t('video.download') }}</span>
             </div>
           </div>
           <scroll-view class="movie-version-scroll" :scroll-x="true" style="width: 100%" :enhanced="true" :showScrollbar="false">
@@ -84,7 +84,7 @@
                 <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr" :key="item.season"> </nut-tab-pane>
               </nut-tabs>
               <div class="tv-version-tabs__season-viewAll" @click="openTvListPopup">
-                <span>查看全部</span>
+                <span>{{ t('video.viewAll') }}</span>
                 <nut-icon name="rect-right" :custom-color="iconColor" size="14"></nut-icon>
               </div>
             </div>
@@ -102,19 +102,19 @@
             :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
             <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + item.ji" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
-                <image src="@/static/playVideo-button.png" />
+                <image src="@/static/playVideo-button.png"  />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div
                   class="item-img-process"
                   :style="{ width: Number(historyTv.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"
                   v-if="item.ji == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"></div>
               </div>
-              <div class="item-title">{{ item.ji + '.' + (item.title || `第${item.ji}集`) }}</div>
+              <div class="item-title">{{ item.ji + '.' + (item.title || t('video.episodeTitle', { episode: item.ji })) }}</div>
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
-            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">重新加载</nut-button>
-            <span v-else>加载中...</span>
+            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">{{ t('video.reload') }}</nut-button>
+            <span v-else>{{ t('common.loadingEllipsis') }}</span>
           </div>
         </div>
         <actor-list
@@ -148,7 +148,9 @@ import tvlistPopup from './components/detail-component/tvlist-popup.vue'
 import { ref } from 'vue'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const { getUntokenDict } = useDict()
 const showTvlistPopup = ref(false)
 const themeClass = useThemeClass()
@@ -190,7 +192,7 @@ const {
 const openTvListPopup = () => {
   if (!tvList.value?.length) {
     uni.showToast({
-      title: '暂无剧集',
+      title: t('video.noEpisodes'),
       icon: 'none',
     })
     return

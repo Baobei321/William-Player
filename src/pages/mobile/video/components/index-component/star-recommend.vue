@@ -5,7 +5,7 @@
         <div class="swiper-content" @click="toVideoDetail(data)">
           <div class="swiper-content-container">
             <div class="swiper-content-left">
-              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + data.poster"></image>
+              <image mode="aspectFill" :src="CONFIG.IMG_DOMAIN + '/t/p/w300_and_h450_bestv2' + data.poster"  />
             </div>
             <div class="swiper-content-right">
               <div class="right-genres">{{ data.genres }}</div>
@@ -13,7 +13,7 @@
               <div class="right-info">
                 <div class="right-info-date">{{ data.releaseTime }}</div>
                 <div class="right-info-star">
-                  <image src="@/static/star-fill.png"></image>
+                  <image src="@/static/star-fill.png"  />
                   <span>{{ data.voteAverage.toFixed(1) }}</span>
                 </div>
               </div>
@@ -28,14 +28,17 @@
 
 <script setup>
 import wilSwiper from "@/components/mobile/wil-swiper/index.vue";
-import { ref, onBeforeMount } from "vue";
+import { ref, watch } from "vue";
 import { classifyList, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 
+const { t } = useI18n()
+const localeStore = useLocaleStore()
 const listData = ref([]);
 const navBarHeight = ref('')
-const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)));
 const removeExtension = (filename) => {
   let name = handleSeasonName(filename, true);
   if (name.length > 7) {
@@ -68,8 +71,12 @@ getH5NavbarHeight();
 // #ifndef H5
 getNavHeight();
 // #endif
-onShow(() => {
-  classifyList1.value = JSON.parse(JSON.stringify(classifyList));
+const getGenreText = genreId => {
+  const genre = classifyList.find(item => item.id == genreId)
+  return genre ? t(genre.labelKey) : ''
+}
+
+const getRecommendList = () => {
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
   let tv = [];
   if (localMovieTvData?.tv) {
@@ -79,9 +86,9 @@ onShow(() => {
       item.type = "tv";
       item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
-          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+          genres += getGenreText(v) ? getGenreText(v) + " " : "";
         } else {
-          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+          genres += getGenreText(v) || "";
         }
       });
       item.genres = genres;
@@ -98,9 +105,9 @@ onShow(() => {
       let genres = "";
       item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
-          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+          genres += getGenreText(v) ? getGenreText(v) + " " : "";
         } else {
-          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+          genres += getGenreText(v) || "";
         }
       });
       item.genres = genres;
@@ -109,7 +116,16 @@ onShow(() => {
     });
   }
   listData.value = [...tv, ...movie];
-});
+};
+
+onShow(getRecommendList);
+
+watch(
+  () => localeStore.locale,
+  () => {
+    getRecommendList();
+  }
+);
 </script>
 
 <style lang="scss" scoped>

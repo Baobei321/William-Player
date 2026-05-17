@@ -1,7 +1,7 @@
 <template>
   <div :class="['video', themeClass]">
     <div class="video-refresh" @click="refreshModule">
-      <span>{{ isRefresh?'正在同步：':'最近更新：' }}</span>
+      <span>{{ isRefresh ? t('media.syncing') : t('media.recentUpdate') }}</span>
       <span :class="['video-refresh-time',isRefresh?'hide-span':'show-span']" :style="{width:refreshWidth>=0?refreshWidth+'px':'auto'}">{{ date }}</span>
       <span class="video-refresh-timefixed">{{ date }}</span>
       <nut-icon name="refresh2" size="14" :class="[isRefresh ? 'icon-refresh' : '']"></nut-icon>
@@ -13,14 +13,14 @@
       </div>
     </div>
     <div class="video-list1">
-      <div class="video-list1-title">我的文件</div>
+      <div class="video-list1-title">{{ t('media.myFiles') }}</div>
       <div class="video-list1-container" v-if="listData.length">
         <wil-cell :options="listData" @click-item="clickCell" :defaultProps="{title:'name',leftIcon:'leftIcon'}"></wil-cell>
       </div>
-      <wil-empty v-else text="暂无文件，请查看资源是否开启" class="video-list1-tip"></wil-empty>
+      <wil-empty v-else :text="t('media.noFilesCheckSource')" class="video-list1-tip"></wil-empty>
     </div>
     <div class="video-link" @click="openModal">
-      <image src="@/static/link-icon.png"></image>
+      <image src="@/static/link-icon.png"  />
     </div>
     <wil-modal ref="wil_modal">
       <wil-form v-model="state.formData" :options="options" ref="base_form">
@@ -30,7 +30,7 @@
 </template>
   
   <script setup>
-import { onBeforeMount, reactive, ref, nextTick } from "vue";
+import { computed, reactive, ref, nextTick } from "vue";
 import wilCell from "@/components/mobile/wil-cell/index.vue";
 import Folder from "@/static/folder.png";
 import dayjs from 'dayjs';
@@ -38,21 +38,26 @@ import { getFolder, get189Folder, getQuarkFolder } from "@/utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
-import { useThemeColors } from '@/hooks/useThemeColors'
 import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
 import wilForm from "@/components/mobile/wil-form/index.vue";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
 const themeClass = useThemeClass()
-const { primaryBtnColor, primaryBtnTextColor, iconColor } = useThemeColors()
-const date = ref("暂未更新");
+const refreshDate = ref('');
+const date = computed(() => {
+  if (!refreshDate.value) return t('media.notUpdatedYet')
+  return refreshDate.value.split(" ")[0] == dayjs().format("MM-DD") ? t('common.today') + ' ' + refreshDate.value.split(" ")[1] : refreshDate.value
+});
 
-const moduleList = ref([
-  { name: "电影", value: 0 },
-  { name: "电视剧", value: 0 },
-  { name: "其他", value: 0 },
+const moduleList = computed(() => [
+  { key: 'movie', name: t('video.movie'), value: moduleData.value.movie },
+  { key: 'tv', name: t('video.tv'), value: moduleData.value.tv },
+  { key: 'other', name: t('media.other'), value: moduleData.value.other },
 ]);
+const moduleData = ref({ movie: 0, tv: 0, other: 0 })
 
 const listData = ref([]);
 const isRefresh = ref(false);
@@ -68,7 +73,7 @@ const state = reactive({
   formData: {},
 });
 
-const options = [{ label: "", prop: "url", type: "input", formItemProps: { placeholder: "请输入地址", type: "text", maxlength: -1 } }];
+const options = computed(() => [{ label: "", prop: "url", type: "input", formItemProps: { placeholder: t('media.pleaseInputUrl'), type: "text", maxlength: -1 } }]);
 
 const loginUser = () => {
   return new Promise((resolve) => {
@@ -106,7 +111,7 @@ const clickCell = (item) => {
 const refreshWebDAVModule = async () => {
   if (!listData.value.length) {
     uni.showToast({
-      title: "请先开启Alist",
+      title: t('source.pleaseEnableAlist'),
       icon: "none",
     });
     isRefresh.value = false;
@@ -136,12 +141,10 @@ const refreshWebDAVModule = async () => {
     })
   ).then(() => {
     setTimeout(() => {
-      moduleList.value.find((i) => i.name == "电影").value = num1;
-      moduleList.value.find((i) => i.name == "电视剧").value = num2;
-      moduleList.value.find((i) => i.name == "其他").value = num3;
+      moduleData.value = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
-      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      refreshDate.value = selectMedia.value.refreshDate;
       uni.setStorageSync("webdavInfo", selectMedia.value);
       nextTick(async () => {
         isRefresh.value = false;
@@ -180,12 +183,10 @@ const refresh189Module = async () => {
     })
   ).then(() => {
     setTimeout(() => {
-      moduleList.value.find((i) => i.name == "电影").value = num1;
-      moduleList.value.find((i) => i.name == "电视剧").value = num2;
-      moduleList.value.find((i) => i.name == "其他").value = num3;
+      moduleData.value = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
-      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      refreshDate.value = selectMedia.value.refreshDate;
       nextTick(async () => {
         isRefresh.value = false;
         await setTimeWidth();
@@ -224,12 +225,10 @@ const refreshQuarkModule = async () => {
     })
   ).then(() => {
     setTimeout(() => {
-      moduleList.value.find((i) => i.name == "电影").value = num1;
-      moduleList.value.find((i) => i.name == "电视剧").value = num2;
-      moduleList.value.find((i) => i.name == "其他").value = num3;
+      moduleData.value = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.moduleData = { movie: num1, tv: num2, other: num3 };
       selectMedia.value.refreshDate = dayjs().format("MM-DD HH:mm");
-      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      refreshDate.value = selectMedia.value.refreshDate;
       nextTick(async () => {
         isRefresh.value = false;
         await setTimeWidth();
@@ -241,7 +240,7 @@ const refreshQuarkModule = async () => {
 const refreshModule = () => {
   if (!selectMedia.value.name) {
     uni.showToast({
-      title: "请先添加资源",
+      title: t('media.pleaseAddResourceFirst'),
       icon: "none",
     });
     return;
@@ -298,23 +297,23 @@ const judgeSelect = () => {
 
 const openModal = () => {
   wil_modal.value.showModal({
-    title: "播放",
+    title: t('media.playCustomLink'),
     confirmColor: "#ff6701",
     confirm: async () => {
       if (!state.formData.url) {
         uni.showToast({
-          title: "请输入链接",
+          title: t('media.pleaseInputLink'),
           icon: "none",
         });
       } else {
         if (!state.formData.url.startsWith("http://") && !state.formData.url.startsWith("https://")) {
           uni.showToast({
-            title: "链接格式不正确",
+            title: t('media.linkFormatInvalid'),
             icon: "none",
           });
         } else {
           uni.navigateTo({
-            url: `/pages/mobile/video/video-player?noSetHistory=0&videoUrl=${encodeURIComponent(state.formData.url)}&liveTitle=自定义链接`,
+            url: `/pages/mobile/video/video-player?noSetHistory=0&videoUrl=${encodeURIComponent(state.formData.url)}&liveTitle=${t('media.customLink')}`,
           });
         }
       }
@@ -365,9 +364,9 @@ onShow(async () => {
   // moduleList.value.find((i) => i.name == "其他").value = selectMedia.value.moduleData?.other || 0;
   if (selectMedia.value.refreshDate) {
     if (selectMedia.value.refreshDate?.split(" ")[0] == dayjs().format("MM-DD")) {
-      date.value = "今天 " + selectMedia.value.refreshDate.split(" ")[1];
+      refreshDate.value = selectMedia.value.refreshDate;
     } else {
-      date.value = selectMedia.value.refreshDate;
+      refreshDate.value = selectMedia.value.refreshDate;
     }
   }
   nextTick(() => {

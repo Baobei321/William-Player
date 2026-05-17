@@ -27,15 +27,15 @@
       </div>
       <div class="load-list__loading-text" v-show="loading">
         <nut-icon name="loading"></nut-icon>
-        <span>加载中...</span>
+        <span>{{ t('common.loadingEllipsis') }}</span>
       </div>
       <div class="load-list__finished-text" v-show="finished">
         <template v-if="paginationData.total > 0">
-          {{ finishedText }}
+          {{ finishedText || t('common.noMore') }}
         </template>
         <template v-else>
           <slot name="empty" v-if="$slots.empty" />
-          <wil-empty text="暂无数据" v-else></wil-empty>
+          <wil-empty :text="noDataText || t('common.noData')" v-else></wil-empty>
         </template>
       </div>
     </div>
@@ -45,6 +45,9 @@
 <script setup>
 import { computed, onBeforeMount, reactive, ref, unref, watch } from 'vue'
 import wilEmpty from '../wil-empty/index.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['currentData', 'scroll'])
 
@@ -74,9 +77,9 @@ const props = defineProps({
   requestParams: { type: Object, default: {} },
   responseAdapter: { type: Function },
   pageSize: { type: Number, default: 10 },
-  finishedText: { type: String, default: '没有更多了' },
+  finishedText: { type: String, default: '' },
   useListTotal: { type: Boolean, default: false },
-  noDataText: { type: String, default: '暂无数据' },
+  noDataText: { type: String, default: '' },
   idKey: { type: String, default: 'id' },
   refresherEnabled: { type: Boolean, default: true }, // 下拉刷新
   scrollHeight: { type: Number }, //高度

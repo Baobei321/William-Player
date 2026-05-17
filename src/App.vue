@@ -1,11 +1,15 @@
 <script>
 import { useThemeStore } from '@/stores/theme'
+import { useLocaleStore } from '@/stores/locale'
+import i18n from '@/i18n'
 
 export default {
   onLaunch: function () {
     console.log('App Launch')
     const themeStore = useThemeStore()
     themeStore.init()
+    const localeStore = useLocaleStore()
+    localeStore.init(i18n)
 
     if (uni.onThemeChange) {
       uni.onThemeChange(res => {
@@ -14,7 +18,7 @@ export default {
     }
 
     // #ifdef APP-PLUS
-    plus.screen.lockOrientation('portrait-primary')
+    plus.screen.lockOrientation("portrait-primary");
     if (process.env.NODE_ENV === 'production') {
       //生产环境 禁用log
       console.log = function () {}

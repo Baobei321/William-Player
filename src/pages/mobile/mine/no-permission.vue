@@ -1,11 +1,14 @@
 <template>
   <div class="no-permission">
-    <wil-empty type="permission" text="暂无权限，请联系管理员"></wil-empty>
+  <wil-empty type="permission" :text="t('common.notPermission')"></wil-empty>
   </div>
 </template>
 
 <script setup>
 import wilEmpty from '@/components/mobile/wil-empty/index.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <style lang="scss" scoped>

@@ -1,5 +1,6 @@
 import * as CONFIG from '@/utils/config.js'
 import { encrypt } from '@/utils/jsencrypt.js'
+import { i18n } from '@/i18n/index.js'
 
 // 全局请求封装
 const base_url = CONFIG.BASE_URL
@@ -111,7 +112,7 @@ const retryFail = params => {
             // uni.clearStorageSync()
             if (code == 404) {
               uni.showToast({
-                title: '请求地址不存在...',
+                title: i18n.global.t('request.requestAddressNotFound'),
                 icon: 'none',
                 duration: 2000,
               })
@@ -129,7 +130,7 @@ const retryFail = params => {
           switch (res.statusCode) {
             case 404:
               uni.showToast({
-                title: '请求地址不存在...',
+                title: i18n.global.t('request.requestAddressNotFound'),
                 icon: 'none',
                 duration: 2000,
               })
@@ -137,7 +138,7 @@ const retryFail = params => {
             default:
               if (res.statusCode !== 403) {
                 uni.showToast({
-                  title: '请重试...',
+                  title: i18n.global.t('request.pleaseRetry'),
                   icon: 'none',
                   duration: 2000,
                 })
@@ -209,7 +210,7 @@ export default params => {
                 })
             } else if (code == 404) {
               uni.showToast({
-                title: '请求地址不存在...',
+                title: i18n.global.t('request.requestAddressNotFound'),
                 icon: 'none',
                 duration: 2000,
               })
@@ -238,11 +239,11 @@ export default params => {
               break
             case 404:
               uni.showToast({
-                title: '请求地址不存在...',
+                title: i18n.global.t('request.requestAddressNotFound'),
                 icon: 'none',
                 duration: 2000,
               })
-              reject('接口请求错误')
+              reject(i18n.global.t('request.apiRequestError'))
               break
             case 403:
               uni.navigateTo({
@@ -251,7 +252,7 @@ export default params => {
               break
             default:
               uni.showToast({
-                title: '请重试...',
+                title: i18n.global.t('request.pleaseRetry'),
                 icon: 'none',
                 duration: 2000,
               })

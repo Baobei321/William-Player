@@ -3,11 +3,11 @@
     <div class="list-item__container">
       <div class="container-left">
         <div class="container-left-img">
-          <image :src="props.data.imgUrl" mode="aspectFill"></image>
+          <image :src="props.data.imgUrl" mode="aspectFill"  />
         </div>
         <div class="container-left-info">
           <div class="container-left-info__name">{{ props.data.name }}</div>
-          <div class="container-left-info__error" v-if="props.data.status === 'ERROR'">下载失败</div>
+          <div class="container-left-info__error" v-if="props.data.status === 'ERROR'">{{ t('toolbox.downloadFailed') }}</div>
           <div class="container-left-info__size" v-else>
             <span class="size-value">{{ props.data.status === 'COMPLETED' ? props.data.total_size : props.data.current_size + ' / ' + props.data.total_size }}</span>
             <template v-if="props.data.status !== 'COMPLETED'">
@@ -18,10 +18,10 @@
         </div>
       </div>
       <div class="container-right">
-        <image class="theme-icon" src="@/static/pause-black.png" @click.stop="pauseById(props.data.id)" v-if="props.data.status === 'DOWNLOADING'"></image>
-        <image class="theme-icon" src="@/static/play-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'PAUSED'"></image>
-        <image class="theme-icon" src="@/static/reload-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'ERROR'"></image>
-        <image src="@/static/delete-icon.png" @click.stop="deleteById(item)"></image>
+        <image class="theme-icon" src="@/static/pause-black.png" @click.stop="pauseById(props.data.id)" v-if="props.data.status === 'DOWNLOADING'"  />
+        <image class="theme-icon" src="@/static/play-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'PAUSED'"  />
+        <image class="theme-icon" src="@/static/reload-black.png" @click.stop="resumeById(props.data.id)" v-if="props.data.status === 'ERROR'"  />
+        <image src="@/static/delete-icon.png" @click.stop="deleteById(props.data)"  />
       </div>
     </div>
     <div class="list-item__progress">
@@ -37,6 +37,9 @@
 
 <script setup>
 import wilProgress from '@/components/mobile/wil-progress/index.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const props = defineProps({
   data: { type: Object, default: {} },
 })

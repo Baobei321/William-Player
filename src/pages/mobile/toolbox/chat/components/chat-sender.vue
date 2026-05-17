@@ -22,12 +22,12 @@
         <t-popover v-model:visible="showMorePopover" placement="top" :theme="popoverTheme" :data-target="popoverTheme">
           <div class="more-button" @click="showMorePopover = true">
             <t-icon name="ai-tool" size="32rpx" :color="iconColor" />
-            <span>更多</span>
+            <span>{{ t('common.more') }}</span>
           </div>
           <template #content>
             <div class="popover-content-list">
-              <div class="popover-content-item" v-for="item in moreOptions" :key="item.name" @click="selectMore(item)">
-                <image :src="item.icon"></image>
+              <div class="popover-content-item" v-for="item in moreOptions" :key="item.key" @click="selectMore(item)">
+                <image :src="item.icon"  />
                 <span>{{ item.name }}</span>
               </div>
             </div>
@@ -35,7 +35,7 @@
         </t-popover>
       </template>
       <div class="ability-item" v-else @click="closeAbility">
-        <image :src="moreOptions.find(i => i.name === abilityType).activeIcon" color="#0052d9"></image>
+        <image :src="moreOptions.find(i => i.key === abilityType).activeIcon" color="#0052d9" />
         <span>{{ abilityType }}</span>
         <t-icon name="close" size="32rpx" :color="activeIconColor" />
       </div>
@@ -55,8 +55,8 @@
           </div>
           <template #content>
             <div class="popover-content-list">
-              <div class="popover-content-item" v-for="item in popoverOptions" :key="item.name" :source-type="item.sourceType" @click="chooseImage(item)">
-                <image :src="item.icon" />
+              <div class="popover-content-item" v-for="item in popoverOptions" :key="item.key" :source-type="item.sourceType" @click="chooseImage(item)">
+                <image :src="item.icon"  />
                 <span>{{ item.name }}</span>
               </div>
             </div>
@@ -90,6 +90,7 @@ import moreVideoActive from '@/static/more-video-active.png'
 import * as CONFIG from '@/utils/config.js'
 import { computed, nextTick, ref } from 'vue'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   loading: {
@@ -100,6 +101,7 @@ const props = defineProps({
 
 const emits = defineEmits(['send', 'stop'])
 const { isDark, iconColor, primaryBtnTextColor } = useThemeColors()
+const { t } = useI18n()
 const popoverTheme = computed(() => (isDark.value ? 'dark' : 'light'))
 const activeIconColor = computed(() => (isDark.value ? '#6f9cff' : '#0052d9'))
 const chatSenderRef = ref(null)
@@ -118,16 +120,16 @@ const attachmentsProps = ref({
   imageViewer: true,
 })
 
-const popoverOptions = [
-  { name: '上传文档', icon: uploadfileIcon, sourceType: ['album'] },
-  { name: '上传图片', icon: uploadimageIcon, sourceType: ['album'] },
-  { name: '拍照', icon: uploadcameraIcon, sourceType: ['camera'] },
-]
+const popoverOptions = computed(() => [
+  { key: 'uploadDocument', name: t('toolbox.uploadDocument'), icon: uploadfileIcon, sourceType: ['album'] },
+  { key: 'uploadImage', name: t('toolbox.uploadImage'), icon: uploadimageIcon, sourceType: ['album'] },
+  { key: 'takePhoto', name: t('toolbox.takePhoto'), icon: uploadcameraIcon, sourceType: ['camera'] },
+])
 
-const moreOptions = [
-  { name: '图像生成', icon: moreImage, activeIcon: moreImageActive, className: 'image' },
-  { name: '视频生成', icon: moreVideo, activeIcon: moreVideoActive, className: 'video' },
-]
+const moreOptions = computed(() => [
+  { key: 'image', name: t('toolbox.imageGeneration'), icon: moreImage, activeIcon: moreImageActive, className: 'image' },
+  { key: 'video', name: t('toolbox.videoGeneration'), icon: moreVideo, activeIcon: moreVideoActive, className: 'video' },
+])
 
 let uploadFileId = 0
 
@@ -143,7 +145,7 @@ const onFileChange = event => {
 }
 
 const selectMore = item => {
-  abilityType.value = item.name
+  abilityType.value = item.key
   showMorePopover.value = false
 }
 
@@ -210,7 +212,7 @@ const chooseFile = () => {
 
 //手动调用wil-uploader的选择文件
 const chooseImage = item => {
-  if (item.name === '上传文档') {
+  if (item.key === 'uploadDocument') {
     chooseFile()
   } else {
     sourceType.value = item.sourceType
@@ -244,7 +246,7 @@ const handleSend = e => {
 const sendMessage = value => {
   if (value.value.trim() === '') {
     uni.showToast({
-      title: '请输入消息内容',
+      title: t('common.pleaseInputMessage'),
       icon: 'none',
     })
     return
@@ -253,7 +255,7 @@ const sendMessage = value => {
     item.width = '200rpx'
     item.height = '200rpx'
   })
-  emits('send', value.value, attachmentsProps.value.items, { abilityType: abilityType.value ? moreOptions.find(i => i.name === abilityType.value).className : '' })
+  emits('send', value.value, attachmentsProps.value.items, { abilityType: abilityType.value ? moreOptions.value.find(i => i.key === abilityType.value).className : '' })
   attachmentsProps.value.items = []
 }
 
@@ -386,90 +388,90 @@ const stopMessage = () => {
           }
         }
       }
-      .t-attachments__file {
-        background-color: var(--app-bg-secondary);
-      }
+    }
+    .t-attachments__file {
+      background-color: var(--app-bg-secondary);
+    }
 
-      .t-attachments__title {
-        color: var(--app-text-primary);
-      }
+    .t-attachments__title {
+      color: var(--app-text-primary);
+    }
 
-      .t-attachments__desc {
-        color: var(--app-text-tertiary);
-      }
+    .t-attachments__desc {
+      color: var(--app-text-tertiary);
+    }
 
-      .t-attachments__remove {
-        background-color: var(--app-text-primary);
-        color: var(--app-bg);
-      }
+    .t-attachments__remove {
+      background-color: var(--app-text-primary);
+      color: var(--app-bg);
+    }
 
-      .t-chat-sender__sendbtn {
-        .suffix-button {
-          display: flex;
-          align-items: center;
-          .t-popover {
-            position: fixed;
-            .t-popover__content {
-              background: var(--app-bg-card);
-              color: var(--app-text-primary);
-              border: 2rpx solid var(--app-border-strong);
-              .popover-content-list {
-                .popover-content-item {
-                  display: flex;
-                  align-items: center;
-                  padding: 12rpx 0;
-                  cursor: pointer;
-                  image {
-                    width: 36rpx;
-                    height: 36rpx;
-                    display: block;
-                    margin-right: 12rpx;
-                  }
-                  span {
-                    font-size: 28rpx;
-                  }
-                  &:first-child {
-                    padding-top: 0;
-                  }
-                  &:last-child {
-                    padding-bottom: 0;
-                  }
+    .t-chat-sender__sendbtn {
+      .suffix-button {
+        display: flex;
+        align-items: center;
+        .t-popover {
+          position: fixed;
+          .t-popover__content {
+            background: var(--app-bg-card);
+            color: var(--app-text-primary);
+            border: 2rpx solid var(--app-border-strong);
+            .popover-content-list {
+              .popover-content-item {
+                display: flex;
+                align-items: center;
+                padding: 12rpx 0;
+                cursor: pointer;
+                image {
+                  width: 36rpx;
+                  height: 36rpx;
+                  display: block;
+                  margin-right: 12rpx;
+                }
+                span {
+                  font-size: 28rpx;
+                }
+                &:first-child {
+                  padding-top: 0;
+                }
+                &:last-child {
+                  padding-bottom: 0;
                 }
               }
             }
           }
-          .upload-btn-icon {
-            width: 64rpx;
-            height: 64rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16rpx;
-            border: 1px solid var(--app-border-strong);
+        }
+        .upload-btn-icon {
+          width: 64rpx;
+          height: 64rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 16rpx;
+          border: 1px solid var(--app-border-strong);
+        }
+        .send-btn-icon {
+          width: 64rpx;
+          height: 64rpx;
+          margin-left: 16rpx;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: rotate(-90deg);
+          transition: all 0.3s ease;
+          &.disabled {
+            background-color: var(--app-text-placeholder);
+            color: var(--app-text-inverse);
           }
-          .send-btn-icon {
-            width: 64rpx;
-            height: 64rpx;
-            margin-left: 16rpx;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: rotate(-90deg);
-            transition: all 0.3s ease;
-            &.disabled {
-              background-color: var(--app-text-placeholder);
-              color: var(--app-text-inverse);
-            }
-            &.active {
-              background-color: var(--app-link);
-              color: var(--app-text-inverse);
-            }
-            .stop-icon {
-              width: 24rpx;
-              height: 24rpx;
-              background-color: var(--app-text-inverse);
-            }
+          &.active {
+            background-color: var(--app-link);
+            color: var(--app-text-inverse);
+          }
+          .stop-icon {
+            width: 24rpx;
+            height: 24rpx;
+            background-color: var(--app-text-inverse);
           }
         }
       }

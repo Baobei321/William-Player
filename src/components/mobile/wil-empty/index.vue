@@ -1,6 +1,6 @@
 <template>
   <div class="wil-empty">
-    <image :src="imageMapping[props.type]"></image>
+    <image :src="imageMapping[props.type]"  />
     <span>{{ props.text }}</span>
   </div>
 </template>

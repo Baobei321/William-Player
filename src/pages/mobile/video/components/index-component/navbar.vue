@@ -17,13 +17,13 @@
             :class="['video-navbar-popover__arrow', showPopover ? 'show-animation' : 'hide-animation']"
             :style="{ top: Number(navBarHeight.split('px')[0]) - 12 + 'px' }"
             v-show="showPopover">
-            <image src="@/static/rect-san.png" style="width: 100%; height: 100%"></image>
+            <image src="@/static/rect-san.png" style="width: 100%; height: 100%"  />
           </div>
           <div :class="['video-navbar-popover__container', showPopover ? 'show-animation' : 'hide-animation']" :style="{ top: navBarHeight }" v-if="showPopover">
             <div class="popover-title">
               <div class="popover-title-left">
                 <span>{{ popoverData.title }}</span>
-                <span class="popover-title-left__button" v-if="popoverData.title == '正在扫描' && showPause" @click="toCancel">暂停</span>
+                <span class="popover-title-left__button" v-if="popoverData.title == t('video.scanning') && showPause" @click="toCancel">{{ t('video.pause') }}</span>
               </div>
               <div class="popover-title-right" @click="closePopover">
                 <nut-icon name="close" custom-color="#fff" size="12"></nut-icon>
@@ -37,8 +37,8 @@
               </div>
             </div>
             <div class="popover-input" v-else>
-              <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
-              <nut-button type="success" @click="confirmApiKey">确认</nut-button>
+              <nut-input v-model="tmdbKey" :placeholder="t('video.inputTmdbApiKey')" />
+              <nut-button type="success" @click="confirmApiKey">{{ t('common.confirm') }}</nut-button>
             </div>
           </div>
         </div>
@@ -50,7 +50,9 @@
 <script setup>
 import { onMounted, ref, watch, watchEffect, nextTick } from 'vue'
 import { setTmdbKey } from '@/network/apis'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   refreshData: { type: Object, default: {} },
   loading: { type: Boolean, default: false },
@@ -66,13 +68,14 @@ const video_navbar = ref(null)
 
 const showPopover = ref(false)
 const popoverPosition = ref({})
+const getProgressList = (failed = false) => [
+  { key: 'found', label: t('video.found'), value: 0 },
+  { key: failed ? 'failed' : 'pendingUpdate', label: failed ? t('video.failed') : t('video.pendingUpdate'), value: 0 },
+  { key: 'updated', label: t('video.updated'), value: 0 },
+]
 const popoverData = ref({
-  title: '正在扫描',
-  list: [
-    { label: '已找到', value: 0 },
-    { label: '待更新', value: 0 },
-    { label: '已更新', value: 0 },
-  ],
+  title: t('video.scanning'),
+  list: getProgressList(),
 })
 const tmdbKey = ref('')
 
@@ -124,14 +127,14 @@ getH5NavbarHeight()
 const toVideoSearch = () => {
   if (!props.isConnected) {
     uni.showToast({
-      title: '网络已断开，请检查网络连接',
+      title: t('common.networkDisconnected'),
       icon: 'none',
     })
     return
   }
   if (loading.value) {
     uni.showToast({
-      title: '正在同步影片，请完成后再搜索',
+      title: t('video.syncingVideoSearchTip'),
       icon: 'none',
     })
     return
@@ -144,14 +147,14 @@ const toVideoSearch = () => {
 const toAddMedia = () => {
   if (!props.isConnected) {
     uni.showToast({
-      title: '网络已断开，请检查网络连接',
+      title: t('common.networkDisconnected'),
       icon: 'none',
     })
     return
   }
   if (loading.value) {
     uni.showToast({
-      title: '正在同步影片，请完成后再管理资源',
+      title: t('video.syncingVideoManageTip'),
       icon: 'none',
     })
     return
@@ -188,7 +191,7 @@ const judgeSelect = () => {
 const showProgress = () => {
   if (!props.isConnected) {
     uni.showToast({
-      title: '网络已断开，请检查网络连接',
+      title: t('common.networkDisconnected'),
       icon: 'none',
     })
     return
@@ -202,12 +205,8 @@ const showProgress = () => {
     showPopover.value = true
     return
   }
-  popoverData.value.title = '正在扫描'
-  popoverData.value.list = [
-    { label: '已找到', value: 0 },
-    { label: '待更新', value: 0 },
-    { label: '已更新', value: 0 },
-  ]
+  popoverData.value.title = t('video.scanning')
+  popoverData.value.list = getProgressList()
   showPopover.value = true
   judgeSelect()
   if (selectType.value.type == 'Emby') {
@@ -221,7 +220,7 @@ const showProgress = () => {
 
 //暂停取消扫描
 const toCancel = () => {
-  popoverData.value.title == '已暂停'
+  popoverData.value.title = t('video.paused')
   showPopover.value = false
   showPause.value = false
   clearTimeout(timer.value)
@@ -263,22 +262,14 @@ watch(
   () => props.refreshData,
   val => {
     if (props.loading) {
-      popoverData.value.list = [
-        { label: '已找到', value: 0 },
-        { label: '待更新', value: 0 },
-        { label: '已更新', value: 0 },
-      ]
-      popoverData.value.list.find(i => i.label == '待更新').value = val.toupdate || 0
+      popoverData.value.list = getProgressList()
+      popoverData.value.list.find(i => i.key == 'pendingUpdate').value = val.toupdate || 0
     } else {
-      popoverData.value.list = [
-        { label: '已找到', value: 0 },
-        { label: '已失败', value: 0 },
-        { label: '已更新', value: 0 },
-      ]
-      popoverData.value.list.find(i => i.label == '已失败').value = val.fail || 0
+      popoverData.value.list = getProgressList(true)
+      popoverData.value.list.find(i => i.key == 'failed').value = val.fail || 0
     }
-    popoverData.value.list.find(i => i.label == '已找到').value = val.found || 0
-    popoverData.value.list.find(i => i.label == '已更新').value = val.updated || 0
+    popoverData.value.list.find(i => i.key == 'found').value = val.found || 0
+    popoverData.value.list.find(i => i.key == 'updated').value = val.updated || 0
   },
   { deep: true }
 )
@@ -288,7 +279,7 @@ watch(
   val => {
     loading.value = val
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`
+      popoverData.value.title = t('video.completedSyncVideos', { count: props.refreshData.success || 0 })
       clearTimeout(timer.value)
       timer.value = null
       showPause.value = false

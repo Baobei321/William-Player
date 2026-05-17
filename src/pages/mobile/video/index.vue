@@ -21,8 +21,8 @@
               <star-recommend v-if="settingData.showRecommend"></star-recommend>
               <div class="scroll-list" :style="{ paddingTop: settingData.showRecommend ? '40rpx' : `calc(40rpx + ${navbarHeight + 'px'})` }">
                 <recent-played v-if="historyPlay.length" :listData="historyPlay" :isConnected="isConnected"></recent-played>
-                <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
-                <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
+                <hx-list :title="t('video.movie')" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length" :isConnected="isConnected"></hx-list>
+                <hx-list :title="t('video.tv')" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length" :isConnected="isConnected"></hx-list>
                 <Classify :isConnected="isConnected"></Classify>
               </div>
             </template>
@@ -34,27 +34,27 @@
         </div>
         <div class="video-empty" v-if="selectType.type == 'Emby' ? !embyMovieTvList?.length : !localMovieTvData?.movie?.length && !localMovieTvData?.tv?.length">
           <div class="video-empty-logo">
-            <image :src="appLogo" />
+            <image :src="appLogo"  />
             <span>William Player</span>
           </div>
           <div class="video-empty-tip">
-            <div>从网盘添加资源到媒体库中</div>
-            <div>即可打造私人影院，随时观看</div>
+            <div>{{ t('video.addResourceToMediaLibrary') }}</div>
+            <div>{{ t('video.buildPrivateCinema') }}</div>
           </div>
           <nut-button :custom-color="primaryBtnColor" @click="toAddWebdav">
             <template #icon>
               <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
             </template>
-            <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
+            <span :style="{ color: primaryBtnTextColor }">{{ t('video.addNewResource') }}</span>
           </nut-button>
           <nut-dialog title="api_key" v-model:visible="showDialog" @cancel="onCancel" @ok="onOk">
-            <nut-input v-model="tmdbKey" placeholder="请输入tmdb的api_key" />
+            <nut-input v-model="tmdbKey" :placeholder="t('video.inputTmdbApiKey')" />
           </nut-dialog>
         </div>
       </template>
     </template>
     <div class="video-nowifi" v-else>
-      <wil-empty type="wifi" text="网络已断开，请检查网络连接"></wil-empty>
+      <wil-empty type="wifi" :text="t('common.networkDisconnected')"></wil-empty>
     </div>
     <wil-upgrade
       :updateFunction="getAppUpdateInfo"
@@ -70,6 +70,7 @@
 
 <script setup>
 import { onBeforeMount, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import videoNavbar from './components/index-component/navbar.vue'
 import Skeleton from './components/index-component/skeleton.vue'
 import starRecommend from './components/index-component/star-recommend.vue'
@@ -92,6 +93,7 @@ import { useThemeColors } from '@/hooks/useThemeColors'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeTabbar } from '@/hooks/useThemeTabbar'
 
+const { t } = useI18n()
 const wil_modal = ref(null)
 const {
   video_navbar,

@@ -13,7 +13,7 @@
       <div class="wil-upgrade-container">
         <div class="wil-upgrade-title">
           <div class="wil-upgrade-title__logo">
-            <image :src="props.logo" />
+            <image :src="props.logo"  />
           </div>
           <div class="wil-upgrade-title__info">
             <div class="wil-upgrade-title__info-name">{{ props.appName }}</div>
@@ -22,17 +22,17 @@
         </div>
         <div class="wil-upgrade-list">
           <div class="wil-upgrade-list__title">
-            <span>发现新版本</span>
+            <span>{{ t('upgrade.foundNewVersion') }}</span>
             <span>{{ newVersion[props.defaultProps.version] }}</span>
           </div>
           <div class="wil-upgrade-list__container" v-html="newVersion[props.defaultProps.remark]"></div>
         </div>
         <div class="wil-upgrade-button">
-          <nut-button custom-color="#ff6701" @click="toDownLoad(newVersion[props.defaultProps.apkUrl])" v-if="!showProgress && downStatus == -1">立即下载更新</nut-button>
-          <nut-button custom-color="#ff6701" @click="showBottom = false" v-if="!showProgress && downStatus == 0">安装失败，关闭</nut-button>
-          <nut-button custom-color="#ff6701" @click="installNow" v-if="!showProgress && downStatus == 1">立即安装</nut-button>
+          <nut-button custom-color="#ff6701" @click="toDownLoad(newVersion[props.defaultProps.apkUrl])" v-if="!showProgress && downStatus == -1">{{ t('upgrade.downloadUpdateNow') }}</nut-button>
+          <nut-button custom-color="#ff6701" @click="showBottom = false" v-if="!showProgress && downStatus == 0">{{ t('upgrade.installFailedClose') }}</nut-button>
+          <nut-button custom-color="#ff6701" @click="installNow" v-if="!showProgress && downStatus == 1">{{ t('upgrade.installNow') }}</nut-button>
           <nut-button custom-color="#ff6701" @click="downloadInstallApp(newVersion[props.defaultProps.apkUrl])" v-if="!showProgress && downStatus == 2">
-            下载中断，继续下载
+            {{ t('upgrade.downloadInterruptedContinue') }}
           </nut-button>
           <template v-if="showProgress">
             <nut-progress :percentage="percent" stroke-color="#ff6701" :text-color="iconColor" />
@@ -45,12 +45,14 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, watch } from 'vue'
+import { computed, ref, onBeforeMount, watch } from 'vue'
 import { onHide } from '@dcloudio/uni-app'
 import { addOperLog } from '@/network/apis'
 import dayjs from 'dayjs'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const { iconColor } = useThemeColors()
 
 const props = defineProps({
@@ -73,7 +75,9 @@ const props = defineProps({
 })
 const showBottom = ref(false)
 const newVersion = ref({})
-const tipText = ref('等待下载')
+const tipTextKey = ref('upgrade.waitDownload')
+const tipTextParams = ref({})
+const tipText = computed(() => t(tipTextKey.value, tipTextParams.value))
 const percent = ref(0)
 const showProgress = ref(false)
 
@@ -149,7 +153,7 @@ const getUpdateInfo = async () => {
 const installNow = () => {
   plus.runtime.install(systemUrl.value, {}, {}, function (error) {
     uni.showToast({
-      title: '安装失败',
+      title: t('upgrade.installFailed'),
       icon: 'none',
     })
   })
@@ -159,17 +163,17 @@ const toDownLoad = apkUrl => {
   if (props.type == 'inApp') {
     downloadInstallApp(apkUrl)
   } else if (props.type == 'outApp') {
-    addOperLog({ title: '更新app', businessType: 13, operatorType: 2 })
+    addOperLog({ title: t('upgrade.updateApp'), businessType: 13, operatorType: 2 })
     if (apkUrl) {
       plus.runtime.openURL(apkUrl, error => {
         if (error) {
-          uni.showToast({ title: '打开浏览器失败', icon: 'none' })
+          uni.showToast({ title: t('common.openBrowserFailed'), icon: 'none' })
         }
       })
     } else {
       plus.runtime.openURL('https://gitee.com/waylon-chen/William-Player/releases/latest', error => {
         if (error) {
-          uni.showToast({ title: '打开浏览器失败', icon: 'none' })
+          uni.showToast({ title: t('common.openBrowserFailed'), icon: 'none' })
         }
       })
     }
@@ -187,14 +191,14 @@ const downloadInstallApp = apkUrl => {
       dFileName.value = d.filename
       plus.runtime.install(plus.io.convertLocalFileSystemURL(d.filename), {}, {}, function (error) {
         uni.showToast({
-          title: '安装失败',
+          title: t('upgrade.installFailed'),
           icon: 'none',
           duration: 7000,
         })
       })
     } else {
       uni.showToast({
-        title: '更新失败',
+        title: t('upgrade.updateFailed'),
         icon: 'none',
       })
       downStatus.value = 0
@@ -209,21 +213,24 @@ const downloadProgress = dtask => {
   try {
     dtask.start()
     uni.showToast({
-      title: '开始下载',
+      title: t('upgrade.startDownload'),
       icon: 'none',
     })
     dtask.addEventListener('statechanged', function (task, status) {
       switch (task.state) {
         case 1:
-          tipText.value = '等待下载'
+          tipTextKey.value = 'upgrade.waitDownload'
+          tipTextParams.value = {}
           break
         case 2:
-          tipText.value = '已连接到服务器'
+          tipTextKey.value = 'upgrade.connectedToServer'
+          tipTextParams.value = {}
           break
         case 3:
           downloadedSize.value = task.downloadedSize
           percent.value = parseInt((parseFloat(task.downloadedSize) / parseFloat(task.totalSize)) * 100)
-          tipText.value = '安装包下载中，请稍后（' + handleSize(task.downloadedSize) + '/' + handleSize(task.totalSize) + '）'
+          tipTextKey.value = 'upgrade.apkDownloading'
+          tipTextParams.value = { downloaded: handleSize(task.downloadedSize), total: handleSize(task.totalSize) }
           break
         case 4:
           plus.nativeUI.closeWaiting()
@@ -235,7 +242,7 @@ const downloadProgress = dtask => {
     downStatus.value = 0
     showProgress.value = false
     uni.showToast({
-      title: '更新失败',
+      title: t('upgrade.updateFailed'),
       icon: 'none',
     })
   }

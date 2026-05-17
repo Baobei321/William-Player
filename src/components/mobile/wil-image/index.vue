@@ -1,5 +1,5 @@
 <template>
-  <image class="wil-image" v-bind="$attrs" :src="resolveAsset(props.src)" :style="{backgroundColor:background}" @load="loadSuccess"></image>
+  <image class="wil-image" v-bind="$attrs" :src="resolveAsset(props.src)" :style="{backgroundColor:background}" @load="loadSuccess"  />
 </template>
 
 <script setup>

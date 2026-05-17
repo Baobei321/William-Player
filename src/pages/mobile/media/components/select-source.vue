@@ -1,6 +1,6 @@
 <template>
     <div :class="['select-source', themeClass]">
-        <div class="select-source-title">选择资源</div>
+        <div class="select-source-title">{{ t('source.selectResource') }}</div>
         <div class="select-source-container" v-if="show">
             <div class="select-source-item" v-for="item in sourceList" :key="item.type">
                 <template v-if="item.list.length">
@@ -9,7 +9,7 @@
                         <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list"
                             :key="vitem.name" @click="handleSelect(item, vitem)">
                             <div class="list-item-img">
-                                <image :src="item.img"></image>
+                                <image :src="item.img"  />
                             </div>
                             <div class="list-item-name">{{ vitem.name }}</div>
                         </div>
@@ -18,12 +18,12 @@
             </div>
         </div>
         <div class="select-source-empty" v-else>
-            <image src="@/static/no-data.png" class="select-source-empty__img"></image>
+            <image src="@/static/no-data.png" class="select-source-empty__img"  />
             <nut-button :custom-color="primaryBtnColor" @click="toAddFile">
                 <template #icon>
                     <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
                 </template>
-                <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
+                <span :style="{ color: primaryBtnTextColor }">{{ t('video.addNewResource') }}</span>
             </nut-button>
         </div>
     </div>
@@ -31,10 +31,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { loginUser, get189Folder, getQuarkFolder } from "@/utils/common";
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { useThemeClass } from '@/hooks/useThemeClass'
 
+const { t } = useI18n()
 const emits = defineEmits(['openFolder'])
 const themeClass = useThemeClass()
 const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
@@ -50,7 +52,7 @@ judegeShow();
 
 const handleSelect = async (item, vitem) => {
     uni.showLoading({
-        title: '加载中',
+        title: t('common.loading'),
     });
     if (item.type == "WebDAV") {
         await loginUser(vitem)
@@ -62,7 +64,7 @@ const handleSelect = async (item, vitem) => {
             .catch((error) => {
                 uni.hideLoading();
                 uni.showToast({
-                    title: "请先开启Alist",
+                    title: t('source.pleaseEnableAlist'),
                     icon: "none",
                 });
             });
@@ -74,7 +76,7 @@ const handleSelect = async (item, vitem) => {
                     emits('openFolder', item, vitem, res)
                 } else {
                     uni.showToast({
-                        title: "请重新登录天翼云盘",
+                        title: t('source.reloginTianyiCloudDrive'),
                         icon: "none",
                     });
                 }
@@ -82,7 +84,7 @@ const handleSelect = async (item, vitem) => {
             .catch((error) => {
                 uni.hideLoading();
                 uni.showToast({
-                    title: "请重新登录天翼云盘",
+                    title: t('source.reloginTianyiCloudDrive'),
                     icon: "none",
                 });
             });
@@ -94,7 +96,7 @@ const handleSelect = async (item, vitem) => {
                     emits('openFolder', item, vitem, res)
                 } else {
                     uni.showToast({
-                        title: "请重新登录夸克网盘",
+                        title: t('source.reloginQuarkCloudDrive'),
                         icon: "none",
                     });
                 }
@@ -102,7 +104,7 @@ const handleSelect = async (item, vitem) => {
             .catch((error) => {
                 uni.hideLoading();
                 uni.showToast({
-                    title: "请重新登录夸克网盘",
+                    title: t('source.reloginQuarkCloudDrive'),
                     icon: "none",
                 });
             });

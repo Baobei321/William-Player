@@ -7,11 +7,15 @@ import posterEmpty from "@/static/poster-empty.png";
 import * as CONFIG from "@/utils/config";
 import { getEmbyList, getGenresList } from "../utils/emby";
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 
 export function useHistoryPlayed({ wil_list, wil_modal }) {
+    const { t } = useI18n()
     const requestParams = ref({});
 
     const routerParams = ref({});
+    const titleKey = ref('');
+    const getTitleText = () => (titleKey.value ? t(titleKey.value) : routerParams.value.title);
     const recentSelect = ref([]);
     const isSelect = ref(false);
     const isClearAll = ref(false);
@@ -43,7 +47,7 @@ export function useHistoryPlayed({ wil_list, wil_modal }) {
         let historyPlay = uni.getStorageSync("historyPlay");
         if (!historyPlay?.length) {
             uni.showToast({
-                title: '已无播放记录',
+                title: t('video.noPlayedRecords'),
                 icon: 'none'
             })
             return
@@ -218,7 +222,7 @@ export function useHistoryPlayed({ wil_list, wil_modal }) {
     };
     const removeExtension = (item) => {
         if (item.type == "tv") {
-            item.name1 = `${item.titlePlay} 第${item.ji}集 ${item.title || '第' + item.ji + '集'}`;
+            item.name1 = `${item.titlePlay} ${t('video.episodeTitle', { episode: item.ji })} ${item.title || t('video.episodeTitle', { episode: item.ji })}`;
             const firstDotIndex = item.name1.indexOf(".");
             let name = firstDotIndex === -1 ? item.name1 : item.name1.substring(0, firstDotIndex);
             if (name.length > 12) {
@@ -243,8 +247,8 @@ export function useHistoryPlayed({ wil_list, wil_modal }) {
     };
     const clearAll = () => {
         wil_modal.value.showModal({
-            title: "温馨提示",
-            content: "是否清空全部播放记录？",
+            title: t('modal.warmTip'),
+            content: t('modal.clearAllPlayedRecordsConfirm'),
             confirmColor: "#ff6701",
             confirm: async () => {
                 recentSelect.value = [];
@@ -282,11 +286,12 @@ export function useHistoryPlayed({ wil_list, wil_modal }) {
     onLoad((options) => {
         judgeSelect();
         routerParams.value = options;
+        titleKey.value = routerParams.value.title == '最近观看' || routerParams.value.title == t('video.recentPlayed') ? 'video.recentPlayed' : '';
         routerParams.value.isConnected = routerParams.value.isConnected1 == "true" ? true : false;
         setItemWidth();
     });
     return {
-        requestParams, isClearAll, routerParams, lineNumber, lineHeight, changeItemFn,
+        requestParams, isClearAll, routerParams, titleKey, getTitleText, lineNumber, lineHeight, changeItemFn,
         isSelect, windowWidth, recentSelect,
         editHistory, getHistoryList, listItemStyle, toPlayHistory, longPress,
         setRecentImg, imgError, imgLoad, removeExtension, clearAll, clearPart

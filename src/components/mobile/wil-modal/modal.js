@@ -1,11 +1,12 @@
 import Modal from './index.vue';
 import { createApp } from 'vue';
 import { useThemeStore } from '@/stores/theme';
+import { i18n } from '@/i18n/index.js';
 
 function showModal({ title, confirmText, cancelColor, confirmColor, cancelText, content, cancel, confirm }) {
     const modalInstance = createApp(Modal, {
-        title: title || '温馨提示',
-        content: content || '是否退出登录',
+        title: title || i18n.global.t('modal.warmTip'),
+        content: content || i18n.global.t('modal.defaultLogoutContent'),
         cancelText: cancelText,
         confirmText: confirmText,
         cancelColor: cancelColor,

@@ -9,11 +9,14 @@ import * as CONFIG from '@/utils/config'
 import Folder from '@/static/folder.png'
 import webdavFileIcon from '@/static/webdav-fileIcon.png'
 import { getMainView, getEmbyList, getEmbyNewList } from '@/utils/emby'
+import { searchMovieTvByType } from '@/utils/tmdb'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import emptyBg from '@/static/poster-empty.png'
 import { PLATFORM } from '@/utils/config.js'
 
 export function useVideoIndex({ wil_modal }) {
+  const { t } = useI18n()
   const video_navbar = ref(null)
   const listData = ref([])
   const sourceList = ref([])
@@ -66,36 +69,7 @@ export function useVideoIndex({ wil_modal }) {
   }
 
   //通过tmdb接口获取更详细的信息
-  const searchMovieTv = (data, type) => {
-    let url = ''
-    if (type == 'movie') {
-      url = 'https://api.tmdb.org/3/search/movie'
-      data.primary_release_year = data.first_air_date_year
-      delete data.first_air_date_year
-    } else if (type == 'tv') {
-      url = 'https://api.tmdb.org/3/search/tv'
-    }
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: url,
-        data: {
-          ...data,
-          language: 'zh-CN',
-          page: 1,
-          api_key: uni.getStorageSync('settingData').tmdbKey,
-        },
-        timeout: 10000,
-        method: 'GET',
-        header: { 'Content-Type': 'application/json' },
-        success: res => {
-          resolve(res.data)
-        },
-        fail: error => {
-          reject(error)
-        },
-      })
-    })
-  }
+  const searchMovieTv = (data, type) => searchMovieTvByType(data, type)
 
   //处理内存大小
   const handleSize = size => {
@@ -137,12 +111,12 @@ export function useVideoIndex({ wil_modal }) {
           path: item.path,
           folderFileId: item.id, //电影的folderFileId放在这个层级
           name: item.name,
-          seasonArr: [{ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId }], //电视剧的folderFileId放在这个层级
+          seasonArr: [{ name: t('video.seasonTitle', { season: chineseNumber[item.season] }), path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId }], //电视剧的folderFileId放在这个层级
         })
       } else {
         let nowSource = source.find(v => v.name == item.name && v.path == item.path)
         if (nowSource) {
-          nowSource.seasonArr.push({ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId })
+          nowSource.seasonArr.push({ name: t('video.seasonTitle', { season: chineseNumber[item.season] }), path: item.seasonPath, season: String(item.season), folderFileId: item.folderFileId })
           nowSource.seasonArr = nowSource.seasonArr.sort((a, b) => {
             return Number(a.season) - Number(b.season)
           })
@@ -153,7 +127,7 @@ export function useVideoIndex({ wil_modal }) {
             path: item.path,
             folderFileId: item.id,
             name: item.name,
-            seasonArr: [{ name: `第${chineseNumber[item.season]}季`, path: item.seasonPath, season: String(item.season) }],
+            seasonArr: [{ name: t('video.seasonTitle', { season: chineseNumber[item.season] }), path: item.seasonPath, season: String(item.season) }],
           })
         }
       }
@@ -176,13 +150,13 @@ export function useVideoIndex({ wil_modal }) {
       refreshLoading.value = false
       if (PLATFORM !== 'TV') {
         wil_modal.value.showModal({
-          title: '温馨提示',
-          content: '未刮削出海报墙，是否要查看教程？',
+          title: t('modal.warmTip'),
+          content: t('video.noPosterWallGuide'),
           confirmColor: '#ff6701',
           confirm: async () => {
             let query = {
               url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/question',
-              title: '问题与反馈',
+              title: t('navbar.feedback'),
             }
             uni.navigateTo({
               url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -204,7 +178,7 @@ export function useVideoIndex({ wil_modal }) {
         scrollTop.value = 0
         refreshLoading.value = false
         uni.showToast({
-          title: '请填写正确的api_key',
+          title: t('video.invalidApiKey'),
           icon: 'none',
         })
       })
@@ -216,7 +190,7 @@ export function useVideoIndex({ wil_modal }) {
     uni.setStorageSync('localMovieTvData', localMovieTvData.value)
     scrollTop.value = 0
     refreshLoading.value = false
-    addOperLog({ title: 'WebDAV生成海报墙', businessType: 11, operatorType: 2 })
+    addOperLog({ title: t('video.webdavPosterWallGenerated'), businessType: 11, operatorType: 2 })
   }
 
   //比较新刮削出来的影片是否已经存在或者删除，不存在就是待更新
@@ -237,7 +211,7 @@ export function useVideoIndex({ wil_modal }) {
     let muluData = uni.getStorageSync('muluData') || {}
     if (!muluData?.tv?.length && !muluData?.movie?.length) {
       uni.showToast({
-        title: '请设置电影电视剧目录',
+        title: t('media.pleaseSetMovieTvDirectory'),
         icon: 'none',
       })
       return
@@ -269,7 +243,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电影目录',
+        title: t('source.pleaseSetMovieDirectory'),
         icon: 'none',
       })
     }
@@ -292,7 +266,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电视剧目录',
+        title: t('source.pleaseSetTvDirectory'),
         icon: 'none',
       })
     }
@@ -417,13 +391,13 @@ export function useVideoIndex({ wil_modal }) {
       refreshLoading.value = false
       if (PLATFORM !== 'TV') {
         wil_modal.value.showModal({
-          title: '温馨提示',
-          content: '未刮削出海报墙，是否要查看教程？',
+          title: t('modal.warmTip'),
+          content: t('video.noPosterWallGuide'),
           confirmColor: '#ff6701',
           confirm: async () => {
             let query = {
               url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/question',
-              title: '问题与反馈',
+              title: t('navbar.feedback'),
             }
             uni.navigateTo({
               url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -444,9 +418,8 @@ export function useVideoIndex({ wil_modal }) {
       .catch(() => {
         scrollTop.value = 0
         refreshLoading.value = false
-        showDialog.value = true
         uni.showToast({
-          title: '请填写正确的api_key',
+          title: t('video.invalidApiKey'),
           icon: 'none',
         })
       })
@@ -458,7 +431,7 @@ export function useVideoIndex({ wil_modal }) {
     uni.setStorageSync('localMovieTvData', localMovieTvData.value)
     scrollTop.value = 0
     refreshLoading.value = false
-    addOperLog({ title: '天翼云盘生成海报墙', businessType: 11, operatorType: 2 })
+    addOperLog({ title: t('video.tianyiPosterWallGenerated'), businessType: 11, operatorType: 2 })
   }
 
   //根据设定好的文件路径进行查找天翼云盘的文件
@@ -468,7 +441,7 @@ export function useVideoIndex({ wil_modal }) {
     let tvMulu = muluData.tv?.filter(v => v.name == selectMedia.value.name)
     if (!movieMulu?.length && !tvMulu?.length) {
       uni.showToast({
-        title: '请设置电影电视剧目录',
+        title: t('media.pleaseSetMovieTvDirectory'),
         icon: 'none',
       })
       return
@@ -498,7 +471,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电影目录',
+        title: t('source.pleaseSetMovieDirectory'),
         icon: 'none',
       })
     }
@@ -518,7 +491,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电视剧目录',
+        title: t('source.pleaseSetTvDirectory'),
         icon: 'none',
       })
     }
@@ -533,13 +506,13 @@ export function useVideoIndex({ wil_modal }) {
       refreshLoading.value = false
       if (PLATFORM !== 'TV') {
         wil_modal.value.showModal({
-          title: '温馨提示',
-          content: '未刮削出海报墙，是否要查看教程？',
+          title: t('modal.warmTip'),
+          content: t('video.noPosterWallGuide'),
           confirmColor: '#ff6701',
           confirm: async () => {
             let query = {
               url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/question',
-              title: '问题与反馈',
+              title: t('navbar.feedback'),
             }
             uni.navigateTo({
               url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -560,9 +533,8 @@ export function useVideoIndex({ wil_modal }) {
       .catch(() => {
         scrollTop.value = 0
         refreshLoading.value = false
-        showDialog.value = true
         uni.showToast({
-          title: '请填写正确的api_key',
+          title: t('video.invalidApiKey'),
           icon: 'none',
         })
       })
@@ -574,7 +546,7 @@ export function useVideoIndex({ wil_modal }) {
     uni.setStorageSync('localMovieTvData', localMovieTvData.value)
     scrollTop.value = 0
     refreshLoading.value = false
-    addOperLog({ title: '夸克网盘生成海报墙', businessType: 11, operatorType: 2 })
+    addOperLog({ title: t('video.quarkPosterWallGenerated'), businessType: 11, operatorType: 2 })
   }
 
   //查找天翼云盘中的名叫电影,电视剧的文件夹，按照此路径简单查询/我的视频/电影，/我的视频/电视剧，避免扫库有风险
@@ -584,7 +556,7 @@ export function useVideoIndex({ wil_modal }) {
     let tvMulu = muluData.tv?.filter(v => v.name == selectMedia.value.name)
     if (!movieMulu?.length && !tvMulu?.length) {
       uni.showToast({
-        title: '请设置电影电视剧目录',
+        title: t('media.pleaseSetMovieTvDirectory'),
         icon: 'none',
       })
       return
@@ -616,7 +588,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电影目录',
+        title: t('source.pleaseSetMovieDirectory'),
         icon: 'none',
       })
     }
@@ -639,7 +611,7 @@ export function useVideoIndex({ wil_modal }) {
       )
     } else {
       uni.showToast({
-        title: '请设置电视剧目录',
+        title: t('source.pleaseSetTvDirectory'),
         icon: 'none',
       })
     }

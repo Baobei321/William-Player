@@ -1,9 +1,9 @@
 <template>
   <div :class="['data-sync', themeClass]">
     <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
-    <div class="scan-text">每隔10秒刷新一次同步状态</div>
-    <div class="scan-tip">请点击下方按钮，扫描其他设备的二维码将数据同步到被扫描的设备</div>
-    <image src="@/static/scan-button.png" class="scan-button" @click="scanCode"></image>
+    <div class="scan-text">{{ t('backend.refreshSyncStatusEveryTenSeconds') }}</div>
+    <div class="scan-tip">{{ t('backend.scanQrCodeSyncTip') }}</div>
+    <image src="@/static/scan-button.png" class="scan-button" @click="scanCode"  />
   </div>
 </template>
 
@@ -16,8 +16,12 @@ import { onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from '@/utils/config'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.dataSync')
 const themeClass = useThemeClass()
 const wilQrcodeRef = ref(null);
 const port = ref("");
@@ -45,7 +49,7 @@ const scanCode = () => {
         };
         if (init) {
           uni.showToast({
-            title: "开始连接",
+            title: t('common.startConnect'),
             icon: 'none'
           })
           TcpModule.connectAsClient(result.port.split(':')[0], 1025, (res) => {
@@ -57,7 +61,7 @@ const scanCode = () => {
             if (result.code == 500) { //本地局域网同步失败，走后端接口同步
               setShareData({ port: result.port.split(':')[1], data: obj }).then(() => {
                 uni.showToast({
-                  title: "同步成功",
+                  title: t('common.syncSuccess'),
                   icon: "none",
                 });
               })
@@ -67,12 +71,12 @@ const scanCode = () => {
                 let res2 = JSON.parse(res1)
                 if (res2.code == 500) {
                   uni.showToast({
-                    title: '同步失败请重新扫描',
+                    title: t('common.syncFailedRescan'),
                     icon: 'none'
                   })
                 } else {
                   uni.showToast({
-                    title: "同步成功",
+                    title: t('common.syncSuccess'),
                     icon: "none",
                   });
                 }
@@ -84,12 +88,12 @@ const scanCode = () => {
             let res2 = JSON.parse(res1)
             if (res2.code == 500) {
               uni.showToast({
-                title: '同步失败请重新扫描',
+                title: t('common.syncFailedRescan'),
                 icon: 'none'
               })
             } else {
               uni.showToast({
-                title: "同步成功",
+                title: t('common.syncSuccess'),
                 icon: "none",
               });
             }
@@ -99,7 +103,7 @@ const scanCode = () => {
 
       } else {
         uni.showToast({
-          title: "扫描此二维码无效",
+          title: t('common.invalidQrCode'),
           icon: "none",
         });
       }
@@ -139,7 +143,7 @@ const refreshStatus = () => {
           timer = null;
           deleteShareData({ port: port.value.split(':')[1] });
           uni.showToast({
-            title: "同步成功",
+            title: t('common.syncSuccess'),
             icon: "none",
           });
           setTimeout(() => {
@@ -163,7 +167,7 @@ const startServer = () => {
     let result = JSON.parse(res)
     if (result.code == 500) {
       uni.showToast({
-        title: '出错了',
+        title: t('common.errorOccurred'),
         icon: 'none',
       })
     } else {

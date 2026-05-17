@@ -13,7 +13,7 @@
     {
       "path": "pages/mobile/backend/data-sync",
       "style": {
-        "navigationBarTitleText": "数据同步"
+        "navigationBarTitleText": "%navbar.dataSync%"
       }
     },
     {
@@ -25,7 +25,7 @@
     {
       "path": "pages/mobile/backend/appreciate",
       "style": {
-        "navigationBarTitleText": "赞赏"
+        "navigationBarTitleText": "%navbar.appreciate%"
       }
     },
     {
@@ -43,25 +43,25 @@
     {
       "path": "pages/mobile/backend/operation-guide",
       "style": {
-        "navigationBarTitleText": "操作指引"
+        "navigationBarTitleText": "%navbar.operationGuide%"
       }
     },
     {
       "path": "pages/mobile/live/index",
       "style": {
-        "navigationBarTitleText": "直播"
+        "navigationBarTitleText": "%navbar.live%"
       }
     },
     {
       "path": "pages/mobile/live/list",
       "style": {
-        "navigationBarTitleText": "直播列表"
+        "navigationBarTitleText": "%navbar.liveList%"
       }
     },
     {
       "path": "pages/mobile/media/list",
       "style": {
-        "navigationBarTitleText": "媒体库"
+        "navigationBarTitleText": "%navbar.mediaLibrary%"
       }
     },
     {
@@ -73,7 +73,7 @@
     {
       "path": "pages/mobile/media/catelog-setting",
       "style": {
-        "navigationBarTitleText": "目录设置"
+        "navigationBarTitleText": "%navbar.catelogSetting%"
       }
     },
     {
@@ -91,7 +91,7 @@
     {
       "path": "pages/mobile/source/file-source",
       "style": {
-        "navigationBarTitleText": "添加新文件源"
+        "navigationBarTitleText": "%navbar.addFileSource%"
       }
     },
     {
@@ -121,7 +121,7 @@
     {
       "path": "pages/mobile/video/search-match",
       "style": {
-        "navigationBarTitleText": "编辑信息",
+        "navigationBarTitleText": "%navbar.editInformation%",
         "navigationBarBackgroundColor": "@navigationBarBackgroundColor1"
       }
     },
@@ -188,7 +188,7 @@
     {
       "path": "pages/mobile/mine/userInfo/index",
       "style": {
-        "navigationBarTitleText": "个人中心"
+        "navigationBarTitleText": "%navbar.personalCenter%"
       }
     },
     {
@@ -200,7 +200,7 @@
     {
       "path": "pages/mobile/mine/settings",
       "style": {
-        "navigationBarTitleText": "设置"
+        "navigationBarTitleText": "%navbar.settings%"
       }
     },
     {
@@ -250,19 +250,19 @@
     "list": [
       {
         "pagePath": "pages/mobile/video/index",
-        "text": "媒体库",
+        "text": "%tabBar.mediaLibrary%",
         "iconPath": "static/video.png",
         "selectedIconPath": "static/video-active.png"
       },
       {
         "pagePath": "pages/mobile/live/index",
-        "text": "直播",
+        "text": "%tabBar.live%",
         "iconPath": "static/live.png",
         "selectedIconPath": "static/live-active.png"
       },
       {
         "pagePath": "pages/mobile/mine/index",
-        "text": "我的",
+        "text": "%tabBar.mine%",
         "iconPath": "static/mine.png",
         "selectedIconPath": "static/mine-active.png"
       }

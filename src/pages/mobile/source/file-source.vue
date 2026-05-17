@@ -5,10 +5,10 @@
       <div class="fileSource-item__list">
         <div :class="['list-item', item.list.length == 1 ? 'list-one' : '']" v-for="vitem in item.list" :key="vitem.name" @click="toPath(vitem)">
           <div class="list-item-img">
-            <image :src="vitem.img"></image>
+            <image :src="vitem.img"  />
           </div>
           <div class="list-item-name">{{ vitem.name }}</div>
-          <image :src="isDark ? icIntoWhite : icIntoBlack" class="list-item-button" />
+          <image :src="isDark ? icIntoWhite : icIntoBlack" class="list-item-button"  />
         </div>
       </div>
     </div>
@@ -16,57 +16,60 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { computed } from "vue";
 import webdavFileIcon from "@/static/webdav-fileIcon.png";
 import icIntoBlack from "@/static/ic-intoblack.png";
 import icIntoWhite from "@/static/ic-intowhite.png";
-import { toParse, toStringfy } from "../mine/common";
-import { onUnload } from "@dcloudio/uni-app";
+import { toStringfy } from "../mine/common";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.addFileSource')
 const themeClass = useThemeClass()
 const { isDark } = useThemeColors()
 
-const sourceList = ref([
+const sourceList = computed(() => [
   {
-    type: "网络存储",
+    type: t('source.networkStorage'),
     list: [
       {
         name: "WebDAV",
         img: webdavFileIcon,
         path: "/pages/mobile/source/add-webdav",
-        query: { title: "添加WebDAV" },
+        query: { title: t('navbar.addWebdav') },
       },
       {
         name: "Emby",
         img: "https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc",
         path: "/pages/mobile/source/add-emby",
-        query: { title: "添加Emby" },
+        query: { title: t('navbar.addEmby') },
       },
     ],
   },
   {
-    type: "云盘存储",
+    type: t('source.cloudStorage'),
     list: [
       {
-        name: "天翼云盘",
+        name: t('navbar.tianyiCloudDrive'),
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/87/69/8c8769f2-6bfa-19b2-53a4-9e10a555deb3/AppIcon-0-0-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/350x350.png",
         path: "/pages/mobile/backend/cloud189-webview",
         query: {
           url: "https://cloud.189.cn",
-          title: "天翼云盘",
+          title: t('navbar.tianyiCloudDrive'),
         },
       },
       {
-        name: "夸克网盘",
+        name: t('navbar.quarkCloudDrive'),
         img: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?",
         path: "/pages/mobile/backend/quark-webview",
         query: {
           url: "https://pan.quark.cn",
-          title: "夸克网盘",
+          title: t('navbar.quarkCloudDrive'),
         },
       },
     ],
@@ -80,7 +83,7 @@ const toPath = (vitem) => {
     });
   } else {
     uni.showToast({
-      title: "敬请期待...",
+      title: t('common.comingSoon'),
       icon: "none",
     });
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="video-classify">
-    <div class="video-classify-title">类别</div>
+    <div class="video-classify-title">{{ t('video.category') }}</div>
     <div class="video-classify-list" :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
       <div
         class="list-item"
@@ -14,7 +14,7 @@
           <div class="img-one"></div>
           <div class="img-two"></div>
           <div class="img-three">
-            <image :src="!props.isConnected && !item.loadImg ? emptyBg : item.img" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill" />
+            <image :src="!props.isConnected && !item.loadImg ? emptyBg : item.img" @error="imgError(item)" @load="imgLoad(item)" mode="aspectFill"  />
           </div>
         </div>
       </div>
@@ -23,18 +23,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { classifyList } from '@/utils/scrape.js'
 import emptyBg from '@/static/empty_bg.png'
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 
+const { t } = useI18n()
+const localeStore = useLocaleStore()
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
 })
 
 const listData = ref([])
-
-const classifyList1 = ref(JSON.parse(JSON.stringify(classifyList)))
 
 const lineNumber = ref(2)
 const lineHeight = ref('')
@@ -57,10 +59,9 @@ const getGenre = () => {
 
   idArr = [...new Set(idArr)]
   idArr.forEach(item => {
-    let obj = classifyList1.value.find(i => i.id == item)
+    let obj = classifyList.find(i => i.id == item)
     if (obj) {
-      obj.loadImg = true
-      listData.value.push(obj)
+      listData.value.push({ ...obj, label: t(obj.labelKey), loadImg: true })
     }
   })
 }
@@ -96,6 +97,13 @@ const imgLoad = item => {
 onShow(() => {
   getGenre()
 })
+
+watch(
+  () => localeStore.locale,
+  () => {
+    getGenre()
+  }
+)
 </script>
 
 <style lang="scss" scoped>

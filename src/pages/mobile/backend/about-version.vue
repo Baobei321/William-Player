@@ -1,6 +1,6 @@
 <template>
   <div :class="['about-version', themeClass]">
-    <wil-navbar title="关于" :rightShow="true">
+    <wil-navbar :title="t('navbar.about')" :rightShow="true">
       <template #right>
         <nut-icon name="share" :custom-color="iconColor" @click="showShare = true"></nut-icon>
       </template>
@@ -8,19 +8,19 @@
     <div class="about-version-wrapper">
       <div class="about-version-container">
         <div class="about-version-container__main">
-          <image src="@/static/app-logo1.png" @click="toLogin"></image>
+          <image src="@/static/app-logo1.png" @click="toLogin"  />
           <div class="main-name">
             <span>William Player</span>
             <span>{{ appVersion }}</span>
           </div>
           <div class="main-time">{{ CONFIG.updateTime }}</div>
         </div>
-        <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true"></nut-cell>
+        <nut-cell :title="t('backend.autoCheckUpdate')" :desc="status[0]" :is-link="true" @click="showPopover = true"></nut-cell>
       </div>
       <div class="about-version-protocol">
-        <image src="@/static/tmdb-xy.png"></image>
-        <div class="about-version-protocol__button" @click="toQQpage">联系我们</div>
-        <div class="about-version-protocol__other" @click="toOtherPage">下载其他平台版本</div>
+        <image src="@/static/tmdb-xy.png"  />
+        <div class="about-version-protocol__button" @click="toQQpage">{{ t('backend.contactUs') }}</div>
+        <div class="about-version-protocol__other" @click="toOtherPage">{{ t('backend.downloadOtherPlatformVersion') }}</div>
         <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
       </div>
       <div class="about-version-button">
@@ -28,9 +28,9 @@
           <template #icon>
             <nut-icon name="refresh2" class="nut-icon-am-rotate nut-icon-am-infinite" v-if="isLoading"></nut-icon>
           </template>
-          检查更新
+          {{ t('backend.checkUpdate') }}
         </nut-button>
-        <nut-button disabled custom-color="#dedde3" v-else>当前已是最新版本</nut-button>
+        <nut-button disabled custom-color="#dedde3" v-else>{{ t('backend.currentLatestVersion') }}</nut-button>
       </div>
       <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
         <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
@@ -43,13 +43,13 @@
         @closed="closedPopup"
         v-model:visible="showUpgrade"
       ></wil-upgrade>
-      <wil-share-sheet v-model:show="showShare" title="分享至" :options="options" @select="handleSelect" :wrap="true"></wil-share-sheet>
+      <wil-share-sheet v-model:show="showShare" :title="t('backend.shareTo')" :options="options" @select="handleSelect" :wrap="true"></wil-share-sheet>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import wilUpgrade from '@/components/mobile/wil-upgrade/index.vue'
 import { getUntokenDicts } from '@/network/apis'
@@ -65,6 +65,11 @@ import weiboIcon from '@/static/weibo-icon.png'
 import copyLink from '@/static/copy-link.png'
 import moreIcon from '@/static/more-icon.png'
 import saveImage from '@/static/save-image.png'
+import { useI18n } from 'vue-i18n'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+
+const { t } = useI18n()
+useI18nNavbar('navbar.about')
 
 const url = ref('')
 const themeClass = useThemeClass()
@@ -73,54 +78,61 @@ const { iconColor } = useThemeColors()
 const status = ref(['总是'])
 const showShare = ref(false)
 const showPopover = ref(false)
-const popoverList = ref([
-  { text: '总是', value: '总是' },
-  { text: '每天', value: '每天' },
-  { text: '每周', value: '每周' },
-  { text: '从不', value: '从不' },
+const popoverList = computed(() => [
+  { text: t('backend.always'), value: '总是', key: 'always' },
+  { text: t('backend.everyDay'), value: '每天', key: 'daily' },
+  { text: t('backend.everyWeek'), value: '每周', key: 'weekly' },
+  { text: t('backend.never'), value: '从不', key: 'never' },
 ])
 const isLoading = ref(false)
 const showButton = ref(true)
 const showUpgrade = ref(false)
 const versionData = ref({})
 
-const options = [
+const options = computed(() => [
   {
     delay: '0.1s',
-    name: '微信',
+    name: t('mine.wechat'),
+    key: 'wechat',
     icon: 'https://q-learning.quectel.com/train-uniapp/assets/wechat-friends-DbSOyenR.png',
   },
   {
     delay: '0.15s',
-    name: '朋友圈',
+    name: t('backend.moments'),
+    key: 'moments',
     icon: 'https://q-learning.quectel.com/train-uniapp/assets/wechat-moments-Cf8Tr5vB.png',
   },
   {
     delay: '0.2s',
     name: 'QQ',
+    key: 'qq',
     icon: 'https://q-learning.quectel.com/train-uniapp/assets/qq-friends-D5XyRct4.png',
   },
   {
     delay: '0.25s',
-    name: '微博',
+    name: t('backend.weibo'),
+    key: 'weibo',
     icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/bcebd0a5a29d4a559d1a94c28aed5261.png',
   },
   {
     delay: '0.3s',
-    name: '复制链接',
+    name: t('backend.copyLink'),
+    key: 'copyLink',
     icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/f7349231fa5944c5b6873fd0461452f0.png',
   },
   {
     delay: '0.1s',
-    name: '海报',
+    name: t('backend.poster'),
+    key: 'poster',
     icon: saveImage,
   },
   {
     delay: '0.15s',
-    name: '更多',
+    name: t('common.more'),
+    key: 'more',
     icon: 'https://szrcapi.mouldsdata.com/minio/tzgcs/2026/03/13/3e6732cec150494c975df84aae3c42ee.png',
   },
-]
+])
 const appVersion = ref(CONFIG.VERSION)
 
 let num = 0
@@ -136,14 +148,15 @@ const checkUpdate = async () => {
 }
 
 const confirm = ({ selectedValue, selectedOptions }) => {
-  uni.setStorageSync('remindTime', { type: selectedValue[0] })
+  const selectedKey = selectedOptions[0]?.key || 'always'
+  uni.setStorageSync('remindTime', { type: selectedValue[0], key: selectedKey })
   showPopover.value = false
 }
 
 const toQQpage = () => {
   let query = {
     url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/qqTalk',
-    title: '问题与反馈',
+    title: t('navbar.feedback'),
   }
   uni.navigateTo({
     url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -154,7 +167,7 @@ const toQQpage = () => {
 const toOtherPage = () => {
   let query = {
     url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/download-center',
-    title: '下载中心',
+    title: t('navbar.downloadCenter'),
   }
   uni.navigateTo({
     url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -163,64 +176,60 @@ const toOtherPage = () => {
 
 //分享
 const handleSelect = item => {
-  if (item.name === '微信') {
+  const shareDescription = t('backend.appShareDescription')
+  if (item.key === 'wechat') {
     uni.share({
       provider: 'weixin',
       type: 0,
       title: 'William Player',
       scene: 'WXSceneSession',
-      summary:
-        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      summary: shareDescription,
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
       imageUrl: 'https://gitee.com/waylon-chen/William-Player/raw/master/src/static/app-logo1.png',
     })
-  } else if (item.name === '朋友圈') {
+  } else if (item.key === 'moments') {
     uni.share({
       provider: 'weixin',
       type: 0,
       title: 'William Player',
       scene: 'WXSceneTimeline',
-      summary:
-        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      summary: shareDescription,
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
       imageUrl: 'https://gitee.com/waylon-chen/William-Player/raw/master/src/static/app-logo1.png',
     })
-  } else if (item.name === 'QQ') {
+  } else if (item.key === 'qq') {
     uni.share({
       provider: 'qq',
       type: 1,
       title: 'William Player',
-      summary:
-        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      summary: shareDescription,
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
     })
-  } else if (item.name === '微博') {
+  } else if (item.key === 'weibo') {
     uni.shareWithSystem({
-      summary:
-        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      summary: shareDescription,
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
     })
-  } else if (item.name === '复制链接') {
+  } else if (item.key === 'copyLink') {
     uni.setClipboardData({
       data: 'https://chenweiliang6.github.io/app-webview/#/download-center',
       success: function () {
         uni.showToast({
-          title: '复制成功',
+          title: t('common.copySuccess'),
           icon: 'none',
         })
       },
     })
-  } else if (item.name === '海报') {
+  } else if (item.key === 'poster') {
     uni.previewImage({
       urls: [
         'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/3D7CAC0_427A_haibao1_20260314190031837newMediaImage.png',
         'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1C3CDC3_427A_haibao_20260314172030157newMediaImage.png',
       ],
     })
-  } else if (item.name === '更多') {
+  } else if (item.key === 'more') {
     uni.shareWithSystem({
-      summary:
-        '一款适配📱 Android Phone 📺Android TV以及Windows的视频播放器，功能页面使用uniapp+vue3开发，播放器使用安卓原生kotlin以及mpv开发，支持云播放(天翼云盘、夸克网盘和Webdav)，支持刮削影视元信息，支持IPTV播放，优雅打造私人影视库。界面简洁纯净，操作简单。',
+      summary: shareDescription,
       href: 'https://chenweiliang6.github.io/app-webview/#/download-center',
     })
   }

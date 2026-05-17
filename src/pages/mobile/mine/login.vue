@@ -1,56 +1,56 @@
 <template>
   <div :class="['login', themeClass]">
-    <div class="login-title">
-      <div class="login-title-top">
-        <span>HI</span>
-        <div>请登录</div>
-      </div>
-      <div class="login-title-bottom">欢迎使用William Player</div>
-    </div>
-    <div class="login-tabs">
-      <nut-tabs v-model="tabValue" @change="changeTabs">
-        <nut-tab-pane title="手机登录" pane-key="1">
-          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"></base-form>
-          <div class="forget" @click="toForget">忘记密码?</div>
-        </nut-tab-pane>
-        <nut-tab-pane title="邮箱登录" pane-key="2">
-          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"></base-form>
-          <div class="forget" @click="toForget">忘记密码?</div>
-        </nut-tab-pane>
-      </nut-tabs>
-    </div>
-    <div class="login-button">
-      <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">登录</nut-button>
-      <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">登录</nut-button>
-      <div class="register-button">
-        <div @click="touristEnter">游客进入</div>
-        <div class="register-button-line"></div>
-        <div @click="toRegister">注册</div>
-      </div>
-    </div>
-    <div class="login-other">
-      <div class="login-other-way">
-        <div class="login-other-way__title">其他登录方式</div>
-        <div class="login-other-way__list">
-          <image
-            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2f/dc/81/2fdc81e4-4c1d-1706-ce9d-ee4932e4dd97/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/350x350.png"
-            @click="loginWx"
-          ></image>
-          <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"></image>
-          <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ"></image>
-        </div>
-      </div>
-      <div class="user-agreement" @click="checkAgree">
-        <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon" />
-        <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon" />
-        <div class="user-agreement-word">
-          <span>我已阅读并同意</span>
-          <span>《用户协议》</span>
-          <span>和</span>
-          <span>《隐私政策》</span>
-        </div>
-      </div>
-    </div>
+  <div class="login-title">
+  <div class="login-title-top">
+  <span>HI</span>
+  <div>{{ t('auth.pleaseLogin') }}</div>
+  </div>
+  <div class="login-title-bottom">{{ t('auth.welcomeUseWilliamPlayer') }}</div>
+  </div>
+  <div class="login-tabs">
+  <nut-tabs v-model="tabValue" @change="changeTabs">
+  <nut-tab-pane :title="t('auth.phoneLogin')" pane-key="1">
+  <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"></base-form>
+  <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
+  </nut-tab-pane>
+  <nut-tab-pane :title="t('auth.emailLogin')" pane-key="2">
+  <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"></base-form>
+  <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
+  </nut-tab-pane>
+  </nut-tabs>
+  </div>
+  <div class="login-button">
+  <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">{{ t('auth.login') }}</nut-button>
+  <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">{{ t('auth.login') }}</nut-button>
+  <div class="register-button">
+  <div @click="touristEnter">{{ t('auth.touristEnter') }}</div>
+  <div class="register-button-line"></div>
+  <div @click="toRegister">{{ t('auth.register') }}</div>
+  </div>
+  </div>
+  <div class="login-other">
+  <div class="login-other-way">
+  <div class="login-other-way__title">{{ t('auth.otherLoginMethods') }}</div>
+  <div class="login-other-way__list">
+  <image
+  src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2f/dc/81/2fdc81e4-4c1d-1706-ce9d-ee4932e4dd97/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/350x350.png"
+  @click="loginWx"
+   />
+  <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"  />
+  <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ"  />
+  </div>
+  </div>
+  <div class="user-agreement" @click="checkAgree">
+  <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon"  />
+  <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon"  />
+  <div class="user-agreement-word">
+  <span>{{ t('auth.readAndAgree') }}</span>
+  <span>{{ t('auth.userAgreement') }}</span>
+  <span>{{ t('auth.and') }}</span>
+  <span>{{ t('auth.privacyPolicy') }}</span>
+  </div>
+  </div>
+  </div>
   </div>
 </template>
 
@@ -67,7 +67,9 @@ import tabsLeft from '@/static/tabs-left.png'
 import tabsRight from '@/static/tabs-right.png'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const tabValue = ref('1')
 const themeClass = useThemeClass()
 const { primaryBtnColor, isDark } = useThemeColors()
@@ -85,13 +87,13 @@ const tabBg = computed(() => {
 const validatorPhone = val => {
   return new Promise((resolve, reject) => {
     if (!val) {
-      reject('手机号码不能为空')
+      reject(t('auth.phoneRequired'))
     } else {
-      const reg = /^1[3-9][0-9]\d{8}$/ // 手机号正则表达式
+      const reg = /^1[3-9][0-9]\d{8}$/
       if (!reg.test(val)) {
-        reject('手机号码格式错误')
+        reject(t('auth.phoneInvalid'))
       } else {
-        resolve() // 所有验证都通过
+        resolve()
       }
     }
   })
@@ -100,36 +102,36 @@ const validatorPhone = val => {
 const validatorEmail = val => {
   return new Promise((resolve, reject) => {
     if (!val) {
-      reject('邮箱不能为空')
+      reject(t('auth.emailRequired'))
     } else {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
       if (!emailRegex.test(val)) {
-        reject('请输入有效的邮箱地址')
+        reject(t('auth.emailInvalid'))
       } else {
-        resolve() // 所有验证都通过
+        resolve()
       }
     }
   })
 }
-const settings1 = ref([
+const settings1 = computed(() => [
   {
-    label: '手机号',
+    label: t('auth.phoneNumber'),
     type: 'input',
     prop: 'phone',
-    formItemProps: { placeholder: '请输入手机号', type: 'number', inputmode: 'numeric' },
+    formItemProps: { placeholder: t('auth.pleaseInputPhone'), type: 'number', inputmode: 'numeric' },
     rule: [{ validator: validatorPhone }],
   },
-  { label: '密码', type: 'input', prop: 'password', formItemProps: { placeholder: '请输入密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
+  { label: t('auth.password'), type: 'input', prop: 'password', formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' }, rule: [{ required: true, message: t('auth.pleaseInputPassword') }] },
 ])
-const settings2 = ref([
+const settings2 = computed(() => [
   {
-    label: '邮箱',
+    label: t('auth.email'),
     type: 'input',
     prop: 'email',
-    formItemProps: { placeholder: '请输入邮箱', type: 'text', inputmode: 'numeric' },
+    formItemProps: { placeholder: t('auth.pleaseInputEmail'), type: 'text', inputmode: 'numeric' },
     rule: [{ validator: validatorEmail }],
   },
-  { label: '密码', type: 'input', prop: 'password', formItemProps: { placeholder: '请输入密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
+  { label: t('auth.password'), type: 'input', prop: 'password', formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' }, rule: [{ required: true, message: t('auth.pleaseInputPassword') }] },
 ])
 
 const base_form1 = ref(null)
@@ -154,7 +156,6 @@ const changeTabs = obj => {
 
 const confirmCommit = async () => {
   if (tabValue.value === '1') {
-    //手机号登录
     base_form1.value.confirmCommit().then(async valid => {
       if (valid) {
         let res = await loginByPhone({ phone: formData1.value.phone, password: encrypt(formData1.value.password) })
@@ -168,7 +169,6 @@ const confirmCommit = async () => {
       }
     })
   } else if (tabValue.value === '2') {
-    //邮箱登录
     base_form2.value.confirmCommit().then(async valid => {
       if (valid) {
         let res = await loginByEmail({ email: formData2.value.email, password: encrypt(formData2.value.password) })
@@ -223,7 +223,7 @@ const toRegister = () => {
 
 const clickNoAgree = () => {
   uni.showToast({
-    title: '请先勾选用户协议',
+    title: t('auth.pleaseCheckAgreement'),
     icon: 'none',
     duration: 2000,
   })
@@ -232,8 +232,8 @@ const clickNoAgree = () => {
 //使用微信登录
 const loginWx = () => {
   uni.login({
-    provider: 'weixin', //使用qq登录
-    onlyAuthorize: true, // 微信登录仅请求授权认证
+    provider: 'weixin',
+    onlyAuthorize: true,
     success: async loginRes => {
       let result = await loginByWechat({ code: loginRes.code })
       uni.setStorageSync(CONFIG.OPEN_ID, result.openId)
@@ -252,7 +252,7 @@ const loginAlipay = () => {
   const Alipay = uni.requireNativePlugin('AlipayModule')
   Alipay.openAuthScheme(
     {
-      appId: '2021006126672664', // 支付宝分配给开发者的应用 ID
+      appId: '2021006126672664',
       scheme: 'WilliamPlayer',
     },
     res => {
@@ -271,7 +271,7 @@ const loginAlipay = () => {
 //使用QQ快捷登录
 const loginQQ = () => {
   uni.login({
-    provider: 'qq', //使用qq登录
+    provider: 'qq',
     success: loginRes => {
       uni.getUserInfo({
         provider: 'qq',
@@ -303,8 +303,6 @@ page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  // background: url("https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/4844737_427A_bg_20250211152611234newMediaImage.png")
-  //   center no-repeat;
   background: var(--app-gradient-mine);
   background-size: 100% 100%;
   padding: 150rpx 48rpx 68rpx 48rpx;
@@ -312,7 +310,6 @@ page {
 
   &-title {
     font-weight: bold;
-    // font-size: 48rpx;
     color: var(--app-text-primary);
     margin-bottom: 64rpx;
 
@@ -403,27 +400,27 @@ page {
                     }
                   }
                 }
+              }
 
-                .remember-password {
-                  display: flex;
-                  align-items: center;
-                  justify-content: flex-start;
+              .remember-password {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
 
-                  span {
-                    color: var(--app-text-secondary);
-                    font-size: 28rpx;
-                    padding-left: 20rpx;
-                  }
+                span {
+                  color: var(--app-text-secondary);
+                  font-size: 28rpx;
+                  padding-left: 20rpx;
                 }
               }
             }
           }
+        }
 
-          .forget {
-            font-size: 26rpx;
-            color: #1492ff;
-            text-align: right;
-          }
+        .forget {
+          font-size: 26rpx;
+          color: #1492ff;
+          text-align: right;
         }
       }
     }
@@ -499,7 +496,6 @@ page {
       justify-content: center;
       box-sizing: border-box;
 
-      // padding-bottom: 68rpx;
       .user-agreement-icon {
         width: 28rpx;
         height: 28rpx;
@@ -528,33 +524,4 @@ page {
     }
   }
 }
-
-// @media (prefers-color-scheme: dark) {
-//   .login {
-//     background: #1e1e20;
-//     &-title {
-//       color: #fff;
-//     }
-//     ::v-deep .base-form {
-//       background: transparent;
-//       padding: 0;
-//       .nut-cell-group {
-//         .nut-cell-group__wrap {
-//           background: transparent;
-//           .nut-form-item {
-//             align-items: center;
-//             &::after {
-//               display: none;
-//             }
-//           }
-//         }
-//       }
-//       .base-form-bottom {
-//         .no-agree {
-//           background: gray !important;
-//         }
-//       }
-//     }
-//   }
-// }
 </style>

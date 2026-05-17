@@ -1,6 +1,6 @@
 <template>
   <div :class="['source-list', themeClass]">
-    <wil-navbar title="资源库" :leftShow="true">
+    <wil-navbar :title="t('navbar.resourceLibrary')" :leftShow="true">
       <template #right>
         <nut-icon name="uploader" :custom-color="iconColor" @click="toAddFile"></nut-icon>
       </template>
@@ -13,36 +13,35 @@
             <div :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.active ? 'list-active' : '']"
               v-for="vitem in item.list" :key="vitem.name" @click="handleSelect(item, vitem)">
               <div class="list-item-img">
-                <image :src="item.img"></image>
+                <image :src="item.img"  />
               </div>
               <div class="list-item-name" :class="[vitem.active ? 'list-item-activeName' : '']">{{ vitem.name }}</div>
               <image class="list-item-button"
                 :src="vitem.active ? moreOrange : isDark ? moreWhite : moreBlack"
-                @click.stop="toShowMoreButton(item, vitem)">
-              </image>
+                @click.stop="toShowMoreButton(item, vitem)"  />
             </div>
           </div>
         </template>
       </div>
     </div>
     <div class="source-list-empty" v-else>
-      <image src="@/static/no-data.png" class="source-list-empty__img"></image>
-      <span class="source-list-empty__tip">添加完资源之后，请为此资源添加电影、电视剧目录！！！</span>
+      <image src="@/static/no-data.png" class="source-list-empty__img"  />
+      <span class="source-list-empty__tip">{{ t('source.resourceTipAfterAdd') }}</span>
       <nut-button :custom-color="primaryBtnColor" @click="toAddFile">
         <template #icon>
           <nut-icon name="uploader" :custom-color="primaryBtnTextColor" size="12"></nut-icon>
         </template>
-        <span :style="{ color: primaryBtnTextColor }">添加新资源</span>
+        <span :style="{ color: primaryBtnTextColor }">{{ t('video.addNewResource') }}</span>
       </nut-button>
     </div>
-    <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" cancel-txt="取消"
+    <nut-action-sheet v-model:visible="showBottom" :title="selectMedia.name" :menu-items="operationList" :cancel-txt="t('common.cancel')"
       @choose="chooseOperation" />
     <wil-modal ref="wil_modal"></wil-modal>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import wilNavbar from "@/components/mobile/wil-navbar/index.vue";
 import { onShow, onUnload } from "@dcloudio/uni-app";
 import { toParse, toStringfy } from "../mine/common";
@@ -54,7 +53,9 @@ import moreWhite from "@/static/more-white.png";
 import moreOrange from "@/static/more-orange.png";
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const sourceList = ref([]);
 const selectMedia = ref({});
 const themeClass = useThemeClass()
@@ -65,33 +66,39 @@ const wil_modal = ref(null);
 
 const showBottom = ref(false);
 
-const operationList = ref([{ name: '设置电影目录' }, { name: '设置电视剧目录' }, { name: "修改" }, { name: "删除" }])
+const getOperationList = () => [
+  { key: 'movieDirectory', name: t('source.setMovieDirectory') },
+  { key: 'tvDirectory', name: t('source.setTvDirectory') },
+  { key: 'modify', name: t('common.modify') },
+  { key: 'delete', name: t('common.delete') },
+]
+const operationList = computed(getOperationList)
 let selectType = {};
 
-const mapping = {
+const getMapping = () => ({
   "WebDAV": {
     path: "/pages/mobile/source/add-webdav",
-    query: { title: "修改WebDAV" },
+    query: { title: t('navbar.modifyWebdav') },
   },
   "天翼云盘": {
     path: "/pages/mobile/backend/cloud189-webview",
     query: {
       url: "https://cloud.189.cn",
-      title: "天翼云盘",
+      title: t('navbar.tianyiCloudDrive'),
     },
   },
   "夸克网盘": {
     path: "/pages/mobile/backend/quark-webview",
     query: {
       url: "https://pan.quark.cn",
-      title: "夸克网盘",
+      title: t('navbar.quarkCloudDrive'),
     },
   },
   "Emby": {
     path: "/pages/mobile/source/add-emby",
-    query: { title: "修改Emby" },
+    query: { title: t('navbar.modifyEmby') },
   }
-};
+});
 
 const toAddFile = () => {
   uni.navigateTo({
@@ -117,8 +124,8 @@ const resetSelect = (vitem) => {
 
 const handleSelect = (item, vitem) => {
   wil_modal.value.showModal({
-    title: "温馨提示",
-    content: "是否确认选择此资源",
+    title: t('modal.warmTip'),
+    content: t('source.selectResourceConfirm'),
     confirmColor: "#ff6701",
     confirm: async () => {
       if (item.type == "WebDAV") {
@@ -129,7 +136,7 @@ const handleSelect = (item, vitem) => {
           })
           .catch((error) => {
             uni.showToast({
-              title: "请先开启Alist",
+              title: t('source.pleaseEnableAlist'),
               icon: "none",
             });
           });
@@ -140,14 +147,14 @@ const handleSelect = (item, vitem) => {
               resetSelect(vitem);
             } else {
               uni.showToast({
-                title: "请重新登录天翼云盘",
+                title: t('source.reloginTianyiCloudDrive'),
                 icon: "none",
               });
             }
           })
           .catch((error) => {
             uni.showToast({
-              title: "请重新登录天翼云盘",
+              title: t('source.reloginTianyiCloudDrive'),
               icon: "none",
             });
           });
@@ -158,14 +165,14 @@ const handleSelect = (item, vitem) => {
               resetSelect(vitem);
             } else {
               uni.showToast({
-                title: "请重新登录夸克网盘",
+                title: t('source.reloginQuarkCloudDrive'),
                 icon: "none",
               });
             }
           })
           .catch((error) => {
             uni.showToast({
-              title: "请重新登录夸克网盘",
+              title: t('source.reloginQuarkCloudDrive'),
               icon: "none",
             });
           });
@@ -177,24 +184,23 @@ const handleSelect = (item, vitem) => {
 };
 
 const toShowMoreButton = (item, vitem) => {
-  if (item.type == 'Emby') {
-    operationList.value = [{ name: "修改" }, { name: "删除" }]
-  }
+  operationList.value = item.type == 'Emby' ? getOperationList().filter(i => ['modify', 'delete'].includes(i.key)) : getOperationList()
   selectType = item;
   selectMedia.value = vitem;
   showBottom.value = true;
 };
 
 const chooseOperation = (item) => {
-  if (item.name == '设置电影目录') {
+  const mapping = getMapping()
+  if (item.key == 'movieDirectory') {
     uni.navigateTo({
-      url: `/pages/mobile/media/catelog-mulu?title=电影`
+      url: `/pages/mobile/media/catelog-mulu?title=${t('video.movie')}`
     })
-  } else if (item.name == '设置电视剧目录') {
+  } else if (item.key == 'tvDirectory') {
     uni.navigateTo({
-      url: `/pages/mobile/media/catelog-mulu?title=电视剧`
+      url: `/pages/mobile/media/catelog-mulu?title=${t('video.tv')}`
     })
-  } else if (item.name == "修改") {
+  } else if (item.key == 'modify') {
     if (selectType.type == "WebDAV") {
       uni.navigateTo({
         url: mapping[selectType.type].path + "?" + toStringfy(mapping[selectType.type].query) + `&address=${selectMedia.value.address}&isActive=${selectMedia.value.active ? "1" : "0"}`,
@@ -208,10 +214,10 @@ const chooseOperation = (item) => {
         url: `${mapping[selectType.type].path}?${toStringfy(mapping[selectType.type].query)}&isActive=${selectMedia.value.active ? "1" : "0"}`,
       });
     }
-  } else if (item.name == "删除") {
+  } else if (item.key == 'delete') {
     wil_modal.value.showModal({
-      title: "温馨提示",
-      content: "是否确认删除该文件源？，此操作将一并删除海报墙",
+      title: t('modal.warmTip'),
+      content: t('source.deleteSourceConfirm'),
       confirmColor: "#ff6701",
       confirm: async () => {
         selectType.list = selectType.list.filter((i) => i.name != selectMedia.value.name);

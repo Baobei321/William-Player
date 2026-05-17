@@ -5,11 +5,11 @@
         <div class="emby-home-media__title-left">
           <image
             src="https://gimg3.baidu.com/search/src=https%3A%2F%2Ftiebapic.baidu.com%2Fforum%2Fw%253D120%253Bh%253D120%2Fsign%3D44147d7d4e82b2b7a79f3dc60196a3d2%2Fc9fcc3cec3fdfc03771506c1c33f8794a4c2265e.jpg%3Ftbpicau%3D2025-04-08-05_5fe90c457d4356ee146a73914e8a8871&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=w240&n=0&g=0n&q=75&fmt=auto?sec=1744045200&t=627b5377de1d3107a8a09cb4f65c9fdc"
-          ></image>
-          <span>我的媒体</span>
+            />
+          <span>{{ t('video.myMedia') }}</span>
         </div>
         <!-- <div class="emby-home-media__title-right" @click="toVideoAll">
-                    <span>全部</span>
+                    <span>{{ t('common.all') }}</span>
                     <nut-icon name="rect-right" size="10" custom-color="#52b54b"></nut-icon>
                 </div> -->
       </div>
@@ -18,7 +18,7 @@
           <div class="emby-home-media__list-classify">
             <div class="emby-home-media__list-classify__item" v-for="item in classifyList" :key="item.id" @click="toVideoAll(item)">
               <div class="emby-home-media__list-classify__item-img">
-                <image :src="setEmptyImg(item.poster)" style="width: 100%; height: 100%; position: static" mode="aspectFill"></image>
+                <image :src="setEmptyImg(item.poster)" style="width: 100%; height: 100%; position: static" mode="aspectFill"  />
               </div>
               <span class="emby-home-media__list-classify__item-name">{{ item.name }}</span>
             </div>
@@ -34,7 +34,9 @@
 import { ref } from 'vue'
 import hxList from './hx-list.vue'
 import emptyBg from '@/static/poster-empty.png'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const classifyList = ref(uni.getStorageSync('embyMovieTvList'))
 const showList = ref([])
 

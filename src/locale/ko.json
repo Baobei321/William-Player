@@ -1,0 +1,16 @@
+{
+  "navbar.dataSync": "데이터 동기화",
+  "navbar.appreciate": "후원",
+  "navbar.operationGuide": "가이드",
+  "navbar.live": "라이브",
+  "navbar.liveList": "라이브 목록",
+  "navbar.mediaLibrary": "미디어 라이브러리",
+  "navbar.catelogSetting": "디렉터리 설정",
+  "navbar.addFileSource": "파일 소스 추가",
+  "navbar.editInformation": "정보 편집",
+  "navbar.personalCenter": "프로필",
+  "navbar.settings": "설정",
+  "tabBar.mediaLibrary": "미디어",
+  "tabBar.live": "라이브",
+  "tabBar.mine": "내 정보"
+}

@@ -12,7 +12,7 @@
             @click="handleSelect(item)"
           >
             <div class="wrapper-list-item__icon">
-              <image :src="item.icon"></image>
+              <image :src="item.icon"  />
             </div>
             <span class="wrapper-list-item__name">{{ item.name }}</span>
           </div>
@@ -24,12 +24,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ShareSheetOption } from './types'
+
+const { t } = useI18n()
 import type { PropType } from 'vue'
 const props = defineProps({
   title: { type: String, default: '' },
   options: { type: Array as PropType<ShareSheetOption[]>, default: [] },
-  cancelText: { type: String, default: '取消' }, //取消按钮文字，传入空字符串可以隐藏按钮
+  cancelText: { type: String, default: '' },
   round: { type: Boolean, default: true },
   duration: { type: [Number, String], default: '0.3' },
   wrap: { type: Boolean, default: false },

@@ -1,16 +1,16 @@
 <template>
   <div :class="['ai-chat', themeClass]">
-    <wil-navbar title="AI问答" :right-show="true">
+    <wil-navbar :title="t('navbar.aiQa')" :right-show="true">
       <template #right>
-        <image src="@/static/add-conversation.png" @click="addNew"></image>
+        <image src="@/static/add-conversation.png" @click="addNew"  />
       </template>
     </wil-navbar>
     <view class="chat-box">
       <!-- 想要使用虚拟列表的话，就不能在chat-list里面使用chat-message，直接在chat-list中通过data属性传值 -->
       <t-chat-list id="chatList" ref="tChatListRef">
         <div class="chat-empty" v-if="!chatList?.length">
-          <span>你好，{{ userInfo.name }}</span>
-          <span>随时为你答疑、创作、也欢迎找我聊天</span>
+          <span>{{ t('toolbox.helloUser', { name: userInfo.name }) }}</span>
+          <span>{{ t('toolbox.aiGreeting') }}</span>
         </div>
         <t-chat-message
           :chat-id="item.chatId"
@@ -29,14 +29,14 @@
           <template #content>
             <div class="content-text">{{ item.content[0]?.data || '' }}</div>
             <div class="content-image" v-if="item.content[1].type === 'image'">
-              <image v-if="!item.content[1].data?.length && item.status === 'loading'"></image>
+              <image v-if="!item.content[1].data?.length && item.status === 'loading'"  />
               <image
                 v-for="vitem in item.content[1].data || []"
                 :key="vitem.url"
                 :src="vitem.url"
                 mode="aspectFill"
                 @click="previewImage(vitem, item.content[1].data)"
-              ></image>
+               />
             </div>
             <div class="content-video" v-if="item.content[1].type === 'video'">
               <div class="content-video-empty" v-if="!item.content[1].data?.length && item.status === 'loading'"></div>
@@ -61,7 +61,7 @@
             :disabled="disabledInput"
             :auto-rise-with-keyboard="true"
             :render-presets="renderPresets"
-            placeholder="请输入您的问题..."
+            :placeholder="t('toolbox.inputQuestion')"
             @send="sendMessage"
             @stop="stopMessage"
           ></chat-sender>
@@ -99,8 +99,12 @@ import * as CONFIG from '@/utils/config.js'
 import wilNavbar from '@/components/mobile/wil-navbar/index.vue'
 import { generations } from '@/network/apis.js'
 import { useThemeClass } from '@/hooks/useThemeClass'
+import { useI18n } from 'vue-i18n'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 
 const themeClass = useThemeClass()
+const { t } = useI18n()
+useI18nNavbar('navbar.aiQa')
 let uniqueId = 0
 const wil_sse = ref(null)
 const tChatListRef = ref(null)
@@ -193,7 +197,7 @@ const sendMessage = async (value, fileList, abilityObj) => {
             content: [
               {
                 type: 'text',
-                data: '正在生成图片，请稍等...',
+                data: t('video.generatingImage'),
               },
               {
                 type: 'image',
@@ -210,7 +214,7 @@ const sendMessage = async (value, fileList, abilityObj) => {
             content: [
               {
                 type: 'text',
-                data: '正在生成视频，请稍等...',
+                data: t('video.generatingVideo'),
               },
               {
                 type: 'video',
@@ -225,12 +229,12 @@ const sendMessage = async (value, fileList, abilityObj) => {
     try {
       generationsPromise = generations({ content: content, type: abilityObj.abilityType })
       let res = await generationsPromise
-      chatList.value[0].content[0].data = `${abilityObj.abilityType === 'image' ? '图片' : '视频'}已生成`
+      chatList.value[0].content[0].data = abilityObj.abilityType === 'image' ? t('video.imageGenerated') : t('video.videoGenerated')
       abilityObj.abilityType === 'image' ? (chatList.value[0].content[1].data = res.data.data) : (chatList.value[0].content[1].data = res.data.video_result)
       chatList.value[0].status = 'complete'
     } catch (error) {
       //异常情况处理
-      chatList.value[0].content[0].data = '生成失败，请重试'
+      chatList.value[0].content[0].data = t('video.generationFailedRetry')
       chatList.value[0].content[1].data = []
       chatList.value[0].status = 'fail'
     }
@@ -287,7 +291,7 @@ const handleMessage = message => {
       chatList.value[0].content.unshift({
         type: 'thinking',
         data: {
-          title: '正在思考中...',
+          title: t('video.thinking'),
           text: message.reasoning_content,
         },
       })
@@ -295,7 +299,7 @@ const handleMessage = message => {
   } else {
     if (chatList.value[0].content.some(i => i.type === 'thinking')) {
       chatList.value[0].status = 'complete'
-      chatList.value[0].content[0].data.title = '已完成思考'
+      chatList.value[0].content[0].data.title = t('video.thinkingCompleted')
       message.content ? (chatList.value[0].content[1].data += message.content) : ''
     } else {
       message.content ? (chatList.value[0].content[0].data += message.content) : ''

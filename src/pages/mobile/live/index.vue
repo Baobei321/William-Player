@@ -1,10 +1,10 @@
 <template>
   <div :class="['live', themeClass]">
     <nut-cell-group>
-      <nut-swipe v-for="(item, index) in liveList" :key="item.name" :disabled="item.name == '默认直播源' ? true : false">
-        <nut-cell :title="item.name" is-link @click="toLiveList(item)"></nut-cell>
+      <nut-swipe v-for="(item, index) in liveList" :key="item.name" :disabled="item.isDefault || item.name === '默认直播源'">
+        <nut-cell :title="getLiveName(item)" is-link @click="toLiveList(item)"></nut-cell>
         <template #right>
-          <nut-button style="height: 100%" type="danger" shape="square" @click="deleteLive(index)">删除</nut-button>
+          <nut-button style="height: 100%" type="danger" shape="square" @click="deleteLive(index)">{{ t('common.delete') }}</nut-button>
         </template>
       </nut-swipe>
     </nut-cell-group>
@@ -12,14 +12,14 @@
       <wil-form v-model="state.formData" :options="options" ref="base_form"></wil-form>
     </wil-modal>
     <div class="live-add" @click="openForm">
-      <image src="@/static/jia-hao.png"></image>
+      <image src="@/static/jia-hao.png"  />
     </div>
     <share-dialog v-model:visible="showShareModal" :shareUrl="shareUrl"></share-dialog>
   </div>
 </template>
 
 <script setup>
-import { onBeforeMount, ref, reactive } from 'vue'
+import { computed, onBeforeMount, ref, reactive } from 'vue'
 import wilForm from '@/components/mobile/wil-form/index.vue'
 import wilModal from '@/components/mobile/wil-modal/index.vue'
 import shareDialog from '../video/components/index-component/share-dialog.vue'
@@ -29,9 +29,13 @@ import { onShow } from '@dcloudio/uni-app'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeTabbar } from '@/hooks/useThemeTabbar'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const themeClass = useThemeClass()
 useThemeNavbar()
+useI18nNavbar('navbar.live')
 useThemeTabbar()
 const liveList = ref([])
 const wil_modal = ref(null)
@@ -59,23 +63,23 @@ const validatorUrl = val => {
   }
 }
 
-const options = [
+const options = computed(() => [
   {
-    label: '直播源名称',
+    label: t('live.liveSourceName'),
     prop: 'name',
     type: 'input',
     required: false,
-    formItemProps: { placeholder: '请输入', type: 'text' },
-    rule: [{ required: true, message: '请输入直播源名称' }],
+    formItemProps: { placeholder: t('common.input'), type: 'text' },
+    rule: [{ required: true, message: t('live.pleaseInputLiveSourceName') }],
   },
   {
-    label: '直播源地址',
+    label: t('live.liveSourceAddress'),
     prop: 'url',
     type: 'input',
-    formItemProps: { placeholder: '请输入', type: 'text' },
-    rule: [{ validator: validatorUrl, message: '请输入正确的直播源地址' }],
+    formItemProps: { placeholder: t('common.input'), type: 'text' },
+    rule: [{ validator: validatorUrl, message: t('live.pleaseInputValidLiveSourceAddress') }],
   },
-]
+])
 
 //获取iptv
 const getIptv = url => {
@@ -93,28 +97,32 @@ const getIptv = url => {
   })
 }
 
+const getLiveName = item => {
+  return item.isDefault || item.name === '默认直播源' ? t('live.defaultLiveSource') : item.name
+}
+
 const openForm = () => {
   wil_modal.value.showModal({
-    title: '添加',
+    title: t('common.add'),
     confirmColor: '#ff6701',
     confirm: async () => {
       if (!state.formData.name || !state.formData.url) {
         uni.showToast({
-          title: '请输入完整的直播源',
+          title: t('live.pleaseInputCompleteLiveSource'),
           icon: 'none',
         })
         return
       }
-      if (liveList.value.some(v => v.name == state.formData.name)) {
+      if (liveList.value.some(v => getLiveName(v) == state.formData.name)) {
         uni.showToast({
-          title: '存在同名直播源',
+          title: t('live.duplicateLiveSourceName'),
           icon: 'none',
         })
         return
       }
       if (liveList.value.some(v => v.url == state.formData.url)) {
         uni.showToast({
-          title: '存在相同url直播源',
+          title: t('live.duplicateLiveSourceUrl'),
           icon: 'none',
         })
         return
@@ -122,7 +130,7 @@ const openForm = () => {
       let res = await getIptv(state.formData.url)
       if (!res[0].groupTitle) {
         uni.showToast({
-          title: '请检查文件的格式是否正确',
+          title: t('live.checkFileFormat'),
           icon: 'error',
         })
       } else {
@@ -144,7 +152,7 @@ const deleteLive = index => {
 
 const toLiveList = item => {
   uni.navigateTo({
-    url: '/pages/mobile/live/list?name=' + item.name,
+    url: '/pages/mobile/live/list?name=' + encodeURIComponent(item.name),
   })
 }
 
@@ -163,7 +171,8 @@ onBeforeMount(() => {
   if (!liveList.value) {
     liveList.value = [
       {
-        name: '默认直播源',
+        name: 'defaultLiveSource',
+        isDefault: true,
         url: 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u',
       },
     ]
