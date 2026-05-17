@@ -47,12 +47,12 @@ export const useLocaleStore = defineStore('locale', {
       this.locale = getSavedLocale()
       this.applyLocale()
     },
-    setLocale(locale) {
+    setLocale(locale, options = {}) {
       this.locale = normalizeLocale(locale)
       uni.setStorageSync(LOCALE_STORAGE_KEY, this.locale)
-      this.applyLocale()
+      this.applyLocale(options)
     },
-    applyLocale() {
+    applyLocale({ syncUniLocale = true } = {}) {
       if (this.i18n) {
         if (this.i18n.global.locale && typeof this.i18n.global.locale === 'object') {
           this.i18n.global.locale.value = this.locale
@@ -60,7 +60,7 @@ export const useLocaleStore = defineStore('locale', {
           this.i18n.global.locale = this.locale
         }
       }
-      if (typeof uni.setLocale === 'function') {
+      if (syncUniLocale && typeof uni.setLocale === 'function') {
         uni.setLocale(this.locale)
       }
       NutUILocale.use(this.nutuiLanguage)

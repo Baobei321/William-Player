@@ -37,6 +37,7 @@ import dayjs from 'dayjs';
 import { getFolder, get189Folder, getQuarkFolder } from "@/utils/common.js";
 import { onShow } from "@dcloudio/uni-app";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import wilEmpty from "@/components/mobile/wil-empty/index.vue";
 import wilModal from "@/components/mobile/wil-modal/index.vue";
@@ -45,6 +46,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.mediaLibrary')
 const themeClass = useThemeClass()
 const refreshDate = ref('');
 const date = computed(() => {

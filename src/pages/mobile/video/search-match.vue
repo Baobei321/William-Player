@@ -66,11 +66,13 @@ import { generateChineseNumberMapping } from "@/utils/scrape";
 import { onLoad } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { searchMovieTvMulti, getTvDetail, getMovieDetail } from '@/utils/tmdb'
 
 useThemeNavbar({ variant: 'secondary' })
+useI18nNavbar('navbar.editInformation')
 const { t } = useI18n()
 const themeClass = useThemeClass()
 const { iconColor } = useThemeColors()

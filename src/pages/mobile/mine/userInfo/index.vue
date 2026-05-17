@@ -58,12 +58,14 @@ import bindedIcon from '@/static/binded-icon.png'
 import nobindedIcon from '@/static/nobinded-icon.png'
 import { bindAlipay, unbindAlipay, bindQQ, unbindQQ, bindWechat, unbindWechat } from '@/network/apis'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 useThemeNavbar()
+useI18nNavbar('navbar.personalCenter')
 const themeClass = useThemeClass()
 const { textSecondaryColor, textPlaceholderColor, successColor, dangerColor } = useThemeColors()
 const userInfo = ref({})

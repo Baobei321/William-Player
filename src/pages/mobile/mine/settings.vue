@@ -71,8 +71,10 @@ import { useThemeStore } from '@/stores/theme'
 import { useLocaleStore } from '@/stores/locale'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
+import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 
 useThemeNavbar()
+useI18nNavbar('navbar.settings')
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const localeStore = useLocaleStore()
@@ -152,7 +154,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
 const confirmLanguagePicker = ({ selectedValue }) => {
   showLanguagePopover.value = false
   languageStatus.value[0] = selectedValue[0]
-  localeStore.setLocale(selectedValue[0])
+  localeStore.setLocale(selectedValue[0], { syncUniLocale: false })
 }
 
 onBeforeMount(() => {
