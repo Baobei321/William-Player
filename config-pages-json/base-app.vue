@@ -27,7 +27,7 @@ export default {
   onShow: function () {
     console.log('App Show')
     const themeStore = useThemeStore()
-    // themeStore.applyTheme();
+    themeStore._resolveAndApply()
   },
   onHide: function () {
     console.log('App Hide')

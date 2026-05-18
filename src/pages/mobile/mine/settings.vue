@@ -29,7 +29,7 @@
       <template #theme>
         <nut-cell :title="t('settings.theme')" is-link :desc="themeText" @click="showPopover = true">
           <template #icon>
-            <image src="@/static/theme-icon.png" />
+            <image :src="themeClass === 'dark' ? themeLight : themeDark" />
           </template>
         </nut-cell>
       </template>
@@ -43,13 +43,13 @@
     </wil-form>
     <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
       <div :class="themeClass">
-        <nut-picker v-model="status" :columns="popoverList" :title="t('settings.theme')" @confirm="confirmPicker" @cancel="showPopover = false" />
+        <nut-picker :modelValue="status" :columns="popoverList" :title="t('settings.theme')" @confirm="confirmPicker" @cancel="showPopover = false" />
       </div>
     </nut-popup>
     <nut-popup v-model:visible="showLanguagePopover" round position="bottom" safe-area-inset-bottom>
       <div :class="themeClass">
         <nut-picker
-          v-model="languageStatusValue"
+          v-model="languageStatus"
           :columns="languageList"
           :title="t('settings.language')"
           @confirm="confirmLanguagePicker"
@@ -72,6 +72,8 @@ import { useLocaleStore } from '@/stores/locale'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useI18nNavbar } from '@/hooks/useI18nNavbar'
+import themeLight from '@/static/mode-light.png'
+import themeDark from '@/static/mode-dark.png'
 
 useThemeNavbar()
 useI18nNavbar('navbar.settings')
@@ -110,17 +112,17 @@ const themeText = computed(() => popoverList.value.find(i => i.value == status.v
 const showLanguagePopover = ref(false)
 const languageList = computed(() => localeStore.supportedLocales.map(item => ({ text: item.label, value: item.value })))
 const languageStatus = ref([localeStore.locale])
-const languageStatusValue = ref([localeStore.locale])
-const languageText = computed(() => languageList.value.find(i => i.value == languageStatus.value[0])?.text || t('settings.chinese'))
+const languageText = ref(t('settings.chinese'))
 
 watch(
   () => localeStore.locale,
   locale => {
     languageStatus.value[0] = locale
-    languageStatusValue.value[0] = locale
+    languageText.value = languageList.value.find(i => i.value == locale)?.text || t('settings.chinese')
   }
 )
 
+const setThemeIcon = () => {}
 const changeSwitch = (val, type) => {
   if (type == 'showProgress') {
     settingData.value.showProgress = val
@@ -154,6 +156,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
 const confirmLanguagePicker = ({ selectedValue }) => {
   showLanguagePopover.value = false
   languageStatus.value[0] = selectedValue[0]
+  languageText.value = languageList.value.find(i => i.value == selectedValue[0])?.text || t('settings.chinese')
   localeStore.setLocale(selectedValue[0], { syncUniLocale: false })
 }
 
@@ -166,6 +169,7 @@ onBeforeMount(() => {
   const mode = themeStore.getThemeUi()
   status.value[0] = mode
   languageStatus.value[0] = localeStore.locale
+  languageText.value = languageList.value.find(i => i.value == languageStatus.value[0])?.text || t('settings.chinese')
 })
 </script>
 

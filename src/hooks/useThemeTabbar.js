@@ -1,9 +1,11 @@
 import { watch, ref } from 'vue';
 import { useThemeStore } from '@/stores/theme';
+import { useLocaleStore } from '@/stores/locale';
 import { onShow } from '@dcloudio/uni-app';
 
 export function useThemeTabbar(options) {
   const themeStore = useThemeStore();
+  const localeStore = useLocaleStore();
   const currentTheme = ref(themeStore.getResolvedTheme());
   const options1 = options || { customNav: false };
 
@@ -35,6 +37,10 @@ export function useThemeTabbar(options) {
         backgroundColor: '#ffffff',
         borderStyle: 'white',
       });
+    }
+
+    if (localeStore.tabBarTextDirty) {
+      localeStore.applyTabBarText();
     }
   };
 

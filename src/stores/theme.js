@@ -65,7 +65,8 @@ export const useThemeStore = defineStore('theme', {
     _resolveAndApply() {
       if (this.mode === 'auto') {
         const sysInfo = uni.getSystemInfoSync()
-        this.resolvedTheme = normalizeResolvedTheme(sysInfo.theme)
+        const theme = sysInfo.osTheme || sysInfo.theme || sysInfo.hostTheme
+        this.resolvedTheme = normalizeResolvedTheme(theme)
       } else {
         this.resolvedTheme = normalizeResolvedTheme(this.mode)
       }

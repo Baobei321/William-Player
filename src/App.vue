@@ -18,7 +18,7 @@ export default {
     }
 
     // #ifdef APP-PLUS
-    plus.screen.lockOrientation("portrait-primary");
+    plus.screen.lockOrientation('portrait-primary')
     if (process.env.NODE_ENV === 'production') {
       //生产环境 禁用log
       console.log = function () {}
@@ -28,7 +28,7 @@ export default {
   onShow: function () {
     console.log('App Show')
     const themeStore = useThemeStore()
-    // themeStore.applyTheme();
+    themeStore._resolveAndApply()
   },
   onHide: function () {
     console.log('App Hide')

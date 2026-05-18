@@ -34,6 +34,7 @@ export const useLocaleStore = defineStore('locale', {
   state: () => ({
     locale: DEFAULT_LOCALE,
     i18n: null,
+    tabBarTextDirty: false,
   }),
   getters: {
     localeConfig: state => getLocaleConfig(state.locale),
@@ -51,6 +52,7 @@ export const useLocaleStore = defineStore('locale', {
       this.locale = normalizeLocale(locale)
       uni.setStorageSync(LOCALE_STORAGE_KEY, this.locale)
       this.applyLocale(options)
+      this.tabBarTextDirty = true
     },
     applyLocale({ syncUniLocale = true } = {}) {
       if (this.i18n) {
@@ -73,6 +75,7 @@ export const useLocaleStore = defineStore('locale', {
         uni.setTabBarItem({ index: 0, text: t('tabBar.mediaLibrary') })
         uni.setTabBarItem({ index: 1, text: t('tabBar.live') })
         uni.setTabBarItem({ index: 2, text: t('tabBar.mine') })
+        this.tabBarTextDirty = false
       } catch (error) {}
     },
   },
