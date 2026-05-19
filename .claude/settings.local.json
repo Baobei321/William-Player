@@ -8,7 +8,9 @@
       "Bash(curl *)",
       "Bash(npm -v)",
       "Bash(PATH=\"/d/nodejs:$PATH\" npm run *)",
-      "WebFetch(domain:blog.csdn.net)"
+      "WebFetch(domain:blog.csdn.net)",
+      "Bash(tasklist)",
+      "Bash(taskkill *)"
     ]
   }
 }

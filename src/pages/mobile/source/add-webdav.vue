@@ -44,7 +44,7 @@ const base_form = ref(null)
 const routerParams = ref({})
 
 const title = ref('')
-const isAdd = computed(() => title.value == '添加WebDAV' || title.value == t('navbar.addWebdav'))
+const isAdd = computed(() => title.value == '添加Openlist/Alist' || title.value == t('navbar.addWebdav'))
 const titleText = computed(() => isAdd.value ? t('navbar.addWebdav') : t('navbar.modifyWebdav'))
 
 const options = computed(() => [
@@ -104,7 +104,7 @@ const confirmPicker = ({ selectedValue, selectedOptions }) => {
 onLoad(options => {
   routerParams.value = options
   title.value = decodeURIComponent(routerParams.value.title)
-  if (title.value == '修改WebDAV') {
+  if (title.value == '修改Openlist/Alist') {
     let sourceList = uni.getStorageSync('sourceList')
     state.formData = sourceList.find(i => i.type == 'WebDAV').list.find(i => i.address == routerParams.value.address)
     state.formData.protocol ? '' : (state.formData.protocol = 'http')

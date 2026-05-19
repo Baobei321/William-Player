@@ -4,7 +4,7 @@ import { i18n } from '@/i18n/index.js';
 
 //校验webdav
 export const validateWebdav = async (action, formData, oldData, routerParams, back = true) => {
-    const isAdd = typeof action === 'boolean' ? action : action == "添加WebDAV";
+    const isAdd = typeof action === 'boolean' ? action : action == "添加Openlist/Alist";
     let sourceList = uni.getStorageSync("sourceList");
     if (isAdd) {
         if (sourceList.find((i) => i.type == "WebDAV").list.find((i) => i.address == formData.address)) {

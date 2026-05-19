@@ -165,11 +165,11 @@ const toAddMedia = () => {
   // let webdavInfo = uni.getStorageSync('webdavInfo')
   // if (!webdavInfo) {
   //   uni.navigateTo({
-  //     url: '/pages/mobile/video/add-webdav?title=添加WebDAV'
+  //     url: '/pages/mobile/video/add-webdav?title=添加Openlist/Alist'
   //   })
   // } else {
   //   uni.navigateTo({
-  //     url: '/pages/mobile/video/add-webdav?title=修改WebDAV'
+  //     url: '/pages/mobile/video/add-webdav?title=修改Openlist/Alist'
   //   })
   // }
 }

@@ -205,7 +205,7 @@ const confirmSubmit = () => {
     if (activeTab.value === 'WebDAV') {
         webdav_form.value.submitForm(valid => {
             if (valid) {
-                validateWebdav(routerParams.value.type ? '修改WebDAV' : '添加WebDAV', state.webdavFormData,state.webdavOldData, {})
+                validateWebdav(routerParams.value.type ? '修改Openlist/Alist' : '添加Openlist/Alist', state.webdavFormData,state.webdavOldData, {})
             }
         })
     } else if (activeTab.value === 'Emby') {
