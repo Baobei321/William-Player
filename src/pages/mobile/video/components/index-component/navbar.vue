@@ -374,7 +374,7 @@ onMounted(() => {
       display: none;
 
       .title {
-        color: #000;
+        color: var(--app-text-primary);
         font-size: 34rpx;
         font-weight: bold;
       }

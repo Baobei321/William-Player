@@ -638,7 +638,7 @@ page {
                       .nut-form-item__body__slots {
                         input {
                           height: 90rpx;
-                          border: 2rpx solid rgb(186, 186, 186);
+                          border: 2rpx solid var(--app-border-strong);
                           border-radius: 10rpx;
                           padding: 0 24rpx;
                         }

@@ -21,7 +21,7 @@
       </base-form>
     </div>
     <div class="forget-button">
-      <nut-button :custom-color="primaryBtnColor" @click="confirmEdit">{{ t('auth.confirmModify') }}</nut-button>
+      <nut-button :custom-color="primaryBtnColor" @click="confirmEdit"><span :style="{ color: primaryBtnTextColor }">{{ t('auth.confirmModify') }}</span></nut-button>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@ import { useThemeColors } from '@/hooks/useThemeColors'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const { primaryBtnColor } = useThemeColors()
+const { primaryBtnColor, primaryBtnTextColor } = useThemeColors()
 const navbarHeight = ref('')
 const countDown = ref(61) //是否展示验证码倒计时,61为不展示
 const themeClass = useThemeClass()

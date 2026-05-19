@@ -460,7 +460,7 @@ page {
         .nut-dialog__content {
           .nut-input {
             input {
-              color: #000;
+              color: var(--app-text-primary);
             }
           }
         }
@@ -468,7 +468,7 @@ page {
         .nut-dialog__footer {
           .nut-dialog__footer-cancel {
             border: none;
-            color: #000;
+            color: var(--app-text-primary);
           }
 
           .nut-dialog__footer-ok {

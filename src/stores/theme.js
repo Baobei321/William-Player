@@ -84,7 +84,7 @@ export const useThemeStore = defineStore('theme', {
       // #ifdef APP-PLUS
       try {
         if (typeof plus !== 'undefined' && plus.nativeUI) {
-          plus.nativeUI.setUIStyle(this.resolvedTheme)
+          this.mode === 'auto' ? plus.nativeUI.setUIStyle('auto') : plus.nativeUI.setUIStyle(this.resolvedTheme)
         }
       } catch (e) {}
       // #endif

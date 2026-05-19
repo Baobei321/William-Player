@@ -19,5 +19,7 @@ export function useThemeColors() {
     iconColor: computed(() => (isDark.value ? '#ffffff' : '#000000')),
     // 弱化的图标颜色
     iconColorMuted: computed(() => (isDark.value ? '#ffffff' : '#bbbbbb')),
+    // 禁用按钮文字颜色
+    disabledBtnTextColor: computed(() => (isDark.value ? '#a0a0a0' : '#86909C')),
   };
 }

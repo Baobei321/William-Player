@@ -31,7 +31,7 @@
         <div class="history-played-bottom" v-if="isSelect">
             <div class="history-played-bottom__left" @click="clearAll">{{ t('common.clearAll') }}</div>
             <div class="history-played-bottom__right"
-                :style="{ color: recentSelect.length ? 'rgb(255, 44, 44)' : 'rgb(188, 188, 188)' }" @click="clearPart">
+                :style="{ color: recentSelect.length ? 'var(--app-danger)' : 'var(--app-text-tertiary)' }" @click="clearPart">
                 {{ recentSelect.length ? t('common.delete') : t('common.cancel') }}</div>
         </div>
         <wil-modal ref="wil_modal"></wil-modal>
@@ -210,7 +210,7 @@ page {
         font-size: 32rpx;
         font-weight: bold;
         height: 120rpx;
-        border-top: 2rpx solid rgb(227, 227, 227);
+        border-top: 2rpx solid var(--app-border);
         box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3);
 
         &__left {
@@ -218,7 +218,7 @@ page {
         }
 
         &__right {
-            color: rgb(188, 188, 188);
+            color: var(--app-text-tertiary);
         }
     }
 }

@@ -130,7 +130,7 @@ getNavHeight();
     .recent-played-title-left {
       font-size: 36rpx;
       font-weight: bold;
-      color: #000;
+      color: var(--app-text-primary);
     }
 
     .recent-played-title-right {
@@ -197,7 +197,7 @@ getNavHeight();
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: var(--app-text-primary);
           }
 
           &:first-child {
@@ -222,7 +222,7 @@ getNavHeight();
     .hxList-title-left {
       font-size: 36rpx;
       font-weight: bold;
-      color: #000;
+      color: var(--app-text-primary);
     }
 
     .hxList-title-right {
@@ -265,7 +265,7 @@ getNavHeight();
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: var(--app-text-primary);
             display: block;
           }
 
@@ -320,8 +320,8 @@ getNavHeight();
 
 .sk-text-14-2857-322 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 56rpx;
   position: relative !important;
@@ -337,8 +337,8 @@ getNavHeight();
 
 .sk-text-14-2857-459 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 50.4rpx;
   position: relative !important;
@@ -346,8 +346,8 @@ getNavHeight();
 
 .sk-text-14-2857-474 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 42rpx;
   position: relative !important;
@@ -359,8 +359,8 @@ getNavHeight();
 
 .sk-text-14-2857-534 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 33.6rpx;
   position: absolute !important;
@@ -368,8 +368,8 @@ getNavHeight();
 
 .sk-text-14-2857-53 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -377,8 +377,8 @@ getNavHeight();
 
 .sk-text-14-2857-57 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -386,8 +386,8 @@ getNavHeight();
 
 .sk-text-14-2857-375 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 50.4rpx;
   position: relative !important;
@@ -395,8 +395,8 @@ getNavHeight();
 
 .sk-text-14-2857-432 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 42rpx;
   position: relative !important;
@@ -404,8 +404,8 @@ getNavHeight();
 
 .sk-text-14-2857-799 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -413,8 +413,8 @@ getNavHeight();
 
 .sk-text-14-2857-681 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 33.6rpx;
   position: relative !important;
@@ -422,8 +422,8 @@ getNavHeight();
 
 .sk-text-14-2857-471 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -431,8 +431,8 @@ getNavHeight();
 
 .sk-text-14-2857-780 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 33.6rpx;
   position: relative !important;
@@ -440,8 +440,8 @@ getNavHeight();
 
 .sk-text-14-2857-396 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -449,8 +449,8 @@ getNavHeight();
 
 .sk-text-14-2857-103 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 33.6rpx;
   position: relative !important;
@@ -458,8 +458,8 @@ getNavHeight();
 
 .sk-text-14-2857-211 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 39.2rpx;
   position: relative !important;
@@ -467,8 +467,8 @@ getNavHeight();
 
 .sk-text-14-2857-117 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 33.6rpx;
   position: relative !important;
@@ -476,8 +476,8 @@ getNavHeight();
 
 .sk-text-14-2857-706 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 50.4rpx;
   position: relative !important;
@@ -485,20 +485,20 @@ getNavHeight();
 
 .sk-text-14-2857-346 {
   background-image: linear-gradient(transparent 14.2857%,
-      #eeeeee 0%,
-      #eeeeee 85.7143%,
+      var(--app-bg-input) 0%,
+      var(--app-bg-input) 85.7143%,
       transparent 0%) !important;
   background-size: 100% 42rpx;
   position: relative !important;
 }
 
 .sk-image {
-  background: #efefef !important;
+  background: var(--app-bg-input) !important;
 }
 
 .sk-pseudo::before,
 .sk-pseudo::after {
-  background: #efefef !important;
+  background: var(--app-bg-input) !important;
   background-image: none !important;
   color: transparent !important;
   border-color: transparent !important;

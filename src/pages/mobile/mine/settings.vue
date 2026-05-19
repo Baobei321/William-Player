@@ -29,14 +29,14 @@
       <template #theme>
         <nut-cell :title="t('settings.theme')" is-link :desc="themeText" @click="showPopover = true">
           <template #icon>
-            <image :src="themeClass === 'dark' ? themeLight : themeDark" />
+            <image :src="setThemeIcon()" />
           </template>
         </nut-cell>
       </template>
       <template #language>
         <nut-cell :title="t('settings.language')" is-link :desc="languageText" @click="showLanguagePopover = true">
           <template #icon>
-            <nut-icon name="people"></nut-icon>
+            <image :src="setLanguageIcon()" />
           </template>
         </nut-cell>
       </template>
@@ -74,6 +74,10 @@ import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useI18nNavbar } from '@/hooks/useI18nNavbar'
 import themeLight from '@/static/mode-light.png'
 import themeDark from '@/static/mode-dark.png'
+import followBlack from '@/static/follow-black.png'
+import followGray from '@/static/follow-gray.png'
+import languageDark from '@/static/language-dark.png'
+import languageLight from '@/static/language-light.png'
 
 useThemeNavbar()
 useI18nNavbar('navbar.settings')
@@ -122,7 +126,36 @@ watch(
   }
 )
 
-const setThemeIcon = () => {}
+const setThemeIcon = () => {
+  if (status.value[0] === 'auto') {
+    const theme = themeStore.getResolvedTheme()
+
+    if (theme === 'light') {
+      return followBlack
+    } else {
+      return followGray
+    }
+  } else if (status.value[0] === 'light') {
+    return themeLight
+  } else if (status.value[0] === 'dark') {
+    return themeDark
+  }
+}
+
+const setLanguageIcon = () => {
+  if (status.value[0] === 'auto') {
+    const theme = themeStore.getResolvedTheme()
+    if (theme === 'light') {
+      return languageLight
+    } else {
+      return languageDark
+    }
+  } else if (status.value[0] === 'light') {
+    return languageLight
+  } else if (status.value[0] === 'dark') {
+    return languageDark
+  }
+}
 const changeSwitch = (val, type) => {
   if (type == 'showProgress') {
     settingData.value.showProgress = val

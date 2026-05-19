@@ -151,7 +151,7 @@ watch(
             height: 100%;
             box-sizing: border-box;
             // padding: 140rpx 0 0 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            background: linear-gradient(180deg, transparent, var(--app-bg-card));
 
             .swiper-content-container {
               padding: 0 24rpx;
@@ -211,7 +211,7 @@ watch(
 
               .right-desc {
                 font-size: 28rpx;
-                color: rgb(54, 54, 54);
+                color: var(--app-text-secondary);
                 display: -webkit-box;
                 -webkit-line-clamp: 3;
                 /* 限制行数（可调整） */

@@ -204,7 +204,7 @@ watch(
     .recent-played-title-left {
       font-size: 36rpx;
       font-weight: bold;
-      color: #000;
+      color: var(--app-text-primary);
     }
 
     .recent-played-title-right {
@@ -282,7 +282,7 @@ watch(
           &-name {
             font-size: 28rpx;
             font-weight: bold;
-            color: #000;
+            color: var(--app-text-primary);
           }
 
           &:first-child {

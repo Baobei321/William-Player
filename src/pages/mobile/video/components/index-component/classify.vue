@@ -114,7 +114,7 @@ watch(
   .video-classify-title {
     font-size: 36rpx;
     font-weight: bold;
-    color: #000;
+    color: var(--app-text-primary);
   }
 
   .video-classify-list {

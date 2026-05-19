@@ -25,10 +25,10 @@
             <div class="edit-container-phonenumber" v-else-if="editType === 'phoneNumber'">
                 <wil-form :options="formOptions1" v-model="phoneForm" ref="wil_form">
                     <template #phonenumberOld>
-                        <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ phoneForm.phonenumber }}</div>
+                        <div :style="{ height: '46rpx', lineHeight: '46rpx', color: 'var(--app-text-tertiary)' }">{{ phoneForm.phonenumber }}</div>
                     </template>
                     <template #email>
-                        <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ phoneForm.email }}</div>
+                        <div :style="{ height: '46rpx', lineHeight: '46rpx', color: 'var(--app-text-tertiary)' }">{{ phoneForm.email }}</div>
                     </template>
                     <template #authCode="item">
                         <div class="authcode">
@@ -45,7 +45,7 @@
             <div class="edit-container-email" v-else-if="editType === 'email'">
                 <wil-form :options="formOptions2" v-model="emailForm" ref="wil_form">
                     <template #emailOld v-if="emailForm.emailOld">
-                        <div style="height: 46rpx;line-height: 46rpx;color: #cccccc;">{{ emailForm.emailOld }}</div>
+                        <div :style="{ height: '46rpx', lineHeight: '46rpx', color: 'var(--app-text-tertiary)' }">{{ emailForm.emailOld }}</div>
                     </template>
                     <template #authCodeOld="item" v-if="emailForm.emailOld">
                         <div class="authcode">

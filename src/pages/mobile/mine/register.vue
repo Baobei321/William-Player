@@ -21,8 +21,8 @@
           </template>
         </wil-form>
         <div class="register-form-button">
-          <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">{{ t('auth.registerAndLogin') }}</nut-button>
-          <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">{{ t('auth.registerAndLogin') }}</nut-button>
+          <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree"><span :style="{ color: primaryBtnTextColor }">{{ t('auth.registerAndLogin') }}</span></nut-button>
+          <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree"><span :style="{ color: disabledBtnTextColor }">{{ t('auth.registerAndLogin') }}</span></nut-button>
         </div>
       </div>
 
@@ -57,7 +57,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const codeEncrypt = ref('')
 const themeClass = useThemeClass()
-const { primaryBtnColor, isDark } = useThemeColors()
+const { primaryBtnColor, primaryBtnTextColor, disabledBtnTextColor, isDark } = useThemeColors()
 const disabledBtnColor = computed(() => (isDark.value ? '#3a3a3d' : '#C9CDD4'))
 const navbarHeight = ref('')
 const countDown = ref(61) //是否展示验证码倒计时,61为不展示

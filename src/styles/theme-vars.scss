@@ -71,4 +71,52 @@ page,
   --nut-cell-color: var(--app-text-secondary);
   --nut-searchbar-background: var(--app-bg);
   --nut-searchbar-input-background: var(--app-bg-input);
+
+  // --- NutUI 深色组件样式覆写 ---
+  .nut-dialog {
+    .nut-dialog__content {
+      color: var(--app-text-primary);
+    }
+
+    .nut-dialog__footer {
+      .nut-dialog__footer-cancel {
+        color: var(--app-text-secondary);
+      }
+    }
+  }
+
+  .nut-cell {
+    background: var(--app-bg-card);
+
+    .nut-cell__title {
+      color: var(--app-text-primary);
+    }
+
+    .nut-cell__value {
+      color: var(--app-text-secondary);
+    }
+
+    .nut-cell__sub-title {
+      color: var(--app-text-tertiary);
+    }
+  }
+
+  .nut-input {
+    input,
+    .uni-input-input {
+      color: var(--app-text-primary);
+    }
+  }
+
+  .nut-textarea {
+    .nut-textarea__textarea {
+      color: var(--app-text-primary);
+    }
+  }
+
+  .nut-switch {
+    .nut-switch__close {
+      color: var(--app-text-primary);
+    }
+  }
 }

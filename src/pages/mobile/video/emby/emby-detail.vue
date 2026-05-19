@@ -73,7 +73,7 @@
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
-            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">{{ t('video.reload') }}</nut-button>
+            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv"><span :style="{ color: primaryBtnTextColor }">{{ t('video.reload') }}</span></nut-button>
             <span v-else>{{ t('common.loadingEllipsis') }}</span>
           </div>
         </div>

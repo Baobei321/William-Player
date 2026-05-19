@@ -83,10 +83,12 @@ page {
     span:first-child {
       font-weight: bold;
       font-size: 34rpx;
+      color: var(--app-text-primary);
       display: block;
     }
     span:last-child {
       font-size: 28rpx;
+      color: var(--app-text-secondary);
       display: block;
     }
   }

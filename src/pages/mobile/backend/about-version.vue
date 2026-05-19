@@ -30,7 +30,7 @@
           </template>
           {{ t('backend.checkUpdate') }}
         </nut-button>
-        <nut-button disabled custom-color="#dedde3" v-else>{{ t('backend.currentLatestVersion') }}</nut-button>
+        <nut-button disabled :custom-color="isDark ? '#3a3a3d' : '#dedde3'" v-else><span :style="{ color: disabledBtnTextColor }">{{ t('backend.currentLatestVersion') }}</span></nut-button>
       </div>
       <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
         <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
@@ -73,7 +73,7 @@ useI18nNavbar('navbar.about')
 
 const url = ref('')
 const themeClass = useThemeClass()
-const { iconColor } = useThemeColors()
+const { iconColor, isDark, disabledBtnTextColor } = useThemeColors()
 
 const status = ref(['总是'])
 const showShare = ref(false)

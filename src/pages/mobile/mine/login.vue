@@ -20,8 +20,8 @@
   </nut-tabs>
   </div>
   <div class="login-button">
-  <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree">{{ t('auth.login') }}</nut-button>
-  <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">{{ t('auth.login') }}</nut-button>
+  <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree"><span :style="{ color: primaryBtnTextColor }">{{ t('auth.login') }}</span></nut-button>
+  <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree"><span :style="{ color: disabledBtnTextColor }">{{ t('auth.login') }}</span></nut-button>
   <div class="register-button">
   <div @click="touristEnter">{{ t('auth.touristEnter') }}</div>
   <div class="register-button-line"></div>
@@ -72,7 +72,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const tabValue = ref('1')
 const themeClass = useThemeClass()
-const { primaryBtnColor, isDark } = useThemeColors()
+const { primaryBtnColor, primaryBtnTextColor, disabledBtnTextColor, isDark } = useThemeColors()
 const disabledBtnColor = computed(() => (isDark.value ? '#3a3a3d' : '#C9CDD4'))
 
 const tabBg = computed(() => {
@@ -468,7 +468,7 @@ page {
       width: 100%;
       margin-bottom: 36rpx;
       .login-other-way__title {
-        color: #acacac;
+        color: var(--app-text-tertiary);
         font-size: 22rpx;
         margin-bottom: 24rpx;
       }
