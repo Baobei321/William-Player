@@ -1,56 +1,60 @@
 <template>
   <div :class="['login', themeClass]">
-  <div class="login-title">
-  <div class="login-title-top">
-  <span>HI</span>
-  <div>{{ t('auth.pleaseLogin') }}</div>
-  </div>
-  <div class="login-title-bottom">{{ t('auth.welcomeUseWilliamPlayer') }}</div>
-  </div>
-  <div class="login-tabs">
-  <nut-tabs v-model="tabValue" @change="changeTabs">
-  <nut-tab-pane :title="t('auth.phoneLogin')" pane-key="1">
-  <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"></base-form>
-  <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
-  </nut-tab-pane>
-  <nut-tab-pane :title="t('auth.emailLogin')" pane-key="2">
-  <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"></base-form>
-  <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
-  </nut-tab-pane>
-  </nut-tabs>
-  </div>
-  <div class="login-button">
-  <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree"><span :style="{ color: primaryBtnTextColor }">{{ t('auth.login') }}</span></nut-button>
-  <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree"><span :style="{ color: disabledBtnTextColor }">{{ t('auth.login') }}</span></nut-button>
-  <div class="register-button">
-  <div @click="touristEnter">{{ t('auth.touristEnter') }}</div>
-  <div class="register-button-line"></div>
-  <div @click="toRegister">{{ t('auth.register') }}</div>
-  </div>
-  </div>
-  <div class="login-other">
-  <div class="login-other-way">
-  <div class="login-other-way__title">{{ t('auth.otherLoginMethods') }}</div>
-  <div class="login-other-way__list">
-  <image
-  src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2f/dc/81/2fdc81e4-4c1d-1706-ce9d-ee4932e4dd97/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/350x350.png"
-  @click="loginWx"
-   />
-  <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay"  />
-  <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ"  />
-  </div>
-  </div>
-  <div class="user-agreement" @click="checkAgree">
-  <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon"  />
-  <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon"  />
-  <div class="user-agreement-word">
-  <span>{{ t('auth.readAndAgree') }}</span>
-  <span>{{ t('auth.userAgreement') }}</span>
-  <span>{{ t('auth.and') }}</span>
-  <span>{{ t('auth.privacyPolicy') }}</span>
-  </div>
-  </div>
-  </div>
+    <div class="login-title">
+      <div class="login-title-top">
+        <span>HI</span>
+        <div>{{ t('auth.pleaseLogin') }}</div>
+      </div>
+      <div class="login-title-bottom">{{ t('auth.welcomeUseWilliamPlayer') }}</div>
+    </div>
+    <div class="login-tabs">
+      <nut-tabs v-model="tabValue" @change="changeTabs">
+        <nut-tab-pane :title="t('auth.phoneLogin')" pane-key="1">
+          <base-form :options="settings1" :show-button="false" ref="base_form1" v-model="formData1"></base-form>
+          <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
+        </nut-tab-pane>
+        <nut-tab-pane :title="t('auth.emailLogin')" pane-key="2">
+          <base-form :options="settings2" :show-button="false" ref="base_form2" v-model="formData2"></base-form>
+          <div class="forget" @click="toForget">{{ t('auth.forgotPassword') }}</div>
+        </nut-tab-pane>
+      </nut-tabs>
+    </div>
+    <div class="login-button">
+      <nut-button :custom-color="primaryBtnColor" @click="confirmCommit" v-if="userAgree" style="filter: invert(1) invert(1)">
+        <span :style="{ color: primaryBtnTextColor }">{{ t('auth.login') }}</span>
+      </nut-button>
+      <nut-button :custom-color="disabledBtnColor" v-else @click="clickNoAgree" class="no-agree">
+        <span :style="{ color: disabledBtnTextColor }">{{ t('auth.login') }}</span>
+      </nut-button>
+      <div class="register-button">
+        <div @click="touristEnter">{{ t('auth.touristEnter') }}</div>
+        <div class="register-button-line"></div>
+        <div @click="toRegister">{{ t('auth.register') }}</div>
+      </div>
+    </div>
+    <div class="login-other">
+      <div class="login-other-way">
+        <div class="login-other-way__title">{{ t('auth.otherLoginMethods') }}</div>
+        <div class="login-other-way__list">
+          <image
+            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2f/dc/81/2fdc81e4-4c1d-1706-ce9d-ee4932e4dd97/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/350x350.png"
+            @click="loginWx"
+          />
+          <image src="https://q7.itc.cn/q_70/images03/20241111/8b6a53a12a58457d87ceea336014303d.jpeg" @click="loginAlipay" />
+          <image src="https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20211029/202110291634000wqez.webp" @click="loginQQ" />
+        </div>
+      </div>
+      <div class="user-agreement" @click="checkAgree">
+        <image :src="checkIcon" v-show="!userAgree" class="user-agreement-icon" />
+        <image :src="checkActiveIcon" v-show="userAgree" class="user-agreement-icon" />
+        <div class="user-agreement-word">
+          <span>{{ t('auth.readAndAgree') }}</span>
+          <span>{{ t('auth.userAgreement') }}</span>
+          <span>{{ t('auth.and') }}</span>
+          <span>{{ t('auth.privacyPolicy') }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -121,7 +125,13 @@ const settings1 = computed(() => [
     formItemProps: { placeholder: t('auth.pleaseInputPhone'), type: 'number', inputmode: 'numeric' },
     rule: [{ validator: validatorPhone }],
   },
-  { label: t('auth.password'), type: 'input', prop: 'password', formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' }, rule: [{ required: true, message: t('auth.pleaseInputPassword') }] },
+  {
+    label: t('auth.password'),
+    type: 'input',
+    prop: 'password',
+    formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' },
+    rule: [{ required: true, message: t('auth.pleaseInputPassword') }],
+  },
 ])
 const settings2 = computed(() => [
   {
@@ -131,7 +141,13 @@ const settings2 = computed(() => [
     formItemProps: { placeholder: t('auth.pleaseInputEmail'), type: 'text', inputmode: 'numeric' },
     rule: [{ validator: validatorEmail }],
   },
-  { label: t('auth.password'), type: 'input', prop: 'password', formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' }, rule: [{ required: true, message: t('auth.pleaseInputPassword') }] },
+  {
+    label: t('auth.password'),
+    type: 'input',
+    prop: 'password',
+    formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' },
+    rule: [{ required: true, message: t('auth.pleaseInputPassword') }],
+  },
 ])
 
 const base_form1 = ref(null)

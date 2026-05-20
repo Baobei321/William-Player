@@ -41,6 +41,7 @@
                     "android.useAndroidX" : "true",
                     "android.enableJetifier" : "true"
                 },
+                "forceDarkAllowed": false,
                 "permissions" : [
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",

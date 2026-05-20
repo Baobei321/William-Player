@@ -4,7 +4,7 @@
     <div class="toolbox-container">
       <div class="toolbox-container-list">
         <div class="list-item" v-for="item in toolboxArr" :key="item.key" @click="clickItem(item)">
-          <image class="list-item-logo" :src="item.icon"  />
+          <image class="list-item-logo" :src="item.icon" />
           <span>{{ item.title }}</span>
         </div>
         <!-- <div @click="handleChat">点击进入</div> -->
@@ -104,6 +104,16 @@ const toolboxArr = computed(() => [
     icon: 'https://appstoreimg-ipv6.vivo.com.cn/appstore/developer/icon/20231211/xnof23rl/202312111204047yhfu.webp',
     path: '/pages/mobile/toolbox/chat/index',
   },
+  {
+    key: 'newApi',
+    title: 'NewApi',
+    icon: 'https://api.gemai.cc/logo.png',
+    path: '/pages/mobile/backend/index',
+    query: {
+      url: CONFIG.BASE_URL.split(':4040')[0] + ':3001',
+      title: 'NewApi',
+    },
+  },
 ])
 
 //流量查询单独的方法
@@ -146,8 +156,6 @@ const clickItem = async item => {
 }
 
 const handleChat = () => {
-  console.log('丢啊')
-
   uni.navigateTo({
     url: '/pages/mobile/toolbox/chat/index',
   })
