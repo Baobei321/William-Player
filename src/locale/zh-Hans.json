@@ -1,0 +1,16 @@
+{
+  "navbar.dataSync": "数据同步",
+  "navbar.appreciate": "赞赏",
+  "navbar.operationGuide": "操作指引",
+  "navbar.live": "直播",
+  "navbar.liveList": "直播列表",
+  "navbar.mediaLibrary": "媒体库",
+  "navbar.catelogSetting": "目录设置",
+  "navbar.addFileSource": "添加新文件源",
+  "navbar.editInformation": "编辑信息",
+  "navbar.personalCenter": "个人中心",
+  "navbar.settings": "设置",
+  "tabBar.mediaLibrary": "媒体库",
+  "tabBar.live": "直播",
+  "tabBar.mine": "我的"
+}

@@ -1,7 +1,7 @@
 <template>
   <div :class="['appreciate', themeClass]">
     <div class="appreciate-img">
-      <image src="@/static/zanshang.jpg"  />
+      <image src="@/static/zanshang.jpg" />
     </div>
     <div class="appreciate-tip">
       {{ t('backend.appreciateDescription') }}
@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { getUntokenDicts,getDicts } from "@/network/apis";
+import { ref } from 'vue'
+import { getUntokenDicts, getDicts } from '@/network/apis'
 import { useThemeNavbar } from '@/hooks/useThemeNavbar'
 import { useThemeClass } from '@/hooks/useThemeClass'
 import { useI18nNavbar } from '@/hooks/useI18nNavbar'
@@ -30,12 +30,12 @@ const { t } = useI18n()
 useThemeNavbar()
 useI18nNavbar('navbar.appreciate')
 const themeClass = useThemeClass()
-const appreciateList = ref([]);
+const appreciateList = ref([])
 const getAppreciateUser = async () => {
-  let res = await getDicts("appreciate_user");
-  appreciateList.value = res.data;
-};
-getAppreciateUser();
+  let res = await getDicts('appreciate_user')
+  appreciateList.value = res.data
+}
+getAppreciateUser()
 </script>
 
 <style lang="scss" scoped>
