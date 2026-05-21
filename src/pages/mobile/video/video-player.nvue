@@ -81,6 +81,11 @@ export default {
   },
   data() {
     return {
+      // 常量
+      VIDEO_HEIGHT: '580rpx',
+      VIDEO_FORMAT: ['mp4', 'mkv', 'm2ts', 'avi', 'mov', 'ts', 'm3u8', 'iso'],
+      IOS_SAVE_INTERVAL: 5, // iOS 每 5 次更新一次历史记录
+
       historyPlay: [],
       historyObj: {
         initialTime: '0',
@@ -126,6 +131,31 @@ export default {
   },
 
   methods: {
+    // 视频列表排序
+    sortVideoList(list, nameKey = 'name') {
+      const regex = /S\d{2}E\d{2}/
+      const regex1 = /\d+/
+      return list.sort((a, b) => {
+        const nameA = a[nameKey]
+        const nameB = b[nameKey]
+        const matchA = nameA.match(regex) || nameA.match(regex1)
+        const matchB = nameB.match(regex) || nameB.match(regex1)
+        if (matchA && matchB) {
+          const numA = parseInt(matchA[0].slice(-2), 10)
+          const numB = parseInt(matchB[0].slice(-2), 10)
+          a.ji = numA
+          b.ji = numB
+          return numA - numB
+        }
+        return 0
+      })
+    },
+
+    // 过滤视频格式
+    filterVideoFormat(list, nameKey = 'name') {
+      return list.filter(item => this.VIDEO_FORMAT.some(v => item[nameKey].includes(v)))
+    },
+
     //判断选择的是webdav还是天翼云盘还是夸克
     judgeSelect() {
       this.sourceList = uni.getStorageSync('sourceList')
@@ -190,52 +220,41 @@ export default {
     setHistory(event) {
       if (this.routerParams.noSetHistory == 0) return
       if (!this.routerParams.type) return
-      if (this.plateForm == 'ios') {
+
+      const currentTime = Math.round(event.detail.currentTime)
+      const isIOS = this.plateForm == 'ios'
+
+      // iOS 每 IOS_SAVE_INTERVAL 次更新一次，Android 实时更新
+      if (isIOS) {
         this.sum += 1
-        if (this.sum == 5) {
-          this.sum = 0
-          this.historyObj.initialTime = Math.round(event.detail.currentTime)
-          let index = null
-          if (this.routerParams.type == 'tv') {
-            index = this.historyPlay.findIndex(
-              i =>
-                i.type == this.routerParams.type &&
-                i.movieTvId == this.historyObj.movieTvId &&
-                handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay)
-            )
-          } else if (this.routerParams.type == 'movie') {
-            index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && handleSeasonName(i.name, true) == handleSeasonName(this.historyObj.name, true))
-          }
-          if (index > -1) {
-            this.historyPlay.splice(index, 1)
-            this.historyPlay.unshift(this.historyObj)
-          } else {
-            if (this.historyObj.type) {
-              this.historyPlay.unshift(this.historyObj)
-            }
-          }
-        }
-      } else if (this.plateForm == 'android') {
-        this.historyObj.initialTime = Math.round(event.detail.currentTime)
-        this.historyObj.wjjId = this.routerParams.wjjId
-        let index = null
-        if (this.routerParams.type == 'tv') {
-          index = this.historyPlay.findIndex(
-            i =>
-              i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay)
-          )
-        } else if (this.routerParams.type == 'movie') {
-          index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && handleSeasonName(i.name) == handleSeasonName(this.historyObj.name))
-        }
-        if (index > -1) {
-          this.historyPlay.splice(index, 1)
-          this.historyPlay.unshift(this.historyObj)
-        } else {
-          if (this.historyObj.type) {
-            this.historyPlay.unshift(this.historyObj)
-          }
-        }
+        if (this.sum != this.IOS_SAVE_INTERVAL) return
+        this.sum = 0
       }
+
+      this.historyObj.initialTime = currentTime
+      if (this.plateForm == 'android') {
+        this.historyObj.wjjId = this.routerParams.wjjId
+      }
+
+      // 查找历史记录索引
+      let index = -1
+      if (this.routerParams.type == 'tv') {
+        index = this.historyPlay.findIndex(
+          i =>
+            i.type == this.routerParams.type && i.movieTvId == this.historyObj.movieTvId && handleSeasonName(i.titlePlay) == handleSeasonName(this.historyObj.titlePlay)
+        )
+      } else if (this.routerParams.type == 'movie') {
+        index = this.historyPlay.findIndex(i => i.type == this.routerParams.type && handleSeasonName(i.name, isIOS) == handleSeasonName(this.historyObj.name, isIOS))
+      }
+
+      // 更新历史记录
+      if (index > -1) {
+        this.historyPlay.splice(index, 1)
+      }
+      if (this.historyObj.type) {
+        this.historyPlay.unshift(this.historyObj)
+      }
+
       this.arriveTimeNext()
     },
     //初始化进入的时候，设置从哪儿开始播放
@@ -339,7 +358,7 @@ export default {
       if (this.pipStatus) {
         this.videoHeight = (event.detail.videoHeight / event.detail.videoWidth) * 750 + 'rpx'
       } else {
-        this.videoHeight = '580rpx'
+        this.videoHeight = this.VIDEO_HEIGHT
       }
     },
     pauseVideo() {
@@ -465,115 +484,27 @@ export default {
         }
       }
       let result = {}
-      let videoFormat = ['mp4', 'mkv', 'm2ts', 'avi', 'mov', 'ts', 'm3u8', 'iso']
-      if (this.selectType.type == 'WebDAV') {
-        try {
-          result = await getFolder(
-            {
-              path: data.path.slice(0, lastIndex),
-            },
-            this.selectMedia
-          )
-        } catch (error) {
-          this.showRehandleButton = true
-          return
+      try {
+        if (this.selectType.type == 'WebDAV') {
+          result = await getFolder({ path: data.path.slice(0, lastIndex) }, this.selectMedia)
+          const list = this.filterVideoFormat(result.data.content, 'name')
+          this.tvList = this.sortVideoList(list, 'name')
+        } else if (this.selectType.type == '天翼云盘') {
+          result = await get189Folder({ folderId: data.wjjId }, this.selectMedia)
+          const list = this.filterVideoFormat(result.fileListAO.fileList, 'name')
+          this.tvList = this.sortVideoList(list, 'name')
+        } else if (this.selectType.type == '夸克网盘') {
+          result = await getQuarkFolder({ fid: data.wjjId }, this.selectMedia)
+          const list = this.filterVideoFormat(result.data.list, 'file_name')
+          this.tvList = this.sortVideoList(list, 'file_name').map(i => ({
+            id: i.fid,
+            name: i.file_name,
+            provider: 'Quark',
+          }))
         }
-        result.data.content = result.data.content.filter(h => {
-          return videoFormat.some(v => h.name.includes(v))
-        })
-        //对电视进行排序
-        this.tvList = result.data.content.sort((a, b) => {
-          const regex = /S\d{2}E\d{2}/
-          const regex1 = /\d+/
-          if (a.name.match(regex)) {
-            let aName = a.name.match(regex)[0]
-            let bName = b.name.match(regex)[0]
-            const numA = parseInt(aName.slice(-2), 10)
-            const numB = parseInt(bName.slice(-2), 10)
-            return numA - numB
-          } else if (a.name.match(regex1)) {
-            let aName = a.name.match(regex1)[0]
-            let bName = b.name.match(regex1)[0]
-            const numA = parseInt(aName.slice(-2), 10)
-            const numB = parseInt(bName.slice(-2), 10)
-            return numA - numB
-          }
-        })
-      } else if (this.selectType.type == '天翼云盘') {
-        try {
-          result = await get189Folder(
-            {
-              folderId: data.wjjId,
-            },
-            this.selectMedia
-          )
-        } catch (error) {
-          this.showRehandleButton = true
-          return
-        }
-        result.fileListAO.fileList = result.fileListAO.fileList.filter(h => {
-          return videoFormat.some(v => h.name.includes(v))
-        })
-        //对电视进行排序
-        this.tvList = result.fileListAO.fileList.sort((a, b) => {
-          const regex = /S\d{2}E\d{2}/
-          const regex1 = /\d+/
-          if (a.name.match(regex)) {
-            let aName = a.name.match(regex)[0]
-            let bName = b.name.match(regex)[0]
-            const numA = parseInt(aName.slice(-2), 10)
-            const numB = parseInt(bName.slice(-2), 10)
-            return numA - numB
-          } else if (a.name.match(regex1)) {
-            let aName = a.name.match(regex1)[0]
-            let bName = b.name.match(regex1)[0]
-            const numA = parseInt(aName.slice(-2), 10)
-            const numB = parseInt(bName.slice(-2), 10)
-            return numA - numB
-          }
-        })
-      } else if (this.selectType.type == '夸克网盘') {
-        try {
-          result = await getQuarkFolder(
-            {
-              fid: data.wjjId,
-            },
-            this.selectMedia
-          )
-        } catch (error) {
-          this.showRehandleButton = true
-          return
-        }
-        result.data.list = result.data.list.filter(h => {
-          return videoFormat.some(v => h.file_name.includes(v))
-        })
-        //对电视进行排序
-        this.tvList = result.data.list
-          .sort((a, b) => {
-            const regex = /S\d{2}E\d{2}/
-            const regex1 = /\d+/
-            if (a.file_name.match(regex)) {
-              let aName = a.file_name.match(regex)[0]
-              let bName = b.file_name.match(regex)[0]
-              const numA = parseInt(aName.slice(-2), 10)
-              const numB = parseInt(bName.slice(-2), 10)
-              return numA - numB
-            } else if (a.file_name.match(regex1)) {
-              let aName = a.file_name.match(regex1)[0]
-              let bName = b.file_name.match(regex1)[0]
-              const numA = parseInt(aName.slice(-2), 10)
-              const numB = parseInt(bName.slice(-2), 10)
-              return numA - numB
-            }
-          })
-          .map(i => {
-            return {
-              id: i.fid,
-              name: i.file_name,
-              // path: "/我的视频/电视剧",
-              provider: 'Quark',
-            }
-          })
+      } catch (error) {
+        this.showRehandleButton = true
+        return
       }
       let res1 = {}
       res1 = await getTvSeason({
