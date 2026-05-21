@@ -57,13 +57,43 @@ npx vue-tsc --noEmit
 
 ## 核心模块
 
-- `src/network/request.js` 是全局请求封装，使用 `CONFIG.BASE_URL`，自动附带 Authorization 与 Tenant-Id，并处理 token 刷新、游客登录和 401/403/404 响应。
-- `src/network/apis.js` 集中封装后端业务接口。
-- `src/utils/common.js` 聚合 WebDAV、天翼云盘、夸克网盘等文件源登录、目录、播放地址和用户信息能力；PC 分支通过 Electron IPC 绕过浏览器侧限制。
-- `src/utils/webdav.js`、`src/utils/webdav-client.js` 提供 WebDAV 协议能力。
-- `src/utils/emby.js` 封装 Emby 媒体服务器能力。
-- `src/utils/scrape.js` 处理影视文件名解析、季集识别、时长格式化、递归刮削等媒体整理逻辑。
+- `src/network/request.js`：全局请求封装，使用 `CONFIG.BASE_URL`，自动附带 Authorization 与 Tenant-Id 头。内置 token 刷新机制——401 时调用 `/refresh` 刷新，刷新失败则调用 `loginTour()` 游客登录。处理 401/403/404 响应，响应成功判断条件为 `res.data.code === 0 || res.data.code === 200`。
+- `src/network/apis.js`：集中封装后端业务接口，按功能模块组织（login、user、account、tmdb、share data、oper logs）。
+- `src/utils/common.js`：聚合 WebDAV、天翼云盘、夸克网盘等文件源登录、目录、播放地址和用户信息能力；PC 分支通过 Electron IPC 绕过浏览器侧限制。
+- `src/utils/webdav.js`、`src/utils/webdav-client.js`：提供 WebDAV 协议能力。
+- `src/utils/emby.js`：封装 Emby 媒体服务器能力。
+- `src/utils/tmdb.js`：TMDB API 封装，支持电影/电视剧搜索、详情查询、演员表获取，语言自动映射 app locale 到 TMDB 格式。
+- `src/utils/scrape.js`：处理影视文件名解析、季集识别、时长格式化、递归刮削等媒体整理逻辑。
 - `src/hooks/useVideoIndex.js`、`src/hooks/useVideoAll.js`、`src/hooks/userVideoDetail.js` 等组合式函数复用媒体首页、列表和详情逻辑。
+
+## 状态管理
+
+项目仅使用两个 Pinia store：
+
+- `src/stores/theme.js`：主题管理，`mode` 为 'light'、'dark' 或 'auto'，`resolvedTheme` 为实际解析结果。`setThemeUi(mode)` 持久化主题，`_applyNativeUi()` 通过 `plus.nativeUI.setUIStyle()` 处理 App 原生 UI。
+- `src/stores/locale.js`：国际化管理，支持 'zh-Hans'、'en'、'ko'、'ja' 四种语言。`setLocale(locale)` 切换语言并同步到 vue-i18n、uni.setLocale 和 NutUI。
+
+## 国际化
+
+使用 `vue-i18n` v9（不是 uni-app 内置 i18n），默认 locale 为 'zh-Hans'。配置在 `src/i18n/index.js`，消息文件位于 `src/locale/` 目录。切换语言时需同步调用 `localeStore.applyLocale({ syncUniLocale: true })` 以更新所有层级的 locale。
+
+## 视频播放器架构
+
+三个平台各自使用不同的播放器实现：
+
+- **Mobile/TV**：`src/pages/mobile/video/video-player.nvue` 和 `src/pages/tv/video/video-player.nvue` 使用 `<video-view>` 原生组件（Android App 端），H5 回退到 `<video>` 组件。记录播放进度（iOS 每 5 秒、Android 实时），支持自动播放下一集。
+- **PC**：`src/pages/electron/video/video-player.vue` 使用 `<mpv-player>` 自定义组件（基于 xgplayer 封装 MPV）。
+- 播放地址获取：各云盘服务通过 `getWebDAVUrl()`、`get189VideoUrl()`、`getQuarkVideoUrl()`、`getEmbyPlayerUrl()` 等函数获取可播放 URL。
+
+## 数据同步机制
+
+- **局域网同步**：使用 `TcpModule` 原生插件，实现 TCP 服务器（端口 1025）和客户端。扫码传输 `{ type: "dataSync", port: "ip:port" }`。
+- **后端 API 同步**：局域网失败时回退到后端 API，通过 `setShareData()` 上传、`getShareData()` 轮询（每 10 秒）、`deleteShareData()` 清理。
+- 同步数据包括：userInfo、muluData、sourceList、historyPlay。
+
+## 自动更新机制
+
+检查更新通过 Gitee API：`https://gitee.com/api/v5/repos/waylon-chen/William-Player/releases/latest`，下载链接从 `assets` 中查找 `app-mobile.apk`。版本比较使用 `compareVersions()` 按点分割数值比较。
 
 ## 样式与主题
 
@@ -105,3 +135,21 @@ npx vue-tsc --noEmit
 ```
 
 运行时平台常量来自 `src/utils/config.js` 的 `PLATFORM`，由构建脚本设置。涉及云盘请求、IPC、播放器能力或页面注册时，要同时考虑 `MOBILE`、`TV`、`PC` 三个平台的差异。
+
+## PC 端 IPC 与 Electron 集成
+
+PC 端通过 Electron IPC 绕过浏览器 CORS 限制访问云盘 API：
+
+- `src/utils/ipcRenderer.js`：Electron IPC 包装器，通过 `window.require('electron').ipcRenderer` 调用主进程。
+- `src/utils/ipcApiRoute.js`：定义可调用的 API 路由（如 `ipcApiRoute.httpRequest`），在 `src/utils/common.js` 中用于天翼云盘、夸克网盘等需要跨域的请求。
+- PC 端请求模式：`ipc.invoke(ipcApiRoute.httpRequest, { url, method, header, options })`。
+
+## 核心配置常量
+
+`src/utils/config.js` 中定义的关键常量：
+
+- `VERSION` / `updateTime`：版本号和更新时间
+- `TOKEN_KEY` / `USER_KEY` / `OPEN_ID` / `USER_ID`：本地存储键名
+- `BASE_URL`：后端 API 地址
+- `IMG_DOMAIN`：TMDB 图片域名 `https://image.tmdb.org`
+- 云盘 API 地址：Folder189Url、Video189Url、QuarkFolderUrl、QuarkVideoUrl、QuarkResolutionUrl

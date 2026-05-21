@@ -246,28 +246,30 @@ export default {
       if (this.routerParams.type == 'movie') {
         let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)
         obj = this.historyPlay?.find(i => i.name === name && i.sourceName === this.selectMedia.name) || {}
-        this.config.title = handleSeasonName(this.historyObj.title, true)
       } else if (this.routerParams.type == 'tv') {
         let name = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)
         obj = this.historyPlay?.find(i => i.name == name && i.path == this.routerParams.path && i.sourceName === this.selectMedia.name) || {}
-        if (this.historyObj.titlePlay) {
-          this.config.title = this.historyObj.titlePlay + ' ' + '第' + this.historyObj.ji + '集 ' + this.historyObj.title
-        } else {
-          //此种情况是处理文件夹播放
-          this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)
-        }
       }
       //这个type在正常播放的时候是有值的，在文件夹播放的时候是没有的，所以不生成历史播放记录
       if (this.routerParams.type) {
         this.historyObj = obj
         this.config.poster = this.historyObj.poster
+        this.config.initialTime = Number(this.historyObj.initialTime) || 0
+        if (this.routerParams.type == 'movie') {
+          this.config.title = handleSeasonName(this.historyObj.title, true)
+        } else if (this.routerParams.type == 'tv') {
+          if (this.historyObj.titlePlay) {
+            this.config.title = this.historyObj.titlePlay + ' ' + '第' + this.historyObj.ji + '集 ' + this.historyObj.title
+          } else {
+            //此种情况是处理文件夹播放
+            this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)
+          }
+        }
       } else {
         this.config.initialTime = 0
         this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1)
         this.historyObj = {}
-        return
       }
-      this.config.initialTime = Number(this.historyObj.initialTime) || 0
     },
     reloadVideo() {
       this.showReload = false

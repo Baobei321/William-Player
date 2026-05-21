@@ -250,19 +250,19 @@
     "list": [
       {
         "pagePath": "pages/mobile/video/index",
-        "text": "%tabBar.mediaLibrary%",
+        "text": "媒体库",
         "iconPath": "static/video.png",
         "selectedIconPath": "static/video-active.png"
       },
       {
         "pagePath": "pages/mobile/live/index",
-        "text": "%tabBar.live%",
+        "text": "直播",
         "iconPath": "static/live.png",
         "selectedIconPath": "static/live-active.png"
       },
       {
         "pagePath": "pages/mobile/mine/index",
-        "text": "%tabBar.mine%",
+        "text": "我的",
         "iconPath": "static/mine.png",
         "selectedIconPath": "static/mine-active.png"
       }

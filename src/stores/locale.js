@@ -54,7 +54,7 @@ export const useLocaleStore = defineStore('locale', {
       this.applyLocale(options)
       this.tabBarTextDirty = true
     },
-    applyLocale({ syncUniLocale = true } = {}) {
+    applyLocale({ syncUniLocale = false } = {}) {
       if (this.i18n) {
         if (this.i18n.global.locale && typeof this.i18n.global.locale === 'object') {
           this.i18n.global.locale.value = this.locale
@@ -71,8 +71,6 @@ export const useLocaleStore = defineStore('locale', {
     applyTabBarText() {
       if (!this.i18n) return
       const t = this.i18n.global.t
-      console.log('你好阿三大苏打');
-      
       try {
         uni.setTabBarItem({ index: 0, text: t('tabBar.mediaLibrary') })
         uni.setTabBarItem({ index: 1, text: t('tabBar.live') })

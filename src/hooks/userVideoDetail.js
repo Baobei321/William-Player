@@ -452,14 +452,18 @@ export function useVideoDetail({ route, router }) {
           sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
           sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
         }
+        const historyArr = uni.getStorageSync('historyPlay') || []
+        if (selectType.value.type != 'WebDAV') {
+          historyItem.folderFileId = selectSource.value.folderFileId
+        }
+        uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
         if (selectType.value.type == 'WebDAV') {
           uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=movie`,
+            url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&type=movie`,
           })
         } else {
-          historyItem.folderFileId = selectSource.value.folderFileId
           uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&item=${JSON.stringify(historyItem)}&type=movie`,
+            url: `/pages/mobile/video/video-player?path=${selectSource.value.path.slice(1)}&folderFileId=${selectSource.value.folderFileId}&type=movie`,
           })
         }
       }
@@ -510,18 +514,22 @@ export function useVideoDetail({ route, router }) {
           sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
           sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
         }
+        const historyArr = uni.getStorageSync('historyPlay') || []
+        if (selectType.value.type != 'WebDAV') {
+          historyItem.folderFileId = tvList.value[0].id
+        }
+        uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
         let openEndTime = {}
         routerParams.value.movieTvId ? '' : (openEndTime.noSetHistory = 0)
         nowTv.openingTime >= 0 ? (openEndTime.openingTime = nowTv.openingTime) : ''
         nowTv.endTime >= 0 ? (openEndTime.endTime = nowTv.endTime) : ''
         if (selectType.value.type == 'WebDAV') {
           uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&item=${encodeURIComponent(JSON.stringify(historyItem))}&type=tv${toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''}`,
+            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&type=tv${toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''}`,
           })
         } else {
-          historyItem.folderFileId = tvList.value[0].id
           uni.navigateTo({
-            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&item=${JSON.stringify(historyItem)}&type=tv${
+            url: `/pages/mobile/video/video-player?path=${activeSeason.value.path.slice(1)}/${tvList.value[0].name}&wjjId=${activeSeason.value.folderFileId}&folderFileId=${tvList.value[0].id}&type=tv${
               toStringfy(openEndTime) ? '&' + toStringfy(openEndTime) : ''
             }`,
           })
@@ -770,6 +778,7 @@ export function useVideoDetail({ route, router }) {
     if (routerParams.value.source) {
       //source从上一个页面传过来
       source = JSON.parse(routerParams.value.source)
+      console.log(source,'source1111')
     }
     sourceList.value = source.map(i => {
       if (source.filter(v => v.provider == i.provider).length > 1) {
