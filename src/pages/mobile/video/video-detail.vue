@@ -7,7 +7,7 @@
           <div class="more-arrow"></div>
           <div class="more-popover">
             <div class="more-popover-item" @click="toSelect(item)" v-for="item in popoverArr" :key="item.text">
-              <image :src="item.icon"  />
+              <image :src="item.icon" />
               <span class="more-popover-item__text">{{ item.text }}</span>
             </div>
           </div>
@@ -21,15 +21,15 @@
           <div class="img-title">{{ imgData.title }}</div>
           <div class="img-mid" v-if="imgData.releaseTime">
             <div class="img-mid-score">
-              <image src="@/static/star-fill.png"  />
+              <image src="@/static/star-fill.png" />
               <span>{{ imgData.score }}</span>
             </div>
             <div class="img-mid-date">
-              <image src="@/static/date-icon.png"  />
+              <image src="@/static/date-icon.png" />
               <span>{{ imgData.releaseTime }}</span>
             </div>
             <div class="img-mid-runtime">
-              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'"  />
+              <image src="@/static/clock-icon.png" v-if="routerParams.type == 'movie'" />
               <span>{{ imgData.runtime }}</span>
             </div>
           </div>
@@ -42,7 +42,7 @@
       <div class="video-detail-container__content">
         <nut-button :custom-color="primaryBtnColor" @click="clickPlayButton">
           <template #icon>
-            <image src="@/static/play.png"  />
+            <image src="@/static/play.png" />
           </template>
           <span :style="{ color: primaryBtnTextColor }">{{ buttonText }}</span>
         </nut-button>
@@ -51,7 +51,7 @@
           <div class="movie-version-title">
             <span>{{ t('video.movieVersion') }}</span>
             <div class="movie-version-title__download" @click="downloadMovie">
-              <image src="@/static/download-icon.png"  />
+              <nut-icon name="download" :custom-color="iconColor" size="18"></nut-icon>
               <span>{{ t('video.download') }}</span>
             </div>
           </div>
@@ -61,7 +61,8 @@
                 :class="['movie-version-list__item', item.provider + item.name == selectSource.provider + selectSource.name ? 'movie-version-list__active' : '']"
                 v-for="item in sourceList"
                 :key="item.provider + item.name"
-                @click="changeSource(item)">
+                @click="changeSource(item)"
+              >
                 {{ item.sourceName }}
               </div>
             </div>
@@ -75,13 +76,14 @@
                 :class="['tv-version-tabs__cloud-item', item.provider + item.name == selectSource.provider + selectSource.name ? 'tv-version-tabs__cloud-active' : '']"
                 v-for="item in sourceList"
                 :key="item.provider + item.name"
-                @click="changeTvSource(item)">
+                @click="changeTvSource(item)"
+              >
                 {{ item.sourceName }}
               </div>
             </div>
             <div class="tv-version-tabs__season">
               <nut-tabs v-model="activeSeason.season" :title-scroll="true" :custom-color="iconColor" background="var(--app-bg)" @change="changeTvSeason">
-                <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr" :key="item.season"> </nut-tab-pane>
+                <nut-tab-pane :title="item.name" :pane-key="item.season" v-for="item in selectSource.seasonArr" :key="item.season"></nut-tab-pane>
               </nut-tabs>
               <div class="tv-version-tabs__season-viewAll" @click="openTvListPopup">
                 <span>{{ t('video.viewAll') }}</span>
@@ -99,21 +101,25 @@
             :enhanced="true"
             :showScrollbar="false"
             v-if="tvList.length"
-            :style="{ '--line-number': lineNumber, '--line-height': lineHeight }">
+            :style="{ '--line-number': lineNumber, '--line-height': lineHeight }"
+          >
             <div class="tv-version-list__item" v-for="(item, index) in tvList" :id="'name' + item.ji" :key="item.name" @click="toPlayVideo(item, index)">
               <div class="item-img" :style="{ backgroundImage: `url(${item.poster})` }">
-                <image src="@/static/playVideo-button.png"  />
+                <image src="@/static/playVideo-button.png" />
                 <span class="item-img-runtime" v-if="item.runtime">{{ item.runtime }}</span>
                 <div
                   class="item-img-process"
                   :style="{ width: Number(historyTv.initialTime) / (Number(parseTime(item.runtime)) * 0.6) + '%' }"
-                  v-if="item.ji == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"></div>
+                  v-if="item.ji == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"
+                ></div>
               </div>
               <div class="item-title">{{ item.ji + '.' + (item.title || t('video.episodeTitle', { episode: item.ji })) }}</div>
             </div>
           </scroll-view>
           <div class="tv-version-empty" v-else>
-            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv"><span :style="{ color: primaryBtnTextColor }">{{ t('video.reload') }}</span></nut-button>
+            <nut-button :custom-color="primaryBtnColor" v-if="showRehandleButton" @click="reHandleTv">
+              <span :style="{ color: primaryBtnTextColor }">{{ t('video.reload') }}</span>
+            </nut-button>
             <span v-else>{{ t('common.loadingEllipsis') }}</span>
           </div>
         </div>
@@ -121,7 +127,8 @@
           ref="actor_list"
           :routerParams="routerParams"
           :selectSource="{ ...selectSource, size: routerParams.type == 'movie' ? selectSource.size : tvList[0]?.size }"
-          :imgData="{ ...imgData, overview: overview }"></actor-list>
+          :imgData="{ ...imgData, overview: overview }"
+        ></actor-list>
       </div>
       <nut-popup v-model:visible="showTimePicker" round position="center">
         <nut-picker v-model="pickerVal" :columns="pickerColumns" :title="pickerTitle" @confirm="confirmPicker" @cancel="showTimePicker = false" />
@@ -133,8 +140,8 @@
       :tv-list="tvList"
       :active-season="activeSeason"
       @playVideo="toPlayVideo"
-      v-if="routerParams.type === 'tv'">
-    </tvlist-popup>
+      v-if="routerParams.type === 'tv'"
+    ></tvlist-popup>
   </div>
 </template>
 
@@ -154,7 +161,7 @@ const { t } = useI18n()
 const { getUntokenDict } = useDict()
 const showTvlistPopup = ref(false)
 const themeClass = useThemeClass()
-const { primaryBtnColor, primaryBtnTextColor, iconColor } = useThemeColors()
+const { primaryBtnColor, primaryBtnTextColor, iconColor, primaryTextColor } = useThemeColors()
 
 const {
   showPopover,
@@ -605,11 +612,13 @@ page {
               span {
                 font-size: 28rpx;
                 font-weight: bold;
+                color: var(--app-text-primary);
               }
               :deep(.nut-icon) {
                 font-size: 28rpx;
                 width: 28rpx;
                 height: 28rpx;
+                color: var(--app-text-primary);
                 &::before {
                   font-size: 28rpx;
                 }

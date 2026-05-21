@@ -185,10 +185,12 @@ watch(
 
               .right-genres {
                 font-size: 26rpx;
+                color: var(--app-text-primary);
               }
 
               .right-name {
                 font-size: 32rpx;
+                color: var(--app-text-primary);
               }
 
               .right-info {
@@ -196,6 +198,7 @@ watch(
                 align-items: center;
                 font-size: 24rpx;
                 font-weight: bold;
+                color: var(--app-text-secondary);
 
                 .right-info-star {
                   display: flex;

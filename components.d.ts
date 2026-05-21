@@ -16,6 +16,7 @@ declare module 'vue' {
     NutDialog: typeof import('nutui-uniapp/components/dialog/dialog.vue')['default']
     NutIcon: typeof import('nutui-uniapp/components/icon/icon.vue')['default']
     NutInput: typeof import('nutui-uniapp/components/input/input.vue')['default']
+    NutList: typeof import('nutui-uniapp/components/list/list.vue')['default']
     NutNavbar: typeof import('nutui-uniapp/components/navbar/navbar.vue')['default']
     NutOverlay: typeof import('nutui-uniapp/components/overlay/overlay.vue')['default']
     NutPicker: typeof import('nutui-uniapp/components/picker/picker.vue')['default']

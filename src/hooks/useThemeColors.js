@@ -11,6 +11,8 @@ export function useThemeColors() {
     // 主操作按钮颜色（浅色下深色按钮，深色下白色按钮）
     primaryBtnColor: computed(() => (isDark.value ? '#ffffff' : '#090909')),
     primaryBtnTextColor: computed(() => (isDark.value ? '#090909' : '#ffffff')),
+    // 主文字颜色（浅色下黑色，深色下白色）
+    primaryTextColor: computed(() => (isDark.value ? '#ffffff' : '#000000')),
     textSecondaryColor: computed(() => (isDark.value ? '#e0e0e0' : '#353a45')),
     textPlaceholderColor: computed(() => (isDark.value ? '#707070' : '#bbbbbb')),
     successColor: computed(() => '#00c286'),
