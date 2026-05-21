@@ -13,6 +13,26 @@ import { queryAll, createDownload } from '@/utils/download'
 import { useI18n } from 'vue-i18n'
 import { useLocaleStore } from '@/stores/locale'
 
+// 过滤掉同一部内容的旧历史记录
+const filterDuplicateHistory = (historyArr, historyItem) => {
+  if (historyItem.type === 'tv') {
+    // 电视剧：按 titlePlay + season + sourceName 去重
+    return historyArr.filter(item =>
+      !(item.type === 'tv' &&
+        item.titlePlay === historyItem.titlePlay &&
+        item.season === historyItem.season &&
+        item.sourceName === historyItem.sourceName)
+    )
+  } else {
+    // 电影：按 name + sourceName 去重
+    return historyArr.filter(item =>
+      !(item.type === 'movie' &&
+        item.name === historyItem.name &&
+        item.sourceName === historyItem.sourceName)
+    )
+  }
+}
+
 export function useVideoDetail({ route, router }) {
   const { t } = useI18n()
   const localeStore = useLocaleStore()
@@ -452,10 +472,11 @@ export function useVideoDetail({ route, router }) {
           sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
           sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
         }
-        const historyArr = uni.getStorageSync('historyPlay') || []
+        let historyArr = uni.getStorageSync('historyPlay') || []
         if (selectType.value.type != 'WebDAV') {
           historyItem.folderFileId = selectSource.value.folderFileId
         }
+        historyArr = filterDuplicateHistory(historyArr, historyItem)
         uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
         if (selectType.value.type == 'WebDAV') {
           uni.navigateTo({
@@ -514,10 +535,11 @@ export function useVideoDetail({ route, router }) {
           sourceType: selectType.value.type, //这个播放记录归属于哪个类型，比如webdav，天翼云盘，夸克网盘
           sourceName: selectMedia.value.name, //这个播放记录再具体到某个类型下的哪一个
         }
-        const historyArr = uni.getStorageSync('historyPlay') || []
+        let historyArr = uni.getStorageSync('historyPlay') || []
         if (selectType.value.type != 'WebDAV') {
           historyItem.folderFileId = tvList.value[0].id
         }
+        historyArr = filterDuplicateHistory(historyArr, historyItem)
         uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
         let openEndTime = {}
         routerParams.value.movieTvId ? '' : (openEndTime.noSetHistory = 0)
@@ -571,9 +593,10 @@ export function useVideoDetail({ route, router }) {
           sourceName: selectMedia.value.name,
         }
       : null
-    const historyArr = uni.getStorageSync('historyPlay') || []
+    let historyArr = uni.getStorageSync('historyPlay') || []
     if (historyItem) {
       isWebDAV ? '' : (historyItem.folderFileId = item.id)
+      historyArr = filterDuplicateHistory(historyArr, historyItem)
       uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
     }
     // 构建查询参数
@@ -612,10 +635,12 @@ export function useVideoDetail({ route, router }) {
       url += `&wjjId=${activeSeason.value.folderFileId}&folderFileId=${item.id}`
       if (historyItem) {
         historyItem.folderFileId = item.id
+        historyArr = filterDuplicateHistory(historyArr, historyItem)
         uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
       }
     } else {
       if (historyItem) {
+        historyArr = filterDuplicateHistory(historyArr, historyItem)
         uni.setStorageSync('historyPlay', [historyItem, ...historyArr])
       }
     }
