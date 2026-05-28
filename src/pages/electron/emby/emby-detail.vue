@@ -81,7 +81,7 @@
                   v-if="index + 1 == historyTv?.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"
                 ></div>
               </div>
-              <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
+              <div class="item-title">{{ index + 1 + '.' + (item.title || t('video.episodeTitle', { episode: index + 1 })) }}</div>
             </div>
           </scroll-view>
         </div>
@@ -120,7 +120,9 @@ import { getEmbyMovieTv, getEmbySeasonList, getEmbyList, setEmbyImg, getSeasonTv
 import { calTime, handleSeasonName, handleSecond, debounce, parseTime } from '@/utils/scrape'
 import { judgeSelect } from '@/utils/tools'
 import actorList from '../home/components/actor-list.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 
 const imgData = ref<Partial<ImgData>>({})
@@ -130,7 +132,7 @@ const activeSeason = ref<Partial<SeasonItem>>({})
 const seasonFirst = ref<{ img: string; overview: string }>({ img: '', overview: '' })
 const tvList = ref<TvEpisode[]>([]) //目前Emby所拥有的电视集数列表
 const historyPlay = ref<HistoryItem[]>(uni.getStorageSync('historyPlay') || []) //历史播放
-const buttonText = ref('播放')
+const buttonText = ref(t('video.play'))
 const firstEnter = ref(true)
 const selectType = ref<Partial<SourceList>>({})
 const selectMedia = ref<Record<string, any>>({})
@@ -201,7 +203,7 @@ const getMovieTvDetail = async (type = 'all') => {
     res.production_companies ? (imgData.value.production_companies = res.production_companies) : ''
     res.overview ? (imgData.value.overview = res.overview) : ''
     res.path ? (imgData.value.path = res.path) : ''
-    res.number_of_episodes ? (imgData.value.runtime = `共${res.number_of_episodes || 0}集（库中有${res.number_of_episodes || 0}集）`) : ''
+    res.number_of_episodes ? (imgData.value.runtime = t('video.totalEpisodesInLibrary', { total: res.number_of_episodes || 0, count: res.number_of_episodes || 0 })) : ''
   }
   return res
 }
@@ -265,9 +267,9 @@ const setButtonText = () => {
   if (route.query.type == 'movie') {
     let history: HistoryItem | undefined = historyPlay.value?.find(i => handleSeasonName(i.name, true) == handleSeasonName(selectSource.value?.name, true))
     if (history && selectSource.value?.path == '/' + history.path) {
-      buttonText.value = '播放 ' + handleSecond(history.initialTime)
+      buttonText.value = t('video.playWithTime', { time: handleSecond(history.initialTime) })
     } else {
-      buttonText.value = '播放'
+      buttonText.value = t('video.play')
     }
   } else if (route.query.type == 'tv') {
     let history: HistoryItem | undefined = historyPlay.value?.find(i => {
@@ -280,9 +282,9 @@ const setButtonText = () => {
     historyTv.value = history || {}
     if (history && activeSeason.value.path + '/' + history.name == '/' + history.path && history.season == activeSeason.value.season) {
       let time = handleSecond(history.initialTime)
-      buttonText.value = `第${history.ji}集 ${time}`
+      buttonText.value = t('video.episodeTitleWithTime', { episode: history.ji, time })
     } else {
-      buttonText.value = '播放'
+      buttonText.value = t('video.play')
     }
   }
 }

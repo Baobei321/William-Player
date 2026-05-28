@@ -3,10 +3,10 @@
     <div class="recent-played-title">
       <div class="recent-played-title-left">
         <img src="https://emby.media/support/images/logo.png" v-if="props.type === 'emby'" />
-        <span>最近观看</span>
+        <span>{{ t('video.recentPlayed') }}</span>
       </div>
       <div class="recent-played-title-right" @click="toHistoryPlayed">
-        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'gray' }">全部</span>
+        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'gray' }">{{ t('common.all') }}</span>
         <span v-if="props.type != 'emby'">{{ props.listData.length }}</span>
         <nut-icon name="rect-right" size="10" :custom-color="props.type == 'emby' ? '#52b54b' : 'gray'"></nut-icon>
       </div>
@@ -32,7 +32,7 @@
             </div>
             <span class="recent-played-list-movie__item-name" v-if="item.type == 'movie'">{{ handleSeasonName(removeExtension(item.name)) }}</span>
             <span class="recent-played-list-movie__item-name" v-if="item.type == 'tv'">
-              {{ removeExtension(`${item.titlePlay} 第${item.ji}集 ${item.title || '第' + item.ji + '集'}`) }}
+              {{ removeExtension(`${item.titlePlay} ${t('video.episodeTitle', { episode: item.ji })} ${item.title || t('video.episodeTitle', { episode: item.ji })}`) }}
             </span>
           </div>
         </div>
@@ -51,6 +51,9 @@ import { toStringfy } from '@/pages/mobile/mine/common'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { judgeSelect } from '@/utils/tools'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -111,7 +114,7 @@ const toVideoPlayer = async item => {
     type: 'vue',
     content: '/video',
     windowName: 'Video',
-    windowTitle: `正在播放：`,
+    windowTitle: t('video.nowPlaying'),
     opusId: '1',
     windowsOption: {
       frame: false,
@@ -167,7 +170,7 @@ const toVideoPlayer = async item => {
 
 const toHistoryPlayed = () => {
   uni.navigateTo({
-    url: `/pages/mobile/video/history-played?title=最近观看&isConnected1=${props.isConnected}`,
+    url: `/pages/mobile/video/history-played?title=${t('video.recentPlayed')}&isConnected1=${props.isConnected}`,
   })
 }
 const imgError = item => {

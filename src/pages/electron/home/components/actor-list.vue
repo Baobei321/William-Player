@@ -2,7 +2,7 @@
   <div class="actor-list">
     <div class="related-actors" v-if="actors.length">
       <div class="related-actors-title">
-        <div class="title-left">相关演员</div>
+        <div class="title-left">{{ t('video.relatedActors') }}</div>
         <div class="title-right">
           <div class="arrow-left" @click="slideActor('left')">
             <img src="@/static/rect-leftblack.png" />
@@ -26,14 +26,14 @@
             <img class="item-avatar" :src="setActorAvatar(item.profile_path)" />
             <div class="item-name">{{ item.name }}</div>
             <div class="item job" v-if="item.role">{{ item.role }}</div>
-            <div class="item-role" v-else>饰 {{ item.character }}</div>
+            <div class="item-role" v-else>{{ t('video.rolePrefix') }} {{ item.character }}</div>
           </div>
         </div>
       </scroll-view>
     </div>
     <div class="tip-footer">
       <span class="tip-footer-name">{{ handleSeasonName(props.selectSource.name, true) + '-' }}</span>
-      <span class="tip-footer-webdav">路径：{{ props.selectSource.path }}</span>
+      <span class="tip-footer-webdav">{{ t('video.pathPrefix') }}{{ props.selectSource.path }}</span>
       <div class="tip-footer-timesize">
         <span v-if="imgData.runtime">{{ imgData.runtime }}</span>
         <span>{{ props.selectSource.sourceName }}</span>
@@ -47,6 +47,9 @@
 import { ref, onBeforeMount } from 'vue'
 import { handleSeasonName, debounce } from '@/utils/scrape'
 import * as CONFIG from '@/utils/config'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   routerParams: { type: Object, default: {} },
@@ -105,7 +108,7 @@ const getActorList = async () => {
   director.value = res?.crew[0] || {}
   actors.value = res.cast.slice(0, 20)
   if (director.value.name) {
-    director.value.role = '导演'
+    director.value.role = t('video.director')
     actors.value.unshift(director.value)
   }
 }

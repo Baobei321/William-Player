@@ -103,7 +103,7 @@
                   v-if="index + 1 == historyTv.ji && item.runtime && activeSeason.path + '/' + historyTv.name == '/' + historyTv.path"
                 ></div>
               </div>
-              <div class="item-title">{{ index + 1 + '.' + (item.title || `第${index + 1}集`) }}</div>
+              <div class="item-title">{{ index + 1 + '.' + (item.title || t('video.episodeTitle', { episode: index + 1 })) }}</div>
             </div>
           </scroll-view>
         </div>
@@ -128,7 +128,9 @@ import { debounce, parseTime } from '@/utils/scrape'
 import actorList from './components/actor-list.vue'
 import wilTitle from '@/components/electron/wil-title/index.vue'
 import { IMG_DOMAIN } from '@/utils/config'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const nowMovieTv = ref({})

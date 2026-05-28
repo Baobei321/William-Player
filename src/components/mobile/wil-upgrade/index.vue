@@ -89,6 +89,27 @@ const downloadedSize = ref(0)
 
 const emits = defineEmits(['closed', 'update:visible'])
 
+const REMIND_TIME_DEFAULT = 'always'
+const REMIND_TIME_TYPES = ['always', 'daily', 'weekly', 'never']
+const legacyRemindTimeMap = {
+  总是: 'always',
+  每天: 'daily',
+  每周: 'weekly',
+  从不: 'never',
+}
+const remindTimeIntervalMap = {
+  daily: 86400000,
+  weekly: 604800000,
+}
+const normalizeRemindTime = remindTime => {
+  const data = remindTime || {}
+  const type = legacyRemindTimeMap[data.type] || data.type
+  return {
+    ...data,
+    type: REMIND_TIME_TYPES.includes(type) ? type : REMIND_TIME_DEFAULT,
+  }
+}
+
 const compareVersions = (newBb, oldBb) => {
   if (newBb) {
     const v1 = newBb?.split('.').map(Number)
@@ -107,13 +128,10 @@ const compareVersions = (newBb, oldBb) => {
 }
 
 const judegeShow = () => {
-  let remindTime = uni.getStorageSync('remindTime')
-  let mapping = {
-    '每天': 86400000,
-    '每周': 604800000,
-  }
+  const remindTime = normalizeRemindTime(uni.getStorageSync('remindTime'))
+  const interval = remindTimeIntervalMap[remindTime.type]
   if (remindTime.lastTime) {
-    if (Date.now() - remindTime.lastTime > mapping[remindTime.type]) {
+    if (Date.now() - remindTime.lastTime > interval) {
       showBottom.value = true
       uni.setStorageSync('remindTime', { type: remindTime.type, lastTime: Date.now() })
     }
@@ -129,18 +147,13 @@ const getUpdateInfo = async () => {
   let version = props.appVersion
   if (compareVersions(newVersion.value.tag_name, version) == 1) {
     if (props.enableControl) {
-      let remindTime = uni.getStorageSync('remindTime')
-      if (!remindTime) {
-        remindTime = { type: '总是', lastTime: null }
-        uni.setStorageSync('remindTime', remindTime)
-      }
-      if (remindTime.type == '总是') {
+      let remindTime = normalizeRemindTime(uni.getStorageSync('remindTime'))
+      uni.setStorageSync('remindTime', remindTime)
+      if (remindTime.type == 'always') {
         showBottom.value = true
-      } else if (remindTime.type == '每天') {
+      } else if (remindTime.type == 'daily' || remindTime.type == 'weekly') {
         judegeShow()
-      } else if (remindTime.type == '每周') {
-        judegeShow()
-      } else if (remindTime.type == '从不') {
+      } else if (remindTime.type == 'never') {
       } else {
         showBottom.value = true
       }

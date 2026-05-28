@@ -1,6 +1,6 @@
 <template>
   <div class="about-version">
-    <wil-title title="问题与反馈"></wil-title>
+    <wil-title :title="t('navbar.about')"></wil-title>
     <div class="about-version-container">
       <div class="about-version-container__main">
         <image src="@/static/app-logo1.png"></image>
@@ -10,11 +10,11 @@
         </div>
         <div class="main-time">{{ CONFIG.updateTime }}</div>
       </div>
-      <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true" :class="[tabIndex === 0 ? 'active-cell' : '']"></nut-cell>
+      <nut-cell :title="t('backend.autoCheckUpdate')" :desc="statusText" :is-link="true" @click="showPopover = true" :class="[tabIndex === 0 ? 'active-cell' : '']"></nut-cell>
     </div>
     <div class="about-version-protocol">
       <image src="@/static/tmdb-xy.png"></image>
-      <div :class="['about-version-protocol__button', tabIndex === 1 ? 'active-protocol' : '']" @click="toQQpage">联系我们</div>
+      <div :class="['about-version-protocol__button', tabIndex === 1 ? 'active-protocol' : '']" @click="toQQpage">{{ t('backend.contactUs') }}</div>
       <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
     </div>
     <div :class="['about-version-button', tabIndex == 2 ? 'about-check-active' : '']">
@@ -22,9 +22,9 @@
         <template #icon>
           <nut-icon name="refresh2" class="nut-icon-am-rotate nut-icon-am-infinite" v-if="isLoading"></nut-icon>
         </template>
-        检查更新
+        {{ t('backend.checkUpdate') }}
       </nut-button>
-      <nut-button disabled custom-color="#dedde3" v-else>当前已是最新版本</nut-button>
+      <nut-button disabled custom-color="#dedde3" v-else>{{ t('backend.currentLatestVersion') }}</nut-button>
     </div>
     <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
       <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import wilUpgrade from '@/components/mobile/wil-upgrade/index.vue'
 import { getUntokenDicts } from '@/network/apis'
@@ -50,18 +50,40 @@ import * as CONFIG from '@/utils/config'
 import { toParse, toStringfy } from '@/pages/mobile/mine/common'
 import { useRouter } from 'vue-router'
 import wilTitle from '@/components/electron/wil-title/index.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const router = useRouter()
 
 const url = ref('')
 
-const status = ref(['总是'])
+const REMIND_TIME_DEFAULT = 'always'
+const REMIND_TIME_TYPES = ['always', 'daily', 'weekly', 'never']
+const legacyRemindTimeMap = {
+  总是: 'always',
+  每天: 'daily',
+  每周: 'weekly',
+  从不: 'never',
+}
+const normalizeRemindType = type => {
+  if (legacyRemindTimeMap[type]) return legacyRemindTimeMap[type]
+  return REMIND_TIME_TYPES.includes(type) ? type : REMIND_TIME_DEFAULT
+}
+
+const status = ref([REMIND_TIME_DEFAULT])
 const showPopover = ref(false)
-const popoverList = ref([
-  { text: '总是', value: '总是' },
-  { text: '每天', value: '每天' },
-  { text: '每周', value: '每周' },
-  { text: '从不', value: '从不' },
+const remindTimeTextMap = computed(() => ({
+  always: t('backend.always'),
+  daily: t('backend.everyDay'),
+  weekly: t('backend.everyWeek'),
+  never: t('backend.never'),
+}))
+const statusText = computed(() => remindTimeTextMap.value[status.value[0]] || status.value[0])
+const popoverList = computed(() => [
+  { text: t('backend.always'), value: 'always' },
+  { text: t('backend.everyDay'), value: 'daily' },
+  { text: t('backend.everyWeek'), value: 'weekly' },
+  { text: t('backend.never'), value: 'never' },
 ])
 const isLoading = ref(false)
 const showButton = ref(true)
@@ -83,7 +105,10 @@ const checkUpdate = async () => {
 }
 
 const confirm = ({ selectedValue, selectedOptions }) => {
-  uni.setStorageSync('remindTime', { type: selectedValue[0] })
+  const type = normalizeRemindType(selectedValue[0])
+  const remindTime = uni.getStorageSync('remindTime') || {}
+  status.value = [type]
+  uni.setStorageSync('remindTime', { ...remindTime, type })
   showPopover.value = false
 }
 
@@ -139,7 +164,10 @@ const closedPopup = () => {
 }
 
 onLoad(options => {
-  status.value = uni.getStorageSync('remindTime').type ? [uni.getStorageSync('remindTime').type] : ['总是']
+  const remindTime = uni.getStorageSync('remindTime') || {}
+  const type = normalizeRemindType(remindTime.type)
+  status.value = [type]
+  uni.setStorageSync('remindTime', { ...remindTime, type })
   url.value = decodeURIComponent(options.url)
 })
 </script>

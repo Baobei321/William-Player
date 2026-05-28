@@ -3,10 +3,10 @@
     <div class="hxList-title">
       <div class="hxList-title-left">
         <img v-if="props.type == 'emby'" src="https://emby.media/support/images/logo.png" draggable="false" />
-        <span>{{ props.title }}</span>
+        <span>{{ displayTitle }}</span>
       </div>
       <div class="hxList-title-right" @click="toVideoAll">
-        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'gray' }">全部</span>
+        <span :style="{ color: props.type == 'emby' ? '#52b54b' : 'gray' }">{{ t('common.all') }}</span>
         <span v-if="props.type != 'emby'">{{ props.listData.length }}</span>
         <nut-icon name="rect-right" size="10" :custom-color="props.type == 'emby' ? '#52b54b' : 'gray'"></nut-icon>
       </div>
@@ -23,7 +23,7 @@
               draggable="false"
             />
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-            <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime || t('video.noReleaseTime') }}</span>
           </div>
         </div>
       </scroll-view>
@@ -31,16 +31,19 @@
   </div>
 </template>
 <script setup>
-import { ref, nextTick, onUnmounted } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 import emptyBg from '@/static/empty_bg.png'
 import posterEmpty from '@/static/poster-empty.png'
 import { onShow } from '@dcloudio/uni-app'
 import { handleSeasonName } from '@/utils/scrape'
 import * as CONFIG from '@/utils/config'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
-  title: { type: String, default: '电影' },
+  title: { type: String, default: '' },
   type: { type: String, default: '' },
   listData: { type: Array, default: [] },
   isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -48,6 +51,7 @@ const props = defineProps({
 
 const router = useRouter()
 const emits = defineEmits(['clickAll'])
+const displayTitle = computed(() => props.title || t('video.movie'))
 const listData1 = ref(JSON.parse(JSON.stringify(props.listData)).slice(0, 30))
 listData1.value.forEach(item => {
   item.loadImg = true
@@ -64,10 +68,12 @@ const embyTypeMapping = {
   'Series': 'tv',
   'Movie': 'movie',
 }
-const typeMapping = {
+const typeMapping = () => ({
   '电影': 'movie',
   '电视剧': 'tv',
-}
+  [t('video.movie')]: 'movie',
+  [t('video.tv')]: 'tv',
+})
 const toVideoDetail = item => {
   console.log(item, 'ite,/type')
 
@@ -79,7 +85,7 @@ const toVideoDetail = item => {
   } else {
     router.push({
       path: `/homeDetail`,
-      query: { name: handleSeasonName(item.name, true), type: typeMapping[props.title], source: JSON.stringify(item.source), movieTvId: item.movieTvId },
+      query: { name: handleSeasonName(item.name, true), type: typeMapping()[displayTitle.value], source: JSON.stringify(item.source), movieTvId: item.movieTvId },
     })
   }
 }
@@ -90,7 +96,7 @@ const toVideoAll = () => {
   } else {
     router.push({
       path: `/homeAll`,
-      query: { title: props.title },
+      query: { title: displayTitle.value },
     })
   }
 }
@@ -123,13 +129,6 @@ onShow(() => {
       item.loadImg = true
     })
   })
-})
-
-onUnmounted(() => {
-  if (timer !== null) {
-    clearInterval(timer)
-    timer = null
-  }
 })
 </script>
 <style lang="scss" scoped>

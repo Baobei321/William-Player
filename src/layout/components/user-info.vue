@@ -13,48 +13,51 @@
       </div>
     </div>
     <div class="user-info-list">
-      <div class="user-info-list__item" :style="{ color: item.color }" v-for="item in options" :key="item.name" @click="handleClick(item.name)">{{ item.name }}</div>
+      <div class="user-info-list__item" :style="{ color: item.color }" v-for="item in options" :key="item.action" @click="handleClick(item.action)">{{ item.label }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import * as CONFIG from '@/utils/config'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { WilMessageBox } from '@/components/electron/wil-message-box/index.js'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const emits = defineEmits(['closePopover'])
 const router = useRouter()
+const { t } = useI18n()
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
-const options = [
-  { name: '意见反馈', color: 'rgb(38,38,38)' },
-  { name: '下载手机版', color: 'rgb(38,38,38)' },
-  { name: userInfo.value.phonenumber === '19994658532' || !userInfo.value.phonenumber ? '登录' : '退出登录', color: 'rgb(247,76,49)' },
-]
+const isTouristUser = computed(() => userInfo.value.phonenumber === '19994658532' || !userInfo.value.phonenumber)
+const options = computed(() => [
+  { action: 'feedback', label: t('mine.feedbackPc'), color: 'rgb(38,38,38)' },
+  { action: 'downloadMobile', label: t('mine.downloadMobileVersion'), color: 'rgb(38,38,38)' },
+  { action: isTouristUser.value ? 'login' : 'logout', label: isTouristUser.value ? t('auth.login') : t('mine.logout'), color: 'rgb(247,76,49)' },
+])
 
 //跳转到登录页，缩小窗口
 const reduceWindow = async () => {
   ipc.invoke(ipcApiRoute.changeWindowSize, { width: 400, height: 500 })
 }
 
-const handleClick = name => {
-  switch (name) {
-    case '意见反馈':
+const handleClick = action => {
+  switch (action) {
+    case 'feedback':
       ipc.invoke(ipcApiRoute.openExternal, 'https://github.com/chenweiliang6/William-Player/issues')
       break
-    case '下载手机版':
+    case 'downloadMobile':
       ipc.invoke(ipcApiRoute.openExternal, 'https://chenweiliang6.github.io/app-webview/#/download-center')
       break
-    case '退出登录':
+    case 'logout':
       WilMessageBox.confirm({
-        title: '提示',
-        message: '确定要退出登录吗？退出后将需要重新登录。',
+        title: t('modal.tip'),
+        message: t('modal.confirmLogoutPc'),
         type: 'warning',
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
       }).then(() => {
         uni.removeStorageSync('Authorization')
         uni.removeStorageSync('refreshToken')
@@ -64,7 +67,7 @@ const handleClick = name => {
         })
       })
       break
-    case '登录':
+    case 'login':
       uni.removeStorageSync('Authorization')
       uni.removeStorageSync('refreshToken')
       reduceWindow()

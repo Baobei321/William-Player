@@ -1,7 +1,7 @@
 <template>
   <div class="recent-played">
     <div class="recent-played-title">
-      <div class="recent-played-title-left">最近观看</div>
+      <div class="recent-played-title-left">{{ t('video.recentPlayed') }}</div>
     </div>
     <div class="recent-played-list">
       <tv-scroll class="recent-played-list-scroll" style="width: 100%" :scrollIntoView="scrollIntoView">
@@ -29,6 +29,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import playVideoButton from "@/static/playVideo-button.png";
 import { handleSecond, parseTime, handleSeasonName, debounce } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
@@ -36,6 +37,7 @@ import emptyBg from "@/static/empty_bg.png";
 import { toStringfy } from "@/pages/mobile/mine/common";
 import tvScroll from "@/components/tv/tv-scroll/index.vue";
 
+const { t } = useI18n()
 
 const props = defineProps({
   isFocus: { type: Boolean, default: true },

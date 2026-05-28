@@ -1,10 +1,13 @@
-import { createApp, h, ref, nextTick } from 'vue'
+import { createApp, h, ref } from 'vue'
 import MessageBox from './index.vue'
+import i18n from '@/i18n'
 
 // 存储MessageBox实例
 let messageBoxInstance = null
 let appInstance = null
 let container = null
+
+const t = (key, values) => i18n.global.t(key, values)
 
 // 销毁MessageBox实例
 const destroyMessageBox = () => {
@@ -50,7 +53,7 @@ const createMessageBox = (options) => {
         if (type === 'confirm') {
           resolve(result)
         } else {
-          reject(new Error(type === 'cancel' ? '用户取消' : '用户关闭'))
+          reject(new Error(type === 'cancel' ? t('modal.userCanceled') : t('modal.userClosed')))
         }
       }, 300) // 等待动画时间
     }
@@ -60,18 +63,18 @@ const createMessageBox = (options) => {
       render() {
         return h(MessageBox, {
           visible: visible.value,
-          title: options.title || '提示',
+          title: options.title || t('modal.tip'),
           message: options.message,
           type: options.type || '',
           showInput: options.showInput || false,
           inputType: options.inputType || 'text',
-          inputPlaceholder: options.inputPlaceholder || '请输入',
+          inputPlaceholder: options.inputPlaceholder || t('modal.inputPlaceholder'),
           inputValue: inputValue.value,
           inputPattern: options.inputPattern,
-          inputErrorMessage: options.inputErrorMessage || '输入内容不符合要求',
+          inputErrorMessage: options.inputErrorMessage || t('modal.inputInvalid'),
           showCancelButton: options.showCancelButton !== false,
-          confirmButtonText: options.confirmButtonText || '确定',
-          cancelButtonText: options.cancelButtonText || '取消',
+          confirmButtonText: options.confirmButtonText || t('common.ok'),
+          cancelButtonText: options.cancelButtonText || t('common.cancel'),
           showClose: options.showClose !== false,
           width: options.width || '420px',
           overlayClickClose: options.overlayClickClose !== false,
@@ -95,6 +98,7 @@ const createMessageBox = (options) => {
     })
     
     // 挂载
+    appInstance.use(i18n)
     messageBoxInstance = appInstance.mount(container)
     
     // 返回销毁函数
@@ -113,8 +117,8 @@ const confirm = (options) => {
   return createMessageBox({
     ...config,
     showCancelButton: true,
-    confirmButtonText: config.confirmButtonText || '确认',
-    cancelButtonText: config.cancelButtonText || '取消'
+    confirmButtonText: config.confirmButtonText || t('common.confirm'),
+    cancelButtonText: config.cancelButtonText || t('common.cancel')
   })
 }
 
@@ -127,7 +131,7 @@ const alert = (options) => {
   return createMessageBox({
     ...config,
     showCancelButton: false,
-    confirmButtonText: config.confirmButtonText || '确定'
+    confirmButtonText: config.confirmButtonText || t('common.ok')
   })
 }
 
@@ -141,8 +145,8 @@ const prompt = (options) => {
     ...config,
     showCancelButton: true,
     showInput: true,
-    confirmButtonText: config.confirmButtonText || '确认',
-    cancelButtonText: config.cancelButtonText || '取消'
+    confirmButtonText: config.confirmButtonText || t('common.confirm'),
+    cancelButtonText: config.cancelButtonText || t('common.cancel')
   })
 }
 
@@ -156,7 +160,7 @@ const success = (options) => {
     ...config,
     type: 'success',
     showCancelButton: false,
-    confirmButtonText: config.confirmButtonText || '确定'
+    confirmButtonText: config.confirmButtonText || t('common.ok')
   })
 }
 
@@ -170,7 +174,7 @@ const error = (options) => {
     ...config,
     type: 'error',
     showCancelButton: false,
-    confirmButtonText: config.confirmButtonText || '确定'
+    confirmButtonText: config.confirmButtonText || t('common.ok')
   })
 }
 
@@ -184,7 +188,7 @@ const warning = (options) => {
     ...config,
     type: 'warning',
     showCancelButton: false,
-    confirmButtonText: config.confirmButtonText || '确定'
+    confirmButtonText: config.confirmButtonText || t('common.ok')
   })
 }
 
@@ -198,7 +202,7 @@ const info = (options) => {
     ...config,
     type: 'info',
     showCancelButton: false,
-    confirmButtonText: config.confirmButtonText || '确定'
+    confirmButtonText: config.confirmButtonText || t('common.ok')
   })
 }
 

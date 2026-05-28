@@ -1,3 +1,8 @@
+<template>
+  <div id="app1">
+    <router-view></router-view>
+  </div>
+</template>
 <script>
 import { useThemeStore } from '@/stores/theme'
 import { useLocaleStore } from '@/stores/locale'
@@ -18,7 +23,6 @@ export default {
     }
 
     // #ifdef APP-PLUS
-    plus.screen.lockOrientation("portrait-primary");
     if (process.env.NODE_ENV === 'production') {
       //生产环境 禁用log
       console.log = function () {}

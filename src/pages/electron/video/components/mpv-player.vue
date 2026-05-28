@@ -28,7 +28,9 @@ import NoSleep from 'nosleep.js'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   videoUrl: { type: String, default: '' },
   title: { type: String, default: '' },
@@ -55,17 +57,17 @@ let historyIndex = -1
 let selectType = {}
 let selectMedia = {}
 
-const langMapping = {
-  chi: '汉语',
-  eng: '英语',
-  kor: '韩语',
-  jap: '日语',
-  fre: '法语',
-  spa: '西班牙语',
-  rus: '俄语',
-  por: '葡萄牙语',
-  ara: '阿拉伯语',
-}
+const langMapping = () => ({
+  chi: t('video.languageChinese'),
+  eng: t('video.languageEnglish'),
+  kor: t('video.languageKorean'),
+  jap: t('video.languageJapanese'),
+  fre: t('video.languageFrench'),
+  spa: t('video.languageSpanish'),
+  rus: t('video.languageRussian'),
+  por: t('video.languagePortuguese'),
+  ara: t('video.languageArabic'),
+})
 
 //在视频开始播放之后获取音轨列表和字幕列表
 const getTrackListData = async () => {
@@ -114,7 +116,7 @@ const initHistoryObj = () => {
       historyIndex = historyPlay.findIndex(i => i.name == name && i.path == route.query.path && i.sourceName === selectMedia.name)
       historyObj = historyIndex > -1 ? historyPlay[historyIndex] : {}
       config.value.title = historyObj.titlePlay
-        ? (config.value.title = historyObj.titlePlay + ' ' + '第' + historyObj.ji + '集 ' + historyObj.title)
+        ? (config.value.title = historyObj.titlePlay + ' ' + t('video.episodeTitle', { episode: historyObj.ji }) + ' ' + historyObj.title)
         : decodeURIComponent(route.query.path).substring(lastIndex + 1)
     }
   } else {
@@ -232,7 +234,7 @@ onMounted(() => {
           mpv.setAudioTrack(audioTrack.value[0].id)
         }
         if (subTitleTrack.value.length) {
-          let hanyu = subTitleTrack.value.find(i => i.language === '汉语')
+          let hanyu = subTitleTrack.value.find(i => i.lang === 'chi')
           if (hanyu) {
             mpv.setSubtitleTrack(hanyu.id)
           } else {
@@ -244,10 +246,10 @@ onMounted(() => {
         subTitleTrack.value = []
       }
       audioTrack.value.forEach((item, index) => {
-        item.language = langMapping[item.lang] || '音频轨道' + index
+        item.language = langMapping()[item.lang] || t('video.audioTrack', { index })
       })
       subTitleTrack.value.forEach((item, index) => {
-        item.language = langMapping[item.lang] || '字幕轨道' + index
+        item.language = langMapping()[item.lang] || t('video.subtitleTrack', { index })
       })
     } else {
       switch (res.data.event) {

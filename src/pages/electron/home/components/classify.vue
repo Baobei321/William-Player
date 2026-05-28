@@ -1,6 +1,6 @@
 <template>
     <div class="video-classify">
-        <div class="video-classify-title">类别</div>
+        <div class="video-classify-title">{{ t('video.category') }}</div>
         <div class="video-classify-list">
             <div class="list-item" v-for="(item, index) in listData" :key="item.id"
                 :style="{ background: item.background }" @click="toVideoAll(item)">
@@ -24,6 +24,9 @@ import { onShow } from "@dcloudio/uni-app";
 import { classifyList } from "@/utils/scrape.js";
 import emptyBg from "@/static/empty_bg.png";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n()
 
 const props = defineProps({
     isConnected: { type: Boolean, default: false }, //手机是否连接网络

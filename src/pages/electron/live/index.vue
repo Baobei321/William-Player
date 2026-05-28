@@ -5,7 +5,7 @@
         <wil-player :videoUrl="videoUrl" :config="config"></wil-player>
       </div>
       <div class="live-left-title">
-        <div class="live-left-title__left">直播</div>
+        <div class="live-left-title__left">{{ t('navbar.live') }}</div>
         <nut-icon name="uploader" class="live-left-title__right"></nut-icon>
       </div>
       <div class="live-left-list">
@@ -41,7 +41,7 @@
           </div>
         </template>
       </wil-category-list>
-      <wil-empty text="加载中..." v-if="loading"></wil-empty>
+      <wil-empty :text="t('common.loadingEllipsis')" v-if="loading"></wil-empty>
     </div>
   </div>
 </template>
@@ -57,7 +57,9 @@ import wilPlayer from '@/components/electron/wil-player/index.vue'
 import type { LiveItem, MenuItem, MenuChild } from './types'
 import { ElPopover } from 'element-plus'
 import HlsPlugin from 'xgplayer-hls'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const videoRef = ref<HTMLVideoElement | null>(null)
 const liveList = ref<LiveItem[]>([])
 const listData = ref<MenuItem[]>([])
@@ -110,7 +112,7 @@ const clickItem = (item: MenuChild, row: MenuChild[]) => {
     let obj: MenuChild | undefined = v.childListArr.find(i => i.name === item.name)
     if (obj) {
       lineColumns.value = obj.childList.map((h, hindex) => {
-        return { value: h.url, text: `线路${hindex + 1}` }
+        return { value: h.url, text: t('live.lineNumber', { number: hindex + 1 }) }
       })
     }
   })
@@ -135,7 +137,7 @@ onBeforeMount(() => {
   if (!liveList.value) {
     liveList.value = [
       {
-        name: '默认直播源',
+        name: t('live.defaultLiveSource'),
         url: 'https://storage.7x24cc.com/storage-server/presigned/ss1/a6-online-fileupload/newMediaImage/1674C67_427A_iptv_20250411082147720newMediaImage.m3u',
       },
     ]

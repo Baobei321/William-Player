@@ -25,7 +25,7 @@
 
             <!-- 输入框（prompt模式） -->
             <div v-if="showInput" class="messagebox-input">
-              <input v-model="inputValue" :type="inputType" :placeholder="inputPlaceholder" class="messagebox-input-inner" ref="inputRef" @keyup.enter="handleEnter" />
+              <input v-model="inputValue" :type="inputType" :placeholder="placeholderText" class="messagebox-input-inner" ref="inputRef" @keyup.enter="handleEnter" />
               <div v-if="inputErrorMessage" class="messagebox-errormessage">
                 {{ inputErrorMessage }}
               </div>
@@ -36,10 +36,10 @@
         <!-- 底部按钮 -->
         <div class="messagebox-btns">
           <nut-button :type="props.cancelButtonType" v-if="showCancelButton" @click="handleCancel">
-            {{ cancelButtonText }}
+            {{ cancelText }}
           </nut-button>
           <nut-button :type="props.confirmButtonType" v-if="showConfirmButton" @click="handleConfirm" :disabled="confirmButtonDisabled">
-            {{ confirmButtonText }}
+            {{ confirmText }}
           </nut-button>
         </div>
       </div>
@@ -49,6 +49,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import wilSvg from '@/components/electron/wil-svg/index.vue'
 
 const props = defineProps({
@@ -99,11 +100,11 @@ const props = defineProps({
   },
   confirmButtonText: {
     type: String,
-    default: '确定',
+    default: '',
   },
   cancelButtonText: {
     type: String,
-    default: '取消',
+    default: '',
   },
   confirmButtonType: {
     type: String,
@@ -146,6 +147,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['confirm', 'cancel', 'close', 'update:inputValue', 'update:visible'])
+const { t } = useI18n()
 
 const visible = ref(false)
 const inputValue = ref(props.inputValue)
@@ -176,6 +178,10 @@ const typeIcon = {
 const typeClass = computed(() => {
   return props.type ? `is-${props.type}` : ''
 })
+
+const confirmText = computed(() => props.confirmButtonText || t('common.ok'))
+const cancelText = computed(() => props.cancelButtonText || t('common.cancel'))
+const placeholderText = computed(() => props.inputPlaceholder || t('modal.inputPlaceholder'))
 
 const confirmButtonClasses = computed(() => {
   return ['messagebox-btn', 'messagebox-confirm', props.confirmButtonType ? `btn-${props.confirmButtonType}` : '']

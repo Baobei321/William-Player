@@ -14,7 +14,9 @@ import { addOperLog } from '@/network/apis'
 import { IMG_DOMAIN } from '@/utils/config'
 import { getEmbyPlayerUrl } from '@/utils/emby'
 import { judgeSelect } from '@/utils/tools'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 
 const config = reactive({
@@ -138,7 +140,7 @@ const setUrl = async () => {
     } else {
       let num = 1
       uni.showToast({
-        title: '不是88vip以上或者登录已过期',
+        title: t('video.quarkVipOrLoginExpired'),
         icon: 'none',
       })
       setQuarkUrl(res, num)

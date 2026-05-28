@@ -2,13 +2,13 @@
   <div class="catelog-mulu">
     <div class="catelog-mulu-title" @click="back">
       <img src="@/static/rect-leftblack.png" />
-      <span>{{ route.query.title }}目录设置</span>
+      <span>{{ pageTitle }}</span>
     </div>
     <div class="catelog-mulu-container">
       <div class="catelog-mulu-item" v-for="item in listData" :key="item.name" @click="event => clickItem(event, item)">
         <div class="item-top">
-          <img :src="routerParams.title == '电视剧' ? xspBlack : dyBlack" />
-          <span>{{ routerParams.title }}</span>
+          <img :src="catalogType === 'tv' ? xspBlack : dyBlack" />
+          <span>{{ catalogTypeLabel }}</span>
         </div>
         <div class="item-bottom">
           <img :src="mapping[item.type]" />
@@ -39,7 +39,7 @@
           <div class="dialog-content-left">
             <div class="source-list-item" v-for="item in sourceList" :key="item.type">
               <template v-if="item.list.length && item.type !== 'Emby'">
-                <div class="source-list-item__title">{{ item.type }}</div>
+                <div class="source-list-item__title">{{ getSourceTypeLabel(item.type) }}</div>
                 <div class="source-list-item__list">
                   <div
                     :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.name === selectMedia.name ? 'list-active' : '']"
@@ -59,7 +59,7 @@
           <div class="dialog-content-right">
             <div class="right-title" @click="toBack" v-if="path || folderFileIdArr.length">
               <nut-icon name="rect-left" custom-color="#000"></nut-icon>
-              <span>返回</span>
+              <span>{{ t('common.back') }}</span>
             </div>
             <wil-list
               :requestFn="getFileList"
@@ -94,8 +94,8 @@
       </template>
       <template #footer>
         <div class="footer-button">
-          <nut-button type="default" @click="cancel">取消</nut-button>
-          <nut-button type="info" @click="confirmDialog">确认</nut-button>
+          <nut-button type="default" @click="cancel">{{ t('common.cancel') }}</nut-button>
+          <nut-button type="info" @click="confirmDialog">{{ t('common.confirm') }}</nut-button>
         </div>
       </template>
     </nut-dialog>
@@ -104,7 +104,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref, toRef } from 'vue'
+import { computed, onBeforeMount, ref, toRef } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import xspBlack from '@/static/xsp-black.png'
 import dyBlack from '@/static/dy-black.png'
@@ -119,13 +119,30 @@ import deleteIcon from '@/static/delete-icon.png'
 import { useRoute, useRouter } from 'vue-router'
 import { useSelectFolder } from '@/hooks/useSelectFolder.js'
 import { loginUser, get189Folder, getQuarkFolder, getWebDAVUrl, get189DownloadUrl, getQuarkVideoUrl } from '@/utils/common.js'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const selectType = ref({})
 const selectMedia = ref({})
 const result = ref({})
 const emits = defineEmits(['confirm', 'openSource'])
+const getCatalogType = value => {
+  if (value === 'tv' || value === '电视剧' || value === t('video.tv')) return 'tv'
+  if (value === 'movie' || value === '电影' || value === t('video.movie')) return 'movie'
+  return 'tv'
+}
+const catalogType = computed(() => getCatalogType(route.query.mediaType || route.query.title))
+const catalogTypeLabel = computed(() => (catalogType.value === 'tv' ? t('video.tv') : t('video.movie')))
+const pageTitle = computed(() => t('source.directorySettingTitle', { title: catalogTypeLabel.value }))
+const providerLabelMap = computed(() => ({
+  WebDAV: 'WebDAV',
+  Emby: 'Emby',
+  天翼云盘: t('source.tianyiCloudDriveLabel'),
+  夸克网盘: t('source.quarkCloudDriveLabel'),
+}))
+const getSourceTypeLabel = type => providerLabelMap.value[type] || type
 
 const {
   data,
@@ -145,7 +162,7 @@ const {
   clickCell,
   setImg,
   confirm,
-} = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => route.query.title), emits: emits })
+} = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => catalogType.value), emits: emits })
 
 const listData = ref([])
 const showBottom = ref(false)
@@ -154,7 +171,7 @@ const showModel = ref('source')
 const routerParams = ref({})
 
 const showDialog = ref(false)
-const dialogTitle = ref('选择目录')
+const dialogTitle = computed(() => t('source.selectDirectory'))
 const sourceList = ref([])
 const wil_list = ref(null)
 const requestParams = ref(null)
@@ -163,15 +180,17 @@ const showPopover = ref(false)
 const selectItem = ref({})
 const position = ref({})
 const mapping1 = {
-  '电视剧': 'tv',
-  '电影': 'movie',
+  tv: 'tv',
+  movie: 'movie',
+  电视剧: 'tv',
+  电影: 'movie',
 }
 
 const handleSelect = async (item, vitem) => {
   selectType.value = item
   selectMedia.value = vitem
   uni.showLoading({
-    title: '加载中',
+    title: t('common.loading'),
   })
   requestParams.value = null
   if (item.type == 'WebDAV') {
@@ -186,7 +205,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请先开启Alist',
+          title: t('source.pleaseEnableAlist'),
           icon: 'none',
         })
       })
@@ -199,7 +218,7 @@ const handleSelect = async (item, vitem) => {
           requestParams.value = {}
         } else {
           uni.showToast({
-            title: '请重新登录天翼云盘',
+            title: t('source.reloginTianyiCloudDrive'),
             icon: 'none',
           })
         }
@@ -207,7 +226,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请重新登录天翼云盘',
+          title: t('source.reloginTianyiCloudDrive'),
           icon: 'none',
         })
       })
@@ -220,7 +239,7 @@ const handleSelect = async (item, vitem) => {
           requestParams.value = {}
         } else {
           uni.showToast({
-            title: '请重新登录夸克网盘',
+            title: t('source.reloginQuarkCloudDrive'),
             icon: 'none',
           })
         }
@@ -228,7 +247,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请重新登录夸克网盘',
+          title: t('source.reloginQuarkCloudDrive'),
           icon: 'none',
         })
       })
@@ -239,20 +258,18 @@ const handleSelect = async (item, vitem) => {
 
 const handleDelete = () => {
   listData.value = listData.value.filter(item => item.name != selectItem.value.name || item.path != selectItem.value.path)
-  muluData.value[mapping1[route.query.title]] = listData.value
+  muluData.value[catalogType.value] = listData.value
   uni.setStorageSync('muluData', muluData.value)
 }
 
 const confirmDialog = () => {
   confirm()
-  listData.value = muluData.value[mapping1[route.query.title]]
+  listData.value = muluData.value[catalogType.value]
   showDialog.value = false
 }
 
-const popoverOptions = ref([
-  // { icon: tongbuIcon, label: '刮削', color: '#1B1B1B', func: handleGx },
-  // { icon: editIcon, label: '修改', color: '#1B1B1B', func: handleEdit },
-  { icon: deleteIcon, label: '删除', color: '#FE4344', func: handleDelete },
+const popoverOptions = computed(() => [
+  { icon: deleteIcon, label: t('common.delete'), color: '#FE4344', func: handleDelete },
 ])
 
 const mapping = {
@@ -286,14 +303,14 @@ const back = () => {
 //     showBottom.value = false
 //     showModel.value = 'source'
 //     muluData.value = data
-//     listData.value = muluData.value[mapping1[route.query.title]]
+//     listData.value = muluData.value[catalogType.value]
 // }
 
 onBeforeMount(() => {
   muluData.value = uni.getStorageSync('muluData') || {}
   muluData.value?.tv ? '' : (muluData.value.tv = [])
   muluData.value?.movie ? '' : (muluData.value.movie = [])
-  listData.value = muluData.value[mapping1[route.query.title]]
+  listData.value = muluData.value[catalogType.value]
 })
 
 const judgeShow = () => {

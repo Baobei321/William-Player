@@ -52,7 +52,9 @@ import { handleSecond } from '@/utils/scrape.js'
 import Popover from '@/components/electron/wil-popover/index.vue'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   title: { type: String, default: '' },
   nowTime: { type: Number, default: 0 },
@@ -171,7 +173,7 @@ const getAudioTrack = () => {
     showPopover.value = true
   } else {
     uni.showToast({
-      title: '当前视频没有音轨',
+      title: t('video.noAudioTrack'),
       icon: 'none',
     })
   }
@@ -196,7 +198,7 @@ const getSubTitleTrack = () => {
     showPopover.value = true
   } else {
     uni.showToast({
-      title: '当前视频没有内嵌字幕',
+      title: t('video.noSubtitleTrack'),
       icon: 'none',
     })
   }

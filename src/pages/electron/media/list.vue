@@ -2,11 +2,11 @@
   <div class="media-list">
     <div class="media-list-title" @click="back">
       <img src="@/static/rect-leftblack.png" />
-      <span>媒体库列表</span>
+      <span>{{ t('navbar.mediaLibraryList') }}</span>
     </div>
     <div class="media-list-breadcrumb">
       <div class="media-list-breadcrumb__item">
-        <span @click="changeBreadcrumb(0)" class="item-name">媒体库</span>
+        <span @click="changeBreadcrumb(0)" class="item-name">{{ t('navbar.mediaLibrary') }}</span>
         <span v-if="state.historyPath.length" class="item-icon">/</span>
       </div>
       <div class="media-list-breadcrumb__item" v-for="(item, index) in state.historyPath" :key="item.path">
@@ -48,9 +48,11 @@ import { ipcApiRoute } from '@/utils/ipcApiRoute'
 import { ElImage } from 'element-plus'
 import fileIcon from '@/static/file-icon.png'
 import { getFormatIcon } from '@/utils/tools'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const router = useRouter()
-const title = ref('媒体库列表')
+const title = ref(t('navbar.mediaLibraryList'))
 const imageRef = ref(null)
 const load_list = ref(null)
 const previewList = ref([])

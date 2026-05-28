@@ -41,7 +41,7 @@
             :isFocus="focusModel == 'recentPlayed'"
             :offsetTop="scrollTop"></recent-played>
           <hx-list
-            title="电影"
+            :title="t('video.movie')"
             :listData="localMovieTvData?.movie"
             :isFocus="focusModel == 'hxMovie'"
             v-if="localMovieTvData?.movie?.length"
@@ -52,7 +52,7 @@
             :offsetTop="scrollTop"
             @setFocus="setFocus"></hx-list>
           <hx-list
-            title="电视剧"
+            :title="t('video.tv')"
             :listData="localMovieTvData?.tv"
             :isFocus="focusModel == 'hxTv'"
             v-if="localMovieTvData?.tv?.length"
@@ -83,6 +83,7 @@
 
 <script setup>
 import { ref, nextTick, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import tvPage from '@/components/tv/tv-page/index.vue'
 import recentPlayed from './components/index-component/recent-played.vue'
 import hxList from './components/index-component/hx-list.vue'
@@ -97,6 +98,7 @@ import { useVideoIndex } from '@/hooks/useVideoIndex.js'
 import { debounce } from '@/utils/scrape'
 import videoEmpty from './components/index-component/video-empty.vue'
 
+const { t } = useI18n()
 const wil_modal = ref(null)
 
 const { video_navbar, refreshData, refreshLoading, movieTvData, localMovieTvData, tmdbKey, historyPlay, settingData, refreshVideo, selectType } = useVideoIndex({
@@ -220,7 +222,7 @@ const cancelModal = () => {
 const confirmModal = () => {
   focusModel.value = 'settingsPopup'
   modalMessage.value.confirmEvent()
-  if (modalMessage.value.title === '是否确认选择此资源？') {
+  if (modalMessage.value.title === t('source.selectResourceConfirm')) {
     showSettings.value = false
     focusModel.value = 'tvNavbar'
     nextTick(() => {

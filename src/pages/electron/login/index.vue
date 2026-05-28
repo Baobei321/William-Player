@@ -1,44 +1,44 @@
 <template>
   <div class="login">
     <div class="login-welcome">
-      <span>你好，欢迎登录</span>
+      <span>{{ t('auth.loginWelcome') }}</span>
       <span>William Player</span>
     </div>
     <div class="login-form">
       <nut-tabs v-model="tabValue">
-        <nut-tab-pane title="手机登录" pane-key="1">
-          <wil-form :options="settings1" :show-button="false" v-model="formData1"> </wil-form>
+        <nut-tab-pane :title="t('auth.phoneLogin')" pane-key="1">
+          <wil-form :options="phoneSettings" :show-button="false" v-model="formData1"> </wil-form>
         </nut-tab-pane>
-        <nut-tab-pane title="邮箱登录" pane-key="2">
-          <wil-form :options="settings2" :show-button="false" v-model="formData2"> </wil-form>
+        <nut-tab-pane :title="t('auth.emailLogin')" pane-key="2">
+          <wil-form :options="emailSettings" :show-button="false" v-model="formData2"> </wil-form>
         </nut-tab-pane>
       </nut-tabs>
     </div>
     <div class="login-button">
-      <nut-button custom-color="#ff6701" :loading="loading" :disabled="disabledButton()" @click="handleLogin">登录</nut-button>
+      <nut-button custom-color="#ff6701" :loading="loading" :disabled="disabledButton()" @click="handleLogin">{{ t('auth.login') }}</nut-button>
     </div>
     <div class="login-policy">
       <div class="login-policy-privacy" @click="changePrivacy">
         <div class="square-unselect" v-if="!checkPolicy"></div>
         <img src="@/static/square-select.png" style="width: 32rpx; height: 32rpx" v-else />
         <div class="login-policy-privacy__text">
-          <span>我已阅读并同意</span>
-          <span @click.stop="openAgreement">《用户协议》</span>
-          <span>和</span>
-          <span @click.stop="openPrivacy">《隐私政策》</span>
+          <span>{{ t('auth.readAndAgree') }}</span>
+          <span @click.stop="openAgreement">{{ t('auth.userAgreement') }}</span>
+          <span>{{ t('auth.and') }}</span>
+          <span @click.stop="openPrivacy">{{ t('auth.privacyPolicy') }}</span>
         </div>
       </div>
       <div class="login-policy-remember" @click="changePassword">
         <div class="square-unselect" v-if="!checkRemember"></div>
         <img src="@/static/square-select.png" style="width: 32rpx; height: 32rpx" v-else />
-        <span>记住密码</span>
+        <span>{{ t('auth.rememberPassword') }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
+import { computed, ref } from 'vue'
 import wilForm from '@/components/mobile/wil-form/index.vue'
 import { loginByPhone, loginByEmail, getWeUserByopenId } from '@/network/apis'
 import { encrypt } from '@/utils/jsencrypt.js'
@@ -47,8 +47,10 @@ import * as CONFIG from '@/utils/config'
 import { useRouter } from 'vue-router'
 import { ipc } from '@/utils/ipcRenderer'
 import { ipcApiRoute } from '@/utils/ipcApiRoute'
+import { useI18n } from 'vue-i18n'
 //todo，需要在此增加游客登录的按钮
 const router = useRouter()
+const { t } = useI18n()
 const tabValue = ref('1')
 const formData1 = ref({})
 const formData2 = ref({})
@@ -59,11 +61,11 @@ const checkRemember = ref(true)
 //手机号校验
 const validatorPhone = val => {
   if (!val) {
-    return { pass: false, msg: '手机号码不能为空' }
+    return { pass: false, msg: t('auth.phoneRequired') }
   } else {
     const reg = /^1[3-9][0-9]\d{8}$/ // 手机号正则表达式
     if (!reg.test(val)) {
-      return { pass: false, msg: '手机号码格式错误' }
+      return { pass: false, msg: t('auth.phoneInvalid') }
     } else {
       return { pass: true }
     }
@@ -72,59 +74,59 @@ const validatorPhone = val => {
 //校验邮箱
 const validatorEmail = val => {
   if (!val) {
-    return { pass: false, msg: '邮箱不能为空' }
+    return { pass: false, msg: t('auth.emailRequired') }
   } else {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(val)) {
-      return { pass: false, msg: '请输入有效的邮箱地址' }
+      return { pass: false, msg: t('auth.emailInvalid') }
     } else {
       return { pass: true }
     }
   }
 }
 
-const settings1 = ref([
+const phoneSettings = computed(() => [
   {
     label: '',
     type: 'input',
     prop: 'phone',
-    formItemProps: { placeholder: '请输入手机号', type: 'number', inputmode: 'numeric' },
+    formItemProps: { placeholder: t('auth.pleaseInputPhone'), type: 'number', inputmode: 'numeric' },
     // rule: [{ validator: validatorPhone }],
   },
   {
     label: '',
     type: 'input',
     prop: 'password',
-    formItemProps: { placeholder: '请输入密码', type: 'password' },
-    //    rule: [{ required: true, message: '请输入密码' }]
+    formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' },
+    //    rule: [{ required: true, message: t('auth.pleaseInputPassword') }]
   },
 ])
-const settings2 = ref([
+const emailSettings = computed(() => [
   {
     label: '',
     type: 'input',
     prop: 'email',
-    formItemProps: { placeholder: '请输入邮箱', type: 'text', inputmode: 'numeric' },
+    formItemProps: { placeholder: t('auth.pleaseInputEmail'), type: 'text', inputmode: 'numeric' },
     // rule: [{ validator: validatorEmail }],
   },
   {
     label: '',
     type: 'input',
     prop: 'password',
-    formItemProps: { placeholder: '请输入密码', type: 'password' },
-    //   rule: [{ required: true, message: '请输入密码' }]
+    formItemProps: { placeholder: t('auth.pleaseInputPassword'), type: 'password' },
+    //   rule: [{ required: true, message: t('auth.pleaseInputPassword') }]
   },
 ])
 
 const openAgreement = () => {
   uni.showToast({
-    title: '暂无用户协议',
+    title: t('auth.noUserAgreement'),
     icon: 'none',
   })
 }
 const openPrivacy = () => {
   uni.showToast({
-    title: '暂无隐私政策',
+    title: t('auth.noPrivacyPolicy'),
     icon: 'none',
   })
 }
@@ -167,7 +169,7 @@ const magnifyWindow = async () => {
 const handleLogin = async () => {
   if (!checkPolicy.value) {
     uni.showToast({
-      title: '请同意用户协议和隐私政策',
+      title: t('auth.pleaseCheckAgreement'),
       icon: 'none',
     })
     return

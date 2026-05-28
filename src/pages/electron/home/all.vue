@@ -24,7 +24,7 @@
               />
             </div>
             <span class="item-name">{{ removeExtension(item) }}</span>
-            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
+            <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || t('video.noReleaseTime') }}</span>
           </div>
         </template>
       </wil-list>
@@ -39,7 +39,9 @@ import { useVideoAll } from '@/hooks/useVideoAll'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { handleSeasonName } from '@/utils/scrape'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const wil_list = ref(null)

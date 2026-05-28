@@ -3,7 +3,7 @@
     <div class="tv-navbar-left">
       <div :class="['tv-navbar-left__search', tabIndex === 0 ? 'search-active' : '']">
         <image src="@/static/search-white.png"></image>
-        <span>搜索</span>
+        <span>{{ t('video.search') }}</span>
       </div>
       <div class="tv-navbar-left__tabs">
         <nut-tabs v-model="activeTab" custom-color="#fff" background="transparent">
@@ -46,8 +46,11 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
 import { onUnload } from '@dcloudio/uni-app'
+
+const { t } = useI18n()
 
 const props = defineProps({
   refreshData: { type: Object, default: {} },
@@ -58,8 +61,8 @@ const props = defineProps({
 })
 const emits = defineEmits(['setFocus', 'changeSetting', 'refresh'])
 
-const tabsArr = ref(['影视', '直播'])
-const activeTab = ref('影视')
+const tabsArr = ref([t('video.movie'), t('live.live')])
+const activeTab = ref(t('video.movie'))
 const nowTime = ref('')
 const tabIndex = ref(-1)
 const loading = ref(false) //是否正在旋转，刮削中
@@ -101,9 +104,9 @@ const evtMove = keyCode => {
     }
   }
   if (tabIndex.value == 1) {
-    activeTab.value = '影视'
+    activeTab.value = t('video.movie')
   } else if (tabIndex.value == 2) {
-    activeTab.value = '直播'
+    activeTab.value = t('live.live')
   }
 }
 
@@ -131,11 +134,11 @@ const showProgress = () => {
     showPopover.value = true
     return
   }
-  popoverData.value.title = '正在扫描'
+  popoverData.value.title = t('video.scanning')
   popoverData.value.list = [
-    { label: '已找到', value: 0 },
-    { label: '待更新', value: 0 },
-    { label: '已更新', value: 0 },
+    { label: t('video.found'), value: 0 },
+    { label: t('video.pendingUpdate'), value: 0 },
+    { label: t('video.updated'), value: 0 },
   ]
   showPopover.value = true
   isShowPopover.value = true
@@ -189,21 +192,21 @@ watch(
   val => {
     if (props.loading) {
       popoverData.value.list = [
-        { label: '已找到', value: 0 },
-        { label: '待更新', value: 0 },
-        { label: '已更新', value: 0 },
+        { label: t('video.found'), value: 0 },
+        { label: t('video.pendingUpdate'), value: 0 },
+        { label: t('video.updated'), value: 0 },
       ]
-      popoverData.value.list.find(i => i.label == '待更新').value = val.toupdate || 0
+      popoverData.value.list.find(i => i.label == t('video.pendingUpdate')).value = val.toupdate || 0
     } else {
       popoverData.value.list = [
-        { label: '已找到', value: 0 },
-        { label: '已失败', value: 0 },
-        { label: '已更新', value: 0 },
+        { label: t('video.found'), value: 0 },
+        { label: t('video.failed'), value: 0 },
+        { label: t('video.updated'), value: 0 },
       ]
-      popoverData.value.list.find(i => i.label == '已失败').value = val.fail || 0
+      popoverData.value.list.find(i => i.label == t('video.failed')).value = val.fail || 0
     }
-    popoverData.value.list.find(i => i.label == '已找到').value = val.found || 0
-    popoverData.value.list.find(i => i.label == '已更新').value = val.updated || 0
+    popoverData.value.list.find(i => i.label == t('video.found')).value = val.found || 0
+    popoverData.value.list.find(i => i.label == t('video.updated')).value = val.updated || 0
   },
   { deep: true }
 )
@@ -212,7 +215,7 @@ watch(
   val => {
     loading.value = val
     if (!val) {
-      popoverData.value.title = `已完成同步${props.refreshData.success || 0}个影片`
+      popoverData.value.title = t('video.completedSyncVideos', { count: props.refreshData.success || 0 })
       timer2.value = setTimeout(() => {
         isShowPopover.value = false
         setTimeout(() => {

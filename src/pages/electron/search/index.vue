@@ -2,12 +2,12 @@
   <div class="search">
     <div class="search-title">
       <img src="@/static/rect-leftblack.png" style="cursor: pointer" @click="back" />
-      <el-input v-model="searchValue" placeholder="搜索影片" clearable @keydown.enter="toSearch" @clear="toSearch">
+      <el-input v-model="searchValue" :placeholder="t('video.inputVideoNameSearch')" clearable @keydown.enter="toSearch" @clear="toSearch">
         <template #prefix>
           <img src="@/static/search-black.png" />
         </template>
       </el-input>
-      <el-button @click="toSearch">搜索</el-button>
+      <el-button @click="toSearch">{{ t('video.search') }}</el-button>
     </div>
     <div class="search-container">
       <div class="search-container-tabs">
@@ -31,7 +31,7 @@
                 <img :src="setEmptyImg(item.poster)" class="item-poster-image" />
               </div>
               <span class="item-name">{{ removeExtension(item) }}</span>
-              <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || '暂无' }}</span>
+              <span class="item-time" v-if="!item.notShowTime">{{ item.releaseTime || t('video.noReleaseTime') }}</span>
             </div>
           </template>
         </wil-list>
@@ -53,6 +53,9 @@ import { getMainView, getEmbyList, setEmbyImg } from '@/utils/emby'
 import dayjs from 'dayjs'
 import type { EmbyCollectionItem, SourceList } from '../emby/types'
 import { judgeSelect } from '@/utils/tools'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -102,10 +105,10 @@ const initSelect = () => {
 //初始化tabsList
 const initTabsList = async () => {
   if (route.query.isEmby !== '1') {
-    activeName.value = '电影'
+    activeName.value = 'movie'
     tabsList.value = [
-      { name: '电影', label: '电影' },
-      { name: '电视剧', label: '电视剧' },
+      { name: 'movie', label: t('video.movie') },
+      { name: 'tv', label: t('video.tv') },
     ]
   } else {
     let res = await getMainView(selectMedia.value)
@@ -154,13 +157,13 @@ const getList = async (params: { pageNum: number; pageSize: number }) => {
   if (route.query.isEmby !== '1') {
     const startIndex = (params.pageNum - 1) * params.pageSize
     const endIndex = params.pageNum * params.pageSize
-    if (activeName.value === '电影') {
+    if (activeName.value === 'movie') {
       return {
         code: 200,
         rows: movieArr.value.slice(startIndex, endIndex),
         total: movieArr.value?.length,
       }
-    } else if (activeName.value === '电视剧') {
+    } else if (activeName.value === 'tv') {
       return {
         code: 200,
         rows: tvArr.value.slice(startIndex, endIndex),

@@ -1,20 +1,20 @@
 <template>
     <div class="appreciate">
-        <wil-title title="赞赏"></wil-title>
+        <wil-title :title="t('navbar.appreciate')"></wil-title>
         <div class="appreciate-container">
             <div class="appreciate-container-left">
                 <img src="@/static/zanshang.jpg">
-                <span>开发维护不易，如果您觉得此App有用，不妨使用微信扫描上方二维码，也可以在github上⭐一下，支持本软件！App完全免费！ </span>
+                <span>{{ t('backend.appreciateDescription') }}</span>
             </div>
             <div class="appreciate-container-right">
                 <div class="appreciate-container-right__title">
-                    <span>❤特别感谢以下小伙伴的打赏！</span>
-                    <span>若有遗漏请在qq交流群联系我补充，qq群：477326591</span>
+                    <span>{{ t('backend.specialThanksDonation') }}</span>
+                    <span>{{ t('backend.donationMissingTip') }}</span>
                 </div>
                 <div class="appreciate-container-right__list">
                     <div class="appreciate-container-right__list-item" v-for="item in appreciateList"
                         :key="item.dictValue">
-                        {{ `${item.dictLabel}（${item.cssClass}元）` }}
+                        {{ t('backend.donationAmount', { name: item.dictLabel, amount: item.cssClass }) }}
                     </div>
                 </div>
             </div>
@@ -26,7 +26,9 @@
 import { getUntokenDicts } from "@/network/apis";
 import { useRouter } from "vue-router";
 import wilTitle from '@/components/electron/wil-title/index.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const appreciateList = ref([]);
 
 const getAppreciateUser = async () => {

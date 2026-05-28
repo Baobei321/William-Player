@@ -15,7 +15,7 @@
       </el-popover>
     </div>
     <div class="sidebar-list" ref="sidebar_list">
-      <div :class="['sidebar-list-item', item.active ? 'sidebar-list-active' : '']" v-for="item in sidebarList" :key="item.name" @click="changeTab(item)">
+      <div :class="['sidebar-list-item', item.active ? 'sidebar-list-active' : '']" v-for="item in sidebarList" :key="item.path" @click="changeTab(item)">
         <img :src="item.active ? item.activeIcon : item.icon" />
         <span>{{ item.name }}</span>
       </div>
@@ -36,52 +36,78 @@ import chilunBlack from '@/static/chilun-black.png'
 import chilunOrange from '@/static/chilun-orange.png'
 import embyBlack from '@/static/emby-black.png'
 import embyOrange from '@/static/emby-orange.png'
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import * as CONFIG from '@/utils/config'
 import { ElPopover } from 'element-plus'
+
+const { t } = useI18n()
 const userInfo = ref(uni.getStorageSync(CONFIG.USER_KEY))
 const router = useRouter()
 const sidebar_list = ref(null)
 const popoverVisible = ref(false)
-const activeTab = ref('首页')
-const sidebarList = ref([
-  { name: '首页', icon: homeBlack, activeIcon: homeOrange, active: true, path: '/home' },
-  { name: 'Emby', icon: embyBlack, activeIcon: embyOrange, active: false, path: '/emby' },
-  { name: '直播', icon: liveBlack, activeIcon: liveOrange, active: false, path: '/live' },
-  { name: '设置', icon: chilunBlack, activeIcon: chilunOrange, active: false, path: '/settings' },
-])
+const activePath = ref(router.currentRoute.value.path || '/home')
+
+const getSidebarList = () => [
+  { name: t('pc.home'), icon: homeBlack, activeIcon: homeOrange, path: '/home' },
+  { name: t('pc.emby'), icon: embyBlack, activeIcon: embyOrange, path: '/emby' },
+  { name: t('navbar.live'), icon: liveBlack, activeIcon: liveOrange, path: '/live' },
+  { name: t('pc.settings'), icon: chilunBlack, activeIcon: chilunOrange, path: '/settings' },
+].map(item => ({ ...item, active: item.path === activePath.value }))
+
+const sidebarList = ref(getSidebarList())
+
+const updateSidebarActive = () => {
+  sidebarList.value.forEach(item => {
+    item.active = item.path === activePath.value
+  })
+}
+
+const measureSidebarHeights = () => {
+  if (!sidebar_list.value) return
+
+  sidebarList.value.forEach((item, index) => {
+    item.height = sidebar_list.value.children[index].offsetHeight
+  })
+}
 
 // 设置active背景的style
 const setActiveStyle = () => {
   const activeItem = sidebarList.value.find(item => item.active)
   const activeIndex = sidebarList.value.findIndex(item => item.active)
+  if (!activeItem || activeIndex === -1) return { height: '0px', top: '0px' }
+
   let top = 0
   sidebarList.value.forEach((item, index) => {
     if (index < activeIndex) {
-      top += item.height
+      top += item.height || 0
     }
   })
-  return { height: activeItem.height + 'px', top: top + 'px' }
+  return { height: (activeItem.height || 0) + 'px', top: top + 'px' }
 }
 
 const changeTab = item => {
-  if (activeTab.value === item.name) return
-  sidebarList.value.find(v => v.active).active = false
-  item.active = true
-  activeTab.value = item.name
+  if (activePath.value === item.path) return
+  activePath.value = item.path
+  updateSidebarActive()
   router.replace({
     path: item.path,
   })
 }
 
 onMounted(() => {
-  setTimeout(() => {
-    sidebarList.value.forEach((item, index) => {
-      item.height = sidebar_list.value.childNodes[index + 1].offsetHeight
-    })
-  }, 100)
+  setTimeout(measureSidebarHeights, 100)
 })
+
+// 监听语言变化，更新侧边栏文案
+watch(
+  () => t('pc.home'),
+  () => {
+    sidebarList.value = getSidebarList()
+    nextTick(measureSidebarHeights)
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -124,8 +150,10 @@ onMounted(() => {
 
       span {
         display: block;
+        width: 100%;
         margin-top: 12rpx;
         color: #000;
+        text-align: center;
       }
     }
 

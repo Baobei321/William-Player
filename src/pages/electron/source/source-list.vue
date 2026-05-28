@@ -1,6 +1,6 @@
 <template>
   <div class="source-list">
-    <wil-title title="资源库">
+    <wil-title :title="t('navbar.resourceLibrary')">
       <template #right>
         <img src="@/static/jia-black.png" @click="openDialog" />
       </template>
@@ -8,7 +8,7 @@
     <div class="source-list-container" v-if="show">
       <div class="source-list-item" v-for="item in sourceList" :key="item.type">
         <template v-if="item.list.length && (route.query.isEmby === '1' ? item.type === 'Emby' : item.type !== 'Emby')">
-          <div class="source-list-item__title">{{ item.type }}</div>
+          <div class="source-list-item__title">{{ getSourceTypeLabel(item.type) }}</div>
           <div class="source-list-item__list">
             <div
               :class="['list-item', item.list.length == 1 ? 'list-one' : '', vitem.active ? 'list-active' : '']"
@@ -21,16 +21,16 @@
               </div>
               <div class="list-item-name" :class="[vitem.active ? 'list-item-activeName' : '']">{{ vitem.name }}</div>
               <div class="list-item-button">
-                <wil-tooltip content="修改" placement="top" trigger="hover">
+                <wil-tooltip :content="t('common.modify')" placement="top" trigger="hover">
                   <img src="@/static/bianji-black.png" @click.stop="editSource(item, vitem)" />
                 </wil-tooltip>
-                <wil-tooltip content="电视剧目录" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
+                <wil-tooltip :content="t('source.setTvDirectory')" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
                   <img src="@/static/xsp-black.png" @click.stop="setTvMulu(item, vitem)" />
                 </wil-tooltip>
-                <wil-tooltip content="电影目录" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
+                <wil-tooltip :content="t('source.setMovieDirectory')" placement="top" trigger="hover" v-if="route.query.isEmby !== '1'">
                   <img src="@/static/dy-black.png" @click.stop="setMovieMulu(item, vitem)" />
                 </wil-tooltip>
-                <wil-tooltip content="删除" placement="top" trigger="hover">
+                <wil-tooltip :content="t('common.delete')" placement="top" trigger="hover">
                   <img src="@/static/delete-icon.png" @click.stop="deleteSource(item, vitem)" />
                 </wil-tooltip>
               </div>
@@ -41,18 +41,18 @@
     </div>
     <div class="source-list-empty" v-else>
       <img src="@/static/no-data.png" class="source-list-empty__img" />
-      <span class="source-list-empty__tip">添加完资源之后，请为此资源添加电影、电视剧目录！！！</span>
+      <span class="source-list-empty__tip">{{ t('source.resourceTipAfterAdd') }}</span>
       <nut-button custom-color="#090909" @click="openDialog">
         <template #icon>
           <nut-icon name="uploader" custom-color="#fff" size="12"></nut-icon>
         </template>
-        <span>添加新资源</span>
+        <span>{{ t('video.addNewResource') }}</span>
       </nut-button>
     </div>
     <nut-dialog v-model:visible="showDialog" @closed="closedDialog">
       <template #header>
         <div class="header-left" @click="back">
-          <img src="@/static/rect-leftblack.png" v-if="showType !== 'fileSource' && !dialogTitle.includes('修改')" />
+          <img src="@/static/rect-leftblack.png" v-if="showType !== 'fileSource' && dialogMode !== 'edit'" />
           <span>{{ dialogTitle }}</span>
         </div>
         <div class="header-right" @click="cancel">
@@ -69,8 +69,8 @@
       </template>
       <template #footer>
         <div class="footer-button">
-          <nut-button type="default" @click="cancel">取消</nut-button>
-          <nut-button type="info" @click="confirm">确认</nut-button>
+          <nut-button type="default" @click="cancel">{{ t('common.cancel') }}</nut-button>
+          <nut-button type="info" @click="confirm">{{ t('common.confirm') }}</nut-button>
         </div>
       </template>
     </nut-dialog>
@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import wilForm from '@/components/mobile/wil-form/index.vue'
 import wilTooltip from '@/components/electron/wil-tooltip/index.vue'
 import wilModal from '@/components/mobile/wil-modal/index.vue'
@@ -90,16 +90,18 @@ import { toParse, toStringfy } from '@/pages/mobile/mine/common'
 import { loginUser, get189Folder, getQuarkFolder, get189User, getQuarkUser } from '@/utils/common'
 import * as CONFIG from '@/utils/config'
 import wilTitle from '@/components/electron/wil-title/index.vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const sourceList = ref([])
 const show = ref(false)
 const wil_modal = ref(null)
 
 const showDialog = ref(false)
-const dialogTitle = ref('添加新文件源')
+const dialogMode = ref('add')
 const showType = ref('fileSource')
 const transitionName = ref('slide-left')
 const wil_form = ref(null)
@@ -113,77 +115,97 @@ const state = reactive({
   options: [],
   editObj: {},
 })
-const options1 = [
-  { label: '名称', prop: 'name', type: 'input', formItemProps: { placeholder: '请输入', type: 'text' }, rule: [{ required: true, message: '请输入名称' }] },
+const providerLabelMap = computed(() => ({
+  WebDAV: 'WebDAV',
+  Emby: 'Emby',
+  天翼云盘: t('source.tianyiCloudDriveLabel'),
+  夸克网盘: t('source.quarkCloudDriveLabel'),
+}))
+const getSourceTypeLabel = type => providerLabelMap.value[type] || type
+const dialogTitle = computed(() => {
+  if (showType.value === 'fileSource') return t('navbar.addFileSource')
+  return dialogMode.value === 'edit'
+    ? t('source.modifyProviderTitle', { provider: providerLabelMap.value[showType.value] || showType.value })
+    : t('source.addProviderTitle', { provider: providerLabelMap.value[showType.value] || showType.value })
+})
+const isAddMode = computed(() => dialogMode.value === 'add')
+const protocolColumns = [
+  { label: 'HTTP', value: 'http' },
+  { label: 'HTTPS', value: 'https' },
+]
+const createWebdavOptions = () => [
+  { label: t('source.name'), prop: 'name', type: 'input', formItemProps: { placeholder: t('common.input'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputName') }] },
   {
-    label: '协议',
+    label: t('source.protocol'),
     prop: 'protocol',
     type: 'radio',
-    formItemProps: { placeholder: '请输入', type: 'text' },
-    rule: [{ required: true, message: '请选择协议' }],
-    columns: [
-      { label: 'HTTP', value: 'http' },
-      { label: 'HTTPS', value: 'https' },
-    ],
+    formItemProps: { placeholder: t('common.input'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseSelectProtocol') }],
+    columns: protocolColumns,
   },
 
-  { label: '地址', prop: 'address', type: 'input', formItemProps: { placeholder: '例如:127.0.0.1', type: 'text' }, rule: [{ required: true, message: '请输入地址' }] },
-  { label: '端口', prop: 'port', type: 'input', formItemProps: { placeholder: '选填,例如:5244', type: 'number' }, rule: [{ required: true, message: '请输入端口' }] },
+  { label: t('source.address'), prop: 'address', type: 'input', formItemProps: { placeholder: t('source.exampleLocalhost'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputAddress') }] },
+  { label: t('source.port'), prop: 'port', type: 'input', formItemProps: { placeholder: t('source.examplePort5244'), type: 'number' }, rule: [{ required: true, message: t('source.pleaseInputPort') }] },
   {
-    label: '用户名',
+    label: t('source.username'),
     prop: 'username',
     type: 'input',
-    formItemProps: { placeholder: 'alist用户名,例如:admin', type: 'text' },
-    rule: [{ required: true, message: '请输入用户名' }],
+    formItemProps: { placeholder: t('source.alistUsernamePlaceholder'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseInputUsername') }],
   },
-  { label: '密码', prop: 'password', type: 'input', formItemProps: { placeholder: 'alist密码', type: 'password' }, rule: [{ required: true, message: '请输入密码' }] },
+  { label: t('source.password'), prop: 'password', type: 'input', formItemProps: { placeholder: t('source.alistPasswordPlaceholder'), type: 'password' }, rule: [{ required: true, message: t('source.pleaseInputPassword') }] },
 ]
 
-const options2 = [
-  { label: '名称', prop: 'name', type: 'input', formItemProps: { placeholder: '选填（自动获取）', type: 'text' } },
+const createEmbyOptions = () => [
+  { label: t('source.name'), prop: 'name', type: 'input', formItemProps: { placeholder: t('source.optionalAutoFetch'), type: 'text' } },
   {
-    label: '协议',
+    label: t('source.protocol'),
     prop: 'protocol',
     type: 'radio',
-    formItemProps: { placeholder: '请输入', type: 'text' },
-    rule: [{ required: true, message: '请选择协议' }],
-    columns: [
-      { label: 'HTTP', value: 'http' },
-      { label: 'HTTPS', value: 'https' },
-    ],
+    formItemProps: { placeholder: t('common.input'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseSelectProtocol') }],
+    columns: protocolColumns,
   },
 
-  { label: '地址', prop: 'address', type: 'input', formItemProps: { placeholder: '例如:127.0.0.1', type: 'text' }, rule: [{ required: true, message: '请输入地址' }] },
-  { label: '端口', prop: 'port', type: 'input', formItemProps: { placeholder: '选填,例如:443', type: 'number' }, rule: [{ required: true, message: '请输入端口' }] },
+  { label: t('source.address'), prop: 'address', type: 'input', formItemProps: { placeholder: t('source.exampleLocalhost'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputAddress') }] },
+  { label: t('source.port'), prop: 'port', type: 'input', formItemProps: { placeholder: t('source.examplePort443'), type: 'number' }, rule: [{ required: true, message: t('source.pleaseInputPort') }] },
   {
-    label: '用户名',
+    label: t('source.username'),
     prop: 'Username',
     type: 'input',
-    formItemProps: { placeholder: '必填', type: 'text' },
-    rule: [{ required: true, message: '请输入用户名' }],
+    formItemProps: { placeholder: t('source.required'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseInputUsername') }],
   },
-  { label: '密码', prop: 'Pw', type: 'input', formItemProps: { placeholder: '选填', type: 'password' } },
+  { label: t('source.password'), prop: 'Pw', type: 'input', formItemProps: { placeholder: t('source.optional'), type: 'password' } },
 ]
 
-const options3 = [
+const createTianyiOptions = () => [
   {
     label: 'Cookie',
     prop: 'cookie',
     type: 'textarea',
-    formItemProps: { placeholder: '请输入天翼云盘的Cookie', type: 'text' },
-    rule: [{ required: true, message: '请输入Cookie' }],
+    formItemProps: { placeholder: t('source.tianyiCookiePlaceholder'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseInputCookie') }],
   },
 ]
 
-const options4 = [
+const createQuarkOptions = () => [
   {
     label: 'Cookie',
     prop: 'cookie',
     type: 'textarea',
-    formItemProps: { placeholder: '请输入夸克网盘的Cookie', type: 'text' },
-    rule: [{ required: true, message: '请输入Cookie' }],
+    formItemProps: { placeholder: t('source.quarkCookiePlaceholder'), type: 'text' },
+    rule: [{ required: true, message: t('source.pleaseInputCookie') }],
   },
 ]
+
+const getProviderOptions = provider => {
+  if (provider === 'WebDAV') return createWebdavOptions()
+  if (provider === 'Emby') return createEmbyOptions()
+  if (provider === '天翼云盘') return createTianyiOptions()
+  if (provider === '夸克网盘') return createQuarkOptions()
+  return []
+}
 
 const backRouter = () => {
   router.go(-1)
@@ -191,7 +213,7 @@ const backRouter = () => {
 
 const openDialog = () => {
   showDialog.value = true
-  dialogTitle.value = '添加新文件源'
+  dialogMode.value = 'add'
   showType.value = 'fileSource'
   transitionName.value = 'slide-left'
   state.formData = { protocol: 'http' }
@@ -199,18 +221,10 @@ const openDialog = () => {
 
 const changeFileSource = item => {
   transitionName.value = 'slide-left'
+  dialogMode.value = 'add'
   showType.value = item.name
-  dialogTitle.value = '添加' + item.name
   state.history.push(item.name)
-  if (item.name === 'WebDAV') {
-    state.options = options1
-  } else if (item.name === 'Emby') {
-    state.options = options2
-  } else if (item.name === '天翼云盘') {
-    state.options = options3
-  } else if (item.name === '夸克网盘') {
-    state.options = options4
-  }
+  state.options = getProviderOptions(item.name)
 }
 
 const back = () => {
@@ -233,16 +247,18 @@ const cancel = () => {
 
 const closedDialog = () => {
   showType.value = 'fileSource'
-  dialogTitle.value = '添加新文件源'
+  dialogMode.value = 'add'
   transitionName.value = 'slide-left'
   state.history = ['fileSource']
 }
 
 const confirm = () => {
+  const currentDialogMode = dialogMode.value
+  const currentValidateActionTitle = isAddMode.value
   if (showType.value === 'WebDAV') {
     wil_form.value.confirmCommit().then(async valid => {
       if (valid) {
-        validateWebdav(dialogTitle.value, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(
+        validateWebdav(currentValidateActionTitle, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(
           () => {
             judgeShow()
           }
@@ -255,7 +271,7 @@ const confirm = () => {
   } else if (showType.value === 'Emby') {
     wil_form.value.confirmCommit().then(async valid => {
       if (valid) {
-        validateEmby(dialogTitle.value, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(
+        validateEmby(isAddMode.value, state.formData, state.oldData, { address: state.formData.address, isActive: state.editObj.active ? '1' : '0' }, false).then(
           () => {
             judgeShow()
           }
@@ -272,7 +288,7 @@ const confirm = () => {
         let cloud189 = sourceList.value.find(i => i.type === '天翼云盘')
         try {
           let res = await get189User(obj)
-          if (dialogTitle.value === '添加天翼云盘') {
+          if (currentDialogMode === 'add') {
             let isHaveData = !sourceList.value.every(item => {
               return !item.list.length
             })
@@ -283,7 +299,7 @@ const confirm = () => {
             } else {
               cloud189.list.push(tyObj)
             }
-          } else if (dialogTitle.value === '修改天翼云盘') {
+          } else if (currentDialogMode === 'edit') {
             let same = cloud189.list.find(i => i.name === state.editObj.name)
             same.name = res.loginName
             same.JSESSIONID = obj.JSESSIONID
@@ -295,7 +311,7 @@ const confirm = () => {
           uni.setStorageSync('sourceList', sourceList.value)
           judgeShow()
         } catch (error) {
-          uni.showToast({ title: 'Cookie无效', icon: 'none' })
+          uni.showToast({ title: t('source.invalidCookie'), icon: 'none' })
         }
       }
     })
@@ -307,7 +323,7 @@ const confirm = () => {
           let res = await getQuarkUser({
             Cookie: state.formData.cookie,
           })
-          if (dialogTitle.value === '添加夸克网盘') {
+          if (currentDialogMode === 'add') {
             let isHaveData = !sourceList.value.every(item => {
               return !item.list.length
             })
@@ -318,7 +334,7 @@ const confirm = () => {
             } else {
               cloudQuark.list.push(tyObj)
             }
-          } else if (dialogTitle.value === '修改夸克网盘') {
+          } else if (currentDialogMode === 'edit') {
             let same = cloudQuark.list.find(i => i.name === state.editObj.name)
             same.name = res.data.nickname
             same.Cookie = obj.JSESSIONID
@@ -329,7 +345,7 @@ const confirm = () => {
           uni.setStorageSync('sourceList', sourceList.value)
           judgeShow()
         } catch (error) {
-          uni.showToast({ title: 'Cookie无效', icon: 'none' })
+          uni.showToast({ title: t('source.invalidCookie'), icon: 'none' })
         }
       }
     })
@@ -373,8 +389,8 @@ const resetSelect = vitem => {
 
 const handleSelect = (item, vitem) => {
   wil_modal.value.showModal({
-    title: '温馨提示',
-    content: '是否确认选择此资源？',
+    title: t('modal.warmTip'),
+    content: t('source.selectResourceConfirm'),
     confirmColor: '#ff6701',
     confirm: async () => {
       if (item.type == 'WebDAV') {
@@ -385,7 +401,7 @@ const handleSelect = (item, vitem) => {
           })
           .catch(error => {
             uni.showToast({
-              title: '请先开启Alist',
+              title: t('source.pleaseEnableAlist'),
               icon: 'none',
             })
           })
@@ -396,14 +412,14 @@ const handleSelect = (item, vitem) => {
               resetSelect(vitem)
             } else {
               uni.showToast({
-                title: '请重新登录天翼云盘',
+                title: t('source.reloginTianyiCloudDrive'),
                 icon: 'none',
               })
             }
           })
           .catch(error => {
             uni.showToast({
-              title: '请重新登录天翼云盘',
+              title: t('source.reloginTianyiCloudDrive'),
               icon: 'none',
             })
           })
@@ -414,14 +430,14 @@ const handleSelect = (item, vitem) => {
               resetSelect(vitem)
             } else {
               uni.showToast({
-                title: '请重新登录夸克网盘',
+                title: t('source.reloginQuarkCloudDrive'),
                 icon: 'none',
               })
             }
           })
           .catch(error => {
             uni.showToast({
-              title: '请重新登录夸克网盘',
+              title: t('source.reloginQuarkCloudDrive'),
               icon: 'none',
             })
           })
@@ -435,23 +451,23 @@ const handleSelect = (item, vitem) => {
 //修改资源
 const editSource = (item, vitem) => {
   state.editObj = vitem
+  dialogMode.value = 'edit'
   showType.value = item.type
-  dialogTitle.value = '修改' + item.type
   state.history = [item.type]
   state.formData = vitem
   if (item.type === 'WebDAV') {
-    state.options = options1
+    state.options = createWebdavOptions()
     state.formData.protocol ? '' : (state.formData.protocol = 'http')
     state.oldData = JSON.parse(JSON.stringify(state.formData))
   } else if (item.type === 'Emby') {
-    state.options = options2
+    state.options = createEmbyOptions()
     state.formData.protocol ? '' : (state.formData.protocol = 'http')
     state.oldData = JSON.parse(JSON.stringify(state.formData))
   } else if (item.type === '天翼云盘') {
-    state.options = options3
+    state.options = createTianyiOptions()
     state.formData.cookie = `JSESSIONID=${vitem.JSESSIONID};COOKIE_LOGIN_USER=${vitem.COOKIE_LOGIN_USER}`
   } else if (item.type === '夸克网盘') {
-    state.options = options4
+    state.options = createQuarkOptions()
     state.formData.cookie = vitem.Cookie
   }
   showDialog.value = true
@@ -463,7 +479,7 @@ const setTvMulu = async (item, vitem) => {
   router.push({
     path: '/catelog-mulu',
     query: {
-      title: '电视剧',
+      mediaType: 'tv',
     },
   })
 }
@@ -474,7 +490,7 @@ const setMovieMulu = async (item, vitem) => {
   router.push({
     path: '/catelog-mulu',
     query: {
-      title: '电影',
+      mediaType: 'movie',
     },
   })
 }
@@ -482,8 +498,8 @@ const setMovieMulu = async (item, vitem) => {
 //删除资源
 const deleteSource = (item, vitem) => {
   wil_modal.value.showModal({
-    title: '温馨提示',
-    content: '是否确认删除该文件源？，此操作将一并删除海报墙',
+    title: t('modal.warmTip'),
+    content: t('source.deleteSourceConfirm'),
     confirmColor: '#ff6701',
     confirm: async () => {
       item.list = item.list.filter(i => i.name != vitem.name)

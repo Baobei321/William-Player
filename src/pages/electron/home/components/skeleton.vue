@@ -7,14 +7,14 @@
             <div class="swiper-content-left">
             </div>
             <div class="swiper-content-right">
-                <div class="right-name">宝物岛</div>
+                <div class="right-name">{{ t('video.noTitle') }}</div>
                 <div class="right-info">
                     <div class="right-info-date">2024-10-28</div>
                     <div class="right-info-star">
                         <img src="@/static/star-fill.png">
                         <span>9.2</span>
                     </div>
-                    <div class="right-info-genres">剧情 爱情</div>
+                    <div class="right-info-genres">{{ t('video.genre') }}</div>
                 </div>
                 <div class="right-desc">
                     <span>
@@ -25,19 +25,19 @@
         </div>
         <div class="skeleton-hx" v-for="item in 2" :key="item">
             <div class="skeleton-hx-title">
-                <div class="skeleton-hx-title__left">电影</div>
-                <div class="skeleton-hx-title__right">全部14箭</div>
+                <div class="skeleton-hx-title__left">{{ t('video.movie') }}</div>
+                <div class="skeleton-hx-title__right">{{ t('common.all') }}</div>
             </div>
             <div class="skeleton-hx-list">
                 <div class="skeleton-hx-list__item" v-for="item1 in 8" :key="item1">
                     <div class="img"></div>
-                    <div class="skeleton-hx-list__item-name">流浪地球</div>
+                    <div class="skeleton-hx-list__item-name">{{ t('video.noTitle') }}</div>
                     <div class="skeleton-hx-list__item-time">2025-10-19</div>
                 </div>
             </div>
         </div>
         <div class="skeleton-classify">
-            <div class="skeleton-classify-title">类别</div>
+            <div class="skeleton-classify-title">{{ t('video.category') }}</div>
             <div class="skeleton-classify-list">
                 <div class="list-item" v-for="item in 13" :key="item"></div>
             </div>
@@ -46,7 +46,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 </script>
 
 <style lang="scss" scoped>

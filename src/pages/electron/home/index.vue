@@ -8,13 +8,13 @@
         <star-recommend @getStarList="getStarList" @change="changeSwiper" ref="star_recommend" :showSwiper="showSwiper"></star-recommend>
         <div class="home-container-list">
           <recent-played v-if="historyPlay.length" :listData="historyPlay"></recent-played>
-          <hx-list title="电影" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"></hx-list>
-          <hx-list title="电视剧" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
+          <hx-list :title="t('video.movie')" :listData="localMovieTvData?.movie" v-if="localMovieTvData?.movie?.length"></hx-list>
+          <hx-list :title="t('video.tv')" :listData="localMovieTvData?.tv" v-if="localMovieTvData?.tv?.length"></hx-list>
           <Classify></Classify>
         </div>
       </div>
       <div class="home-empty" v-else>
-        <wil-empty type="data" text="暂无影片"></wil-empty>
+        <wil-empty type="data" :text="t('video.noTitle')"></wil-empty>
       </div>
     </template>
     <Skeleton v-else></Skeleton>
@@ -40,6 +40,9 @@ import { useVideoIndex } from '@/hooks/useVideoIndex'
 import { defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import Skeleton from './components/skeleton.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 defineOptions({
   name: 'Home',
 })
@@ -89,7 +92,7 @@ const openVideo = () => {
     type: 'vue',
     content: '/video',
     windowName: 'Video',
-    windowTitle: `正在播放：`,
+    windowTitle: t('video.nowPlaying'),
     opusId: '1',
     windowsOption: {
       frame: false,

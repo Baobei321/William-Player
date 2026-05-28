@@ -1,6 +1,6 @@
 <template>
     <div class="qq">
-        <wil-title title="QQ交流"></wil-title>
+        <wil-title :title="t('backend.contactUs')"></wil-title>
         <div class="qq-container">
             <iframe :src="url"></iframe>
         </div>
@@ -11,7 +11,9 @@
 import { useRoute, useRouter } from 'vue-router';
 import * as CONFIG from '@/utils/config'
 import wilTitle from '@/components/electron/wil-title/index.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const url = CONFIG.BASE_URL.split(":4040")[0] + ':8443/app-webview/#/qqTalk'

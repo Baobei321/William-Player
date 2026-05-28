@@ -8,7 +8,7 @@
         <div class="emby-media" v-if="classifyList?.length">
           <div class="emby-media-title">
             <img :src="embyIcon" />
-            <span>我的媒体</span>
+            <span>{{ t('video.myMedia') }}</span>
           </div>
           <div class="emby-media-list">
             <div class="emby-media-list__item" v-for="item in classifyList" :key="item.id">
@@ -20,7 +20,7 @@
         <hx-list :listData="item.list" :title="item.name" v-for="item in showList" :key="item.id" type="emby" @clickAll="clickAll(item)"></hx-list>
       </div>
     </template>
-    <wil-empty type="data" v-else text="暂无数据"></wil-empty>
+    <wil-empty type="data" v-else :text="t('common.noData')"></wil-empty>
   </div>
 </template>
 
@@ -37,6 +37,9 @@ import { getMainView, getEmbyList, getEmbyNewList, getHistoryList } from '@/util
 import type { EmbyCollectionItem, ProcessedCollectionItem, EmbyQueryParams, ClassifyItem, SourceList, HistoryItem } from './types'
 import { judgeSelect } from '@/utils/tools'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const router = useRouter()
 
 const underImgArr = ref<string[]>([])
