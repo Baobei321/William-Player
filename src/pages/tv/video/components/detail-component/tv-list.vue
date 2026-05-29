@@ -10,7 +10,7 @@
         <image :src="item.poster" mode="aspectFill"></image>
         <div class="item-right">
           <div class="item-right-name">
-            {{ item.title ? `第${item.ji}集 ${item.title}` : `第${item.ji}集` }}
+            {{ item.title ? t('video.episodeRecordName', { episode: item.ji, title: item.title }) : t('video.episodeTitle', { episode: item.ji }) }}
           </div>
           <div class="item-right-overview">{{ item.overview }}</div>
         </div>
@@ -22,7 +22,10 @@
 <script setup>
 import tvScroll from '@/components/tv/tv-scroll/index.vue'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { debounce } from '@/utils/scrape'
+
+const { t } = useI18n()
 
 const props = defineProps({
   list: { type: Array, default: [] },

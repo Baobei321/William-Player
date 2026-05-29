@@ -42,6 +42,7 @@
             :offsetTop="scrollTop"></recent-played>
           <hx-list
             :title="t('video.movie')"
+            mediaType="movie"
             :listData="localMovieTvData?.movie"
             :isFocus="focusModel == 'hxMovie'"
             v-if="localMovieTvData?.movie?.length"
@@ -53,6 +54,7 @@
             @setFocus="setFocus"></hx-list>
           <hx-list
             :title="t('video.tv')"
+            mediaType="tv"
             :listData="localMovieTvData?.tv"
             :isFocus="focusModel == 'hxTv'"
             v-if="localMovieTvData?.tv?.length"

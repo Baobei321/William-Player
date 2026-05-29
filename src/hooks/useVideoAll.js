@@ -1,4 +1,4 @@
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, computed } from 'vue'
 import { onShow, onLoad } from '@dcloudio/uni-app'
 import emptyBg from '@/static/empty_bg.png'
 import { toStringfy } from '../pages/mobile/mine/common'
@@ -13,6 +13,9 @@ export function useVideoAll({ wil_list, route = null }) {
   const { t } = useI18n()
   const requestParams = ref({})
   const titleKey = ref('')
+  const displayTitle = ref('')
+  const listKind = ref('all')
+  const isRecent = computed(() => listKind.value === 'recent')
   const getTypeByTitle = title => {
     const mapping = {
       [t('video.movie')]: 'movie',
@@ -22,6 +25,7 @@ export function useVideoAll({ wil_list, route = null }) {
     }
     return mapping[title]
   }
+  const getMediaType = () => routerParams.value.mediaType || getTypeByTitle(routerParams.value.title)
 
   const routerParams = ref({})
 
@@ -37,7 +41,7 @@ export function useVideoAll({ wil_list, route = null }) {
   const lineHeight = ref('')
 
   const windowWidth = ref(375)
-  const getTitleText = () => (titleKey.value ? t(titleKey.value) : routerParams.value.title)
+  const getTitleText = () => (displayTitle.value || (titleKey.value ? t(titleKey.value) : routerParams.value.title))
 
   const changeSort = () => {
     wil_list.value.reload()
@@ -238,7 +242,7 @@ export function useVideoAll({ wil_list, route = null }) {
         return await getEmbyFolderList(params)
       }
     } else {
-      if (routerParams.value.title == t('video.recentPlayed') || routerParams.value.title == '最近观看') {
+      if (isRecent.value) {
         let res = uni.getStorageSync('historyPlay') || []
         res = res.filter(v => v.sourceType == selectType.value.type && v.sourceName == selectMedia.value.name)
         res.forEach(item => {
@@ -249,9 +253,9 @@ export function useVideoAll({ wil_list, route = null }) {
           rows: res.slice((params.pageNum - 1) * params.pageSize, params.pageNum * params.pageSize),
           total: res.length,
         }
-      } else if ([t('video.tv'), t('video.movie'), '电视剧', '电影'].includes(routerParams.value.title)) {
+      } else if (getMediaType()) {
         let res = uni.getStorageSync('localMovieTvData') || {}
-        let arr = res[getTypeByTitle(routerParams.value.title)]
+        let arr = res[getMediaType()] || []
         arr.forEach(item => {
           item.loadImg = true
         })
@@ -376,7 +380,9 @@ export function useVideoAll({ wil_list, route = null }) {
       [t('video.tv')]: 'video.tv',
       [t('video.movie')]: 'video.movie',
     }
-    titleKey.value = titleMapping[routerParams.value.title] || ''
+    titleKey.value = routerParams.value.genreKey || titleMapping[routerParams.value.title] || ''
+    displayTitle.value = titleKey.value ? t(titleKey.value) : routerParams.value.title
+    listKind.value = routerParams.value.listKind || (routerParams.value.title == '最近观看' || routerParams.value.title == t('video.recentPlayed') ? 'recent' : 'all')
     routerParams.value.isConnected = routerParams.value.isConnected1 == 'true' ? true : false
     if (CONFIG.PLATFORM === 'PC') {
       routerParams.value = route.query
@@ -407,6 +413,8 @@ export function useVideoAll({ wil_list, route = null }) {
   return {
     routerParams,
     titleKey,
+    displayTitle,
+    isRecent,
     getTitleText,
     showPopover,
     getTypeByTitle,

@@ -18,7 +18,7 @@
           @pause="pauseVideo" v-if="config.url && !showReload">
         </video>
         <button class="video-button" v-if="showReload" @click="reloadVideo">
-          <text style="color:#fff">重新加载</text>
+          <text style="color:#fff">{{ t('video.reload') }}</text>
         </button>
       </view>
     </view>
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import i18n from "@/i18n";
 import { addOperLog } from "@/network/apis";
 import { getWebDAVUrl, get189VideoUrl, loginUser, getQuarkResolutionUrl, getQuarkVideoUrl, getFolder, getTvSeason, get189Folder, getQuarkFolder } from "@/utils/common";
 import { calTime, handleSeasonName, generateChineseNumberMapping } from "@/utils/scrape";
@@ -79,6 +80,9 @@ export default {
   },
 
   methods: {
+    t(key, values) {
+      return i18n.global.t(key, values);
+    },
     //判断选择的是webdav还是天翼云盘还是夸克
     judgeSelect() {
       this.sourceList = uni.getStorageSync("sourceList");
@@ -207,7 +211,7 @@ export default {
         this.config.title = handleSeasonName(this.historyObj.title, true);
       } else {
         if (this.historyObj.titlePlay) {
-          this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+          this.config.title = this.historyObj.titlePlay + " " + this.t('video.episodeRecordName', { episode: this.historyObj.ji, title: this.historyObj.title });
         } else {
           this.config.title = decodeURIComponent(this.routerParams.path).substring(lastIndex + 1);
         }
@@ -269,7 +273,7 @@ export default {
         } else {
           let num = 1;
           uni.showToast({
-            title: "不是88vip以上或者登录已过期",
+            title: this.t('video.quarkVipOrLoginExpired'),
             icon: "none",
           });
           this.setQuarkUrl(res, num);
@@ -325,7 +329,7 @@ export default {
       this.historyObj.name = this.tvList[currentIndex].name;
       this.historyObj.runtime = this.tvList[currentIndex].runtime;
       this.historyObj.title = this.tvList[currentIndex].title;
-      this.config.title = this.historyObj.titlePlay + " " + "第" + this.historyObj.ji + "集 " + this.historyObj.title;
+      this.config.title = this.historyObj.titlePlay + " " + this.t('video.episodeRecordName', { episode: this.historyObj.ji, title: this.historyObj.title });
       this.historyObj.initialTime = String(this.config.initialTime);
       this.config.poster = this.historyObj.poster;
       try {
@@ -353,7 +357,7 @@ export default {
         this.setUrl();
       } else {
         uni.showToast({
-          title: "请重新登录网盘",
+          title: this.t('video.pleaseReloginCloudDrive'),
           icon: "none",
         });
       }
@@ -520,7 +524,7 @@ export default {
       };
       //处理现有的集数，将tmdb的封面，时长都设置进去，还有每一集的标题
       this.tvList.forEach((v, vindex) => {
-        v.title = res1.episodes[vindex]?.name || "暂无标题";
+        v.title = res1.episodes[vindex]?.name || this.t('video.noTitle');
         v.poster = res1.episodes[vindex]?.still_path ? IMG_DOMAIN + "/t/p/w533_and_h300_bestv2" + res1.episodes[vindex]?.still_path : "";
         v.runtime = res1.episodes[vindex]?.runtime ? calTime(res1.episodes[vindex]?.runtime, "en") : "00:00";
       });
@@ -535,7 +539,7 @@ export default {
     this.settingData = uni.getStorageSync("settingData");
     if (this.uniPlatform != "app") {
       uni.showToast({
-        title: "目前仅支持AAC格式音频和内嵌字幕，不支持EAC3格式音频和外挂字幕",
+        title: this.t('video.playerCodecSupportTip'),
         duration: 3000,
         icon: "none",
       });

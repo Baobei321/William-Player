@@ -1,6 +1,6 @@
 <template>
   <div class="source-list">
-    <div class="source-list-title">{{ props.title }}</div>
+    <div class="source-list-title">{{ props.title || t('navbar.resourceLibrary') }}</div>
     <div class="source-list-container" v-if="show">
       <div class="source-list-container__classify" :style="{ paddingBottom: item?.list?.length ? '16rpx' : '0' }" v-for="(item, index) in sourceList" :key="item.type">
         <template v-if="item?.list?.length">
@@ -40,14 +40,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { loginUser, get189Folder, getQuarkFolder } from '@/utils/common'
 import { onShow } from '@dcloudio/uni-app'
 
 const props = defineProps({
-  title: { type: String, default: '资源库' },
+  title: { type: String, default: '' },
   type: { type: String, default: 'list' }, //可选值list、menu，list就是在settings-popup中显示，menu就是在选择目录的页面使用
 })
+const { t } = useI18n()
 const emits = defineEmits(['changeShowType', 'openModal', 'getSelectType'])
 
 const tabIndex = ref(0)
@@ -119,7 +121,7 @@ const evtMove = keyCode => {
       } else if (iconIndex.value == 0) {
         //编辑当前资源
         uni.showToast({
-          title: '功能开发中',
+          title: t('common.comingSoon'),
           icon: 'none',
         })
         // let { item, vitem } = getItemAndVitem()
@@ -201,8 +203,8 @@ const handleChoose = index => {
 //点击选中资源
 const selectSource = (item, vitem) => {
   emits('openModal', {
-    title: '是否确认选择此资源？',
-    message: '选择资源之后将进行刮削。',
+    title: t('source.selectResourceConfirm'),
+    message: t('source.selectResourceMessage'),
     confirmEvent: async () => {
       if (item.type == 'WebDAV') {
         await loginUser(vitem)
@@ -212,7 +214,7 @@ const selectSource = (item, vitem) => {
           })
           .catch(error => {
             uni.showToast({
-              title: '请先开启Alist',
+              title: t('source.pleaseEnableAlist'),
               icon: 'none',
             })
           })
@@ -223,14 +225,14 @@ const selectSource = (item, vitem) => {
               resetSelect(vitem)
             } else {
               uni.showToast({
-                title: '请重新登录天翼云盘',
+                title: t('source.reloginTianyiCloudDrive'),
                 icon: 'none',
               })
             }
           })
           .catch(error => {
             uni.showToast({
-              title: '请重新登录天翼云盘',
+              title: t('source.reloginTianyiCloudDrive'),
               icon: 'none',
             })
           })
@@ -241,14 +243,14 @@ const selectSource = (item, vitem) => {
               resetSelect(vitem)
             } else {
               uni.showToast({
-                title: '请重新登录夸克网盘',
+                title: t('source.reloginQuarkCloudDrive'),
                 icon: 'none',
               })
             }
           })
           .catch(error => {
             uni.showToast({
-              title: '请重新登录夸克网盘',
+              title: t('source.reloginQuarkCloudDrive'),
               icon: 'none',
             })
           })
@@ -269,8 +271,8 @@ const editSource = () => {
 const deleteSource = (item, vitem) => {
   //item是type，vitem是media
   emits('openModal', {
-    title: '是否删除该资源？',
-    message: '删除该资源会同时删除所有关联的媒体信息，是否继续此操作？',
+    title: t('source.deleteResourceConfirm'),
+    message: t('source.deleteResourceMessage'),
     confirmEvent: () => {
       item.list = item.list.filter(i => i.name != vitem.name)
       uni.setStorageSync('sourceList', sourceList.value)

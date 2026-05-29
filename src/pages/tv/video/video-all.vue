@@ -1,10 +1,10 @@
 <template>
   <tv-page @keyCodeClick="evtMove">
     <div class="video-all">
-      <div class="video-all-title">{{ routerParams.title }}</div>
+      <div class="video-all-title">{{ displayTitle }}</div>
       <div class="video-all-list">
         <wil-list :requestFn="getMovieTvList" :request-params="requestParams" ref="wil_list" :refresherEnabled="false"
-          idKey="path" :listContainerClass="routerParams.title == '最近观看' ? 'list-recent' : 'list-container'"
+          idKey="path" :listContainerClass="isRecent ? 'list-recent' : 'list-container'"
           :pageSize="windowWidth > 700 ? 18 : 12" :changeItemFn="changeItemFn" :style="{ '--line-height': lineHeight }"
           :scrollIntoView="scrollIntoView" :scroll-with-animation="true" @currentData="currentData">
           <template #default="item">
@@ -12,12 +12,12 @@
               @click="toVideoDetail(item)" @longpress="longPress(item)">
               <div class="item-poster">
                 <image
-                  :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg : (routerParams.title == '最近观看' ? setRecentImg(item.poster) : setEmptyImg(item.poster))"
+                  :src="(!routerParams.isConnected && !item.loadImg) ? emptyBg : (isRecent ? setRecentImg(item.poster) : setEmptyImg(item.poster))"
                   class="item-poster-image" mode="aspectFill" @error="imgError(item)" @load="imgLoad(item)">
                 </image>
               </div>
               <span class="item-name">{{ removeExtension(item) }}</span>
-              <span class="item-time" v-if="routerParams.title != '最近观看'">{{ item.releaseTime || '暂无' }}</span>
+              <span class="item-time" v-if="!isRecent">{{ item.releaseTime || t('common.none') }}</span>
             </div>
           </template>
         </wil-list>

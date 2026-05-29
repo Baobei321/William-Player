@@ -2,24 +2,28 @@
     <div class="appreciate">
         <div class="appreciate-left">
             <image src="@/static/zanshang.jpg"></image>
-            <span>开发维护不易，如果您觉得此App有用，不妨使用微信扫描上方二维码，也可以在github上⭐一下，支持本软件！App完全免费！ </span>
+            <span>{{ t('backend.appreciateDescription') }}</span>
         </div>
         <div class="appreciate-right">
             <div class="appreciate-right-title">
-                <span>❤特别感谢以下小伙伴的打赏！</span>
-                <span>若有遗漏请在qq交流群联系我补充，qq群：477326591</span>
+                <span>{{ t('backend.specialThanksDonation') }}</span>
+                <span>{{ t('backend.donationMissingTip') }}</span>
             </div>
             <div class="appreciate-right-list">
                 <div class="appreciate-right-list__item" v-for="item in appreciateList" :key="item.dictValue">
-                    {{ `${item.dictLabel}（${item.cssClass}元）` }}
+                    {{ t('backend.donationAmount', { name: item.dictLabel, amount: item.cssClass }) }}
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script setup>import { ref } from "vue";
+<script setup>
+import { ref } from "vue";
+import { useI18n } from 'vue-i18n'
 import { getUntokenDicts } from "@/network/apis";
+
+const { t } = useI18n()
 const appreciateList = ref([]);
 const getAppreciateUser = async () => {
     let res = await getUntokenDicts("appreciate_user");

@@ -8,7 +8,7 @@
             </image>
             <image src="@/static/play-gray.png" v-else></image>
             <div class="operation-button-play__text">
-                <span>立即观看</span>
+                <span>{{ t('video.watchNow') }}</span>
                 <span>{{ props.title }}</span>
             </div>
         </div>
@@ -17,46 +17,49 @@
             <image src="@/static/wangpan-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'source'"></image>
             <image src="@/static/wangpan-gray.png" v-else></image>
-            <span>天翼云盘</span>
+            <span>{{ t('source.selectResource') }}</span>
         </div>
         <div class="operation-button-season operation-button-item" @click="toOpenPopup('season')"
             :class="[props.focusModel === 'operationButton' && activeButton === 'season' ? 'operation-button-active' : '']">
             <image src="@/static/season-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'season'"></image>
             <image src="@/static/season-gray.png" v-else></image>
-            <span>第一季</span>
+            <span>{{ t('video.season') }}</span>
         </div>
         <div class="operation-button-tvlist operation-button-item" @click="toOpenPopup('tvlist')"
             :class="[props.focusModel === 'operationButton' && activeButton === 'tvlist' ? 'operation-button-active' : '']">
             <image src="@/static/playlist-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'tvlist'"></image>
             <image src="@/static/playlist-gray.png" v-else></image>
-            <span>剧集</span>
+            <span>{{ t('video.episode') }}</span>
         </div>
         <div class="operation-button-actor operation-button-item" @click="toOpenPopup('actor')"
             :class="[props.focusModel === 'operationButton' && activeButton === 'actor' ? 'operation-button-active' : '']">
             <image src="@/static/people-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'actor'"></image>
             <image src="@/static/people-gray.png" v-else></image>
-            <span>演职人员</span>
+            <span>{{ t('video.castAndCrew') }}</span>
         </div>
         <div class="operation-button-more operation-button-item" @click="toOpenPopup('more')"
             :class="[props.focusModel === 'operationButton' && activeButton === 'more' ? 'operation-button-active' : '']">
             <image src="@/static/gengduo-black.png"
                 v-if="props.focusModel === 'operationButton' && activeButton === 'more'"></image>
             <image src="@/static/gengduo-gray.png" v-else></image>
-            <span>更多</span>
+            <span>{{ t('common.more') }}</span>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
     type: { type: String, default: 'tv' },
     focusModel: { type: String, default: '' },
-    title: { type: String, default: '暂无播放记录' }
+    title: { type: String, default: '' }
 })
 
 const emits = defineEmits(['openPopup', 'toPlay'])

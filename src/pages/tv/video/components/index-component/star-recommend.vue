@@ -18,7 +18,7 @@
               <div class="left-desc">{{ data.overview }}</div>
               <div class="left-button" :style="{ border: props.isFocus ? '6rpx solid #ff6701' : '6rpx solid #e9dfd3' }">
                 <image src="@/static/play-black.png"></image>
-                <span>立即观看</span>
+                <span>{{ t('video.watchNow') }}</span>
               </div>
             </div>
             <div class="swiper-content-right">
@@ -33,10 +33,15 @@
 
 <script setup>
 import wilSwiper from "@/components/mobile/wil-swiper/index.vue";
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, watch } from "vue";
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 import { classifyList, handleSeasonName } from "@/utils/scrape";
 import { onShow } from "@dcloudio/uni-app";
 import * as CONFIG from "@/utils/config";
+const { t } = useI18n()
+const localeStore = useLocaleStore()
+
 const props = defineProps({
   isFocus: { type: Boolean, default: true },
   historyPlay: { type: Array, default: [] },
@@ -56,9 +61,14 @@ const removeExtension = (filename) => {
 
 const toVideoDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/mobile/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
+    url: `/pages/tv/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${item.type}&source=${JSON.stringify(item.source)}&movieTvId=${item.movieTvId}`,
   });
 };
+
+const getGenreText = genreId => {
+  const genre = classifyList.find(item => item.id == genreId)
+  return genre ? t(genre.labelKey) : ''
+}
 
 const changeSwiper = (index) => {
   emits("change", index);
@@ -97,7 +107,7 @@ defineExpose({
   getScrollTop
 });
 
-onShow(() => {
+const getRecommendList = () => {
   classifyList1.value = JSON.parse(JSON.stringify(classifyList));
   let localMovieTvData = uni.getStorageSync("localMovieTvData") || {};
   let tv = [];
@@ -108,9 +118,9 @@ onShow(() => {
       item.type = "tv";
       item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
-          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+          genres += getGenreText(v) ? getGenreText(v) + " " : "";
         } else {
-          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+          genres += getGenreText(v) || "";
         }
       });
       item.genres = genres;
@@ -127,9 +137,9 @@ onShow(() => {
       let genres = "";
       item.genre_ids?.forEach((v, vindex) => {
         if (vindex < item.genre_ids.length - 1) {
-          genres += classifyList1.value.find((h) => h.id == v)?.label ? classifyList1.value.find((h) => h.id == v).label + " " : "";
+          genres += getGenreText(v) ? getGenreText(v) + " " : "";
         } else {
-          genres += classifyList1.value.find((h) => h.id == v)?.label || "";
+          genres += getGenreText(v) || "";
         }
       });
       item.genres = genres;
@@ -139,7 +149,16 @@ onShow(() => {
   }
   listData.value = [...tv, ...movie];
   emits("getStarList", listData.value);
-});
+}
+
+onShow(getRecommendList);
+
+watch(
+  () => localeStore.locale,
+  () => {
+    getRecommendList();
+  }
+);
 </script>
 
 <style lang="scss" scoped>

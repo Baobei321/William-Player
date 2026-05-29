@@ -11,23 +11,23 @@
               <div class="img-icon">
                 <image :src="tabIndex == index ? icIntoblack : icIntowhite"></image>
               </div>
-              <span class="img-all">查看全部</span>
-              <span class="img-number">共{{ props.listData.length }}部</span>
+              <span class="img-all">{{ t('video.viewAll') }}</span>
+              <span class="img-number">{{ t('video.totalCount', { count: props.listData.length }) }}</span>
             </div>
-            <span class="hxList-list-movie__item-name" style="opacity: 0">毒液</span>
-            <span class="hxList-list-movie__item-time" style="opacity: 0">暂无</span>
+            <span class="hxList-list-movie__item-name" style="opacity: 0">{{ props.title }}</span>
+            <span class="hxList-list-movie__item-time" style="opacity: 0">{{ t('common.none') }}</span>
           </template>
           <template v-else>
             <image
               :src="setEmptyImg(item.poster)"
               mode="aspectFill"
               :class="[
-                props.title == '电影' ? 'hxList-list-movie__img-movie' : 'hxList-list-movie__img-tv',
+                props.mediaType == 'movie' ? 'hxList-list-movie__img-movie' : 'hxList-list-movie__img-tv',
                 tabIndex == index ? 'hxList-list-movie__img-active' : 'hxList-list-movie__item-img',
               ]">
             </image>
             <span class="hxList-list-movie__item-name">{{ removeExtension(item.name) }}</span>
-            <span class="hxList-list-movie__item-time">{{ item.releaseTime || '暂无' }}</span>
+            <span class="hxList-list-movie__item-time">{{ item.releaseTime || t('common.none') }}</span>
           </template>
         </div>
       </tv-scroll>
@@ -36,6 +36,7 @@
 </template>
 <script setup>
 import { ref, nextTick, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import posterEmpty from '@/static/poster-empty.png'
 import { onShow } from '@dcloudio/uni-app'
 import { handleSeasonName, throttle, debounce } from '@/utils/scrape'
@@ -44,8 +45,11 @@ import tvScroll from '@/components/tv/tv-scroll/index.vue'
 import icIntoblack from '@/static/ic-intoblack.png'
 import icIntowhite from '@/static/ic-intowhite.png'
 
+const { t } = useI18n()
+
 const props = defineProps({
-  title: { type: String, default: '电影' },
+  title: { type: String, default: '' },
+  mediaType: { type: String, default: 'movie' },
   number: { type: String, default: '0' },
   listData: { type: Array, default: [] },
   isFocus: { type: Boolean, default: false },
@@ -148,13 +152,9 @@ const setScrollIntoView = debounce(() => {
   }
 }, 300)
 
-const typeMapping = {
-  '电影': 'movie',
-  '电视剧': 'tv',
-}
 const toVideoDetail = item => {
   uni.navigateTo({
-    url: `/pages/tv/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${typeMapping[props.title]}&source=${JSON.stringify(
+    url: `/pages/tv/video/video-detail?path=${item.path}&name=${handleSeasonName(item.name, true)}&type=${props.mediaType}&source=${JSON.stringify(
       item.source
     )}&movieTvId=${item.movieTvId}`,
   })
@@ -162,7 +162,7 @@ const toVideoDetail = item => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/tv/video/video-all?title=${props.title}`,
+    url: `/pages/tv/video/video-all?title=${encodeURIComponent(props.title)}&mediaType=${props.mediaType}`,
   })
 }
 
@@ -193,7 +193,7 @@ onShow(() => {
   setTimeout(() => {
     let windowHeight = uni.getSystemInfoSync().windowHeight
     const query = uni.createSelectorQuery()
-    if (props.title == '电影') {
+    if (props.mediaType == 'movie') {
       query
         .select('.hxList-list-movie__img-movie')
         .fields(
@@ -206,7 +206,7 @@ onShow(() => {
           }
         )
         .exec()
-    } else if (props.title == '电视剧') {
+    } else if (props.mediaType == 'tv') {
       query
         .select('.hxList-list-movie__img-tv')
         .fields(

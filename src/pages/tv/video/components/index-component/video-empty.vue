@@ -5,21 +5,23 @@
       <span>William Player</span>
     </div>
     <div class="video-empty-tip">
-      <div>从网盘添加资源到媒体库中</div>
-      <div>即可打造私人影院，随时观看</div>
+      <div>{{ t('video.addResourceToMediaLibrary') }}</div>
+      <div>{{ t('video.buildPrivateCinema') }}</div>
     </div>
     <nut-button custom-color="#ffffff" @click="toAddWebdav" :style="{ border: props.isFocus ? '6rpx solid #ff6701 !important' : 'none' }">
       <template #icon>
         <nut-icon name="uploader" custom-color="#000" size="12"></nut-icon>
       </template>
-      <span>添加新资源</span>
+      <span>{{ t('video.addNewResource') }}</span>
     </nut-button>
   </div>
 </template>
 
 <script setup>
 import appLogo from '@/static/app-logo1.png'
-import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   isFocus: { type: Boolean, default: true },

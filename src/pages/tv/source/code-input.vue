@@ -7,17 +7,17 @@
             <div class="code-input-right">
                 <div class="code-input-right__tabs">
                     <div :class="['tabs-item', item.active ? 'tabs-active' : '', tabIndex === index ? 'tabs-select' : '']"
-                        v-for="(item, index) in tabsList" :key="item.name" @click="changeTab(item, index)">{{ item.name
+                        v-for="(item, index) in tabsList" :key="item.value" @click="changeTab(item, index)">{{ item.name
                         }}
                     </div>
                 </div>
                 <div class="code-input-right__form">
-                    <tv-form labelPosition="top" :options="state.webdavFormOptions" v-model="state.webdavFormData"
-                        :showButton="true" buttonText="提交" type="steps" v-if="activeTab === 'WebDAV'" ref="webdav_form"
+                    <tv-form labelPosition="top" :options="webdavFormOptions" v-model="state.webdavFormData"
+                        :showButton="true" :buttonText="t('common.submit')" type="steps" v-if="activeTab === 'WebDAV'" ref="webdav_form"
                         @confirm="confirmSubmit" @triggerBoundary="triggerBoundary">
                     </tv-form>
-                    <tv-form labelPosition="top" :options="state.embyFormOptions" v-model="state.embyFormData"
-                        :showButton="true" buttonText="提交" type="steps" v-if="activeTab === 'Emby'" ref="emby_form"
+                    <tv-form labelPosition="top" :options="embyFormOptions" v-model="state.embyFormData"
+                        :showButton="true" :buttonText="t('common.submit')" type="steps" v-if="activeTab === 'Emby'" ref="emby_form"
                         @confirm="confirmSubmit" @triggerBoundary="triggerBoundary">
                     </tv-form>
                 </div>
@@ -27,7 +27,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import wilQrcode from "@/components/mobile/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
 import tvPage from "@/components/tv/tv-page/index.vue";
@@ -35,6 +36,7 @@ import tvForm from '@/components/tv/tv-form/index.vue'
 import { validateWebdav, validateEmby } from "@/utils/validate";
 import { onLoad } from "@dcloudio/uni-app";
 
+const { t } = useI18n()
 const wilQrcodeRef = ref(null);
 const webdav_form = ref(null)
 const emby_form = ref(null)
@@ -47,13 +49,13 @@ let sub189Nvue = null;
 let subQuarkNvue = null;
 
 const tabIndex = ref(0)//默认选中的索引
-const tabsList = ref([
-    { name: 'WebDAV', active: true },
-    { name: 'Emby', active: false },
-    { name: '天翼云盘', active: false },
-    { name: '夸克网盘', active: false }
-])
 const activeTab = ref('WebDAV')
+const tabsList = computed(() => [
+    { value: 'WebDAV', name: 'WebDAV', active: activeTab.value === 'WebDAV' },
+    { value: 'Emby', name: 'Emby', active: activeTab.value === 'Emby' },
+    { value: '天翼云盘', name: t('navbar.tianyiCloudDrive'), active: activeTab.value === '天翼云盘' },
+    { value: '夸克网盘', name: t('navbar.quarkCloudDrive'), active: activeTab.value === '夸克网盘' }
+])
 
 const focusModel = ref('tabs')//当前键盘控制器在哪个组件上
 
@@ -61,47 +63,45 @@ const state = reactive({
     //webdav的表单配置
     webdavFormData: { protocol: 'http' },
     webdavOldData:{},
-    webdavFormOptions: [
-        { label: "名称", prop: "name", type: "input", formItemProps: { placeholder: "请输入", type: "text" }, rule: [{ required: true, message: "请输入名称" }] },
-        {
-            label: "协议", prop: "protocol", type: 'radio', formItemProps: { placeholder: "请选择", type: "text" }, rule: [{ required: true, message: "请选择协议" }], columns: [
-                { label: "HTTP", value: "http" },
-                { label: "HTTPS", value: "https" },
-            ]
-        },
-        { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
-        { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "必填,例如:5244", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
-        {
-            label: "用户名",
-            prop: "username",
-            type: "input",
-            formItemProps: { placeholder: "alist用户名,例如:admin", type: "text" },
-            rule: [{ required: true, message: "请输入用户名" }],
-        },
-        { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "alist密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
-    ],
     //emby的表单配置
     embyFormData: { protocol: 'http' },
-    embyFormOptions: [
-        {
-            label: "协议", prop: "protocol", type: 'radio', formItemProps: { placeholder: "请选择", type: "text" }, rule: [{ required: true, message: "请选择协议" }], columns: [
-                { label: "HTTP", value: "http" },
-                { label: "HTTPS", value: "https" },
-            ]
-        },
-        { label: "地址", prop: "address", type: "input", formItemProps: { placeholder: "例如:127.0.0.1", type: "text" }, rule: [{ required: true, message: "请输入地址" }] },
-        { label: "端口", prop: "port", type: "input", formItemProps: { placeholder: "必填,例如:443", type: "number" }, rule: [{ required: true, message: "请输入端口" }] },
-        {
-            label: "用户名",
-            prop: "username",
-            type: "input",
-            formItemProps: { placeholder: "emby用户名,例如:admin", type: "text" },
-            rule: [{ required: true, message: "请输入用户名" }],
-        },
-        { label: "密码", prop: "password", type: "input", formItemProps: { placeholder: "emby密码", type: "password" }, rule: [{ required: true, message: "请输入密码" }] },
-    ],
     embyOldData:{}
 })
+const protocolOptions = [
+    { label: 'HTTP', value: 'http' },
+    { label: 'HTTPS', value: 'https' },
+]
+const webdavFormOptions = computed(() => [
+    { label: t('source.name'), prop: 'name', type: 'input', formItemProps: { placeholder: t('common.input'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputName') }] },
+    {
+        label: t('source.protocol'), prop: 'protocol', type: 'radio', formItemProps: { placeholder: t('common.select'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseSelectProtocol') }], columns: protocolOptions,
+    },
+    { label: t('source.address'), prop: 'address', type: 'input', formItemProps: { placeholder: t('source.exampleLocalhost'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputAddress') }] },
+    { label: t('source.port'), prop: 'port', type: 'input', formItemProps: { placeholder: t('source.requiredPortExample5244'), type: 'number' }, rule: [{ required: true, message: t('source.pleaseInputPort') }] },
+    {
+        label: t('source.username'),
+        prop: 'username',
+        type: 'input',
+        formItemProps: { placeholder: t('source.alistUsernamePlaceholder'), type: 'text' },
+        rule: [{ required: true, message: t('source.pleaseInputUsername') }],
+    },
+    { label: t('source.password'), prop: 'password', type: 'input', formItemProps: { placeholder: t('source.alistPasswordPlaceholder'), type: 'password' }, rule: [{ required: true, message: t('source.pleaseInputPassword') }] },
+])
+const embyFormOptions = computed(() => [
+    {
+        label: t('source.protocol'), prop: 'protocol', type: 'radio', formItemProps: { placeholder: t('common.select'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseSelectProtocol') }], columns: protocolOptions,
+    },
+    { label: t('source.address'), prop: 'address', type: 'input', formItemProps: { placeholder: t('source.exampleLocalhost'), type: 'text' }, rule: [{ required: true, message: t('source.pleaseInputAddress') }] },
+    { label: t('source.port'), prop: 'port', type: 'input', formItemProps: { placeholder: t('source.requiredPortExample443'), type: 'number' }, rule: [{ required: true, message: t('source.pleaseInputPort') }] },
+    {
+        label: t('source.username'),
+        prop: 'username',
+        type: 'input',
+        formItemProps: { placeholder: t('source.embyUsernamePlaceholder'), type: 'text' },
+        rule: [{ required: true, message: t('source.pleaseInputUsername') }],
+    },
+    { label: t('source.password'), prop: 'password', type: 'input', formItemProps: { placeholder: t('source.embyPasswordPlaceholder'), type: 'password' }, rule: [{ required: true, message: t('source.pleaseInputPassword') }] },
+])
 
 
 // #ifdef APP-PLUS
@@ -139,7 +139,7 @@ const startServer = () => {
         let result = JSON.parse(res)
         if (result.code == 500) {
             uni.showToast({
-                title: '出错了',
+                title: t('common.errorOccurred'),
                 icon: 'none',
             })
         } else {
@@ -155,13 +155,9 @@ const startServer = () => {
 
 //点击选择tab
 const changeTab = (item, index) => {
-    if (item.name === activeTab) return
-    tabsList.value.forEach(v => {
-        v.active = false
-    });
-    activeTab.value = item.name
+    if (item.value === activeTab.value) return
+    activeTab.value = item.value
     tabIndex.value = index
-    item.active = true
     if (activeTab.value === '天翼云盘') {
         open189Webview()
     } else if (activeTab.value === '夸克网盘') {
@@ -175,7 +171,7 @@ const keyCodeClick = (keyCode) => {
         if (keyCode === "KeyDown") { //往下就是到下面的输入form，如果是天翼和夸克，就不能往下
             if (activeTab.value === 'WebDAV' || activeTab.value === 'Emby') {
                 focusModel.value = 'form'
-                tabIndex.value = tabsList.value.findIndex(v => v.name === activeTab.value)
+                tabIndex.value = tabsList.value.findIndex(v => v.value === activeTab.value)
                 activeTab.value === 'WebDAV' ? webdav_form.value.evtMove(keyCode) : emby_form.value.evtMove(keyCode)
             }
         } else if (keyCode === "KeyLeft") {
@@ -205,13 +201,13 @@ const confirmSubmit = () => {
     if (activeTab.value === 'WebDAV') {
         webdav_form.value.submitForm(valid => {
             if (valid) {
-                validateWebdav(routerParams.value.type ? '修改Openlist/Alist' : '添加Openlist/Alist', state.webdavFormData,state.webdavOldData, {})
+                validateWebdav(!routerParams.value.type, state.webdavFormData,state.webdavOldData, {})
             }
         })
     } else if (activeTab.value === 'Emby') {
         emby_form.value.submitForm(valid => {
             if (valid) {
-                validateEmby(routerParams.value.type ? '修改Emby' : '添加Emby', state.embyFormData,state.embyOldData, {})
+                validateEmby(!routerParams.value.type, state.embyFormData,state.embyOldData, {})
             }
         })
     }

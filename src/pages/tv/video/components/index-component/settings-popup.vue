@@ -3,13 +3,26 @@
         <nut-popup position="right" v-bind="$attrs" @closed="closedPopup">
             <div :class="['popup', openAnimation ? 'settings-leave' : 'settings-enter']"
                 v-show="showType == 'settings'">
-                <div class="popup-title">设置</div>
+                <div class="popup-title">{{ t('navbar.settings') }}</div>
                 <div class="popup-container">
                     <div class="popup-container-list" v-for="(litem, lindex) in settings" :key="lindex">
                         <div :class="['list-item', tabIndex === item.index ? 'list-active' : '']" v-for="item in litem"
-                            :key="item.title" @click="clickItem(item)">
+                            :key="item.key" @click="clickItem(item)">
                             <image :src="tabIndex === item.index ? item.activeIcon : item.icon"></image>
                             <span>{{ item.title }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div :class="['popup', openAnimation ? 'source-enter' : 'source-leave']" v-show="showType == 'language'">
+                <div class="popup-title">{{ t('settings.language') }}</div>
+                <div class="popup-container">
+                    <div class="popup-container-list">
+                        <div :class="['list-item', languageIndex === index ? 'list-active' : '']" v-for="(item, index) in languageList"
+                            :key="item.value" @click="chooseLanguage(item.value, index)">
+                            <image :src="languageIndex === index ? languageActiveIcon : languageIcon"></image>
+                            <span>{{ item.label }}</span>
+                            <span class="list-item-check" v-if="item.value === localeStore.locale">✓</span>
                         </div>
                     </div>
                 </div>
@@ -18,14 +31,16 @@
                 ref="source_list" @changeShowType="changeShowType" @openModal="openModal" :title="typeTitle">
             </source-list>
             <catelog-mulu v-if="showType == 'catelogMulu'" :class="[openAnimation ? 'source-enter' : 'source-leave']"
-                ref="catelog_mulu" @changeShowType="changeShowType" :title="typeTitle">
+                ref="catelog_mulu" @changeShowType="changeShowType" :title="typeTitle" :catalogType="catalogType">
             </catelog-mulu>
         </nut-popup>
     </div>
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useLocaleStore } from '@/stores/locale'
 import ziyuankuGray from '@/static/ziyuanku-gray.png'
 import ziyuankuBlack from '@/static/ziyuanku-black.png'
 import datasyncGray from '@/static/datasync-gray.png'
@@ -40,21 +55,29 @@ import fankuiGray from '@/static/fankui-gray.png'
 import fankuiBlack from '@/static/fankui-black.png'
 import zanshangGray from '@/static/zanshang-gray.png'
 import zanshangBlack from '@/static/zanshang-black.png'
+import languageIcon from '@/static/language-dark.png'
+import languageActiveIcon from '@/static/language-light.png'
 import sourceList from './source-list.vue'
 import catelogMulu from './catelog-mulu.vue'
-const settings = [
+
+const { t } = useI18n()
+const localeStore = useLocaleStore()
+const settings = computed(() => [
     [
-        { icon: ziyuankuGray, activeIcon: ziyuankuBlack, title: '资源库', index: 0, type: 'source' },
-        { icon: datasyncGray, activeIcon: datasyncBlack, title: '数据同步', index: 1, path: '/pages/tv/mine/data-sync' },
-        { icon: xspGray, activeIcon: xspBlack, title: '电视剧目录设置', index: 2, type: 'catelogMulu' },
-        { icon: dyGray, activeIcon: dyBlack, title: '电影目录设置', index: 3, type: 'catelogMulu' },
+        { key: 'source', icon: ziyuankuGray, activeIcon: ziyuankuBlack, title: t('navbar.resourceLibrary'), index: 0, type: 'source' },
+        { key: 'dataSync', icon: datasyncGray, activeIcon: datasyncBlack, title: t('navbar.dataSync'), index: 1, path: '/pages/tv/mine/data-sync' },
+        { key: 'tvCatalog', icon: xspGray, activeIcon: xspBlack, title: t('navbar.tvCatelogSetting'), index: 2, type: 'catelogMulu', catalogType: 'tv' },
+        { key: 'movieCatalog', icon: dyGray, activeIcon: dyBlack, title: t('navbar.movieCatelogSetting'), index: 3, type: 'catelogMulu', catalogType: 'movie' },
     ],
     [
-        { icon: fankuiGray, activeIcon: fankuiBlack, title: '问题与反馈', index: 4, path: '/pages/tv/mine/enter-qqgroup' },
-        { icon: zanshangGray, activeIcon: zanshangBlack, title: '赞赏', index: 5, path: '/pages/tv/mine/appreciate' },
-        { icon: guanyuGray, activeIcon: guanyuBlack, title: '关于', index: 6, path: '/pages/tv/mine/about-version' },
+        { key: 'language', icon: languageIcon, activeIcon: languageActiveIcon, title: t('settings.language'), index: 4, type: 'language' },
+        { key: 'feedback', icon: fankuiGray, activeIcon: fankuiBlack, title: t('navbar.feedback'), index: 5, path: '/pages/tv/mine/enter-qqgroup' },
+        { key: 'appreciate', icon: zanshangGray, activeIcon: zanshangBlack, title: t('navbar.appreciate'), index: 6, path: '/pages/tv/mine/appreciate' },
+        { key: 'about', icon: guanyuGray, activeIcon: guanyuBlack, title: t('navbar.about'), index: 7, path: '/pages/tv/mine/about-version' },
     ]
-]
+])
+const languageList = computed(() => localeStore.supportedLocales)
+const lengthValue = computed(() => settings.value.reduce((sum, item) => sum + item.length, 0))
 const tabIndex = ref(0)
 const showType = ref('settings')//在popup中展示的模块
 const openAnimation = ref(false) //true就是点击跳转，false就是返回
@@ -62,16 +85,10 @@ const openAnimation = ref(false) //true就是点击跳转，false就是返回
 const source_list = ref(null)
 const catelog_mulu = ref(null)
 const typeTitle = ref('')
+const catalogType = ref('')
+const languageIndex = ref(Math.max(languageList.value.findIndex(item => item.value === localeStore.locale), 0))
 
-const lengthValue = ref(0)
-const emits = defineEmits(['changeSetting', 'openModal'])
-
-//获取settings的长度
-const getLength = () => {
-    settings.forEach(item => {
-        lengthValue.value += item.length
-    })
-}
+const emits = defineEmits(['changeSetting', 'openModal', 'closed'])
 
 const evtMove = (keyCode) => {
     if (showType.value === 'settings') {
@@ -87,11 +104,21 @@ const evtMove = (keyCode) => {
             emits('changeSetting', false)
         } else if (keyCode === 'KeyEnter') {
             let targetObject = null;
-            for (const innerArray of settings) { // 遍历外层数组
+            for (const innerArray of settings.value) { // 遍历外层数组
                 targetObject = innerArray.find(item => item.index === tabIndex.value); // 在内层数组中查找
                 if (targetObject) break; // 找到后立即终止循环
             }
             clickItem(targetObject)
+        }
+    } else if (showType.value === 'language') {
+        if (keyCode === 'KeyUp') {
+            languageIndex.value > 0 ? languageIndex.value-- : ''
+        } else if (keyCode === 'KeyDown') {
+            languageIndex.value < languageList.value.length - 1 ? languageIndex.value++ : ''
+        } else if (keyCode === 'KeyLeft') {
+            changeShowType('settings')
+        } else if (keyCode === 'KeyEnter') {
+            chooseLanguage(languageList.value[languageIndex.value].value, languageIndex.value)
         }
     } else if (showType.value === 'source') {
         source_list.value.evtMove(keyCode)
@@ -102,6 +129,7 @@ const evtMove = (keyCode) => {
 
 //跳转页面
 const clickItem = (item) => {
+    if (!item) return
     if (item.path) {
         uni.navigateTo({
             url: item.path
@@ -110,6 +138,10 @@ const clickItem = (item) => {
     }
     if (item.type) {
         typeTitle.value = item.title
+        catalogType.value = item.catalogType || ''
+        if (item.type === 'language') {
+            languageIndex.value = Math.max(languageList.value.findIndex(v => v.value === localeStore.locale), 0)
+        }
         openAnimation.value = true
         setTimeout(() => {
             showType.value = item.type
@@ -119,6 +151,11 @@ const clickItem = (item) => {
             }, 0);
         }, 150);
     }
+}
+
+const chooseLanguage = (locale, index) => {
+    languageIndex.value = index
+    localeStore.setLocale(locale, { syncUniLocale: false })
 }
 
 //二级popup返回settings
@@ -145,8 +182,6 @@ const closedPopup = () => {
 const openModal = (obj) => {
     emits('openModal', obj)
 }
-
-getLength()
 
 defineExpose({
     evtMove
@@ -209,6 +244,13 @@ defineExpose({
                             padding-left: 24rpx;
                             color: #c5c6d0;
                             font-size: 32rpx;
+                        }
+
+                        .list-item-check {
+                            margin-left: auto;
+                            padding-left: 0;
+                            color: #ff6701;
+                            font-size: 36rpx;
                         }
                     }
 

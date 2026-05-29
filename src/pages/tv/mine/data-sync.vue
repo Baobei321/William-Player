@@ -1,23 +1,25 @@
 <template>
     <div class="info-sync">
-        <div class="info-sync-title">手机扫码同步William Player</div>
+        <div class="info-sync-title">{{ t('backend.tvScanSyncTitle') }}</div>
         <!-- <span style="color:#fff">{{ port }}</span> -->
         <wilQrcode ref="wilQrcodeRef" :logo="appLogo"></wilQrcode>
-        <div class="scan-text">每隔10秒刷新一次同步状态</div>
+        <div class="scan-text">{{ t('backend.refreshSyncStatusEveryTenSeconds') }}</div>
         <div class="info-sync-tip">
-            <span>请使用手机</span><span>William Player</span><span>扫码同步</span>
+            <span>{{ t('backend.useMobileScanPrefix') }}</span><span>William Player</span><span>{{ t('backend.scanSyncSuffix') }}</span>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useI18n } from 'vue-i18n'
 import wilQrcode from "@/components/mobile/wil-qrcode/index.vue";
 import appLogo from "@/static/app-logo1.png";
 import { setShareData, deleteShareData, getShareData } from "@/network/apis";
 import { onUnload } from "@dcloudio/uni-app";
 import * as CONFIG from '@/utils/config'
 
+const { t } = useI18n()
 const wilQrcodeRef = ref(null);
 const port = ref("");
 let timer = null;
@@ -60,7 +62,7 @@ const refreshStatus = () => {
                     timer = null;
                     deleteShareData({ port: port.value });
                     uni.showToast({
-                        title: "同步成功",
+                        title: t('common.syncSuccess'),
                         icon: "none",
                     });
                     setTimeout(() => {
@@ -84,7 +86,7 @@ const startServer = () => {
         let result = JSON.parse(res)
         if (result.code == 500) {
             uni.showToast({
-                title: '出错了',
+                title: t('common.errorOccurred'),
                 icon: 'none',
             })
         } else {

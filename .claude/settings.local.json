@@ -15,7 +15,13 @@
       "PowerShell(npx vue-tsc --noEmit)",
       "PowerShell(npm run *)",
       "PowerShell(Write-Error *)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(command -v node)",
+      "Bash(command -v npm)",
+      "Bash(command -v npx)",
+      "Bash(npx -v)",
+      "Bash(node ./build/build.js tv)",
+      "Bash(node node_modules/@dcloudio/vite-plugin-uni/bin/uni.js build -p app-plus)"
     ]
   }
 }

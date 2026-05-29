@@ -1,12 +1,14 @@
 <template>
     <div class="enter-qqgroup">
-        <div class="enter-qqgroup-title">扫码进群反馈</div>
+        <div class="enter-qqgroup-title">{{ t('backend.scanQrCodeJoinFeedback') }}</div>
         <image src="https://camo.githubusercontent.com/04d89e0fe63cd5580bf00ceb7463bdf1913c2eb1f7843c66b58103d97c1832a5/68747470733a2f2f67697465652e636f6d2f43574c63776c303231392f64726177696e672d6265642f7261772f6d61737465722f696d672f71712d67726f75702e6a7067"></image>
     </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 </script>
 
 <style lang="scss" scoped>

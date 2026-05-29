@@ -33,8 +33,7 @@
             </select-popover>
         </div>
         <div class="tv-form-bottom" v-if="showButton">
-            <nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ props.buttonText
-                }}</nut-button>
+            <nut-button custom-color="#ff6701" v-if="!$slots.bottom" @click="confirmCommit">{{ buttonText }}</nut-button>
             <slot name="bottom" v-if="$slots.bottom"></slot>
         </div>
     </div>
@@ -42,6 +41,7 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
+import { useI18n } from 'vue-i18n'
 import selectPopover from '../../../pages/mobile/media/components/popover.vue'
 
 const props = defineProps({
@@ -51,8 +51,11 @@ const props = defineProps({
     labelPosition: { type: String, default: "left" },
     showButton: { type: Boolean, default: false },
     modelValue: { type: Object, default: {} },
-    buttonText: { type: String, default: "确认并发布" },
+    buttonText: { type: String, default: "" },
 });
+
+const { t } = useI18n()
+const buttonText = computed(() => props.buttonText || t('common.confirmAndPublish'))
 
 const formRef = ref(null);
 

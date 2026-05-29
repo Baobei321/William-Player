@@ -1,6 +1,6 @@
 <template>
   <div class="video-classify">
-    <div class="video-classify-title">类别</div>
+    <div class="video-classify-title">{{ t('video.category') }}</div>
     <div class="video-classify-list" :style="{ '--line-height': lineHeight }">
       <div
         class="list-item"
@@ -26,8 +26,11 @@
 
 <script setup>
 import { nextTick, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { onShow } from '@dcloudio/uni-app'
 import { classifyList } from '@/utils/scrape.js'
+
+const { t } = useI18n()
 
 const props = defineProps({
   focusModel: { type: String, default: '' },
@@ -66,6 +69,7 @@ const getGenre = () => {
   idArr.forEach(item => {
     let obj = classifyList1.value.find(i => i.id == item)
     if (obj) {
+      obj.label = obj.labelKey ? t(obj.labelKey) : obj.label
       obj.loadImg = true
       listData.value.push(obj)
     }
@@ -133,7 +137,7 @@ setItemWidth()
 //跳转到videoAll
 const toVideoAll = item => {
   uni.navigateTo({
-    url: `/pages/tv/video/video-all?title=${item.label}&genreId=${item.id}`,
+    url: `/pages/tv/video/video-all?title=${encodeURIComponent(item.label)}&genreId=${item.id}&genreKey=${item.labelKey || ''}`,
   })
 }
 

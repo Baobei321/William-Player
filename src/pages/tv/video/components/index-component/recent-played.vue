@@ -152,7 +152,7 @@ const toVideoPlayer = async (item) => {
 
 const toVideoAll = () => {
   uni.navigateTo({
-    url: `/pages/tv/video/video-all?title=最近观看`,
+    url: `/pages/tv/video/video-all?title=${encodeURIComponent(t('video.recentPlayed'))}&listKind=recent`,
   });
 };
 //获取上下的组件

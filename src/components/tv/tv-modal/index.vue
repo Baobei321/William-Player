@@ -4,27 +4,29 @@
             <div class="tv-modal-container__title">{{ props.title }}</div>
             <div class="tv-modal-container__message">{{ props.message }}</div>
             <div class="tv-modal-container__button">
-                <div :class="['button-cancel', tabIndex === 0 ? 'button-active' : '']" @click="cancel">{{
-                    props.cancelText }}
+                <div :class="['button-cancel', tabIndex === 0 ? 'button-active' : '']" @click="cancel">{{ cancelText }}
                 </div>
-                <div :class="['button-confirm', tabIndex === 1 ? 'button-active' : '']" @click="confirm">{{
-                    props.confirmText
-                    }}</div>
+                <div :class="['button-confirm', tabIndex === 1 ? 'button-active' : '']" @click="confirm">{{ confirmText }}</div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
     title: { type: String, default: '' },
     message: { type: String, default: '' },
-    cancelText: { type: String, default: '取消' },
-    confirmText: { type: String, default: '确认' },
+    cancelText: { type: String, default: '' },
+    confirmText: { type: String, default: '' },
 })
+
+const { t } = useI18n()
+const cancelText = computed(() => props.cancelText || t('common.cancel'))
+const confirmText = computed(() => props.confirmText || t('common.confirm'))
 
 const emits = defineEmits(['update:visible', 'cancel', 'closed', 'confirm'])
 

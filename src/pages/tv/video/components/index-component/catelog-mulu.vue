@@ -1,6 +1,6 @@
 <template>
   <div class="catelog-mulu">
-    <div class="catelog-mulu-title">{{ title + '目录' }}</div>
+    <div class="catelog-mulu-title">{{ t('source.directorySettingTitle', { title: catalogTypeLabel }) }}</div>
     <div class="catelog-mulu-container">
       <nut-swipe v-for="(item, index) in listData" :key="item.name" :ref="el => setRefs(el, index)">
         <div :class="['list-item', index === tabIndex ? 'list-active' : '']">
@@ -33,13 +33,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import webdavFileIcon from '@/static/webdav-fileIcon.png'
 import { onShow } from '@dcloudio/uni-app'
 
 const props = defineProps({
-  title: { type: String, default: '电视剧目录设置' },
+  title: { type: String, default: '' },
+  catalogType: { type: String, default: 'tv' },
 })
+const { t } = useI18n()
 
 const emits = defineEmits(['changeShowType'])
 
@@ -50,10 +53,13 @@ const mapping = {
   '夸克网盘':
     'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/60/6f/e5/606fe5ab-3bfb-c5e4-5bed-08c9b2b5188f/AppIcon-0-0-1x_U007emarketing-0-7-0-0-85-220.png/350x350.png?',
 }
-const mapping1 = {
-  '电视剧': 'tv',
-  '电影': 'movie',
+const getCatalogType = value => {
+  if (['tv', '电视剧', t('video.tv'), t('navbar.tvCatelogSetting')].includes(value)) return 'tv'
+  if (['movie', '电影', t('video.movie'), t('navbar.movieCatelogSetting')].includes(value)) return 'movie'
+  return 'tv'
 }
+const catalogType = computed(() => getCatalogType(props.catalogType || props.title))
+const catalogTypeLabel = computed(() => (catalogType.value === 'tv' ? t('video.tv') : t('video.movie')))
 
 const tabIndex = ref(0)
 const muluData = ref({})
@@ -62,14 +68,12 @@ const itemRefs = ref([])
 const isSwipe = ref(false) //标识当前是否有swipe被打开
 const iconIndex = ref(-1) //表示swipe右侧的那些图标的索引
 
-const title = ref(props.title.split('目录设置')[0])
-
 //获取存在本地的目录数据
 const getMuluData = () => {
   muluData.value = uni.getStorageSync('muluData') || {}
   muluData.value?.tv ? '' : (muluData.value.tv = [])
   muluData.value?.movie ? '' : (muluData.value.movie = [])
-  listData.value = muluData.value[mapping1[title.value]]
+  listData.value = muluData.value[catalogType.value]
 }
 
 //为每个swipe设置ref
@@ -79,7 +83,7 @@ const setRefs = (el, index) => {
 
 const toSelectMulu = () => {
   uni.navigateTo({
-    url: `/pages/tv/source/catelog-settings?title=${title.value}`,
+    url: `/pages/tv/source/catelog-settings?catalogType=${catalogType.value}`,
   })
 }
 
@@ -127,7 +131,7 @@ const evtMove = keyCode => {
       if (iconIndex.value == 0) {
         //删除目录
         listData.value = listData.value.filter(item => item.name !== listData.value[tabIndex.value].name||item.path !== listData.value[tabIndex.value].path)
-        muluData.value[mapping1[title.value]] = listData.value
+        muluData.value[catalogType.value] = listData.value
         uni.setStorageSync('muluData', muluData.value)
       }
     }

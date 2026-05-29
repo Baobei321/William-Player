@@ -10,10 +10,10 @@
                 </image>
                 <div class="item-right">
                     <div class="item-right-name">{{ item.name }}</div>
-                    <div class="item-right-role">{{ item.known_for_department != 'Acting' ? '导演' : '饰' + item.character
+                    <div class="item-right-role">{{ item.known_for_department != 'Acting' ? t('video.director') : t('video.roleWithCharacter', { character: item.character })
                     }}
                     </div>
-                    <div class="item-right-gender">{{ item.gender == 1 ? '女' : '男' }}</div>
+                    <div class="item-right-gender">{{ item.gender == 1 ? t('common.female') : t('common.male') }}</div>
                     <div class="item-right-tag">TMDB</div>
                 </div>
             </div>
@@ -25,7 +25,10 @@
 import tvScroll from "@/components/tv/tv-scroll/index.vue";
 import * as CONFIG from "@/utils/config";
 import { ref } from "vue";
+import { useI18n } from 'vue-i18n'
 import { debounce } from "@/utils/scrape";
+
+const { t } = useI18n()
 
 const props = defineProps({
     routerParams: { type: Object, default: {} },

@@ -2,7 +2,7 @@
   <tv-page @keyCodeClick="keyCodeClick">
     <div class="catelog-settings">
       <div class="catelog-settings-menu">
-        <source-list :title="`请选择${routerParams.title}目录`" type="menu" ref="source_list" @getSelectType="getSelectType"></source-list>
+        <source-list :title="t('source.selectCatalogDirectory', { title: catalogTypeLabel })" type="menu" ref="source_list" @getSelectType="getSelectType"></source-list>
       </div>
       <wil-list
         :requestFn="getFileList"
@@ -46,7 +46,8 @@
 </template>
 
 <script setup>
-import { reactive, ref, toRef } from 'vue'
+import { computed, reactive, ref, toRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import tvPage from '@/components/tv/tv-page/index'
 import tvModal from '@/components/tv/tv-modal/index.vue'
 import sourceList from '../video/components/index-component/source-list.vue'
@@ -56,6 +57,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { loginUser, getFolder, getTvSeason, get189Folder, getQuarkFolder, getCutContent } from '@/utils/common'
 import { debounce } from '@/utils/scrape'
 
+const { t } = useI18n()
 const focusModel = ref('menu')
 const source_list = ref(null)
 const result = ref({})
@@ -64,6 +66,8 @@ const requestParams = ref(null)
 const wil_list = ref(null)
 const selectType = ref({})
 const selectMedia = ref({})
+const catalogType = computed(() => routerParams.value.catalogType || routerParams.value.title || 'tv')
+const catalogTypeLabel = computed(() => (['movie', '电影', t('video.movie'), t('navbar.movieCatelogSetting')].includes(catalogType.value) ? t('video.movie') : t('video.tv')))
 
 const tabIndex = ref(0)
 const iconIndex = ref(-1)
@@ -92,15 +96,15 @@ const {
   clickCell,
   setImg,
   confirm,
-} = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => routerParams.value.title), emits: emits })
+} = useSelectFolder({ selectType: selectType, selectMedia: selectMedia, result: result, title: toRef(() => routerParams.value.title), catalogType: catalogType, emits: emits })
 
 //选择当前目录作为影片目录
 const chooseNowMulu = item => {
   focusModel.value = 'modal'
   chooseName(item)
   modalMessage.value = {
-    title: '是否确认选择此目录？',
-    message: '选择该目录后将会根据此目录进行刮削。',
+    title: t('source.confirmSelectDirectory'),
+    message: t('source.selectDirectoryScrapeTip'),
     confirmEvent: async () => {
       confirm()
     },
@@ -192,7 +196,7 @@ const setScrollIntoView = debounce(() => {
 
 const handleSelect = async (item, vitem) => {
   uni.showLoading({
-    title: '加载中',
+    title: t('common.loading'),
   })
   if (item.type == 'WebDAV') {
     await loginUser(vitem)
@@ -206,7 +210,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请先开启Alist',
+          title: t('source.pleaseEnableAlist'),
           icon: 'none',
         })
       })
@@ -219,7 +223,7 @@ const handleSelect = async (item, vitem) => {
           requestParams.value = {}
         } else {
           uni.showToast({
-            title: '请重新登录天翼云盘',
+            title: t('source.reloginTianyiCloudDrive'),
             icon: 'none',
           })
         }
@@ -227,7 +231,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请重新登录天翼云盘',
+          title: t('source.reloginTianyiCloudDrive'),
           icon: 'none',
         })
       })
@@ -240,7 +244,7 @@ const handleSelect = async (item, vitem) => {
           requestParams.value = {}
         } else {
           uni.showToast({
-            title: '请重新登录夸克网盘',
+            title: t('source.reloginQuarkCloudDrive'),
             icon: 'none',
           })
         }
@@ -248,7 +252,7 @@ const handleSelect = async (item, vitem) => {
       .catch(error => {
         uni.hideLoading()
         uni.showToast({
-          title: '请重新登录夸克网盘',
+          title: t('source.reloginQuarkCloudDrive'),
           icon: 'none',
         })
       })
@@ -262,7 +266,7 @@ const cancelModal = () => {
 //modal点击确定按钮
 const confirmModal = () => {
   modalMessage.value.confirmEvent()
-  if (modalMessage.value.title === '是否确认选择此目录？') {
+  if (modalMessage.value.confirmEvent) {
     focusModel.value = 'list'
   }
 }

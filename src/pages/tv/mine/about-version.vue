@@ -10,11 +10,11 @@
           </div>
           <div class="main-time">{{ CONFIG.updateTime }}</div>
         </div>
-        <nut-cell title="自动检查更新" :desc="status[0]" :is-link="true" @click="showPopover = true" :class="[tabIndex === 0 ? 'active-cell' : '']"></nut-cell>
+        <nut-cell :title="t('backend.autoCheckUpdate')" :desc="currentStatusText" :is-link="true" @click="showPopover = true" :class="[tabIndex === 0 ? 'active-cell' : '']"></nut-cell>
       </div>
       <div class="about-version-protocol">
         <image src="@/static/tmdb-xy.png"></image>
-        <div :class="['about-version-protocol__button', tabIndex === 1 ? 'active-protocol' : '']" @click="toQQpage">联系我们</div>
+        <div :class="['about-version-protocol__button', tabIndex === 1 ? 'active-protocol' : '']" @click="toQQpage">{{ t('backend.contactUs') }}</div>
         <!-- <div class="about-version-protocol__tip">@2024-至今，由chenweiliang6开发并开源，仅用于学习和使用，不可用于商用</div> -->
       </div>
       <div :class="['about-version-button', tabIndex == 2 ? 'about-check-active' : '']">
@@ -22,9 +22,9 @@
           <template #icon>
             <nut-icon name="refresh2" class="nut-icon-am-rotate nut-icon-am-infinite" v-if="isLoading"></nut-icon>
           </template>
-          检查更新
+          {{ t('backend.checkUpdate') }}
         </nut-button>
-        <nut-button disabled custom-color="#dedde3" v-else>当前已是最新版本</nut-button>
+        <nut-button disabled custom-color="#dedde3" v-else>{{ t('backend.currentLatestVersion') }}</nut-button>
       </div>
       <nut-popup v-model:visible="showPopover" round position="bottom" safe-area-inset-bottom>
         <nut-picker v-model="status" :columns="popoverList" title="" @confirm="confirm" @cancel="showPopover = false" />
@@ -42,7 +42,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { onLoad } from '@dcloudio/uni-app'
 import wilUpgrade from '@/components/mobile/wil-upgrade/index.vue'
 import { getUntokenDicts } from '@/network/apis'
@@ -52,16 +53,25 @@ import { toParse, toStringfy } from '@/pages/mobile/mine/common'
 import tvPage from '@/components/tv/tv-page/index.vue'
 import { getAppLatestVersion } from '@/utils/common'
 
+const { t } = useI18n()
 const url = ref('')
 
-const status = ref(['总是'])
+const status = ref(['always'])
 const showPopover = ref(false)
-const popoverList = ref([
-  { text: '总是', value: '总是' },
-  { text: '每天', value: '每天' },
-  { text: '每周', value: '每周' },
-  { text: '从不', value: '从不' },
+const updateFrequencyMap = {
+  总是: 'always',
+  每天: 'everyDay',
+  每周: 'everyWeek',
+  从不: 'never',
+}
+const normalizeUpdateFrequency = value => updateFrequencyMap[value] || value || 'always'
+const popoverList = computed(() => [
+  { text: t('backend.always'), value: 'always' },
+  { text: t('backend.everyDay'), value: 'everyDay' },
+  { text: t('backend.everyWeek'), value: 'everyWeek' },
+  { text: t('backend.never'), value: 'never' },
 ])
+const currentStatusText = computed(() => popoverList.value.find(item => item.value === status.value[0])?.text || '')
 const isLoading = ref(false)
 const showButton = ref(true)
 const showUpgrade = ref(false)
@@ -82,6 +92,7 @@ const checkUpdate = async () => {
 }
 
 const confirm = ({ selectedValue, selectedOptions }) => {
+  status.value = [selectedValue[0]]
   uni.setStorageSync('remindTime', { type: selectedValue[0] })
   showPopover.value = false
 }
@@ -89,7 +100,7 @@ const confirm = ({ selectedValue, selectedOptions }) => {
 const toQQpage = () => {
   let query = {
     url: CONFIG.BASE_URL.split(':4040')[0] + ':8443/app-webview/#/qqTalk',
-    title: '问题与反馈',
+    title: t('navbar.feedback'),
   }
   uni.navigateTo({
     url: '/pages/mobile/backend/index' + '?' + toStringfy(query),
@@ -149,20 +160,18 @@ const evtMove = keyCode => {
     }
   } else if (keyCode === 'KeyEnter') {
     if (tabIndex.value == 0) {
-      //打开popup设置检查更新频率
+      showPopover.value = true
     } else if (tabIndex.value == 1) {
-      //打开联系我们
-      uni.navigateTo({
-        url: '/pages/mobile/backend/index',
-      })
+      toQQpage()
     } else if (tabIndex.value == 2) {
-      //检查更新
+      checkUpdate()
     }
   }
 }
 
 onLoad(options => {
-  status.value = uni.getStorageSync('remindTime').type ? [uni.getStorageSync('remindTime').type] : ['总是']
+  const remindTime = uni.getStorageSync('remindTime') || {}
+  status.value = [normalizeUpdateFrequency(remindTime.type)]
   url.value = decodeURIComponent(options.url)
 })
 </script>

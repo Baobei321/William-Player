@@ -41,7 +41,7 @@
             </nut-form>
             <div :class="['form-button', tabIndex === props.options.length ? 'form-button-active' : '']"
                 v-if="showButton" @click="confirmSubmit">
-                {{ props.buttonText }}
+                {{ buttonText }}
             </div>
             <!-- 用于显示select的popover -->
             <select-popover v-model:visible="showPopover" :options="popoverOptions" :position="popoverPosition"
@@ -53,15 +53,19 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n'
 import selectPopover from '@/pages/mobile/media/components/popover.vue'
 
 const props = defineProps({
     options: { type: Array, default: [] },
     modelValue: { type: Object, default: {} },
     stepColor: { type: String, default: '#bcc7db' },
-    buttonText: { type: String, default: '确认' },
+    buttonText: { type: String, default: '' },
     showButton: { type: Boolean, default: false },
 })
+
+const { t } = useI18n()
+const buttonText = computed(() => props.buttonText || t('common.confirm'))
 
 const emits = defineEmits(["submit", "update:modelValue", "changePicker", "clickInput", "blur", "triggerBoundary", "confirm"]);
 

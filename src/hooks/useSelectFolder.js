@@ -7,7 +7,7 @@ import fileIcon from '@/static/file-icon.png'
 import { onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-export function useSelectFolder({ selectType, selectMedia, result, title, emits }) {
+export function useSelectFolder({ selectType, selectMedia, result, title, catalogType, emits }) {
   const { t } = useI18n()
   const muluData = ref(uni.getStorageSync('muluData') || { tv: [], movie: [] })
   const isInit = ref(true)
@@ -19,9 +19,9 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
   const selectName = ref('') //选中的文件夹的name
 
   const getCatalogType = value => {
-    if (['tv', '电视剧', t('video.tv')].includes(value)) return 'tv'
-    if (['movie', '电影', t('video.movie')].includes(value)) return 'movie'
-    return value
+    if (['tv', '电视剧', t('video.tv'), t('navbar.tvCatelogSetting')].includes(value)) return 'tv'
+    if (['movie', '电影', t('video.movie'), t('navbar.movieCatelogSetting')].includes(value)) return 'movie'
+    return value || 'tv'
   }
 
   const responseAdapter = res11 => {
@@ -214,10 +214,8 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
     muluData.value = uni.getStorageSync('muluData') || { tv: [], movie: [] }
     if (unref(selectType).type == 'WebDAV') {
       //这块逻辑有问题，不能存在就替换，像webdav可能挂载多个网盘
-      // let exit = muluData.value[getCatalogType(unref(title))].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
-      // //已存在就替换，不存在就新增
-      // exit ? exit.path = path.value + '/' + selectName.value || '/' : muluData.value[getCatalogType(unref(title))].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
-      let exit = muluData.value[getCatalogType(unref(title))]?.find(
+      const currentCatalogType = getCatalogType(unref(catalogType) || unref(title))
+      let exit = muluData.value[currentCatalogType]?.find(
         v => v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value
       )
       if (exit) {
@@ -226,7 +224,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
           icon: 'none',
         })
       } else {
-        muluData.value[getCatalogType(unref(title))].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
+        muluData.value[currentCatalogType].push({ type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/' })
       }
     } else {
       // let exit = muluData.value[getCatalogType(unref(title))].find(v => v.type == unref(selectType).type && v.name == unref(selectMedia).name)
@@ -238,7 +236,8 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
       //     let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
       //     muluData.value[getCatalogType(unref(title))].push(obj)
       // }
-      let exit = muluData.value[getCatalogType(unref(title))]?.find(
+      const currentCatalogType = getCatalogType(unref(catalogType) || unref(title))
+      let exit = muluData.value[currentCatalogType]?.find(
         v =>
           v.type == unref(selectType).type && v.name == unref(selectMedia).name && v.path == path.value + '/' + selectName.value && v.folderFileId == folderFileId.value
       )
@@ -249,7 +248,7 @@ export function useSelectFolder({ selectType, selectMedia, result, title, emits 
         })
       } else {
         let obj = { type: unref(selectType).type, name: unref(selectMedia).name, path: path.value + '/' + selectName.value || '/', folderFileId: folderFileId.value }
-        muluData.value[getCatalogType(unref(title))].push(obj)
+        muluData.value[currentCatalogType].push(obj)
       }
     }
     console.log(muluData.value)
