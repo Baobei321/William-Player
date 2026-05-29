@@ -1,6 +1,6 @@
 import * as CONFIG from '@/utils/config.js'
-import { ipc } from "@/utils/ipcRenderer";
-import { ipcApiRoute } from "@/utils/ipcApiRoute";
+// import { ipc } from "@/utils/ipcRenderer";
+// import { ipcApiRoute } from "@/utils/ipcApiRoute";
 import { sendEmail } from '@/network/apis'
 import { i18n } from '@/i18n/index.js'
 import { getTvSeasonDetail, getMovieTvDetailById } from '@/utils/tmdb'

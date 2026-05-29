@@ -1,8 +1,3 @@
-<template>
-  <div id="app1">
-    <router-view></router-view>
-  </div>
-</template>
 <script>
 import { useThemeStore } from '@/stores/theme'
 import { useLocaleStore } from '@/stores/locale'

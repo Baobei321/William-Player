@@ -14,7 +14,8 @@
       "Bash(npx vue-tsc *)",
       "PowerShell(npx vue-tsc --noEmit)",
       "PowerShell(npm run *)",
-      "PowerShell(Write-Error *)"
+      "PowerShell(Write-Error *)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

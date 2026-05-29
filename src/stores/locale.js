@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { Locale as NutUILocale } from 'nutui-uniapp/locale'
+import { PLATFORM } from '@/utils/config.js'
 
 export const LOCALE_STORAGE_KEY = 'app_locale'
 
@@ -18,6 +19,8 @@ const LEGACY_LOCALE_MAP = {
 }
 
 const DEFAULT_LOCALE = 'zh-Hans'
+
+const hasNativeTabBar = () => PLATFORM === 'MOBILE' && typeof uni.setTabBarItem === 'function'
 
 export const getLocaleConfig = locale => {
   return SUPPORTED_LOCALES.find(item => item.value === locale) || SUPPORTED_LOCALES[0]
@@ -69,14 +72,30 @@ export const useLocaleStore = defineStore('locale', {
       this.applyTabBarText()
     },
     applyTabBarText() {
-      if (!this.i18n) return
+      if (!this.i18n || !hasNativeTabBar()) return
       const t = this.i18n.global.t
-      try {
-        uni.setTabBarItem({ index: 0, text: t('tabBar.mediaLibrary') })
-        uni.setTabBarItem({ index: 1, text: t('tabBar.live') })
-        uni.setTabBarItem({ index: 2, text: t('tabBar.mine') })
-        this.tabBarTextDirty = false
-      } catch (error) {}
+      const items = [
+        { index: 0, text: t('tabBar.mediaLibrary') },
+        { index: 1, text: t('tabBar.live') },
+        { index: 2, text: t('tabBar.mine') },
+      ]
+      let hasFailed = false
+      const tasks = items.map(item => {
+        try {
+          return Promise.resolve(uni.setTabBarItem(item)).catch(() => {
+            hasFailed = true
+          })
+        } catch (error) {
+          hasFailed = true
+          return Promise.resolve()
+        }
+      })
+
+      Promise.all(tasks).then(() => {
+        if (!hasFailed) {
+          this.tabBarTextDirty = false
+        }
+      })
     },
   },
 })

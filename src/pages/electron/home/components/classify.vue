@@ -19,14 +19,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { classifyList } from "@/utils/scrape.js";
 import emptyBg from "@/static/empty_bg.png";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useLocaleStore } from "@/stores/locale";
 
 const { t } = useI18n()
+const localeStore = useLocaleStore()
 
 const props = defineProps({
     isConnected: { type: Boolean, default: false }, //手机是否连接网络
@@ -57,8 +59,7 @@ const getGenre = () => {
     idArr.forEach((item) => {
         let obj = classifyList1.value.find((i) => i.id == item);
         if (obj) {
-            obj.loadImg = true;
-            listData.value.push(obj);
+            listData.value.push({ ...obj, label: t(obj.labelKey), loadImg: true });
         }
     });
 };
@@ -84,6 +85,13 @@ const imgLoad = (item) => {
 onShow(() => {
     getGenre();
 });
+
+watch(
+    () => localeStore.locale,
+    () => {
+        getGenre();
+    }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -94,7 +102,7 @@ onShow(() => {
     .video-classify-title {
         font-size: 36rpx;
         font-weight: bold;
-        color: #000;
+        color: var(--app-text-primary);
     }
 
     .video-classify-list {
@@ -179,10 +187,4 @@ onShow(() => {
     }
 }
 
-// @media (prefers-color-scheme: dark) {
-//     .video-classify {
-//         .video-classify-title {
-//             color: #fff;
-//         }
-//     }
-// }</style>
+</style>

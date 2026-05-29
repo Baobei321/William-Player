@@ -2,6 +2,7 @@ import { watch, ref } from 'vue';
 import { useThemeStore } from '@/stores/theme';
 import { useLocaleStore } from '@/stores/locale';
 import { onShow } from '@dcloudio/uni-app';
+import { PLATFORM } from '@/utils/config.js';
 
 export function useThemeTabbar(options) {
   const themeStore = useThemeStore();
@@ -15,31 +16,37 @@ export function useThemeTabbar(options) {
 
     if (theme === 'dark') {
       if (options1.customNav) {
-        uni.setNavigationBarColor({
-          frontColor: '#ffffff',
-          backgroundColor: 'transparent',
-        });
+        themeStore.applyNavigationBar('transparentDark');
       }
 
-      uni.setTabBarStyle({
-        backgroundColor: '#1e1e20',
-        borderStyle: 'black',
-      });
+      if (PLATFORM === 'MOBILE') {
+        try {
+          Promise.resolve(
+            uni.setTabBarStyle({
+              backgroundColor: '#1e1e20',
+              borderStyle: 'black',
+            })
+          ).catch(() => {})
+        } catch (error) {}
+      }
     } else {
       if (options1.customNav) {
-        uni.setNavigationBarColor({
-          frontColor: '#000000',
-          backgroundColor: 'transparent',
-        });
+        themeStore.applyNavigationBar('transparentLight');
       }
 
-      uni.setTabBarStyle({
-        backgroundColor: '#ffffff',
-        borderStyle: 'white',
-      });
+      if (PLATFORM === 'MOBILE') {
+        try {
+          Promise.resolve(
+            uni.setTabBarStyle({
+              backgroundColor: '#ffffff',
+              borderStyle: 'white',
+            })
+          ).catch(() => {})
+        } catch (error) {}
+      }
     }
 
-    if (localeStore.tabBarTextDirty) {
+    if (PLATFORM === 'MOBILE' && localeStore.tabBarTextDirty) {
       localeStore.applyTabBarText();
     }
   };

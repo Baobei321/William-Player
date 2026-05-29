@@ -22,6 +22,7 @@ declare module 'vue' {
     NutProgress: typeof import('nutui-uniapp/components/progress/progress.vue')['default']
     NutRadio: typeof import('nutui-uniapp/components/radio/radio.vue')['default']
     NutRadioGroup: typeof import('nutui-uniapp/components/radiogroup/radiogroup.vue')['default']
+    NutSwipe: typeof import('nutui-uniapp/components/swipe/swipe.vue')['default']
     NutSwiper: typeof import('nutui-uniapp/components/swiper/swiper.vue')['default']
     NutSwiperItem: typeof import('nutui-uniapp/components/swiperitem/swiperitem.vue')['default']
     NutTabPane: typeof import('nutui-uniapp/components/tabpane/tabpane.vue')['default']

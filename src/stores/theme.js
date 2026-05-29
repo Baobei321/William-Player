@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { PLATFORM } from '@/utils/config.js'
 
 const THEME_MODES = ['light', 'dark', 'auto']
 
@@ -16,6 +17,14 @@ const NAVIGATION_BAR_STYLES = {
       frontColor: '#000000',
       backgroundColor: '#f7f7f7',
     },
+    transparentLight: {
+      frontColor: '#000000',
+      backgroundColor: 'transparent',
+    },
+    transparentDark: {
+      frontColor: '#ffffff',
+      backgroundColor: 'transparent',
+    },
   },
   dark: {
     default: {
@@ -25,6 +34,14 @@ const NAVIGATION_BAR_STYLES = {
     secondary: {
       frontColor: '#ffffff',
       backgroundColor: '#1e1e20',
+    },
+    transparentLight: {
+      frontColor: '#000000',
+      backgroundColor: 'transparent',
+    },
+    transparentDark: {
+      frontColor: '#ffffff',
+      backgroundColor: 'transparent',
     },
   },
 }
@@ -97,20 +114,24 @@ export const useThemeStore = defineStore('theme', {
     },
 
     applyNavigationBar(variant = 'default') {
+      if (PLATFORM === 'PC' || typeof uni.setNavigationBarColor !== 'function') return
       try {
-        uni.setNavigationBarColor(this.getNavigationBarStyle(variant))
+        Promise.resolve(uni.setNavigationBarColor(this.getNavigationBarStyle(variant))).catch(() => {})
       } catch (e) {}
     },
 
     _applyTabBar() {
+      if (PLATFORM !== 'MOBILE' || typeof uni.setTabBarStyle !== 'function') return
       const isDark = this.resolvedTheme === 'dark'
       try {
-        uni.setTabBarStyle({
-          color: isDark ? '#a0a0a0' : '#86909C',
-          selectedColor: '#ff6701',
-          backgroundColor: isDark ? '#1e1e20' : '#ffffff',
-          borderStyle: isDark ? 'black' : 'white',
-        })
+        Promise.resolve(
+          uni.setTabBarStyle({
+            color: isDark ? '#a0a0a0' : '#86909C',
+            selectedColor: '#ff6701',
+            backgroundColor: isDark ? '#1e1e20' : '#ffffff',
+            borderStyle: isDark ? 'black' : 'white',
+          })
+        ).catch(() => {})
       } catch (e) {}
     },
 
